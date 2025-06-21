@@ -11,15 +11,14 @@ mind <- "2023-01-12"
 maxd <- "2023-01-21"
 
 datadir <- ""
-datadir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+datadir <- "All_data/raw_microclimate_data/Bokong/Tomst_data_Final_reading_February2024"
 
 #################################################################################3
 
 # read names x tomst id table
 
-ids <- fread(paste0(datadir, "/", "tomst_ids.csv")) %>% 
-  rename(tomst_id = TMS) %>% 
-  mutate(plot = paste0(site, "_",grid,plot))
+ids <- read_excel(paste0(datadir, "/", "Bokong_Logger_notes.xlsx")) %>% 
+  mutate(plot = paste0(Site, "_",Grid,Cell))
 
 # List logger data files to read
 f <- list.files(datadir, pattern = "data_[0-9]", full.names = T, recursive = T)
