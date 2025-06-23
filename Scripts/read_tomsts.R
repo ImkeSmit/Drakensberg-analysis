@@ -8,8 +8,8 @@ library(patchwork)
 library(readxl)
 
 # Set date limits to remove implausible dates
-mind <- "2023-11-10" #get this installment dates from the BOkong logger notes file
-maxd <- "2024-02-04"
+mind <- as.Date("2023-11-10") #get this installment dates from the BOkong logger notes file
+maxd <- as.Date("2024-02-04")
 
 datadir <- ""
 datadir <- "All_data/raw_microclimate_data/Bokong/Tomst_data_Final_reading_February2024"
@@ -111,8 +111,9 @@ df %>% rename(datetime = V2,
 df %>% arrange(plot, datetime) -> df
 
 # Remove implausible dates
-df %>% filter(datetime >= mind,
-              datetime <= maxd) -> df
+df2 <- df |> filter(datetime >= mind,
+              datetime <= maxd)
+
 
 ############################################################################
 # PLOTTINGS
