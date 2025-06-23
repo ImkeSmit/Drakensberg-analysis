@@ -5,6 +5,7 @@ library(tidyverse)
 library(lubridate)
 library(data.table)
 library(patchwork)
+library(readxl)
 
 # Set date limits to remove implausible dates
 mind <- "2023-01-12"
@@ -25,9 +26,9 @@ f <- list.files(datadir, pattern = "data_[0-9]", full.names = T, recursive = T)
 
 fi <- data.frame(file = f)
 
-fi$tomst_id <- unlist(lapply(fi$file, function(x) as.numeric(strsplit(gsub("data_","",rev(strsplit(x, "/")[[1]])[1]), "_")[[1]][1])))
+fi$TMS <- unlist(lapply(fi$file, function(x) as.numeric(strsplit(gsub("data_","",rev(strsplit(x, "/")[[1]])[1]), "_")[[1]][1])))
 
-fi <- full_join(fi, ids) %>% 
+fi <- full_join(fi, ids, by = join_by(TMS)) %>% 
   mutate(plot = toupper(plot)) %>% 
   filter(!is.na(file))
 
@@ -36,17 +37,19 @@ fi$file2 <- gsub("_..csv", "", fi$file)
 fi <- fi[order(fi$plot),]
 
 # This should be zero
-fi %>% filter(is.na(plot)) %>% nrow
+fi %>% filter(is.na(plot)) %>% nrow #there is one file (logger) That doesn't have a plot
+#lets remove this row or now
+fi <- fi %>% filter(!is.na(plot))
 
 readdata <- function(i){
-  nn <- sum(grepl(i, fi$file2))
+  nn <- sum(grepl(i, fi$file))
   
   if(nn > 1){
     
-    fi2 <- fi %>% filter(grepl(i, fi$file2))
+    fi2 <- fi %>% filter(grepl(i, fi$file))
     
     df2 <- data.frame()
-    for(ii in fi2$file2){
+    for(ii in fi2$file){
       print(ii)
       d <- fread(ii)
       
@@ -72,7 +75,7 @@ readdata <- function(i){
   } else {
     
     print(i)
-    d <- fread(fi$file[fi$file2 == i])
+    d <- fread(fi$file[fi$file == i])
     
     d %>% select(V2,V3,V4,V5,V6,V7) -> d
     
@@ -80,7 +83,7 @@ readdata <- function(i){
     
     d %>% mutate(across(V4:V6, ~as.numeric(gsub(",",".\\",.)))) -> d
     
-    d$plot <- fi[which(fi$file2 == i),"plot"]
+    d$plot <- fi[which(fi$file == i),"plot"]
     
     d %>% mutate(V2 = ymd_hm(V2, tz = "UTC")) %>% 
       mutate(V2 = with_tz(V2, tzone = "Etc/GMT-2")) -> d
@@ -93,7 +96,8 @@ readdata <- function(i){
 
 
 # read the Tomst data in
-mylist <- lapply(fi$file2, readdata)
+test <- readdata()
+mylist <- lapply(fi$file, readdata)
 df <- rbindlist( mylist )
 
 # Rename columns
