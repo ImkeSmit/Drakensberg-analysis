@@ -8,8 +8,8 @@ library(patchwork)
 library(readxl)
 
 # Set date limits to remove implausible dates
-mind <- "2023-01-12"
-maxd <- "2023-01-21"
+mind <- "2023-11-10" #get this installment dates from the BOkong logger notes file
+maxd <- "2024-02-04"
 
 datadir <- ""
 datadir <- "All_data/raw_microclimate_data/Bokong/Tomst_data_Final_reading_February2024"
