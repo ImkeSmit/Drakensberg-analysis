@@ -104,9 +104,9 @@ df <- rbindlist( mylist )
 # Rename columns
 df %>% rename(datetime = V2,
               zone = V3,
-              soil_temp = V4,
-              surface_temp = V5,
-              air_temp = V6,
+              soil_temp = V4, #T1
+              surface_temp = V5, #T2
+              air_temp = V6, #T3
               moist = V7) -> df
 
 df %>% arrange(plot, datetime) -> df
