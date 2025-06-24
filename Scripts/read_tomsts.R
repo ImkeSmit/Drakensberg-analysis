@@ -122,7 +122,6 @@ df2 <- df |> filter(datetime >= mind,
 
 # Select the plot names to be plotted
 plots <- unique(df$plot)
-plots <- plots[1:5]
 
 # Plot temperatures
 pdf("tomst.pdf", 12, 10)
@@ -132,14 +131,19 @@ for(i in plots){
   
   g1 <- df2 |>filter(plot == i) |> 
     ggplot() +
-    geom_line(aes(x = datetime, y = soil_temp), col = "darkgoldenrod") +
-    geom_line(aes(x = datetime, y = surface_temp), col = "brown1")+
-    geom_line(aes(x = datetime, y = air_temp), col = "cornflowerblue") +
-    
+    geom_line(aes(x = datetime, y = soil_temp, col = 'soil_temp')) +
+    geom_line(aes(x = datetime, y = surface_temp, col = 'surface_temp'))+
+    geom_line(aes(x = datetime, y = air_temp, col = 'air_temp')) +
+    scale_color_manual(name=' ',
+                       breaks=c('soil_temp', 'surface_temp', 'air_temp'),
+                       values=c('soil_temp'='darkgoldenrod', 
+                                'surface_temp'='brown1', 
+                                'air_temp'='cornflowerblue'))+
     theme_minimal() +
     ylab("Temperature") + xlab("Date")+
     scale_y_continuous(limits = c(-5, 35))+
-    ggtitle(i)
+    ggtitle(i) +
+    theme(legend.position = "bottom")
   
   g2 <- df2 |> filter(plot == i) |> 
     ggplot(aes(x = datetime, y = moist), col = "cornflowerblue") +
@@ -154,13 +158,3 @@ for(i in plots){
 }
 dev.off()
 
-
-g1 <- df2 |>filter(plot == plots[1]) |> 
-  ggplot() +
-  geom_line(aes(x = datetime, y = soil_temp), col = "darkgoldenrod") +
-  geom_line(aes(x = datetime, y = surface_temp), col = "brown1")+
-  geom_line(aes(x = datetime, y = air_temp), col = "cornflowerblue") +
-  theme_minimal() +
-  ylab("Temperature") + xlab("Date")+
-  scale_y_continuous(limits = c(-5, 35))+
-  ggtitle(plots[1])
