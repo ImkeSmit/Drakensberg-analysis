@@ -158,3 +158,22 @@ for(i in plots){
 }
 dev.off()
 
+
+#let's close in on a week in BOKONG_1C14
+testplot <- df2 |> filter(plot == "BOKONG_1C14", 
+              datetime >= as.Date("2023-11-15"), datetime <= as.Date("2023-11-22")) |> 
+  ggplot() +
+  geom_line(aes(x = datetime, y = soil_temp, col = 'soil_temp')) +
+  geom_line(aes(x = datetime, y = surface_temp, col = 'surface_temp'))+
+  geom_line(aes(x = datetime, y = air_temp, col = 'air_temp')) +
+  scale_color_manual(name=' ',
+                     breaks=c('soil_temp', 'surface_temp', 'air_temp'),
+                     values=c('soil_temp'='darkgoldenrod', 
+                              'surface_temp'='brown1', 
+                              'air_temp'='cornflowerblue'))+
+  theme_minimal() +
+  ylab("Temperature") + xlab("Date")+
+  scale_y_continuous(limits = c(-5, 50))+
+  ggtitle("BOKONG_1C14") +
+  theme(legend.position = "bottom")
+  
