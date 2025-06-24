@@ -7,6 +7,7 @@ library(lubridate)
 library(data.table)
 library(patchwork)
 library(readxl)
+library(ggplot2)
 
 # Set date limits to remove implausible dates
 mind <- as.Date("2023-11-10") #get this installment dates from the BOkong logger notes file
@@ -103,9 +104,9 @@ df <- rbindlist( mylist )
 # Rename columns
 df %>% rename(datetime = V2,
               zone = V3,
-              T1 = V4,
-              T2 = V5,
-              T3 = V6,
+              soil_temp = V4,
+              surface_temp = V5,
+              air_temp = V6,
               moist = V7) -> df
 
 df %>% arrange(plot, datetime) -> df
@@ -121,31 +122,45 @@ df2 <- df |> filter(datetime >= mind,
 
 # Select the plot names to be plotted
 plots <- unique(df$plot)
+plots <- plots[1:5]
 
 # Plot temperatures
 pdf("tomst.pdf", 12, 10)
 for(i in plots){
   #i <- plots[3]
   print(i)
-  df2 %>% filter(plot == i) %>% 
-    ggplot(aes_string(x="datetime")) +
-    geom_line(aes_string(y = "T3"), col = "cornflowerblue") +
-    geom_line(aes_string(y = "T2"), col = "brown1") +
-    geom_line(aes_string(y = "T1"), col = "darkgoldenrod") +
+  
+  g1 <- df2 |>filter(plot == i) |> 
+    ggplot() +
+    geom_line(aes(x = datetime, y = soil_temp), col = "darkgoldenrod") +
+    geom_line(aes(x = datetime, y = surface_temp), col = "brown1")+
+    geom_line(aes(x = datetime, y = air_temp), col = "cornflowerblue") +
+    
     theme_minimal() +
     ylab("Temperature") + xlab("Date")+
     scale_y_continuous(limits = c(-5, 35))+
-    ggtitle(i) -> g1
+    ggtitle(i)
   
-  df2 %>% filter(plot == i) %>% 
-    ggplot(aes_string(x="Datetime")) +
-    geom_line(aes_string(y = "moist"), col = "cornflowerblue") +
+  g2 <- df2 |> filter(plot == i) |> 
+    ggplot(aes(x = datetime, y = moist), col = "cornflowerblue") +
+    geom_line(col = "cornflowerblue") +
     theme_minimal() +
     ylab("Moisture count") + xlab("Date")+
-    scale_y_continuous(limits = c(0, 3900)) -> g2
+    scale_y_continuous(limits = c(0, 3900))
   
   
   print(g1 / g2)
   
 }
 dev.off()
+
+
+g1 <- df2 |>filter(plot == plots[1]) |> 
+  ggplot() +
+  geom_line(aes(x = datetime, y = soil_temp), col = "darkgoldenrod") +
+  geom_line(aes(x = datetime, y = surface_temp), col = "brown1")+
+  geom_line(aes(x = datetime, y = air_temp), col = "cornflowerblue") +
+  theme_minimal() +
+  ylab("Temperature") + xlab("Date")+
+  scale_y_continuous(limits = c(-5, 35))+
+  ggtitle(plots[1])
