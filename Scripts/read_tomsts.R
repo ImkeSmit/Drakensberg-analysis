@@ -2,6 +2,7 @@
 # Read & plot Tomst microclimate data
 
 library(tidyverse)
+library(tidylog)
 library(lubridate)
 library(data.table)
 library(patchwork)
@@ -96,7 +97,6 @@ readdata <- function(i){
 
 
 # read the Tomst data in
-test <- readdata()
 mylist <- lapply(fi$file, readdata)
 df <- rbindlist( mylist )
 
@@ -127,7 +127,7 @@ pdf("tomst.pdf", 12, 10)
 for(i in plots){
   #i <- plots[3]
   print(i)
-  df %>% filter(plot == i) %>% 
+  df2 %>% filter(plot == i) %>% 
     ggplot(aes_string(x="datetime")) +
     geom_line(aes_string(y = "T3"), col = "cornflowerblue") +
     geom_line(aes_string(y = "T2"), col = "brown1") +
@@ -137,8 +137,8 @@ for(i in plots){
     scale_y_continuous(limits = c(-5, 35))+
     ggtitle(i) -> g1
   
-  df %>% filter(plot == i) %>% 
-    ggplot(aes_string(x="datetime")) +
+  df2 %>% filter(plot == i) %>% 
+    ggplot(aes_string(x="Datetime")) +
     geom_line(aes_string(y = "moist"), col = "cornflowerblue") +
     theme_minimal() +
     ylab("Moisture count") + xlab("Date")+
