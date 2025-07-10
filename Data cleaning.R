@@ -42,7 +42,8 @@ wh <- read_excel("All_data/raw_occurrence_data/Witsieshoek/Data entry 22 Mar 202
   select(!species_richness) |> 
   pivot_longer(cols= 4:187, names_to = "taxon", values_to = "cover") |> 
   mutate(site = "WH", 
-         cellref = paste0(site, grid, column, row))
+         cellref = paste0(site, grid, column, row)) |> 
+  filter(!cover == 0)
 
 #check that all grids and cells are there:
 length(unique(wh$grid)) #all 7
