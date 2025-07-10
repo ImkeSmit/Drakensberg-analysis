@@ -27,7 +27,9 @@ gg_summer <- read_excel("All_data/raw_occurrence_data/GoldenGate/GoldenGate_grid
   mutate(site = "GG", 
          grid = as.numeric(grid), 
          row = as.numeric(row),
-         cellref = paste0(site, grid, column, row))
+         cellref = paste0(site, grid, column, row), 
+         cover = as.numeric(cover)) |> 
+  filter(!cover == 0)
 
 #check that all grids and cells are there:
 length(unique(gg_summer$grid)) #all 8
