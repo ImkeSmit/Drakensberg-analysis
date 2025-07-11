@@ -105,14 +105,55 @@ bk[which(bk$cover == 1510.0), which(colnames(bk) == "cover")] <-15  #tenaxia dis
 ####Bind sites together and extract speciesnames####
 allsites <- gg_summer |> 
   bind_rows(wh) |> 
-  bind_rows(bk)
+  bind_rows(bk) |> 
+  mutate(dataset = "veg_survey")
 
 all_sp <- allsites |> 
-  distinct(site, taxon) #get all unique site and taxon combinations
+  distinct(dataset, site, taxon) #get all unique site and taxon combinations
 #export to excel to create name key
-write.xlsx(all_sp, "All_data/clean_data/microc_climb_sp.xlsx")
+write.xlsx(all_sp, "All_data/clean_data/micro_climb_survey_names.xlsx", sheetName = "veg_survey_names")
 
 #checking some species:
 gg_summer[grep("argyrolobium", gg_summer$taxon), ]
 test <- gg_summer[grep("asclep", gg_summer$taxon), ]
 gg_summer[grep("gladiolus", gg_summer$taxon), ]
+
+
+####Import trait data####
+#for now, we'll just get the names from the trait data, and clean the rest later
+
+gg_trait_names <- read_excel("All_data/raw_trait_data/GG_dataset_Functional_traits.xlsx") |> 
+  rename(taxon = Species) |> 
+  mutate(taxon = str_to_lower(taxon),
+         taxon = str_squish(taxon),
+         taxon = str_replace_all(taxon, " ", "_")) |> 
+  select(taxon) |> 
+  mutate(site = "GG", dataset = "FT") |> 
+  distinct(taxon, site, dataset)
+
+wh_trait_names <-read_excel("All_data/raw_trait_data/WH_Functional_traits_dataset.xlsx", sheet = "Data_entry") |> 
+  select(Date:Notes) |> 
+  rename(taxon = Species) |> 
+  mutate(taxon = str_to_lower(taxon),
+         taxon = str_squish(taxon),
+         taxon = str_replace_all(taxon, " ", "_")) |> 
+  select(taxon) |> 
+  mutate(site = "WH", dataset = "FT") |> 
+  distinct(taxon, site, dataset)
+
+bk_trait_names <- read_excel("All_data/raw_trait_data/FT_Bokong_19Nov.xlsx", sheet = "FT measurements") |> 
+  rename(taxon = Species) |> 
+  mutate(taxon = str_to_lower(taxon),
+         taxon = str_squish(taxon),
+         taxon = str_replace_all(taxon, " ", "_")) |> 
+  select(taxon) |> 
+  mutate(site = "BK", dataset = "FT") |> 
+  distinct(taxon, site, dataset)
+
+all_trait_sp <- gg_trait_names |> 
+  bind_rows(wh_trait_names) |> 
+  bind_rows(bk_trait_names) 
+
+#create a trait names file
+write.xlsx(all_trait_sp, "All_data/clean_data/micro_climb_trait_names.xlsx", sheetName = "trait_names", overwrite = F)
+
