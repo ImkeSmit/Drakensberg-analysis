@@ -111,3 +111,8 @@ all_sp <- allsites |>
   distinct(site, taxon) #get all unique site and taxon combinations
 #export to excel to create name key
 write.xlsx(all_sp, "All_data/clean_data/microc_climb_sp.xlsx")
+
+#checking some species:
+gg_summer[grep("argyrolobium", gg_summer$taxon), ]
+test <- gg_summer[grep("asclep", gg_summer$taxon), ]
+gg_summer[grep("gladiolus", gg_summer$taxon), ]
