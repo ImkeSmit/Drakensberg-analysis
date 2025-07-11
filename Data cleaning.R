@@ -4,6 +4,7 @@ library(tidylog)
 library(readxl)
 library(janitor)
 library(ggplot2)
+library(openxlsx)
 
 ####GOLDEN GATE####
 gg_spring <- read_excel("All_data/raw_occurrence_data/GoldenGate/GoldenGate_grids_2019_09_27.xlsx", 
@@ -105,3 +106,8 @@ bk[which(bk$cover == 1510.0), which(colnames(bk) == "cover")] <-15  #tenaxia dis
 allsites <- gg_summer |> 
   bind_rows(wh) |> 
   bind_rows(bk)
+
+all_sp <- allsites |> 
+  distinct(site, taxon) #get all unique site and taxon combinations
+#export to excel to create name key
+write.xlsx(all_sp, "All_data/clean_data/microc_climb_sp.xlsx")
