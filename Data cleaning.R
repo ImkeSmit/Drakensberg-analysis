@@ -3,6 +3,7 @@ library(tidyverse)
 library(tidylog)
 library(readxl)
 library(janitor)
+library(ggplot2)
 
 ####GOLDEN GATE####
 gg_spring <- read_excel("All_data/raw_occurrence_data/GoldenGate/GoldenGate_grids_2019_09_27.xlsx", 
@@ -34,7 +35,12 @@ gg_summer <- read_excel("All_data/raw_occurrence_data/GoldenGate/GoldenGate_grid
 #check that all grids and cells are there:
 length(unique(gg_summer$grid)) #all 8
 length(unique(gg_summer$cellref)) #1280 all cells from the 8 grids present
-  
+
+#check that cover values make sense
+ggplot(gg_summer) +
+  geom_histogram(aes(x = cover))
+min(gg_summer$cover)
+max(gg_summer$cover)
 
 ####WITSIESHOEK####
 wh <- read_excel("All_data/raw_occurrence_data/Witsieshoek/Data entry 22 Mar 2023.xlsx", sheet = 1) |> 
@@ -48,6 +54,12 @@ wh <- read_excel("All_data/raw_occurrence_data/Witsieshoek/Data entry 22 Mar 202
 #check that all grids and cells are there:
 length(unique(wh$grid)) #all 7
 length(unique(wh$cellref)) #1120 all cells from the 8 grids present
+
+#check that cover values make sense
+ggplot(wh) +
+  geom_histogram(aes(x = cover))
+min(wh$cover)
+max(wh$cover)
 
 
 ####BOKONG####
@@ -64,7 +76,9 @@ bk <- read_excel("All_data/raw_occurrence_data/Bokong/BNR_vegetation_survey_data
          cellref = paste0(site, grid, column, row), 
          cover = str_replace_all(cover, ",", ".")) |> 
   filter(!is.na(cover)) |> 
-  mutate(cover2 = as.numeric(cover))
+  mutate(cover2 = as.numeric(cover), 
+         grid = as.numeric(grid), 
+         row = as.numeric(row))
 
 #there are still NA's in the cover column, let's sort them out
 bk[which(is.na(bk$cover2)) , ] #get Na rows
@@ -75,3 +89,19 @@ bk[which(is.na(bk$cover2)) , which(colnames(bk) == "cover2")] <- 0.5
 bk <- bk |> 
   select(!cover) |> 
   rename(cover = cover2)
+
+#check that cover values make sense
+ggplot(bk) +
+  geom_histogram(aes(x = cover))
+min(bk$cover)
+max(bk$cover)
+unique(bk$cover) #there are a few problems here : 0, 0.2 and 1510.0
+
+bk <- bk[-which(bk$cover == 0), ] #I assume cover = 0 means the species was absent, remove it
+bk[which(bk$cover == 0.2), which(colnames(bk) == "cover")] <- 0.5 #felicia rosulata, give cover of 0.5
+bk[which(bk$cover == 1510.0), which(colnames(bk) == "cover")] <-15  #tenaxia disticha, can be big grass, give cover of 15
+
+####Bind sites together and extract speciesnames####
+allsites <- gg_summer |> 
+  bind_rows(wh) |> 
+  bind_rows(bk)
