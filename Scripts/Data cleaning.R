@@ -172,6 +172,10 @@ standardise_names <- function(data, #dataframe containing species names that nee
   #add change tracker column to keep track of names changed
   data$change_tracker <- NA
   
+  #remove names that do not have synonyms
+  naming_system <- naming_system |> 
+    filter(!is.na(synonym1))
+  
   for (i in 1:nrow(data)) {
     old_name <- data[i, which(colnames(data) == data_species_column)]
     new_name <- NA
@@ -215,3 +219,9 @@ wh_clean_names <- standardise_names(wh, "taxon", naming_system = name_trail,
 
 bk_clean_names <- standardise_names(bk, "taxon", naming_system = name_trail, 
                                     "taxon", c("synonym1", "synonym2", "synonym3"))
+
+
+#Quality control the names changes
+unique(gg_summer_clean_names$change_tracker)
+unique(wh_clean_names$change_tracker)
+unique(bk_clean_names$change_tracker)
