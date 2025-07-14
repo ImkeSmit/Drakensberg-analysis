@@ -225,3 +225,11 @@ bk_clean_names <- standardise_names(bk, "taxon", naming_system = name_trail,
 unique(gg_summer_clean_names$change_tracker)
 unique(wh_clean_names$change_tracker)
 unique(bk_clean_names$change_tracker)
+
+
+#Bind all three sites together and export
+micro_climb_veg_survey <- gg_summer_clean_names |> 
+  bind_rows(wh_clean_names) |> 
+  bind_rows(bk_clean_names)
+
+write.xlsx(micro_climb_veg_survey, "All_data/clean_data/micro_climb+veg_survey.xlsx")
