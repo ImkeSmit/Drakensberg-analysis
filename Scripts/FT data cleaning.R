@@ -73,7 +73,8 @@ GG <- GG |>
          Total_leaf_area_cm2 = Total_Area_cm2, 
          Chlorophyll_mg_per_m2 = 'Chlor_mg/m2', 
          Average_leaf_area_cm2 = Average_Area_cm2, 
-         Scan_name = Image_number)
+         Scan_name = Image_number, 
+         Width_at_tear_mm = Width_mm)
 
 
 #Are there NA's where there shouldn't be?
@@ -103,14 +104,16 @@ WH <- read.xlsx("All_data/raw_trait_data/WH_Functional_traits_dataset.xlsx", she
 names(WH) <- gsub("\\.", "_", names(WH)) #replace full stops in column names
 names(WH) <- gsub("[()]", "", names(WH)) #remove brackets
 
-WH <- WH |> 
+WH <- WH |> #try to standardise column names between the datasets
   rename(Taxon = Species, 
          Wet_mass_mg = Wet_Mass, 
          Dry_mass_mg = Dry_Mass, 
-         'Chlorophyll_mg/m2' = Chlorophyll, 
+         Chlorophyll_mg_per_m2 = Chlorophyll, 
          Total_leaf_area_cm2 = Total_Leaf_Area, 
          Average_leaf_area_cm2  = Average_Leaf_Area, 
-         Scan_name = Scan_Name)
+         Scan_name = Scan_Name, 
+         Sample_ID = Envelope_Number, 
+         Width_at_tear_mm = Width_mm)
 
 #Are there NA's where there shouldn't be?
 WH[which(is.na(WH$Grid)), ]
@@ -123,10 +126,10 @@ unique(WH$Height_cm) #there is a value of "S"
 WH[which(WH$Height_cm == "S") , ] #This will get an NA when we change it to numeric
 WH$Height_cm <- as.numeric(WH$Height_cm)
 
-unique(WH$Width_mm) #there are NA and " NA" values, they will get NA values
-WH[which(is.na(WH$Width_mm)) , ]
-WH[which(WH$Width_mm == " NA") , ]
-WH$Width_mm <- as.numeric(WH$Width_mm)
+unique(WH$Width_at_tear_mm) #there are NA and " NA" values, they will get NA values
+WH[which(is.na(WH$Width_at_tear_mm)) , ]
+WH[which(WH$Width_at_tear_mm == " NA") , ]
+WH$Width_at_tear_mm <- as.numeric(WH$Width_at_tear_mm)
 
 unique(WH$Dry_mass_mg) #there are scan names in here
 WH[grep("jpg", WH$Dry_mass_mg), ] #these will get NA, what are the numbers in the notes column??
@@ -134,4 +137,32 @@ WH$Dry_mass_mg <- as.numeric(WH$Dry_mass_mg)
 
 
 ####BOKONG####
-BK <- read.xlsx("All_data/raw_trait_data/FT_Bokong_19Nov.xlsx", sheet = "FT measurements")
+BK <- read.xlsx("All_data/raw_trait_data/FT_Bokong_19Nov.xlsx", sheet = "FT measurements") |> 
+  select(!Date) |> 
+  mutate(Site = "BK")
+
+#clean up column names
+names(BK) <- gsub("\\.", "_", names(BK)) #replace full stops in column names
+names(BK) <- gsub("[()]", "", names(BK)) #remove brackets
+
+BK <- BK |> 
+  rename(Taxon = Species, 
+         Chlorophyll_mg_per_m2 = Chlorofil, 
+         Scan_name = Image_reference, 
+         FTT_N = FTT)
+
+#Check that all trait values are numeric
+summary(BK)
+unique(BK$Chlorophyll_mg_per_m2) #there is a value of " ", NA, NA-no signal
+BK[which(BK$Chlorophyll_mg_per_m2 == " ") , ] #This will get an NA when we change it to numeric
+BK[which(BK$Chlorophyll_mg_per_m2 == "NA - no signal") , ]
+BK[which(is.na(BK$Chlorophyll_mg_per_m2)) , ]
+BK$Chlorophyll_mg_per_m2 <- as.numeric(BK$Chlorophyll_mg_per_m2)
+
+unique(BK$FTT_N)#there are values of "cannot take measurement" These will get NA
+BK[which(BK$FTT_N == "Cannot take measurement") , ]
+BK$FTT_N <- as.numeric(BK$FTT_N)
+
+unique(BK$Width_at_tear_mm) #again values of cannot take measurement
+BK[which(BK$Width_at_tear_mm == "Cannot take measurement") , ]
+BK$Width_at_tear_mm <- as.numeric(BK$Width_at_tear_mm)
