@@ -178,7 +178,8 @@ standardise_names <- function(data, #dataframe containing species names that nee
     
     found <- FALSE
     for (j in 1:nrow(naming_system)) { # looks whether species name should be corrected and replaces it with the new_heli_name_system in case
-      found <- grepl(old_name, naming_system[j, which(colnames(naming_system) %in% synonym)])
+      #found <- grepl(old_name, naming_system[j, which(colnames(naming_system) %in% synonym)])
+      found <- any(old_name == as.character(naming_system[j, synonym]))
       
      # if (is.na(found)){ # only runs if the species is missing
     #    found <- FALSE
@@ -205,7 +206,6 @@ standardise_names <- function(data, #dataframe containing species names that nee
 #import naming system 
 name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
 
-test <- data.frame(taxon = c("baby_oak", "aga_cam", "ale_nat", "ajuga_ophrydis", "andropogon_filiformes"))
-
-clean_names_test <- standardise_names(test, "taxon", naming_system = name_trail, 
+#clean names of veg surveys on elevation gradient
+gg_summer_clean_names <- standardise_names(gg_summer, "taxon", naming_system = name_trail, 
                                     "taxon", c("synonym1", "synonym2", "synonym3"))
