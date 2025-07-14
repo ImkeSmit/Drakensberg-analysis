@@ -169,6 +169,8 @@ standardise_names <- function(data, #dataframe containing species names that nee
                                    correct_name,  #column in naming_system that has the correct name
                                    synonym) #columns in naming_system that has the synonyms
 {
+  #add change tracker column to keep track of names changed
+  data$change_tracker <- NA
   
   for (i in 1:nrow(data)) {
     old_name <- data[i, which(colnames(data) == data_species_column)]
@@ -178,9 +180,9 @@ standardise_names <- function(data, #dataframe containing species names that nee
     for (j in 1:nrow(naming_system)) { # looks whether species name should be corrected and replaces it with the new_heli_name_system in case
       found <- grepl(old_name, naming_system[j, which(colnames(naming_system) %in% synonym)])
       
-      if (is.na(found)){ # only runs if the species is missing
-        found <- FALSE
-      }
+     # if (is.na(found)){ # only runs if the species is missing
+    #    found <- FALSE
+    #  }
       
       if (TRUE %in% found){ # only runs if the species is a synonym
         new_name <- naming_system[j, which(colnames(naming_system) %in% correct_name)] # finds the true name of the species and saves it
@@ -188,12 +190,12 @@ standardise_names <- function(data, #dataframe containing species names that nee
       }
     }
     
-    if (found) { # replaces the species in the trait database with the saved true name if "found" is "TRUE"
+    if (TRUE %in% found) { # replaces the species in the trait database with the saved true name if "found" is "TRUE"
       data[i, which(colnames(data) == data_species_column)] <- new_name
       
       #add column to keep track of which names changed
-      data <- data |> 
-        mutate(change_tracker = paste0("row", "=", i, " ", "name changed from ", old_name, " to ", new_name))
+      data[i, which(colnames(data) == "change_tracker")] <- paste0(old_name, " -> ", new_name)
+      
     }
   }#end loop through rows
   return(data)
@@ -203,4 +205,7 @@ standardise_names <- function(data, #dataframe containing species names that nee
 #import naming system 
 name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
 
-clean_names_WH <- standardise_names(wh, "taxon", naming_system = name_trail, "taxon", c("synonym1", "synonym2", "synonym3"))
+test <- data.frame(taxon = c("baby_oak", "aga_cam", "ale_nat", "ajuga_ophrydis", "andropogon_filiformes"))
+
+clean_names_test <- standardise_names(test, "taxon", naming_system = name_trail, 
+                                    "taxon", c("synonym1", "synonym2", "synonym3"))
