@@ -61,29 +61,34 @@ GG <- read.xlsx("All_data/raw_trait_data/GG_dataset_Functional_traits.xlsx") |>
 GG[which(GG$Grid_Cell == "G7B14"), which(colnames(GG) == "Cell")] <- "B14"
 GG[which(GG$Grid_Cell == "G4-c16"), which(colnames(GG) == "Cell")] <- "C16"
 
-#now we can drop the Grid_Cell column 
+#clean up column names
+names(GG) <- gsub("\\.", "_", names(GG)) #replace full stops in column names
+names(GG) <- gsub("[()]", "", names(GG)) #remove brackets
+
+#Rename columns, and drop the Grid_Cell_column
 GG <- GG |> 
   select(!Grid_Cell) |> 
   mutate(Site = "GG") |>  #add site variable
   rename(Taxon = Species, 
          Total_leaf_area_cm2 = Total_Area_cm2, 
-         Chlorophyll_mg/m2 = Chlor_mg/m2, 
+         Chlorophyll_mg_per_m2 = 'Chlor_mg/m2', 
          Average_leaf_area_cm2 = Average_Area_cm2, 
          Scan_name = Image_number)
 
-#clean up column names
-names(GG) <- gsub("\\.", "_", names(GG)) #replace full stops in column names
-names(GG) <- gsub("[()]", "", names(GG)) #remove brackets
 
 #Are there NA's where there shouldn't be?
 GG[which(is.na(GG$Grid)), ]
-GG[which(is.na(GG$Grid_Cell)), ]
 GG[which(is.na(GG$Cell)), ]
-GG[which(is.na(GG$Species)), ]
+GG[which(is.na(GG$Taxon)), ]
 
 #Check that all trait values are numeric
 summary(GG)
+
+unique(GG$FTT_N) #there are NA values, they will get NA
 GG$FTT_N <- as.numeric(GG$FTT_N)
+
+unique(GG$Width_mm) #There are values of BA and NA
+GG[which(GG$Width_mm == "BA"), ] #they will get NA
 GG$Width_mm <- as.numeric(GG$Width_mm)
 
 
@@ -107,7 +112,26 @@ WH <- WH |>
          Average_leaf_area_cm2  = Average_Leaf_Area, 
          Scan_name = Scan_Name)
 
+#Are there NA's where there shouldn't be?
+WH[which(is.na(WH$Grid)), ]
+WH[which(is.na(WH$Cell)), ]
+WH[which(is.na(WH$Taxon)), ]
+
+#Check that all trait values are numeric
+summary(WH)
+unique(WH$Height_cm) #there is a value of "S"
+WH[which(WH$Height_cm == "S") , ] #This will get an NA when we change it to numeric
+WH$Height_cm <- as.numeric(WH$Height_cm)
+
+unique(WH$Width_mm) #there are NA and " NA" values, they will get NA values
+WH[which(is.na(WH$Width_mm)) , ]
+WH[which(WH$Width_mm == " NA") , ]
+WH$Width_mm <- as.numeric(WH$Width_mm)
+
+unique(WH$Dry_mass_mg) #there are scan names in here
+WH[grep("jpg", WH$Dry_mass_mg), ] #these will get NA, what are the numbers in the notes column??
+WH$Dry_mass_mg <- as.numeric(WH$Dry_mass_mg)
 
 
-
+####BOKONG####
 BK <- read.xlsx("All_data/raw_trait_data/FT_Bokong_19Nov.xlsx", sheet = "FT measurements")
