@@ -74,7 +74,10 @@ GG <- GG |>
          Chlorophyll_mg_per_m2 = 'Chlor_mg/m2', 
          Average_leaf_area_cm2 = Average_Area_cm2, 
          Scan_name = Image_number, 
-         Width_at_tear_mm = Width_mm)
+         Width_at_tear_mm = Width_mm) |> 
+  mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
+         Taxon = str_squish(Taxon),
+         Taxon = str_replace_all(Taxon, " ", "_"))
 
 
 #Are there NA's where there shouldn't be?
@@ -92,6 +95,12 @@ unique(GG$Width_mm) #There are values of BA and NA
 GG[which(GG$Width_mm == "BA"), ] #they will get NA
 GG$Width_mm <- as.numeric(GG$Width_mm)
 
+#standardise names
+name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
+GG_clean_names <- standardise_names(data = GG, data_species_column = "Taxon", 
+                                      naming_system = name_trail, correct_name = "taxon", 
+                                    synonym = c("synonym1", "synonym2", "synonym3"))
+unique(GG_clean_names$change_tracker) #all in order
 
   
 ####WITSIESHOEK####
@@ -113,7 +122,10 @@ WH <- WH |> #try to standardise column names between the datasets
          Average_leaf_area_cm2  = Average_Leaf_Area, 
          Scan_name = Scan_Name, 
          Sample_ID = Envelope_Number, 
-         Width_at_tear_mm = Width_mm)
+         Width_at_tear_mm = Width_mm) |> 
+  mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
+         Taxon = str_squish(Taxon),
+         Taxon = str_replace_all(Taxon, " ", "_"))
 
 #Are there NA's where there shouldn't be?
 WH[which(is.na(WH$Grid)), ]
@@ -135,6 +147,13 @@ unique(WH$Dry_mass_mg) #there are scan names in here
 WH[grep("jpg", WH$Dry_mass_mg), ] #these will get NA, what are the numbers in the notes column??
 WH$Dry_mass_mg <- as.numeric(WH$Dry_mass_mg)
 
+#standardise names
+name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
+WH_clean_names <- standardise_names(data = WH, data_species_column = "Taxon", 
+                                    naming_system = name_trail, correct_name = "taxon", 
+                                    synonym = c("synonym1", "synonym2", "synonym3"))
+unique(WH_clean_names$change_tracker) #all in order
+
 
 ####BOKONG####
 BK <- read.xlsx("All_data/raw_trait_data/FT_Bokong_19Nov.xlsx", sheet = "FT measurements") |> 
@@ -149,7 +168,10 @@ BK <- BK |>
   rename(Taxon = Species, 
          Chlorophyll_mg_per_m2 = Chlorofil, 
          Scan_name = Image_reference, 
-         FTT_N = FTT)
+         FTT_N = FTT) |> 
+  mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
+         Taxon = str_squish(Taxon),
+         Taxon = str_replace_all(Taxon, " ", "_"))
 
 #Check that all trait values are numeric
 summary(BK)
@@ -166,3 +188,10 @@ BK$FTT_N <- as.numeric(BK$FTT_N)
 unique(BK$Width_at_tear_mm) #again values of cannot take measurement
 BK[which(BK$Width_at_tear_mm == "Cannot take measurement") , ]
 BK$Width_at_tear_mm <- as.numeric(BK$Width_at_tear_mm)
+
+#standardise names
+name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
+BK_clean_names <- standardise_names(data = BK, data_species_column = "Taxon", 
+                                    naming_system = name_trail, correct_name = "taxon", 
+                                    synonym = c("synonym1", "synonym2", "synonym3"))
+unique(BK_clean_names$change_tracker) #all in order
