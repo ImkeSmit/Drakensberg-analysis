@@ -209,3 +209,9 @@ name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx"
 #clean names of veg surveys on elevation gradient
 gg_summer_clean_names <- standardise_names(gg_summer, "taxon", naming_system = name_trail, 
                                     "taxon", c("synonym1", "synonym2", "synonym3"))
+
+wh_clean_names <- standardise_names(wh, "taxon", naming_system = name_trail, 
+                                    "taxon", c("synonym1", "synonym2", "synonym3"))
+
+bk_clean_names <- standardise_names(bk, "taxon", naming_system = name_trail, 
+                                    "taxon", c("synonym1", "synonym2", "synonym3"))
