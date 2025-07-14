@@ -232,4 +232,4 @@ micro_climb_veg_survey <- gg_summer_clean_names |>
   bind_rows(wh_clean_names) |> 
   bind_rows(bk_clean_names)
 
-write.xlsx(micro_climb_veg_survey, "All_data/clean_data/micro_climb+veg_survey.xlsx")
+write.xlsx(micro_climb_veg_survey, "All_data/clean_data/micro_climb_occurrence.xlsx")
