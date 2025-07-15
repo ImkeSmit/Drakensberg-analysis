@@ -42,6 +42,7 @@ ggplot(gg_summer) +
   geom_histogram(aes(x = cover))
 min(gg_summer$cover)
 max(gg_summer$cover)
+class(gg_summer$cover)
 
 ####WITSIESHOEK####
 wh <- read_excel("All_data/raw_occurrence_data/Witsieshoek/Data entry 22 Mar 2023.xlsx", sheet = 1) |> 
@@ -83,8 +84,12 @@ bk <- read_excel("All_data/raw_occurrence_data/Bokong/BNR_vegetation_survey_data
 
 #there are still NA's in the cover column, let's sort them out
 bk[which(is.na(bk$cover2)) , ] #get Na rows
-#let's just give all these a value of 0.5
-bk[which(is.na(bk$cover2)) , which(colnames(bk) == "cover2")] <- 0.5
+#Go back to paper data sheets and check these values
+bk[which(bk$cellref == "BK1A13" & bk$taxon == "new_alternate_anthospermum") , which(colnames(bk) == "cover2")] <- 0.5
+bk[which(bk$cellref == "BK2A5" & bk$taxon == "festuca_caprina") , which(colnames(bk) == "cover2")] <- 25
+bk <- bk[-which(bk$cellref == "BK6G12" & bk$taxon == "afroaster_erucifolius") , ] #sp not present on sheet
+bk[which(bk$cellref == "BK7B20" & bk$taxon == "gazania_krebsiana") , which(colnames(bk) == "cover2")] <- 0.5
+
 
 #delete the character cover column and rename cover2
 bk <- bk |> 
@@ -98,9 +103,9 @@ min(bk$cover)
 max(bk$cover)
 unique(bk$cover) #there are a few problems here : 0, 0.2 and 1510.0
 
-bk <- bk[-which(bk$cover == 0), ] #I assume cover = 0 means the species was absent, remove it
-bk[which(bk$cover == 0.2), which(colnames(bk) == "cover")] <- 0.5 #felicia rosulata, give cover of 0.5
-bk[which(bk$cover == 1510.0), which(colnames(bk) == "cover")] <-15  #tenaxia disticha, can be big grass, give cover of 15
+bk <- bk[-which(bk$cover == 0), ] #sp not present on sheet, remove
+bk[which(bk$cover == 0.2), which(colnames(bk) == "cover")] <- 0.5 #checked on paper sheet
+bk[which(bk$cover == 1510.0), which(colnames(bk) == "cover")] <-15  #checked on paper sheet
 
 ####Bind sites together and extract speciesnames####
 allsites <- gg_summer |> 
