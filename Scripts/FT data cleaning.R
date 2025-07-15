@@ -201,3 +201,11 @@ BK_clean_names <- standardise_names(data = BK, data_species_column = "Taxon",
                                     naming_system = name_trail, correct_name = "taxon", 
                                     synonym = c("synonym1", "synonym2", "synonym3"))
 unique(BK_clean_names$change_tracker) #all in order
+
+
+
+
+###When finished, write to file
+write.xlsx(GG_clean_names, "All_data/clean_data/Golden_Gate_clean_traits.xlsx")
+write.xlsx(WH_clean_names, "All_data/clean_data/Witsieshoek_clean_traits.xlsx")
+write.xlsx(BK_clean_names, "All_data/clean_data/Bokong_clean_traits.xlsx")
