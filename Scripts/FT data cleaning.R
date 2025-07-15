@@ -75,8 +75,7 @@ GG <- GG |>
          Average_leaf_area_cm2 = Average_Area_cm2, 
          Scan_name = Image_number, 
          Width_at_tear_mm = Width_mm, 
-         Sample_ID = Ref_number, 
-         Notes2= X18) |> 
+         Sample_ID = Ref_number) |> 
   mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
          Taxon = str_squish(Taxon),
          Taxon = str_replace_all(Taxon, " ", "_"))
@@ -124,7 +123,8 @@ WH <- WH |> #try to standardise column names between the datasets
          Average_leaf_area_cm2  = Average_Leaf_Area, 
          Scan_name = Scan_Name, 
          Sample_ID = Envelope_Number, 
-         Width_at_tear_mm = Width_mm) |> 
+         Width_at_tear_mm = Width_mm, 
+         Notes2 = X18) |> 
   mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
          Taxon = str_squish(Taxon),
          Taxon = str_replace_all(Taxon, " ", "_"))
