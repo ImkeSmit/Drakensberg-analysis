@@ -127,7 +127,7 @@ WH <- WH |> #try to standardise column names between the datasets
          Notes2 = X18) |> 
   mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
          Taxon = str_squish(Taxon),
-         Taxon = str_replace_all(Taxon, " ", "_"))
+         Taxon = str_replace_all(Taxon, " ", "_")) 
 
 #Are there NA's where there shouldn't be?
 WH[which(is.na(WH$Grid)), ]
@@ -148,6 +148,10 @@ WH$Width_at_tear_mm <- as.numeric(WH$Width_at_tear_mm)
 unique(WH$Dry_mass_mg) #there are scan names in here
 WH[grep("jpg", WH$Dry_mass_mg), ] #these will get NA, what are the numbers in the notes column??
 WH$Dry_mass_mg <- as.numeric(WH$Dry_mass_mg)
+
+#now we can calculate SLA
+WH <- WH |> 
+  mutate(SLA = Total_leaf_area_cm2/Dry_mass_mg)
 
 #standardise names
 name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
