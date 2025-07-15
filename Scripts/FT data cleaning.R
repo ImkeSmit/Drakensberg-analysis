@@ -91,9 +91,9 @@ summary(GG)
 unique(GG$FTT_N) #there are NA values, they will get NA
 GG$FTT_N <- as.numeric(GG$FTT_N)
 
-unique(GG$Width_mm) #There are values of BA and NA
-GG[which(GG$Width_mm == "BA"), ] #they will get NA
-GG$Width_mm <- as.numeric(GG$Width_mm)
+unique(GG$Width_at_tear_mm) #There are values of BA and NA
+GG[which(GG$Width_at_tear_mm == "BA"), ] #they will get NA
+GG$Width_at_tear_mm <- as.numeric(GG$Width_at_tear_mm)
 
 #standardise names
 name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
