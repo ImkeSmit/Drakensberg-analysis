@@ -74,7 +74,9 @@ GG <- GG |>
          Chlorophyll_mg_per_m2 = 'Chlor_mg/m2', 
          Average_leaf_area_cm2 = Average_Area_cm2, 
          Scan_name = Image_number, 
-         Width_at_tear_mm = Width_mm) |> 
+         Width_at_tear_mm = Width_mm, 
+         Sample_ID = Ref_number, 
+         Notes2= X18) |> 
   mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
          Taxon = str_squish(Taxon),
          Taxon = str_replace_all(Taxon, " ", "_"))
