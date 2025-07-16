@@ -67,7 +67,7 @@ names(GG) <- gsub("[()]", "", names(GG)) #remove brackets
 
 #Rename columns, and drop the Grid_Cell_column
 GG <- GG |> 
-  select(!Grid_Cell) |> 
+  select(!c(Grid_Cell, `Dry/Wet`)) |> 
   mutate(Site = "GG") |>  #add site variable
   rename(Taxon = Species, 
          Total_leaf_area_cm2 = Total_Area_cm2, 
@@ -102,6 +102,11 @@ GG_clean_names <- standardise_names(data = GG, data_species_column = "Taxon",
                                       naming_system = name_trail, correct_name = "taxon", 
                                     synonym = c("synonym1", "synonym2", "synonym3"))
 unique(GG_clean_names$change_tracker) #all in order
+
+
+###Let's look at the notes
+GG_probs <- GG_clean_names |> 
+  filter(!is.na(Area_Notes) | !is.na(Notes))
 
   
 ####WITSIESHOEK####
@@ -201,6 +206,70 @@ BK_clean_names <- standardise_names(data = BK, data_species_column = "Taxon",
                                     naming_system = name_trail, correct_name = "taxon", 
                                     synonym = c("synonym1", "synonym2", "synonym3"))
 unique(BK_clean_names$change_tracker) #all in order
+
+
+
+####Checking Trait values####
+#Combine trait data of all three sites
+FT_allsites <- GG_clean_names |> 
+  bind_rows(WH_clean_names) |> 
+  bind_rows(BK_clean_names)
+
+FT_long <- FT_allsites |> 
+  pivot_longer(cols = Wet_mass_mg:SLA, names_to = "Trait", values_to = "Value")
+
+#check the distributions of all variables
+ggplot(FT_long) + 
+  geom_histogram(aes(x = Value)) +
+  facet_wrap(~Trait, scales = "free") #none seem to have outrageous values
+#but lets check what species are in the tails of the distribution
+
+# Define tail threshold (e.g., 5%)
+tail_threshold <- 0.05
+
+# Function to identify tail records
+get_trait_tails <- function(trait_vector, threshold = 0.05) {
+  # Remove NAs for quantile calculation
+  lower_cutoff <- quantile(trait_vector, probs = threshold, na.rm = TRUE)
+  upper_cutoff <- quantile(trait_vector, probs = 1 - threshold, na.rm = TRUE)
+  
+  tail_status <- sapply(trait_vector, function(x) {
+    if (is.na(x)) {
+      return(NA)
+    } else if (x < lower_cutoff) {
+      return("low_tail")
+    } else if (x > upper_cutoff) {
+      return("high_tail")
+    } else {
+      return("middle")
+    }
+  })
+  
+  return(tail_status)
+}
+
+
+FT_allsites$LA_tail <- get_trait_tails(FT_allsites$Average_leaf_area_cm2, tail_threshold)
+LA_outlier <- FT_allsites[which(FT_allsites$LA_tail == "high_tail"), ] #those with very high LA are all large leaved sp
+
+FT_allsites$Chlor_tail <- get_trait_tails(FT_allsites$Chlorophyll_mg_per_m2, tail_threshold)
+Chlor_outlier <- FT_allsites[which(FT_allsites$Chlor_tail == "low_tail"), ] #all seem in order, no notes about sp with low chlorophyll readings
+
+FT_allsites$Dry_mass_tail <- get_trait_tails(FT_allsites$Dry_mass, tail_threshold)
+Dry_mass_outlier <- FT_allsites[which(FT_allsites$Dry_mass_tail == "high_tail"), ] #heavy leaves make sense for these sp
+
+
+FT_allsites$FTT_tail <- get_trait_tails(FT_allsites$FTT_N, tail_threshold)
+FTT_outlier <- FT_allsites[which(FT_allsites$FTT_tail == "high_tail"), ] 
+#two have notes of FTT-split in GG, what does it mean? Otherwise nothing alarming
+
+FT_allsites$H_tail <- get_trait_tails(FT_allsites$Height_cm, tail_threshold)
+H_outlier <- FT_allsites[which(FT_allsites$H_tail == "high_tail"), ] 
+#two have notes of FTT-split in GG, what does it mean? Otherwise nothing alarming
+
+
+
+
 
 
 
