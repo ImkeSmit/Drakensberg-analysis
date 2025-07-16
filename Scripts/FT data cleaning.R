@@ -68,7 +68,6 @@ names(GG) <- gsub("[()]", "", names(GG)) #remove brackets
 #Rename columns, and drop the Grid_Cell_column
 GG <- GG |> 
   select(!c(Grid_Cell, `Dry/Wet`)) |> 
-  mutate(Site = "GG") |>  #add site variable
   rename(Taxon = Species, 
          Total_leaf_area_cm2 = Total_Area_cm2, 
          Chlorophyll_mg_per_m2 = 'Chlor_mg/m2', 
@@ -78,7 +77,9 @@ GG <- GG |>
          Sample_ID = Ref_number) |> 
   mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
          Taxon = str_squish(Taxon),
-         Taxon = str_replace_all(Taxon, " ", "_"))
+         Taxon = str_replace_all(Taxon, " ", "_")) |> 
+  mutate(Site = "GG", #add site variable
+         Sample_ID = paste0(Site, Sample_ID)) 
 
 
 #Are there NA's where there shouldn't be?
@@ -132,7 +133,8 @@ WH <- WH |> #try to standardise column names between the datasets
          Notes2 = X18) |> 
   mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
          Taxon = str_squish(Taxon),
-         Taxon = str_replace_all(Taxon, " ", "_")) 
+         Taxon = str_replace_all(Taxon, " ", "_"), 
+         Sample_ID = paste0(Site, Sample_ID)) 
 
 #Are there NA's where there shouldn't be?
 WH[which(is.na(WH$Grid)), ]
@@ -182,7 +184,8 @@ BK <- BK |>
          FTT_N = FTT) |> 
   mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
          Taxon = str_squish(Taxon),
-         Taxon = str_replace_all(Taxon, " ", "_"))
+         Taxon = str_replace_all(Taxon, " ", "_"), 
+         Sample_ID = paste0(Site, Sample_ID))
 
 #Check that all trait values are numeric
 summary(BK)
@@ -267,6 +270,22 @@ FT_allsites$H_tail <- get_trait_tails(FT_allsites$Height_cm, tail_threshold)
 H_outlier <- FT_allsites[which(FT_allsites$H_tail == "high_tail"), ] 
 #two have notes of FTT-split in GG, what does it mean? Otherwise nothing alarming
 
+FT_allsites$SLA_tail <- get_trait_tails(FT_allsites$SLA, tail_threshold)
+SLA_outlier <- FT_allsites[which(FT_allsites$SLA_tail == "high_tail"), ] 
+#many succulens which make sense, will have to test this another way too
+
+FT_allsites$Thickness_tail <- get_trait_tails(FT_allsites$Thickness_mm, tail_threshold)
+Thickness_outlier <- FT_allsites[which(FT_allsites$Thickness_tail == "high_tail"), ] 
+Thickness_problems <- Thickness_outlier[order(Thickness_outlier$Thickness_mm), ][c(309,310), which(colnames(Thickness_outlier) == "Scan_name")]
+#The two highest values are a little wack
+#Tenaxia disticha with thickness = 26mm
+#Gazania krebsiana with thickness = 95mm
+#remove these values
+
+FT_checked <- GG_clean_names |> 
+  bind_rows(WH_clean_names) |> 
+  bind_rows(BK_clean_names)
+FT_checked[which(FT_checked$Scan_name %in% c(Thickness_problems)),] #which(colnames(FT_checked) == "Thickness_mm")] <- NA
 
 
 
