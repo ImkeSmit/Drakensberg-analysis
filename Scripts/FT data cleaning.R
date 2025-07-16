@@ -286,10 +286,28 @@ Thickness_problems <- Thickness_outlier[order(Thickness_outlier$Thickness_mm), ]
 #remove these values, correct in FT_checked
 FT_checked[which(FT_checked$Sample_ID %in% c(Thickness_problems)), which(colnames(FT_checked) == "Thickness_mm")] <- NA
 
+FT_allsites$TLA_tail <- get_trait_tails(FT_allsites$Total_leaf_area_cm2, tail_threshold)
+TLA_outlier <- FT_allsites[which(FT_allsites$TLA_tail == "high_tail"), ] #all looks fine
+#the largest areas come from very large leaves
 
+FT_allsites$Wet_mass_tail <- get_trait_tails(FT_allsites$Wet_mass_mg, tail_threshold)
+Wet_mass_outlier <- FT_allsites[which(FT_allsites$Wet_mass_tail == "high_tail"), ] #all looks fine
+#The leaves with the highest masses make sense
 
+FT_allsites$Width_tail <- get_trait_tails(FT_allsites$Width_at_tear_mm, tail_threshold)
+Width_outlier <- FT_allsites[which(FT_allsites$Width_tail == "high_tail"), ] 
+#There is an elionurus muticus with a width of 7.86, that is wack
+#the 3 highest widths are improbable
+Width_outlier[which(Width_outlier$Taxon == "elionurus_muticus") , ]
+Width_outlier[which(Width_outlier$Taxon == "pentameris_setifolia") , ] #this one is probably fine
 
+#Fix the elionurus problem
+Width_problem1 <- Width_outlier[which(Width_outlier$Taxon == "elionurus_muticus") , which(colnames(Width_outlier) == "Sample_ID")]
+FT_checked[which(FT_checked$Sample_ID == Width_problem1), which(colnames(FT_checked) == "Width_at_tear_mm")] <- NA
 
+#fix the 3 highest widths
+Width_problem2 <- Width_outlier[order(Width_outlier$Width_at_tear_mm), ][c(131:133), which(colnames(Width_outlier) == "Sample_ID")]
+FT_checked[which(FT_checked$Sample_ID %in% Width_problem2), which(colnames(FT_checked) == "Width_at_tear_mm")] <- NA
 
 
 ###When finished, write to file
