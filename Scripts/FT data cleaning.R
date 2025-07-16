@@ -310,6 +310,40 @@ Width_problem2 <- Width_outlier[order(Width_outlier$Width_at_tear_mm), ][c(131:1
 FT_checked[which(FT_checked$Sample_ID %in% Width_problem2), which(colnames(FT_checked) == "Width_at_tear_mm")] <- NA
 
 
+#Graphing checks
+ggplot(FT_checked) +
+  geom_point(aes(x = SLA, y = Dry_mass_mg))
+
+ggplot(FT_checked) +
+  geom_point(aes(x = SLA, y = Total_leaf_area_cm2))
+
+ggplot(FT_checked) +
+  geom_point(aes(y = Total_leaf_area_cm2, x = Dry_mass_mg))
+
+ggplot(FT_checked) +
+  geom_point(aes(y = SLA, x = Thickness_mm))
+
+ggplot(FT_checked) +
+  geom_point(aes(y = Wet_mass_mg, x = Dry_mass_mg))
+
+#are there any cases where dry mass exceeds wet mass?
+mass_problems <- FT_checked |> 
+  filter(Dry_mass_mg > Wet_mass_mg)
+
+#yes, compare the masses of these records to the general masses of each sp
+
+#Wet mass unreliable: watsonia, searsia_discolor,themeda_triandra, trifolium_burchellianum, 
+#elionurus_muticus, berkheya rhapontica, helichrysum_aureum, festucca_scabra, senecio coronatus,
+#helichrysum ecklonis, senecio_glaberrimus 
+
+#Don't know which mass is unreliable: aristida_junciformis
+
+#Dry mass unreliable: eragrostis_capensis, diheteropogon_filifolius
+
+#now we have to make these masses NA
+
+
+
 ###When finished, write to file
 write.xlsx(GG_clean_names, "All_data/clean_data/Golden_Gate_clean_traits.xlsx")
 write.xlsx(WH_clean_names, "All_data/clean_data/Witsieshoek_clean_traits.xlsx")
