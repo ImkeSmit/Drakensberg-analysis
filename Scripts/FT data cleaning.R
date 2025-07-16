@@ -218,6 +218,9 @@ FT_allsites <- GG_clean_names |>
   bind_rows(WH_clean_names) |> 
   bind_rows(BK_clean_names)
 
+#make a copy to apply corrections to
+FT_checked <- FT_allsites
+
 FT_long <- FT_allsites |> 
   pivot_longer(cols = Wet_mass_mg:SLA, names_to = "Trait", values_to = "Value")
 
@@ -276,16 +279,12 @@ SLA_outlier <- FT_allsites[which(FT_allsites$SLA_tail == "high_tail"), ]
 
 FT_allsites$Thickness_tail <- get_trait_tails(FT_allsites$Thickness_mm, tail_threshold)
 Thickness_outlier <- FT_allsites[which(FT_allsites$Thickness_tail == "high_tail"), ] 
-Thickness_problems <- Thickness_outlier[order(Thickness_outlier$Thickness_mm), ][c(309,310), which(colnames(Thickness_outlier) == "Scan_name")]
+Thickness_problems <- Thickness_outlier[order(Thickness_outlier$Thickness_mm), ][c(309,310), which(colnames(Thickness_outlier) == "Sample_ID")]
 #The two highest values are a little wack
 #Tenaxia disticha with thickness = 26mm
 #Gazania krebsiana with thickness = 95mm
-#remove these values
-
-FT_checked <- GG_clean_names |> 
-  bind_rows(WH_clean_names) |> 
-  bind_rows(BK_clean_names)
-FT_checked[which(FT_checked$Scan_name %in% c(Thickness_problems)),] #which(colnames(FT_checked) == "Thickness_mm")] <- NA
+#remove these values, correct in FT_checked
+FT_checked[which(FT_checked$Sample_ID %in% c(Thickness_problems)), which(colnames(FT_checked) == "Thickness_mm")] <- NA
 
 
 
