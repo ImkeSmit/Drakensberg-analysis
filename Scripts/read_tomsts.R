@@ -40,7 +40,7 @@ fi <- fi[order(fi$plot),]
 
 # This should be zero
 fi %>% filter(is.na(plot)) %>% nrow #there is one file (logger) That doesn't have a plot
-#lets remove this row or now
+#lets remove this row for now
 fi <- fi %>% filter(!is.na(plot))
 
 readdata <- function(i){
