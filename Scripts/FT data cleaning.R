@@ -271,7 +271,6 @@ FTT_outlier <- FT_allsites[which(FT_allsites$FTT_tail == "high_tail"), ]
 
 FT_allsites$H_tail <- get_trait_tails(FT_allsites$Height_cm, tail_threshold)
 H_outlier <- FT_allsites[which(FT_allsites$H_tail == "high_tail"), ] 
-#two have notes of FTT-split in GG, what does it mean? Otherwise nothing alarming
 
 FT_allsites$SLA_tail <- get_trait_tails(FT_allsites$SLA, tail_threshold)
 SLA_outlier <- FT_allsites[which(FT_allsites$SLA_tail == "high_tail"), ] 
@@ -333,7 +332,7 @@ mass_problems <- FT_checked |>
 #yes, compare the masses of these records to the general masses of each sp
 
 #Wet mass unreliable: watsonia, searsia_discolor,themeda_triandra, trifolium_burchellianum, 
-#elionurus_muticus, berkheya rhapontica, helichrysum_aureum, festucca_scabra, senecio coronatus,
+#elionurus_muticus, berkheya rhapontica, helichrysum_aureum, festuca_scabra, senecio coronatus,
 #helichrysum ecklonis, senecio_glaberrimus 
 
 #Don't know which mass is unreliable: aristida_junciformis
@@ -341,6 +340,23 @@ mass_problems <- FT_checked |>
 #Dry mass unreliable: eragrostis_capensis, diheteropogon_filifolius
 
 #now we have to make these masses NA
+#sample ID's to change wet_mass
+change_wet_mass <- mass_problems[which(mass_problems$Taxon %in% c("watsonia", "searsia_discolor", "themeda_triandra", 
+                                                                  "trifolium_burchellianium", "elionurus_muticus", 
+                                                                  "berkheya_rhapontica", "helichrysum_aureum", 
+                                                                  "festuca_scabra", "senecio_coronatus", "helichrysum_ecklonis", 
+                                                                  "senecio_glaberrimus")), which(colnames(mass_problems) == "Sample_ID")]
+
+change_all_mass <- mass_problems[which(mass_problems$Taxon %in% c("aristida_junciformis")), which(colnames(mass_problems) == "Sample_ID")]
+
+
+change_dry_mass <- mass_problems[which(mass_problems$Taxon %in% c("eragrostis_capensis", "diheteropogon_filifolius")), which(colnames(mass_problems) == "Sample_ID")]
+
+#overwrite unreliable values with NA
+FT_checked[which(FT_checked$Sample_ID %in% c(change_wet_mass)), which(colnames(FT_checked) == "Wet_mass_mg")] <- NA
+FT_checked[which(FT_checked$Sample_ID %in% c(change_all_mass)), which(colnames(FT_checked) %in% c("Wet_mass_mg", "Dry_mass_mg", "SLA"))] <- NA
+#if dry mass is unreliable we have to change the SLA too
+FT_checked[which(FT_checked$Sample_ID %in% c(change_dry_mass)), which(colnames(FT_checked) %in% c("Dry_mass_mg", "SLA"))] <- NA
 
 
 
