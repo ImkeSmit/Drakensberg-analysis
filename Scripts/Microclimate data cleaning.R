@@ -65,12 +65,49 @@ readdata <- function(i){
 datadir <- "All_data/raw_microclimate_data/Witsieshoek/Witsies_Tomst_data_final_reading_Feb2024"
 
 # read names x tomst id table
-ids <- read_csv(paste0(datadir, "/", "tomst_ids.csv")) %>% 
-  rename(date_installed = `Date installed`, 
-         date_removed = `Date removed`) %>%
-  mutate(plot = paste0(Site, "_",Grid,Cell), 
-         date_installed = dmy(date_installed), 
-         date_removed = ymd(date_removed))
+ids <- read.delim(paste0(datadir, "/", "tomst_ids.csv"), sep = ";") |>  
+  filter(site == "witsieshoek") |> 
+  rename(Cell = plot) |> 
+  mutate(Cell = toupper(Cell),
+         site = toupper(site),
+         plot = paste0(site, "_",grid,Cell))
+
+# List logger data files to read
+f <- list.files(datadir, pattern = "data_[0-9]", full.names = T, recursive = T)
+
+fi <- data.frame(file = f)
+
+fi$TMS <- unlist(lapply(fi$file, function(x) as.numeric(strsplit(gsub("data_","",rev(strsplit(x, "/")[[1]])[1]), "_")[[1]][1])))
+
+fi <- full_join(fi, ids, by = join_by(TMS)) %>% 
+  mutate(plot = toupper(plot)) %>% 
+  filter(!is.na(file))
+
+fi$file2 <- gsub("_..csv", "", fi$file)
+
+fi <- fi[order(fi$plot),]
+
+# This should be zero
+fi %>% filter(is.na(plot)) %>% nrow 
+
+# read the Tomst data in
+mylist <- lapply(fi$file, readdata)
+wh_microclim <- rbindlist( mylist )
+
+# Rename columns
+wh_microclim <- wh_microclim %>% rename(datetime = V2,
+                                        zone = V3,
+                                        soil_temp = V4, #T1
+                                        surface_temp = V5, #T2
+                                        air_temp = V6, #T3
+                                        moist = V7) 
+
+wh_microclim <- wh_microclim %>% arrange(plot, datetime) 
+
+# Remove implausible dates
+mind <- ymd("2023-01-01") #can't find the installation or extraction date. Assume these dates
+maxd <- ymd("2024-02-28")
+wh_microclim2 <- wh_microclim |> filter(between(datetime, mind, maxd))
 
 
 ####BOKONG####
