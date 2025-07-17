@@ -107,10 +107,7 @@ bk_microclim <- bk_microclim %>% rename(datetime = V2,
 bk_microclim <- bk_microclim %>% arrange(plot, datetime) 
 
 # Remove implausible dates
-mind <- as.Date("2023-01-09") #the date of insertion is in a text file in the Bokong microclimate folder
-maxd <- as.Date("2024-02-04")
-bk_microclim2 <- bk_microclim |> filter(datetime >= mind,
-                    datetime <= maxd)
+mind <- ymd("2023-01-09") #the date of insertion is in a text file in the Bokong microclimate folder
+maxd <- ymd("2024-02-04")
+bk_microclim2 <- bk_microclim |> filter(between(datetime, mind, maxd))
 
-test <- bk_microclim |> filter(datetime >= mind,
-                       datetime <= maxd)
