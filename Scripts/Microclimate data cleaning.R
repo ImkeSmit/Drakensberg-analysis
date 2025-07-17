@@ -5,6 +5,7 @@ library(lubridate)
 library(data.table)
 library(patchwork)
 library(openxlsx)
+library(readxl)
 
 ###create function to read in files
 readdata <- function(i){
@@ -62,7 +63,7 @@ readdata <- function(i){
 
 
 ####WITSIESHOEK####
-datadir <- "All_data/raw_microclimate_data/Witsieshoek/Witsies_Tomst_data_final_reading_Feb2024"
+datadir <- "All_data/raw_data/raw_microclimate_data/Witsieshoek/Witsies_Tomst_data_final_reading_Feb2024"
 
 # read names x tomst id table
 ids <- read.delim(paste0(datadir, "/", "tomst_ids.csv"), sep = ";") |>  
@@ -107,11 +108,12 @@ wh_microclim <- wh_microclim %>% arrange(plot, datetime)
 # Remove implausible dates
 mind <- ymd("2023-01-01") #can't find the installation or extraction date. Assume these dates
 maxd <- ymd("2024-02-28")
-wh_microclim2 <- wh_microclim |> filter(between(datetime, mind, maxd))
+wh_microclim2 <- wh_microclim |> filter(between(datetime, mind, maxd)) |> 
+  distinct(datetime, plot, .keep_all = T)
 
 
 ####BOKONG####
-datadir <- "All_data/raw_microclimate_data/Bokong/Tomst_data_Final_reading_February2024"
+datadir <- "All_data/raw_data/raw_microclimate_data/Bokong/Tomst_data_Final_reading_February2024"
 
 # read names x tomst id table
 ids <- read_excel(paste0(datadir, "/", "Bokong_Logger_notes.xlsx")) %>% 
@@ -158,5 +160,15 @@ bk_microclim <- bk_microclim %>% arrange(plot, datetime)
 # Remove implausible dates
 mind <- ymd("2023-01-09") #the date of insertion is in a text file in the Bokong microclimate folder
 maxd <- ymd("2024-02-04")
-bk_microclim2 <- bk_microclim |> filter(between(datetime, mind, maxd))
+bk_microclim2 <- bk_microclim |> filter(between(datetime, mind, maxd)) |> 
+  distinct(datetime, plot, .keep_all = T) #remove duplicate entries
+
+####Write the cleaned microclimate data to text files####
+#Excel cna't open a table with this many rows, so we write it to a text file
+write.table(bk_microclim2, file = "All_data/clean_data/Tomst_data/Bokong_tomst_data.txt", sep = "\t",
+            row.names = TRUE, col.names = c(colnames(bk_microclim2)))
+
+write.table(wh_microclim2, file = "All_data/clean_data/Tomst_data/Witsieshoek_tomst_data.txt", sep = "\t",
+            row.names = TRUE, col.names = c(colnames(wh_microclim2)))
+
 
