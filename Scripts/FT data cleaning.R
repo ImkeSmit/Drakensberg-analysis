@@ -361,4 +361,10 @@ FT_checked[which(FT_checked$Sample_ID %in% c(change_dry_mass)), which(colnames(F
 
 
 ###When finished, write to file
+#reorder the columns
+FT_checked <- FT_checked |> 
+select(Sample_ID, Site, Grid, Cell, Taxon, Wet_mass_mg, Dry_mass_mg, Chlorophyll_mg_per_m2, FTT_N, 
+       Height_cm, Thickness_mm, Width_at_tear_mm, Total_leaf_area_cm2, Average_leaf_area_cm2, SLA, 
+       Scan_name, Number_of_Leaves, Number_of_leaves_weighed, Notes, Notes2, Area_Notes, change_tracker) |> 
+  arrange(Sample_ID)
 write.xlsx(FT_checked, "All_data/clean_data/micro-climb_traits.xlsx")
