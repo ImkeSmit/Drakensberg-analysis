@@ -361,6 +361,4 @@ FT_checked[which(FT_checked$Sample_ID %in% c(change_dry_mass)), which(colnames(F
 
 
 ###When finished, write to file
-write.xlsx(GG_clean_names, "All_data/clean_data/Golden_Gate_clean_traits.xlsx")
-write.xlsx(WH_clean_names, "All_data/clean_data/Witsieshoek_clean_traits.xlsx")
-write.xlsx(BK_clean_names, "All_data/clean_data/Bokong_clean_traits.xlsx")
+write.xlsx(FT_checked, "All_data/clean_data/micro-climb_traits.xlsx")
