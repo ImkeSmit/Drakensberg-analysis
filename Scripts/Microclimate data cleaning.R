@@ -61,6 +61,18 @@ readdata <- function(i){
 }
 
 
+####WITSIESHOEK####
+datadir <- "All_data/raw_microclimate_data/Witsieshoek/Witsies_Tomst_data_final_reading_Feb2024"
+
+# read names x tomst id table
+ids <- read_csv(paste0(datadir, "/", "tomst_ids.csv")) %>% 
+  rename(date_installed = `Date installed`, 
+         date_removed = `Date removed`) %>%
+  mutate(plot = paste0(Site, "_",Grid,Cell), 
+         date_installed = dmy(date_installed), 
+         date_removed = ymd(date_removed))
+
+
 ####BOKONG####
 datadir <- "All_data/raw_microclimate_data/Bokong/Tomst_data_Final_reading_February2024"
 
