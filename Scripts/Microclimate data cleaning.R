@@ -69,7 +69,7 @@ readdata <- function(i){
 
 
 ####GOLDEN GATE####
-datadir <- "All_data/raw_data/raw_microclimate_data/GoldenGate/Golden_Gate_Tomsp_Final_reading_Feb2024"
+datadir <- "All_data/raw_data/raw_microclimate_data"
 
 # read names x tomst id table
 ids <- read.delim(paste0(datadir, "/", "tomst_ids.csv"), sep = ";") |>  
@@ -80,7 +80,7 @@ ids <- read.delim(paste0(datadir, "/", "tomst_ids.csv"), sep = ";") |>
          plot = paste0(site, "_",grid,Cell))
 
 # List logger data files to read
-f <- list.files(datadir, pattern = "data_[0-9]", full.names = T, recursive = T)
+f <- list.files(paste0(datadir, "/", "GoldenGate/Golden_Gate_Tomsp_Final_reading_Feb2024"), pattern = "data_[0-9]", full.names = T, recursive = T)
 
 fi <- data.frame(file = f)
 
@@ -127,7 +127,7 @@ gg_microclim |>
 
 
 ####WITSIESHOEK####
-datadir <- "All_data/raw_data/raw_microclimate_data/Witsieshoek/Witsies_Tomst_data_final_reading_Feb2024"
+datadir <- "All_data/raw_data/raw_microclimate_data"
 
 # read names x tomst id table
 ids <- read.delim(paste0(datadir, "/", "tomst_ids.csv"), sep = ";") |>  
@@ -138,7 +138,7 @@ ids <- read.delim(paste0(datadir, "/", "tomst_ids.csv"), sep = ";") |>
          plot = paste0(site, "_",grid,Cell))
 
 # List logger data files to read
-f <- list.files(datadir, pattern = "data_[0-9]", full.names = T, recursive = T)
+f <- list.files(paste0(datadir, "/", "Witsieshoek/Witsies_Tomst_data_final_reading_Feb2024"), pattern = "data_[0-9]", full.names = T, recursive = T)
 
 fi <- data.frame(file = f)
 
@@ -177,18 +177,18 @@ wh_microclim2 <- wh_microclim |> filter(between(datetime, mind, maxd)) |>
 
 
 ####BOKONG####
-datadir <- "All_data/raw_data/raw_microclimate_data/Bokong/Tomst_data_Final_reading_February2024"
+datadir <- "All_data/raw_data/raw_microclimate_data"
 
 # read names x tomst id table
-ids <- read_excel(paste0(datadir, "/", "Bokong_Logger_notes.xlsx")) %>% 
-  rename(date_installed = `Date installed`, 
-         date_removed = `Date removed`) %>%
-  mutate(plot = paste0(Site, "_",Grid,Cell), 
-         date_installed = dmy(date_installed), 
-         date_removed = ymd(date_removed))
+ids <- read.delim(paste0(datadir, "/", "tomst_ids.csv"), sep = ";") |> 
+  filter(site == "bokong") |> 
+  rename(Cell = plot) |> 
+  mutate(Cell = toupper(Cell),
+         site = toupper(site),
+         plot = paste0(site, "_",grid,Cell))
 
 # List logger data files to read
-f <- list.files(datadir, pattern = "data_[0-9]", full.names = T, recursive = T)
+f <- list.files(paste0(datadir, "/", "Bokong/Tomst_data_Final_reading_February2024"), pattern = "data_[0-9]", full.names = T, recursive = T)
 
 fi <- data.frame(file = f)
 
@@ -203,9 +203,7 @@ fi$file2 <- gsub("_..csv", "", fi$file)
 fi <- fi[order(fi$plot),]
 
 # This should be zero
-fi %>% filter(is.na(plot)) %>% nrow #there is one file (logger) That doesn't have a plot
-#lets remove this row for now
-fi <- fi %>% filter(!is.na(plot))
+fi %>% filter(is.na(plot)) %>% nrow 
 
 # read the Tomst data in
 mylist <- lapply(fi$file, readdata)
