@@ -62,6 +62,64 @@ readdata <- function(i){
 }
 
 
+####GOLDEN GATE####
+datadir <- "All_data/raw_data/raw_microclimate_data/GoldenGate/Golden_Gate_Tomsp_Final_reading_Feb2024"
+
+# read names x tomst id table
+ids <- read.delim(paste0(datadir, "/", "tomst_ids.csv"), sep = ";") |>  
+  filter(site == "goldengate") |> 
+  rename(Cell = plot) |> 
+  mutate(Cell = toupper(Cell),
+         site = toupper(site),
+         plot = paste0(site, "_",grid,Cell))
+
+# List logger data files to read
+f <- list.files(datadir, pattern = "data_[0-9]", full.names = T, recursive = T)
+
+fi <- data.frame(file = f)
+
+fi$TMS <- unlist(lapply(fi$file, function(x) as.numeric(strsplit(gsub("data_","",rev(strsplit(x, "/")[[1]])[1]), "_")[[1]][1])))
+
+fi <- full_join(fi, ids, by = join_by(TMS)) %>% 
+  mutate(plot = toupper(plot)) %>% 
+  filter(!is.na(file))
+
+fi$file2 <- gsub("_..csv", "", fi$file)
+
+fi <- fi[order(fi$plot),]
+
+# This should be zero
+fi %>% filter(is.na(plot)) %>% nrow 
+#there is one logger file that doesn't have info on which cell it was in. remove this file
+fi <- fi |> 
+  filter(!is.na(plot))
+
+# read the Tomst data in
+mylist <- lapply(fi$file, readdata)
+gg_microclim <- rbindlist( mylist )
+
+# Rename columns
+gg_microclim <- gg_microclim %>% rename(datetime = V2,
+                                        zone = V3,
+                                        soil_temp = V4, #T1
+                                        surface_temp = V5, #T2
+                                        air_temp = V6, #T3
+                                        moist = V7) 
+
+gg_microclim <- gg_microclim %>% arrange(plot, datetime) 
+
+# Remove implausible dates
+mind <- ymd("2023-01-01") #can't find the installation or extraction date. Assume these dates
+maxd <- ymd("2024-02-28")
+gg_microclim2 <- gg_microclim |> filter(between(datetime, mind, maxd)) |> 
+  distinct(datetime, plot, .keep_all = T) #remove duplicate rows
+
+#look at the duplicate rows for quality control
+gg_microclim |> 
+  group_by_all() |> 
+  filter(n() >1)
+
+
 ####WITSIESHOEK####
 datadir <- "All_data/raw_data/raw_microclimate_data/Witsieshoek/Witsies_Tomst_data_final_reading_Feb2024"
 
