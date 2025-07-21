@@ -30,6 +30,9 @@ readdata <- function(i){
     df2 %>% filter(!duplicated(.$V2, fromLast = T)) -> df2
     
     df2$plot <- fi[which(fi$file2 == ii),"plot"]
+    df2$site <- fi[which(fi$file2 == ii),"site"]
+    df2$grid <- fi[which(fi$file2 == ii),"grid"]
+    df2$cell <- fi[which(fi$file2 == ii),"Cell"]
     
     df2 %>% mutate(across(V4:V6, ~as.numeric(gsub(",",".\\",.)))) -> df2
     
@@ -51,6 +54,9 @@ readdata <- function(i){
     d %>% mutate(across(V4:V6, ~as.numeric(gsub(",",".\\",.)))) -> d
     
     d$plot <- fi[which(fi$file == i),"plot"]
+    d$site <- fi[which(fi$file == i),"site"]
+    d$grid <- fi[which(fi$file == i),"grid"]
+    d$cell <- fi[which(fi$file == i),"Cell"]
     
     d %>% mutate(V2 = ymd_hm(V2, tz = "UTC")) %>% 
       mutate(V2 = with_tz(V2, tzone = "Etc/GMT-2")) -> d
