@@ -225,6 +225,11 @@ maxd <- ymd("2024-02-04") #from bokong logger notes file
 bk_microclim2 <- bk_microclim |> filter(between(datetime, mind, maxd)) |> 
   distinct(datetime, plot, .keep_all = T) #remove duplicate entries
 
+#look at the duplicate rows for quality control
+bk_microclim |> 
+  group_by_all() |> 
+  filter(n() >1)
+
 ####Write the cleaned microclimate data to text files####
 #Excel cna't open a table with this many rows, so we write it to a text file
 write.table(bk_microclim2, file = "All_data/clean_data/Tomst_data/Bokong_tomst_data.txt", sep = "\t",
