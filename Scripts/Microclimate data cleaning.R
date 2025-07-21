@@ -221,7 +221,7 @@ bk_microclim <- bk_microclim %>% arrange(plot, datetime)
 
 # Remove implausible dates
 mind <- ymd("2023-01-09") #the date of insertion is in a text file in the Bokong microclimate folder
-maxd <- ymd("2024-02-04")
+maxd <- ymd("2024-02-04") #from bokong logger notes file
 bk_microclim2 <- bk_microclim |> filter(between(datetime, mind, maxd)) |> 
   distinct(datetime, plot, .keep_all = T) #remove duplicate entries
 
@@ -232,5 +232,8 @@ write.table(bk_microclim2, file = "All_data/clean_data/Tomst_data/Bokong_tomst_d
 
 write.table(wh_microclim2, file = "All_data/clean_data/Tomst_data/Witsieshoek_tomst_data.txt", sep = "\t",
             row.names = TRUE, col.names = c(colnames(wh_microclim2)))
+
+write.table(gg_microclim2, file = "All_data/clean_data/Tomst_data/GoldenGate_tomst_data.txt", sep = "\t",
+            row.names = TRUE, col.names = c(colnames(gg_microclim2)))
 
 
