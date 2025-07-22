@@ -53,7 +53,7 @@ standardise_names <- function(data, #dataframe containing species names that nee
 }#end function
 
 ####GOLDEN GATE####
-GG <- read.xlsx("All_data/raw_trait_data/GG_dataset_Functional_traits.xlsx") |> 
+GG <- read.xlsx("All_data/raw_data/raw_trait_data/GG_dataset_Functional_traits.xlsx") |> 
   select(Ref.number:Notes) |> 
   mutate(Cell = str_split_i(Grid_Cell, "_", 2)) #this creates 2 NA's
 #the NA's are created because the Grid_Cell column does not follow the same format as the others
@@ -98,7 +98,7 @@ GG[which(GG$Width_at_tear_mm == "BA"), ] #they will get NA
 GG$Width_at_tear_mm <- as.numeric(GG$Width_at_tear_mm)
 
 #standardise names
-name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
+name_trail <- read.xlsx("All_data/clean_data/Species names/micro_climb_ALL_names_editing - Copy.xlsx", sheet = "editing")
 GG_clean_names <- standardise_names(data = GG, data_species_column = "Taxon", 
                                       naming_system = name_trail, correct_name = "taxon", 
                                     synonym = c("synonym1", "synonym2", "synonym3"))
@@ -111,7 +111,7 @@ GG_probs <- GG_clean_names |>
 
   
 ####WITSIESHOEK####
-WH <- read.xlsx("All_data/raw_trait_data/WH_Functional_traits_dataset.xlsx", sheet = "Data_entry") |> 
+WH <- read.xlsx("All_data/raw_data/raw_trait_data/WH_Functional_traits_dataset.xlsx", sheet = "Data_entry") |> 
   mutate(Cell = paste0(Column, Row), 
          Site = "WH") |> 
   select(!c(Date, Column, Row))
@@ -161,7 +161,7 @@ WH <- WH |>
   mutate(SLA = Total_leaf_area_cm2/Dry_mass_mg)
 
 #standardise names
-name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
+name_trail <- read.xlsx("All_data/clean_data/Species names/micro_climb_ALL_names_editing - Copy.xlsx", sheet = "editing")
 WH_clean_names <- standardise_names(data = WH, data_species_column = "Taxon", 
                                     naming_system = name_trail, correct_name = "taxon", 
                                     synonym = c("synonym1", "synonym2", "synonym3"))
@@ -169,7 +169,7 @@ unique(WH_clean_names$change_tracker) #all in order
 
 
 ####BOKONG####
-BK <- read.xlsx("All_data/raw_trait_data/FT_Bokong_19Nov.xlsx", sheet = "FT measurements") |> 
+BK <- read.xlsx("All_data/raw_data/raw_trait_data/FT_Bokong_19Nov.xlsx", sheet = "FT measurements") |> 
   select(!Date) |> 
   mutate(Site = "BK")
 
@@ -271,6 +271,7 @@ FTT_outlier <- FT_allsites[which(FT_allsites$FTT_tail == "high_tail"), ]
 
 FT_allsites$H_tail <- get_trait_tails(FT_allsites$Height_cm, tail_threshold)
 H_outlier <- FT_allsites[which(FT_allsites$H_tail == "high_tail"), ] 
+#ruschia puterilli has a height of 87, which is impossible
 
 FT_allsites$SLA_tail <- get_trait_tails(FT_allsites$SLA, tail_threshold)
 SLA_outlier <- FT_allsites[which(FT_allsites$SLA_tail == "high_tail"), ] 
@@ -282,7 +283,7 @@ Thickness_problems <- Thickness_outlier[order(Thickness_outlier$Thickness_mm), ]
 #The two highest values are a little wack
 #Tenaxia disticha with thickness = 26mm
 #Gazania krebsiana with thickness = 95mm
-#remove these values, correct in FT_checked
+#remove these values, correct in FT_checked "BK619"  "GG1609"
 FT_checked[which(FT_checked$Sample_ID %in% c(Thickness_problems)), which(colnames(FT_checked) == "Thickness_mm")] <- NA
 
 FT_allsites$TLA_tail <- get_trait_tails(FT_allsites$Total_leaf_area_cm2, tail_threshold)
@@ -300,11 +301,11 @@ Width_outlier <- FT_allsites[which(FT_allsites$Width_tail == "high_tail"), ]
 Width_outlier[which(Width_outlier$Taxon == "elionurus_muticus") , ]
 Width_outlier[which(Width_outlier$Taxon == "pentameris_setifolia") , ] #this one is probably fine
 
-#Fix the elionurus problem
+#Fix the elionurus problem "GG1788"
 Width_problem1 <- Width_outlier[which(Width_outlier$Taxon == "elionurus_muticus") , which(colnames(Width_outlier) == "Sample_ID")]
 FT_checked[which(FT_checked$Sample_ID == Width_problem1), which(colnames(FT_checked) == "Width_at_tear_mm")] <- NA
 
-#fix the 3 highest widths
+#fix the 3 highest widths "BK867"  "WH2132" "BK265"
 Width_problem2 <- Width_outlier[order(Width_outlier$Width_at_tear_mm), ][c(131:133), which(colnames(Width_outlier) == "Sample_ID")]
 FT_checked[which(FT_checked$Sample_ID %in% Width_problem2), which(colnames(FT_checked) == "Width_at_tear_mm")] <- NA
 
@@ -341,16 +342,18 @@ mass_problems <- FT_checked |>
 
 #now we have to make these masses NA
 #sample ID's to change wet_mass
-change_wet_mass <- mass_problems[which(mass_problems$Taxon %in% c("watsonia", "searsia_discolor", "themeda_triandra", 
+#"GG1597" "GG217"  "GG1542" "WH117"  "WH974"  "WH1138" "WH1383" "WH1469" "WH1805" "WH2511" "WH2866" "WH2938"
+change_wet_mass <- mass_problems[which(mass_problems$Taxon %in% c("watsonia_sp1", "searsia_discolor", "themeda_triandra", 
                                                                   "trifolium_burchellianium", "elionurus_muticus", 
                                                                   "berkheya_rhapontica", "helichrysum_aureum", 
                                                                   "festuca_scabra", "senecio_coronatus", "helichrysum_ecklonis", 
                                                                   "senecio_glaberrimus")), which(colnames(mass_problems) == "Sample_ID")]
 
 change_all_mass <- mass_problems[which(mass_problems$Taxon %in% c("aristida_junciformis")), which(colnames(mass_problems) == "Sample_ID")]
-
+#"GG625"
 
 change_dry_mass <- mass_problems[which(mass_problems$Taxon %in% c("eragrostis_capensis", "diheteropogon_filifolius")), which(colnames(mass_problems) == "Sample_ID")]
+#"WH2015" "WH2019"
 
 #overwrite unreliable values with NA
 FT_checked[which(FT_checked$Sample_ID %in% c(change_wet_mass)), which(colnames(FT_checked) == "Wet_mass_mg")] <- NA
