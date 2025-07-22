@@ -141,22 +141,24 @@ WH <- read.xlsx("All_data/raw_data/raw_trait_data/WH_Functional_traits_dataset.x
   mutate(Cell = paste0(Column, Row), 
          Site = "WH") |> 
   select(!c(Date, Column, Row))
+#The number of leaves column was created in excel from the notes column
 
 #clean up column names
 names(WH) <- gsub("\\.", "_", names(WH)) #replace full stops in column names
 names(WH) <- gsub("[()]", "", names(WH)) #remove brackets
 
 WH <- WH |> #try to standardise column names between the datasets
+  select(!Average_Leaf_Area) |> 
   rename(Taxon = Species, 
          Wet_mass_mg = Wet_Mass, 
          Dry_mass_mg = Dry_Mass, 
          Chlorophyll_mg_per_m2 = Chlorophyll, 
-         Total_leaf_area_cm2 = Total_Leaf_Area, 
-         Average_leaf_area_cm2  = Average_Leaf_Area, 
+         Leaf_area_cm2 = Total_Leaf_Area, 
          Scan_name = Scan_Name, 
          Sample_ID = Envelope_Number, 
          Width_at_tear_mm = Width_mm, 
-         Notes2 = X18) |> 
+         Number_of_Leaves = Number_of_leaves,
+         Notes2 = X19) |> 
   mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
          Taxon = str_squish(Taxon),
          Taxon = str_replace_all(Taxon, " ", "_"), 
@@ -182,9 +184,32 @@ unique(WH$Dry_mass_mg) #there are scan names in here
 WH[grep("jpg", WH$Dry_mass_mg), ] #these will get NA, what are the numbers in the notes column??
 WH$Dry_mass_mg <- as.numeric(WH$Dry_mass_mg)
 
+
+###Make sure that only mass and area per leaf are given
+###We must remove total area and total mass that represent the measurement of more than one leaf
+for(i in 1:nrow(WH)) {
+  nleaves <- WH[i, which(colnames(WH) == "Number_of_Leaves")]
+  
+  if(is.na(nleaves) == FALSE) {
+  
+  if(nleaves > 1) {
+    #work out wet mass per leaf and replace the total wet mass
+    wet_mass_per_leaf <- WH[i, which(colnames(WH) == "Wet_mass_mg")]/nleaves
+    WH[i, which(colnames(WH) == "Wet_mass_mg")] <- wet_mass_per_leaf
+    
+    #work out dry mass per leaf and replace the total wet mass
+    dry_mass_per_leaf <- WH[i, which(colnames(WH) == "Dry_mass_mg")]/nleaves
+    WH[i, which(colnames(WH) == "Dry_mass_mg")] <- dry_mass_per_leaf
+    
+    area_per_leaf <- WH[i, which(colnames(WH) == "Leaf_area_cm2")]/nleaves
+    WH[i, which(colnames(WH) == "Leaf_area_cm2")] <- area_per_leaf
+    
+  }}}
+
+
 #now we can calculate SLA
 WH <- WH |> 
-  mutate(SLA = Total_leaf_area_cm2/Dry_mass_mg)
+  mutate(SLA = Leaf_area_cm2/Dry_mass_mg)
 
 #standardise names
 name_trail <- read.xlsx("All_data/clean_data/Species names/micro_climb_ALL_names_editing - Copy.xlsx", sheet = "editing")
