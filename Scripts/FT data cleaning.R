@@ -212,7 +212,7 @@ WH <- WH |>
   mutate(SLA = Leaf_area_cm2/Dry_mass_mg)
 
 #standardise names
-name_trail <- read.xlsx("All_data/clean_data/Species names/micro_climb_ALL_names_editing - Copy.xlsx", sheet = "editing")
+name_trail <- read.xlsx("All_data/clean_data/Species names/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
 WH_clean_names <- standardise_names(data = WH, data_species_column = "Taxon", 
                                     naming_system = name_trail, correct_name = "taxon", 
                                     synonym = c("synonym1", "synonym2", "synonym3"))
