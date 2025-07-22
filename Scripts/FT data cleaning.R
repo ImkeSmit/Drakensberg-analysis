@@ -67,11 +67,10 @@ names(GG) <- gsub("[()]", "", names(GG)) #remove brackets
 
 #Rename columns, and drop the Grid_Cell_column
 GG <- GG |> 
-  select(!c(Grid_Cell, `Dry/Wet`)) |> 
+  select(!c(Grid_Cell, `Dry/Wet`, Average_Area_cm2)) |> 
   rename(Taxon = Species, 
-         Total_leaf_area_cm2 = Total_Area_cm2, 
+         Leaf_area_cm2 = Total_Area_cm2, 
          Chlorophyll_mg_per_m2 = 'Chlor_mg/m2', 
-         Average_leaf_area_cm2 = Average_Area_cm2, 
          Scan_name = Image_number, 
          Width_at_tear_mm = Width_mm, 
          Sample_ID = Ref_number) |> 
@@ -96,6 +95,33 @@ GG$FTT_N <- as.numeric(GG$FTT_N)
 unique(GG$Width_at_tear_mm) #There are values of BA and NA
 GG[which(GG$Width_at_tear_mm == "BA"), ] #they will get NA
 GG$Width_at_tear_mm <- as.numeric(GG$Width_at_tear_mm)
+
+
+###Make sure that only mass and area per leaf are given
+###We must remove total area and total mass that represent the measurement of more than one leaf
+for(i in 1:nrow(GG)) {
+  nleaves <- GG[i, which(colnames(GG) == "Number_of_Leaves")]
+  
+if(nleaves > 1) {
+  #work out wet mass per leaf and replace the total wet mass
+  wet_mass_per_leaf <- GG[i, which(colnames(GG) == "Wet_mass_mg")]/nleaves
+  GG[i, which(colnames(GG) == "Wet_mass_mg")] <- wet_mass_per_leaf
+  
+  #work out dry mass per leaf and replace the total wet mass
+  dry_mass_per_leaf <- GG[i, which(colnames(GG) == "Dry_mass_mg")]/nleaves
+  GG[i, which(colnames(GG) == "Dry_mass_mg")] <- dry_mass_per_leaf
+  
+  area_per_leaf <- GG[i, which(colnames(GG) == "Leaf_area_cm2")]/nleaves
+  GG[i, which(colnames(GG) == "Leaf_area_cm2")] <- area_per_leaf
+  
+}}
+
+
+#work out SLA again after replacing total area and mass with area and mass per leaf
+GG <- GG |> 
+  mutate(SLA = Leaf_area_cm2/Dry_mass_mg)
+  
+
 
 #standardise names
 name_trail <- read.xlsx("All_data/clean_data/Species names/micro_climb_ALL_names_editing - Copy.xlsx", sheet = "editing")
@@ -364,6 +390,9 @@ FT_checked[which(FT_checked$Sample_ID %in% c(change_all_mass)), which(colnames(F
 #if dry mass is unreliable we have to change the SLA too
 FT_checked[which(FT_checked$Sample_ID %in% c(change_dry_mass)), which(colnames(FT_checked) %in% c("Dry_mass_mg", "SLA"))] <- NA
 
+
+
+###
 
 
 ###When finished, write to file
