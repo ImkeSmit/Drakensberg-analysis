@@ -272,6 +272,9 @@ FTT_outlier <- FT_allsites[which(FT_allsites$FTT_tail == "high_tail"), ]
 FT_allsites$H_tail <- get_trait_tails(FT_allsites$Height_cm, tail_threshold)
 H_outlier <- FT_allsites[which(FT_allsites$H_tail == "high_tail"), ] 
 #ruschia puterilli has a height of 87, which is impossible
+H_problems <- H_outlier[which(H_outlier$Taxon == "ruschia_putterillii"), which(colnames(Thickness_outlier) == "Sample_ID")]
+FT_checked[which(FT_checked$Sample_ID == H_problems), which(colnames(FT_checked) == "Height_cm")] <- NA
+
 
 FT_allsites$SLA_tail <- get_trait_tails(FT_allsites$SLA, tail_threshold)
 SLA_outlier <- FT_allsites[which(FT_allsites$SLA_tail == "high_tail"), ] 
