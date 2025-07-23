@@ -7,20 +7,7 @@ library(ggplot2)
 library(openxlsx)
 
 ####GOLDEN GATE####
-gg_spring <- read_excel("All_data/raw_occurrence_data/GoldenGate/GoldenGate_grids_2019_09_27.xlsx", 
-                        sheet = "Species_data_spring") |> 
-  select(!Richness) |> 
-  pivot_longer(cols = 4:146, names_to = "taxon", values_to = "cover") |> 
-  rename(grid = Grid, column = Column, row = Row) |> 
-  mutate(site = "GG", 
-         cellref = paste0(site, grid, column, row))
-
-#check that all grids and cells are there:
-length(unique(gg_spring$grid)) #only 4
-length(unique(gg_spring$cellref)) #640 all cells from the 4 grids present
-
-
-gg_summer <- read_excel("All_data/raw_occurrence_data/GoldenGate/GoldenGate_grids_2019_09_27.xlsx", 
+gg_summer <- read_excel("All_data/raw_data/raw_occurrence_data/GoldenGate/GoldenGate_grids_2019_09_27.xlsx", 
                         sheet = "Species_data_summer", col_names = as.character(c(1:212))) |> 
   row_to_names(row_number = 2) |> 
   clean_names() |> #makes all colnames lowercase and with underscores
@@ -45,7 +32,7 @@ max(gg_summer$cover)
 class(gg_summer$cover)
 
 ####WITSIESHOEK####
-wh <- read_excel("All_data/raw_occurrence_data/Witsieshoek/Data entry 22 Mar 2023.xlsx", sheet = 1) |> 
+wh <- read_excel("All_data/raw_data/raw_occurrence_data/Witsieshoek/Data entry 22 Mar 2023.xlsx", sheet = 1) |> 
   clean_names() |> 
   select(!species_richness) |> 
   pivot_longer(cols= 4:187, names_to = "taxon", values_to = "cover") |> 
@@ -65,7 +52,7 @@ max(wh$cover)
 
 
 ####BOKONG####
-bk <- read_excel("All_data/raw_occurrence_data/Bokong/BNR_vegetation_survey_data_updatedMarch2023.xlsx", sheet = "Veg_data", 
+bk <- read_excel("All_data/raw_data/raw_occurrence_data/Bokong/BNR_vegetation_survey_data_updatedMarch2023.xlsx", sheet = "Veg_data", 
                  col_names = as.character(c(1:1677))) |>
   select(!2) |> 
   t() |> 
@@ -213,17 +200,17 @@ standardise_names <- function(data, #dataframe containing species names that nee
 
 
 #import naming system 
-name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
+name_trail <- read.xlsx("All_data/clean_data/Species names/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
 
 #clean names of veg surveys on elevation gradient
 gg_summer_clean_names <- standardise_names(gg_summer, "taxon", naming_system = name_trail, 
-                                    "taxon", c("synonym1", "synonym2", "synonym3"))
+                                    "taxon", c("synonym1", "synonym2", "synonym3", "synonym4"))
 
 wh_clean_names <- standardise_names(wh, "taxon", naming_system = name_trail, 
-                                    "taxon", c("synonym1", "synonym2", "synonym3"))
+                                    "taxon", c("synonym1", "synonym2", "synonym3", "synonym4"))
 
 bk_clean_names <- standardise_names(bk, "taxon", naming_system = name_trail, 
-                                    "taxon", c("synonym1", "synonym2", "synonym3"))
+                                    "taxon", c("synonym1", "synonym2", "synonym3", "synonym4"))
 
 
 #Quality control the names changes
@@ -235,6 +222,7 @@ unique(bk_clean_names$change_tracker)
 #Bind all three sites together and export
 micro_climb_veg_survey <- gg_summer_clean_names |> 
   bind_rows(wh_clean_names) |> 
-  bind_rows(bk_clean_names)
+  bind_rows(bk_clean_names) |> 
+  select(!change_tracker)
 
 write.xlsx(micro_climb_veg_survey, "All_data/clean_data/micro_climb_occurrence.xlsx")
