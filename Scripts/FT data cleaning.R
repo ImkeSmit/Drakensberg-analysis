@@ -220,7 +220,7 @@ unique(WH_clean_names$change_tracker) #all in order
 
 
 ####BOKONG####
-BK <- read.xlsx("All_data/raw_data/raw_trait_data/FT_Bokong_19Nov.xlsx", sheet = "FT measurements") |> 
+BK <- read.xlsx("All_data/raw_data/raw_trait_data/FT_Bokong_Edited.xlsx", sheet = "FT measurements") |> 
   select(!Date) |> 
   mutate(Site = "BK")
 
@@ -229,10 +229,14 @@ names(BK) <- gsub("\\.", "_", names(BK)) #replace full stops in column names
 names(BK) <- gsub("[()]", "", names(BK)) #remove brackets
 
 BK <- BK |> 
-  rename(Taxon = Species, 
+  select(!c(Dry_mass_mg, Area_cm2,)) |> #remove columns that represent total mass or area
+  rename(Leaf_area_cm2 = Area_per_leaf, #these columns represent the measurement per leaf, we only want them
+         Dry_mass_mg = Mass_per_leaf,
+         Taxon = Species, 
          Chlorophyll_mg_per_m2 = Chlorofil, 
          Scan_name = Image_reference, 
-         FTT_N = FTT) |> 
+         FTT_N = FTT, 
+         SLA_notes = X20) |> 
   mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
          Taxon = str_squish(Taxon),
          Taxon = str_replace_all(Taxon, " ", "_"), 
@@ -253,6 +257,28 @@ BK$FTT_N <- as.numeric(BK$FTT_N)
 unique(BK$Width_at_tear_mm) #again values of cannot take measurement
 BK[which(BK$Width_at_tear_mm == "Cannot take measurement") , ]
 BK$Width_at_tear_mm <- as.numeric(BK$Width_at_tear_mm)
+
+
+###Make sure that only mass and area per leaf are given
+###Dry mass and area per leaf were already worked out in the sheet. 
+#however we still need to calculate wet mass per leaf
+for(i in 1:nrow(BK)) {
+  nleaves <- BK[i, which(colnames(BK) == "Number_of_leaves_collected")] #this is the number of fresh leaves collected and weighed for wet mass
+  
+  if(nleaves > 1) {
+    #work out wet mass per leaf and replace the total wet mass
+    wet_mass_per_leaf <- BK[i, which(colnames(BK) == "Wet_mass_mg")]/nleaves
+    BK[i, which(colnames(BK) == "Wet_mass_mg")] <- wet_mass_per_leaf
+    
+  }}
+
+#SLA is already correctly worked out in this sheet
+
+#there are entries of Dry_mass_mg = 0. These were wehn the envelope was empty. 
+#replace with NA
+BK[which(BK$Dry_mass_mg == 0), ] #look at the records first
+BK[which(BK$Dry_mass_mg == 0), which(colnames(BK) == "Dry_mass_mg")] <- NA
+
 
 #standardise names
 name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
