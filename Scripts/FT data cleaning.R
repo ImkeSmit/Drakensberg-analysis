@@ -439,7 +439,7 @@ ggplot(FT_checked) +
   geom_point(aes(x = LDMC, y = Wet_mass_mg))
 
 #the three highest LDMC values may definitely be outliers
-FT_checked |> slice_max(LDMC, n = 3)
+FT_checked |> slice_max(LDMC, n = 4)
 
 #festuca scabra has LDMC of 19500 WH1469
 FT_checked |> 
@@ -450,10 +450,31 @@ FT_checked |>
 FT_checked[which(FT_checked$Sample_ID == "WH1469"), which(colnames(FT_checked) %in% c("Wet_mass_mg", "LDMC"))] <- NA
 
 #watsonia_sp1 has LDMC of 14064.64 GG1597
+FT_checked |> 
+  filter(Taxon == "watsonia_sp1") |> 
+  ggplot(aes(x = LDMC)) +
+  geom_histogram()
+#clear outlier, wet mass is the problem, make NA
+FT_checked[which(FT_checked$Sample_ID == "GG1597"), which(colnames(FT_checked) %in% c("Wet_mass_mg", "LDMC"))] <- NA
 
 #trifolium burchellianum has LDMC of 7600 WH117
+FT_checked |> 
+  filter(Taxon == "trifolium_burchellianium") |> 
+  ggplot(aes(x = LDMC)) +
+  geom_histogram()
+#clear outlier, wet mass is the problem, make NA
+FT_checked[which(FT_checked$Sample_ID == "WH117"), which(colnames(FT_checked) %in% c("Wet_mass_mg", "LDMC"))] <- NA
 
+#eragrostis capensis has LDMC of 4583 WH2015
+FT_checked |> 
+  filter(Taxon == "eragrostis_capensis") |> 
+  ggplot(aes(x = LDMC)) +
+  geom_histogram()
 
+check <- FT_checked |> 
+  filter(Taxon == "eragrostis_capensis") 
+#clear outlier, dry mass is the problem, make NA
+FT_checked[which(FT_checked$Sample_ID == "WH2015"), which(colnames(FT_checked) %in% c("Dry_mass_mg", "LDMC", "SLA"))] <- NA
 
 
 ggplot(FT_checked) +
