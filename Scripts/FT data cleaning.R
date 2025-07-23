@@ -139,7 +139,7 @@ unique(GG_clean_names$change_tracker) #all in order
 
   
 ####WITSIESHOEK####
-WH <- read.xlsx("All_data/raw_data/raw_trait_data/WH_Functional_traits_dataset.xlsx", sheet = "Data_entry") |> 
+WH <- read.xlsx("All_data/raw_data/raw_trait_data/WH_Functional_traits_dataset2.xlsx", sheet = "Data_entry") |> 
   mutate(Cell = paste0(Column, Row), 
          Site = "WH") |> 
   select(!c(Date, Column, Row))
@@ -345,10 +345,6 @@ get_trait_tails <- function(trait_vector, threshold = 0.05) {
 
 FT_allsites$LA_tail <- get_trait_tails(FT_allsites$Leaf_area_cm2, tail_threshold)
 LA_outlier <- FT_allsites[which(FT_allsites$LA_tail == "high_tail"), ] #those with very high LA are all large leaved sp
-#WH125 is oxalis obliquifolia with very large LA. I looked on the scan and there is no oxalis on that scan
-FT_allsites[which(FT_allsites$Scan_name == "WH_22-11-22_027"), ] #none of the sp seem correct
-FT_allsites[which(FT_allsites$Scan_name == "WH_22-11-22_028"), ]
-#these outliers are removed later in the graphing checks
 
 
 FT_allsites$Chlor_tail <- get_trait_tails(FT_allsites$Chlorophyll_mg_per_m2, tail_threshold)
@@ -423,14 +419,6 @@ FT_allsites |>
 #make NA
 FT_checked[which(FT_checked$Sample_ID == "WH2018"), which(colnames(FT_checked) %in% c("SLA", "Dry_mass_mg"))] <- NA
 
-#oxalis obliquifolia with SLA of 47.22 WH125
-FT_allsites |> 
-  filter(Taxon == "oxalis_obliquifolia") |> 
-  ggplot(aes(x = SLA)) +
-  geom_histogram()
-#the leaf area is very high, causing the problem, make NA
-FT_checked[which(FT_checked$Sample_ID == "WH125"), which(colnames(FT_checked) %in% c("SLA", "Leaf_area_cm2"))] <- NA
-
 #bulbostylis humilis has SLA of 3.104
 FT_allsites |> 
   filter(Taxon == "bulbostylis_humilis") |> 
@@ -501,14 +489,6 @@ mass_problems <- FT_checked |>
   filter(Dry_mass_mg > Wet_mass_mg)
 
 #yes, compare the masses of these records to the general masses of each sp
-
-#Wet mass unreliable: watsonia, searsia_discolor,themeda_triandra, trifolium_burchellianum, 
-#elionurus_muticus, berkheya rhapontica, helichrysum_aureum, festuca_scabra, senecio coronatus,
-#helichrysum ecklonis, senecio_glaberrimus 
-
-#Don't know which mass is unreliable: aristida_junciformis
-
-#Dry mass unreliable: eragrostis_capensis, diheteropogon_filifolius
 
 #now we have to make these masses NA
 #sample ID's to change wet_mass
