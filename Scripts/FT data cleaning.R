@@ -229,7 +229,7 @@ names(BK) <- gsub("\\.", "_", names(BK)) #replace full stops in column names
 names(BK) <- gsub("[()]", "", names(BK)) #remove brackets
 
 BK <- BK |> 
-  select(!c(Dry_mass_mg, Area_cm2,)) |> #remove columns that represent total mass or area
+  select(!c(Dry_mass_mg, Area_cm2)) |> #remove columns that represent total mass or area
   rename(Leaf_area_cm2 = Area_per_leaf, #these columns represent the measurement per leaf, we only want them
          Dry_mass_mg = Mass_per_leaf,
          Taxon = Species, 
@@ -240,7 +240,8 @@ BK <- BK |>
   mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
          Taxon = str_squish(Taxon),
          Taxon = str_replace_all(Taxon, " ", "_"), 
-         Sample_ID = paste0(Site, Sample_ID))
+         Sample_ID = paste0(Site, Sample_ID), 
+         Ft_N_per_mm = FTT_N/Width_at_tear_mm) #force to tear is the force to tear the leaf divided by leaf width
 
 #Check that all trait values are numeric
 summary(BK)
@@ -279,6 +280,10 @@ for(i in 1:nrow(BK)) {
 BK[which(BK$Dry_mass_mg == 0), ] #look at the records first
 BK[which(BK$Dry_mass_mg == 0), which(colnames(BK) == "Dry_mass_mg")] <- NA
 
+
+#remove all unnecessary columns
+BK <- BK |> 
+  select(!c(Number_of_leaves_weighed, Notes, X22, Number_of_leaves_collected, FTT_N, Width_at_tear_mm))
 
 #standardise names
 name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
