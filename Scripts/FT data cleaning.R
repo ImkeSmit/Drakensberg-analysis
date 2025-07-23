@@ -118,8 +118,12 @@ if(nleaves > 1) {
 
 
 #work out SLA again after replacing total area and mass with area and mass per leaf
+#also work out LDMC, Ft
 GG <- GG |> 
-  mutate(SLA = Leaf_area_cm2/Dry_mass_mg)
+  mutate(SLA = Leaf_area_cm2/Dry_mass_mg, 
+         LDMC = Dry_mass_mg/ (Wet_mass_mg / 1000),
+         Ft = FTT_N / Width_at_tear_mm) |> #Force to tear is the force to tear the leaf divided by the width
+  select(!c(Number_of_Leaves, Notes, Area_Notes, FTT_N, Width_at_tear_mm))
   
 
 
@@ -131,9 +135,7 @@ GG_clean_names <- standardise_names(data = GG, data_species_column = "Taxon",
 unique(GG_clean_names$change_tracker) #all in order
 
 
-###Let's look at the notes
-GG_probs <- GG_clean_names |> 
-  filter(!is.na(Area_Notes) | !is.na(Notes))
+
 
   
 ####WITSIESHOEK####
@@ -207,9 +209,12 @@ for(i in 1:nrow(WH)) {
   }}}
 
 
-#now we can calculate SLA
+#Calculate SLA, LDMC, Ft and remove unnesecary columns
 WH <- WH |> 
-  mutate(SLA = Leaf_area_cm2/Dry_mass_mg)
+  mutate(SLA = Leaf_area_cm2/Dry_mass_mg, 
+         LDMC = Dry_mass_mg/ (Wet_mass_mg / 1000),
+         Ft = FTT_N / Width_at_tear_mm) |> #Force to tear is the force to tear the leaf divided by the width
+  select(!c(Number_of_Leaves, Notes, Notes2, FTT_N, Width_at_tear_mm))
 
 #standardise names
 name_trail <- read.xlsx("All_data/clean_data/Species names/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
@@ -301,10 +306,11 @@ FT_allsites <- GG_clean_names |>
   bind_rows(BK_clean_names)
 
 #make a copy to apply corrections to
-FT_checked <- FT_allsites
+FT_checked <- FT_allsites |> 
+  select(!change_tracker)
 
 FT_long <- FT_allsites |> 
-  pivot_longer(cols = Wet_mass_mg:SLA, names_to = "Trait", values_to = "Value")
+  pivot_longer(cols = c(Wet_mass_mg:SLA, LDMC, Ft), names_to = "Trait", values_to = "Value")
 
 #check the distributions of all variables
 ggplot(FT_long) + 
@@ -337,8 +343,12 @@ get_trait_tails <- function(trait_vector, threshold = 0.05) {
 }
 
 
-FT_allsites$LA_tail <- get_trait_tails(FT_allsites$Average_leaf_area_cm2, tail_threshold)
+FT_allsites$LA_tail <- get_trait_tails(FT_allsites$Leaf_area_cm2, tail_threshold)
 LA_outlier <- FT_allsites[which(FT_allsites$LA_tail == "high_tail"), ] #those with very high LA are all large leaved sp
+#WH125 is oxalis obliquifolia with very large LA. I looked on the scan and there is no oxalis on that scan
+FT_allsites[which(FT_allsites$Scan_name == "WH_22-11-22_027"), ] #none of the sp seem correct
+FT_allsites[which(FT_allsites$Scan_name == "WH_22-11-22_028"), ]
+
 
 FT_allsites$Chlor_tail <- get_trait_tails(FT_allsites$Chlorophyll_mg_per_m2, tail_threshold)
 Chlor_outlier <- FT_allsites[which(FT_allsites$Chlor_tail == "low_tail"), ] #all seem in order, no notes about sp with low chlorophyll readings
@@ -347,20 +357,20 @@ FT_allsites$Dry_mass_tail <- get_trait_tails(FT_allsites$Dry_mass, tail_threshol
 Dry_mass_outlier <- FT_allsites[which(FT_allsites$Dry_mass_tail == "high_tail"), ] #heavy leaves make sense for these sp
 
 
-FT_allsites$FTT_tail <- get_trait_tails(FT_allsites$FTT_N, tail_threshold)
-FTT_outlier <- FT_allsites[which(FT_allsites$FTT_tail == "high_tail"), ] 
-#two have notes of FTT-split in GG, what does it mean? Otherwise nothing alarming
+FT_allsites$Ft_tail <- get_trait_tails(FT_allsites$Ft, tail_threshold)
+Ft_outlier <- FT_allsites[which(FT_allsites$Ft_tail == "high_tail"), ] 
 
 FT_allsites$H_tail <- get_trait_tails(FT_allsites$Height_cm, tail_threshold)
 H_outlier <- FT_allsites[which(FT_allsites$H_tail == "high_tail"), ] 
 #ruschia puterilli has a height of 87, which is impossible
-H_problems <- H_outlier[which(H_outlier$Taxon == "ruschia_putterillii"), which(colnames(Thickness_outlier) == "Sample_ID")]
+H_problems <- H_outlier[which(H_outlier$Taxon == "ruschia_putterillii"), which(colnames(H_outlier) == "Sample_ID")]
 FT_checked[which(FT_checked$Sample_ID == H_problems), which(colnames(FT_checked) == "Height_cm")] <- NA
 
 
 FT_allsites$SLA_tail <- get_trait_tails(FT_allsites$SLA, tail_threshold)
 SLA_outlier <- FT_allsites[which(FT_allsites$SLA_tail == "high_tail"), ] 
 #many succulens which make sense, will have to test this another way too
+#Again there is WH125 which has the highest SLA
 
 FT_allsites$Thickness_tail <- get_trait_tails(FT_allsites$Thickness_mm, tail_threshold)
 Thickness_outlier <- FT_allsites[which(FT_allsites$Thickness_tail == "high_tail"), ] 
