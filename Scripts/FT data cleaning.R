@@ -375,11 +375,12 @@ SLA_outlier <- FT_allsites[which(FT_allsites$SLA_tail == "high_tail"), ]
 
 FT_allsites$Thickness_tail <- get_trait_tails(FT_allsites$Thickness_mm, tail_threshold)
 Thickness_outlier <- FT_allsites[which(FT_allsites$Thickness_tail == "high_tail"), ] 
-Thickness_problems <- Thickness_outlier[order(Thickness_outlier$Thickness_mm), ][c(309,310), which(colnames(Thickness_outlier) == "Sample_ID")]
-#The two highest values are a little wack
+Thickness_problems <- Thickness_outlier[order(Thickness_outlier$Thickness_mm), ][c(308,309,310), which(colnames(Thickness_outlier) == "Sample_ID")]
+#The 3 highest values are a little wack
+#Scilla natalensis = 6mm
 #Tenaxia disticha with thickness = 26mm
 #Gazania krebsiana with thickness = 95mm
-#remove these values, correct in FT_checked "BK619"  "GG1609"
+#remove these values, correct in FT_checked "GG350"  "BK619"  "GG1609"
 FT_checked[which(FT_checked$Sample_ID %in% c(Thickness_problems)), which(colnames(FT_checked) == "Thickness_mm")] <- NA
 
 FT_allsites$Wet_mass_tail <- get_trait_tails(FT_allsites$Wet_mass_mg, tail_threshold)
@@ -430,6 +431,12 @@ FT_allsites |>
 #the leaf area is very high, causing the problem, make NA
 FT_checked[which(FT_checked$Sample_ID == "WH125"), which(colnames(FT_checked) %in% c("SLA", "Leaf_area_cm2"))] <- NA
 
+#bulbostylis humilis has SLA of 3.104
+FT_allsites |> 
+  filter(Taxon == "bulbostylis_humilis") |> 
+  ggplot(aes(x = SLA)) +
+  geom_histogram() #jaa that is high but doesn't seem impossible
+
 
 ###LDMC###
 ggplot(FT_checked) +
@@ -478,10 +485,10 @@ FT_checked[which(FT_checked$Sample_ID == "WH2015"), which(colnames(FT_checked) %
 
 
 ggplot(FT_checked) +
-  geom_point(aes(x = SLA, y = Total_leaf_area_cm2))
+  geom_point(aes(y = SLA, x = Leaf_area_cm2))
 
 ggplot(FT_checked) +
-  geom_point(aes(y = Total_leaf_area_cm2, x = Dry_mass_mg))
+  geom_point(aes(y = Leaf_area_cm2, x = Dry_mass_mg))
 
 ggplot(FT_checked) +
   geom_point(aes(y = SLA, x = Thickness_mm))
@@ -505,24 +512,24 @@ mass_problems <- FT_checked |>
 
 #now we have to make these masses NA
 #sample ID's to change wet_mass
-#"GG1597" "GG217"  "GG1542" "WH117"  "WH974"  "WH1138" "WH1383" "WH1469" "WH1805" "WH2511" "WH2866" "WH2938"
-change_wet_mass <- mass_problems[which(mass_problems$Taxon %in% c("watsonia_sp1", "searsia_discolor", "themeda_triandra", 
-                                                                  "trifolium_burchellianium", "elionurus_muticus", 
+#"GG217"  "GG1542" "WH974"  "WH1138" "WH1383" "WH1805" "WH2511" "WH2866" "WH2938" "BK291"
+change_wet_mass <- mass_problems[which(mass_problems$Taxon %in% c("searsia_discolor", "themeda_triandra", 
+                                                                  "elionurus_muticus", 
                                                                   "berkheya_rhapontica", "helichrysum_aureum", 
                                                                   "festuca_scabra", "senecio_coronatus", "helichrysum_ecklonis", 
-                                                                  "senecio_glaberrimus")), which(colnames(mass_problems) == "Sample_ID")]
+                                                                  "senecio_glaberrimus", "alepidea_natalensis")), which(colnames(mass_problems) == "Sample_ID")]
 
-change_all_mass <- mass_problems[which(mass_problems$Taxon %in% c("aristida_junciformis")), which(colnames(mass_problems) == "Sample_ID")]
-#"GG625"
+change_all_mass <- mass_problems[which(mass_problems$Taxon %in% c("aristida_junciformis", "romulea_thodei")), which(colnames(mass_problems) == "Sample_ID")]
+#"GG625"  "BK1076"
 
-change_dry_mass <- mass_problems[which(mass_problems$Taxon %in% c("eragrostis_capensis", "diheteropogon_filifolius")), which(colnames(mass_problems) == "Sample_ID")]
-#"WH2015" "WH2019"
+change_dry_mass <- mass_problems[which(mass_problems$Taxon %in% c("diheteropogon_filifolius")), which(colnames(mass_problems) == "Sample_ID")]
+#"WH2019"
 
 #overwrite unreliable values with NA
-FT_checked[which(FT_checked$Sample_ID %in% c(change_wet_mass)), which(colnames(FT_checked) == "Wet_mass_mg")] <- NA
-FT_checked[which(FT_checked$Sample_ID %in% c(change_all_mass)), which(colnames(FT_checked) %in% c("Wet_mass_mg", "Dry_mass_mg", "SLA"))] <- NA
+FT_checked[which(FT_checked$Sample_ID %in% c(change_wet_mass)), which(colnames(FT_checked) %in% c("Wet_mass_mg", "LDMC"))] <- NA
+FT_checked[which(FT_checked$Sample_ID %in% c(change_all_mass)), which(colnames(FT_checked) %in% c("Wet_mass_mg", "Dry_mass_mg", "SLA", "LDMC"))] <- NA
 #if dry mass is unreliable we have to change the SLA too
-FT_checked[which(FT_checked$Sample_ID %in% c(change_dry_mass)), which(colnames(FT_checked) %in% c("Dry_mass_mg", "SLA"))] <- NA
+FT_checked[which(FT_checked$Sample_ID %in% c(change_dry_mass)), which(colnames(FT_checked) %in% c("Dry_mass_mg", "SLA", "LDMC"))] <- NA
 
 
 
@@ -531,9 +538,9 @@ FT_checked[which(FT_checked$Sample_ID %in% c(change_dry_mass)), which(colnames(F
 
 ###When finished, write to file
 #reorder the columns
-FT_checked <- FT_checked |> 
-select(Sample_ID, Site, Grid, Cell, Taxon, Wet_mass_mg, Dry_mass_mg, Chlorophyll_mg_per_m2, FTT_N, 
-       Height_cm, Thickness_mm, Width_at_tear_mm, Total_leaf_area_cm2, Average_leaf_area_cm2, SLA, 
-       Scan_name, Number_of_Leaves, Number_of_leaves_weighed, Notes, Notes2, Area_Notes, change_tracker) |> 
+FT_final <- FT_checked |> 
+select(Sample_ID, Site, Grid, Cell, Taxon, Wet_mass_mg, Dry_mass_mg, Chlorophyll_mg_per_m2, Ft, 
+       Height_cm, Thickness_mm, Leaf_area_cm2, SLA, 
+       Scan_name, SLA_notes) |> 
   arrange(Sample_ID)
-write.xlsx(FT_checked, "All_data/clean_data/micro-climb_traits.xlsx")
+write.xlsx(FT_final, "All_data/clean_data/micro-climb_traits.xlsx")
