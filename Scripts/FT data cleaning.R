@@ -123,7 +123,7 @@ GG <- GG |>
   mutate(SLA = Leaf_area_cm2/Dry_mass_mg, 
          LDMC = Dry_mass_mg/ (Wet_mass_mg / 1000),
          Ft = FTT_N / Width_at_tear_mm) |> #Force to tear is the force to tear the leaf divided by the width
-  select(!c(Number_of_Leaves, Notes, Area_Notes, FTT_N, Width_at_tear_mm))
+  select(!c(Number_of_Leaves, Notes, Area_Notes))
   
 
 
@@ -214,7 +214,7 @@ WH <- WH |>
   mutate(SLA = Leaf_area_cm2/Dry_mass_mg, 
          LDMC = Dry_mass_mg/ (Wet_mass_mg / 1000),
          Ft = FTT_N / Width_at_tear_mm) |> #Force to tear is the force to tear the leaf divided by the width
-  select(!c(Number_of_Leaves, Notes, Notes2, FTT_N, Width_at_tear_mm))
+  select(!c(Number_of_Leaves, Notes, Notes2))
 
 #standardise names
 name_trail <- read.xlsx("All_data/clean_data/Species names/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
@@ -287,11 +287,11 @@ BK <- BK |>
   mutate(SLA = Leaf_area_cm2 / Dry_mass_mg, 
          LDMC = Dry_mass_mg/ (Wet_mass_mg / 1000),
          Ft = FTT_N / Width_at_tear_mm) |> #Force to tear is the force to tear the leaf divided by the width
-        select(!c(Number_of_leaves_weighed, Notes, X22, Number_of_leaves_collected, FTT_N, Width_at_tear_mm))
+        select(!c(Number_of_leaves_weighed, Notes, X22, Number_of_leaves_collected))
 
 
 #standardise names
-name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
+name_trail <- read.xlsx("All_data/clean_data/Species names/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
 BK_clean_names <- standardise_names(data = BK, data_species_column = "Taxon", 
                                     naming_system = name_trail, correct_name = "taxon", 
                                     synonym = c("synonym1", "synonym2", "synonym3"))
@@ -348,6 +348,7 @@ LA_outlier <- FT_allsites[which(FT_allsites$LA_tail == "high_tail"), ] #those wi
 #WH125 is oxalis obliquifolia with very large LA. I looked on the scan and there is no oxalis on that scan
 FT_allsites[which(FT_allsites$Scan_name == "WH_22-11-22_027"), ] #none of the sp seem correct
 FT_allsites[which(FT_allsites$Scan_name == "WH_22-11-22_028"), ]
+#these outliers are removed later in the graphing checks
 
 
 FT_allsites$Chlor_tail <- get_trait_tails(FT_allsites$Chlorophyll_mg_per_m2, tail_threshold)
@@ -381,10 +382,6 @@ Thickness_problems <- Thickness_outlier[order(Thickness_outlier$Thickness_mm), ]
 #remove these values, correct in FT_checked "BK619"  "GG1609"
 FT_checked[which(FT_checked$Sample_ID %in% c(Thickness_problems)), which(colnames(FT_checked) == "Thickness_mm")] <- NA
 
-FT_allsites$TLA_tail <- get_trait_tails(FT_allsites$Total_leaf_area_cm2, tail_threshold)
-TLA_outlier <- FT_allsites[which(FT_allsites$TLA_tail == "high_tail"), ] #all looks fine
-#the largest areas come from very large leaves
-
 FT_allsites$Wet_mass_tail <- get_trait_tails(FT_allsites$Wet_mass_mg, tail_threshold)
 Wet_mass_outlier <- FT_allsites[which(FT_allsites$Wet_mass_tail == "high_tail"), ] #all looks fine
 #The leaves with the highest masses make sense
@@ -399,15 +396,65 @@ Width_outlier[which(Width_outlier$Taxon == "pentameris_setifolia") , ] #this one
 #Fix the elionurus problem "GG1788"
 Width_problem1 <- Width_outlier[which(Width_outlier$Taxon == "elionurus_muticus") , which(colnames(Width_outlier) == "Sample_ID")]
 FT_checked[which(FT_checked$Sample_ID == Width_problem1), which(colnames(FT_checked) == "Width_at_tear_mm")] <- NA
+FT_checked[which(FT_checked$Sample_ID == Width_problem1), which(colnames(FT_checked) == "Ft")] <- NA
 
 #fix the 3 highest widths "BK867"  "WH2132" "BK265"
 Width_problem2 <- Width_outlier[order(Width_outlier$Width_at_tear_mm), ][c(131:133), which(colnames(Width_outlier) == "Sample_ID")]
 FT_checked[which(FT_checked$Sample_ID %in% Width_problem2), which(colnames(FT_checked) == "Width_at_tear_mm")] <- NA
+FT_checked[which(FT_checked$Sample_ID %in% Width_problem2), which(colnames(FT_checked) == "Ft")] <- NA
 
+
+FT_allsites$LDMC_tail <- get_trait_tails(FT_allsites$LDMC, tail_threshold)
+LDMC_outlier <- FT_allsites[which(FT_allsites$LDMC_tail == "high_tail"), ]
+#looks like there are many outliers... 
 
 #Graphing checks
+###SLA###
 ggplot(FT_checked) +
   geom_point(aes(x = SLA, y = Dry_mass_mg))
+#the two highest SLA values are big outliers, lets compare them to the mean of their species
+#heli ecklonis with SLA of 15.5 WH2018
+FT_allsites |> 
+  filter(Taxon == "helichrysum_ecklonis") |> 
+  ggplot(aes(x = SLA)) +
+  geom_histogram()
+#looks like the dry mass is very low, causing the problem
+#make NA
+FT_checked[which(FT_checked$Sample_ID == "WH2018"), which(colnames(FT_checked) %in% c("SLA", "Dry_mass_mg"))] <- NA
+
+#oxalis obliquifolia with SLA of 47.22 WH125
+FT_allsites |> 
+  filter(Taxon == "oxalis_obliquifolia") |> 
+  ggplot(aes(x = SLA)) +
+  geom_histogram()
+#the leaf area is very high, causing the problem, make NA
+FT_checked[which(FT_checked$Sample_ID == "WH125"), which(colnames(FT_checked) %in% c("SLA", "Leaf_area_cm2"))] <- NA
+
+
+###LDMC###
+ggplot(FT_checked) +
+  geom_point(aes(x = LDMC, y = Dry_mass_mg))
+
+ggplot(FT_checked) +
+  geom_point(aes(x = LDMC, y = Wet_mass_mg))
+
+#the three highest LDMC values may definitely be outliers
+FT_checked |> slice_max(LDMC, n = 3)
+
+#festuca scabra has LDMC of 19500 WH1469
+FT_checked |> 
+  filter(Taxon == "festuca_scabra") |> 
+  ggplot(aes(x = LDMC)) +
+  geom_histogram()
+#clear outlier, wet mass is the problem, make NA
+FT_checked[which(FT_checked$Sample_ID == "WH1469"), which(colnames(FT_checked) %in% c("Wet_mass_mg", "LDMC"))] <- NA
+
+#watsonia_sp1 has LDMC of 14064.64 GG1597
+
+#trifolium burchellianum has LDMC of 7600 WH117
+
+
+
 
 ggplot(FT_checked) +
   geom_point(aes(x = SLA, y = Total_leaf_area_cm2))
