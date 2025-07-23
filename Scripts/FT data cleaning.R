@@ -240,8 +240,7 @@ BK <- BK |>
   mutate(Taxon = str_to_lower(Taxon), #change speciesnames to lower case and replace spaces with underscores
          Taxon = str_squish(Taxon),
          Taxon = str_replace_all(Taxon, " ", "_"), 
-         Sample_ID = paste0(Site, Sample_ID), 
-         Ft_N_per_mm = FTT_N/Width_at_tear_mm) #force to tear is the force to tear the leaf divided by leaf width
+         Sample_ID = paste0(Site, Sample_ID))
 
 #Check that all trait values are numeric
 summary(BK)
@@ -259,6 +258,10 @@ unique(BK$Width_at_tear_mm) #again values of cannot take measurement
 BK[which(BK$Width_at_tear_mm == "Cannot take measurement") , ]
 BK$Width_at_tear_mm <- as.numeric(BK$Width_at_tear_mm)
 
+#there are entries of Dry_mass_mg = 0. These were wehn the envelope was empty. 
+#replace with NA
+BK[which(BK$Dry_mass_mg == 0), ] #look at the records first
+BK[which(BK$Dry_mass_mg == 0), which(colnames(BK) == "Dry_mass_mg")] <- NA
 
 ###Make sure that only mass and area per leaf are given
 ###Dry mass and area per leaf were already worked out in the sheet. 
@@ -273,17 +276,14 @@ for(i in 1:nrow(BK)) {
     
   }}
 
-#SLA is already correctly worked out in this sheet
 
-#there are entries of Dry_mass_mg = 0. These were wehn the envelope was empty. 
-#replace with NA
-BK[which(BK$Dry_mass_mg == 0), ] #look at the records first
-BK[which(BK$Dry_mass_mg == 0), which(colnames(BK) == "Dry_mass_mg")] <- NA
-
-
-#remove all unnecessary columns
+#Recalculate SLA, LDMC and Ft
 BK <- BK |> 
-  select(!c(Number_of_leaves_weighed, Notes, X22, Number_of_leaves_collected, FTT_N, Width_at_tear_mm))
+  mutate(SLA = Leaf_area_cm2 / Dry_mass_mg, 
+         LDMC = Dry_mass_mg/ (Wet_mass_mg / 1000),
+         Ft = FTT_N / Width_at_tear_mm) |> #Force to tear is the force to tear the leaf divided by the width
+        select(!c(Number_of_leaves_weighed, Notes, X22, Number_of_leaves_collected, FTT_N, Width_at_tear_mm))
+
 
 #standardise names
 name_trail <- read.xlsx("All_data/clean_data/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
