@@ -131,7 +131,7 @@ GG <- GG |>
 name_trail <- read.xlsx("All_data/clean_data/Species names/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
 GG_clean_names <- standardise_names(data = GG, data_species_column = "Taxon", 
                                       naming_system = name_trail, correct_name = "taxon", 
-                                    synonym = c("synonym1", "synonym2", "synonym3"))
+                                    synonym = c("synonym1", "synonym2", "synonym3", "synonym4"))
 unique(GG_clean_names$change_tracker) #all in order
 
 
@@ -220,7 +220,7 @@ WH <- WH |>
 name_trail <- read.xlsx("All_data/clean_data/Species names/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
 WH_clean_names <- standardise_names(data = WH, data_species_column = "Taxon", 
                                     naming_system = name_trail, correct_name = "taxon", 
-                                    synonym = c("synonym1", "synonym2", "synonym3"))
+                                    synonym = c("synonym1", "synonym2", "synonym3", "synonym4"))
 unique(WH_clean_names$change_tracker) #all in order
 
 
@@ -294,7 +294,7 @@ BK <- BK |>
 name_trail <- read.xlsx("All_data/clean_data/Species names/micro_climb_ALL_names_editing.xlsx", sheet = "editing")
 BK_clean_names <- standardise_names(data = BK, data_species_column = "Taxon", 
                                     naming_system = name_trail, correct_name = "taxon", 
-                                    synonym = c("synonym1", "synonym2", "synonym3"))
+                                    synonym = c("synonym1", "synonym2", "synonym3", "synonym4"))
 unique(BK_clean_names$change_tracker) #all in order
 
 
