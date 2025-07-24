@@ -96,9 +96,9 @@ fi <- fi[order(fi$plot),]
 
 # This should be zero
 fi %>% filter(is.na(plot)) %>% nrow 
-#there is one logger file that doesn't have info on which cell it was in. remove this file
-fi <- fi |> 
-  filter(!is.na(plot))
+#there is one logger file that doesn't have info on which cell it was in. 
+#Go back to paper notes nad find that TMS 95223945 was installed in grid 4 B7
+fi[which(fi$TMS== 95223945), which(colnames(fi) %in% c("site", "grid", "Cell", "plot"))] <- c("GOLDENGATE", 4, "B7", "GOLDENGATE_4B7")
 
 # read the Tomst data in
 mylist <- lapply(fi$file, readdata)
