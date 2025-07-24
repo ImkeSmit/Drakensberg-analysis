@@ -519,8 +519,9 @@ FT_checked[which(FT_checked$Sample_ID %in% c(change_dry_mass)), which(colnames(F
 ###When finished, write to file
 #reorder the columns
 FT_final <- FT_checked |> 
+  mutate(Leaf_area_mm2 = Leaf_area_cm2*100, #change to standard unit
+         SLA = Leaf_area_mm2/Dry_mass_mg) |>  #now we have to work out SLA again
 select(Sample_ID, Site, Grid, Cell, Taxon, Wet_mass_mg, Dry_mass_mg, Chlorophyll_mg_per_m2, Ft, 
-       Height_cm, Thickness_mm, Leaf_area_cm2, SLA, 
-       Scan_name, SLA_notes) |> 
+       Height_cm, Thickness_mm, Leaf_area_mm2, SLA, Scan_name, SLA_notes) |> 
   arrange(Sample_ID)
 write.xlsx(FT_final, "All_data/clean_data/micro-climb_traits.xlsx")
