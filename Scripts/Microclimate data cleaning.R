@@ -220,8 +220,11 @@ bk_microclim <- bk_microclim %>% rename(datetime = V2,
 bk_microclim <- bk_microclim %>% arrange(plot, datetime) 
 
 # Remove implausible dates
-mind <- ymd("2023-01-09") #the date of insertion is in a text file in the Bokong microclimate folder
-maxd <- ymd("2024-02-04") #from bokong logger notes file
+#the date of insertion is in a text file in the Bokong microclimate folder
+#some loggers were installed 9 Jan, others 11 jan, therefore remove all data before 12 jan
+mind <- ymd("2023-01-12") 
+#loggers were removed on 4feb, therefore remove all data after 3 feb
+maxd <- ymd("2024-02-03") #from bokong logger notes file
 bk_microclim2 <- bk_microclim |> filter(between(datetime, mind, maxd)) |> 
   distinct(datetime, plot, .keep_all = T) #remove duplicate entries
 
@@ -231,7 +234,7 @@ bk_microclim |>
   filter(n() >1)
 
 ####Write the cleaned microclimate data to text files####
-#Excel cna't open a table with this many rows, so we write it to a text file
+#Excel can't open a table with this many rows, so we write it to a text file
 write.table(bk_microclim2, file = "All_data/clean_data/Tomst_data/Bokong_tomst_data.txt", sep = "\t",
             row.names = TRUE, col.names = c(colnames(bk_microclim2)))
 
