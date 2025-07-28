@@ -115,8 +115,9 @@ gg_microclim <- gg_microclim %>% rename(datetime = V2,
 gg_microclim <- gg_microclim %>% arrange(plot, datetime) 
 
 # Remove implausible dates
-mind <- ymd("2023-01-01") #can't find the installation or extraction date. Assume these dates
-maxd <- ymd("2024-02-28")
+#from TOMSt logger entry and extraction dates file
+mind <- ymd("2022-11-30") #loggers inserted on 29 Nov 2022, use data from one day after
+maxd <- ymd("2024-02-04") #loggers extracted on 5 Feb 2024
 gg_microclim2 <- gg_microclim |> filter(between(datetime, mind, maxd)) |> 
   distinct(datetime, plot, .keep_all = T) #remove duplicate rows
 
@@ -170,8 +171,9 @@ wh_microclim <- wh_microclim %>% rename(datetime = V2,
 wh_microclim <- wh_microclim %>% arrange(plot, datetime) 
 
 # Remove implausible dates
-mind <- ymd("2023-01-01") #can't find the installation or extraction date. Assume these dates
-maxd <- ymd("2024-02-28")
+#from TOMSt logger entry and extraction dates file
+mind <- ymd("2022-12-03") #all entered on 2 Dec 2022
+maxd <- ymd("2024-02-06") #all extracted on 7 Feb
 wh_microclim2 <- wh_microclim |> filter(between(datetime, mind, maxd)) |> 
   distinct(datetime, plot, .keep_all = T)
 
@@ -220,7 +222,7 @@ bk_microclim <- bk_microclim %>% rename(datetime = V2,
 bk_microclim <- bk_microclim %>% arrange(plot, datetime) 
 
 # Remove implausible dates
-#the date of insertion is in a text file in the Bokong microclimate folder
+##from TOMSt logger entry and extraction dates file
 #some loggers were installed 9 Jan, others 11 jan, therefore remove all data before 12 jan
 mind <- ymd("2023-01-12") 
 #loggers were removed on 4feb, therefore remove all data after 3 feb
