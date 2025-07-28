@@ -111,7 +111,7 @@ gg_microclim <- gg_microclim %>% rename(datetime = V2,
                                         soil_temp = V4, #T1
                                         surface_temp = V5, #T2
                                         air_temp = V6, #T3
-                                        vwc = V7, 
+                                        raw_moisture = V7, 
                                         cellref = plot) 
 
 gg_microclim <- gg_microclim %>% arrange(cellref, datetime) 
@@ -169,7 +169,7 @@ wh_microclim <- wh_microclim %>% rename(datetime = V2,
                                         soil_temp = V4, #T1
                                         surface_temp = V5, #T2
                                         air_temp = V6, #T3
-                                        vwc = V7, 
+                                        raw_moisture = V7, 
                                         cellref = plot) 
 
 wh_microclim <- wh_microclim %>% arrange(cellref, datetime) 
@@ -222,7 +222,7 @@ bk_microclim <- bk_microclim %>% rename(datetime = V2,
               soil_temp = V4, #T1
               surface_temp = V5, #T2
               air_temp = V6, #T3
-              vwc = V7, 
+              raw_moisture = V7, 
               cellref = plot) 
 
 bk_microclim <- bk_microclim %>% arrange(cellref, datetime) 
