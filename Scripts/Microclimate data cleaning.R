@@ -74,10 +74,11 @@ datadir <- "All_data/raw_data/raw_microclimate_data"
 # read names x tomst id table
 ids <- read.delim(paste0(datadir, "/", "tomst_ids.csv"), sep = ";") |>  
   filter(site == "goldengate") |> 
+  mutate(site = "GG") |> #add new site code to match other datasets
   rename(Cell = plot) |> 
   mutate(Cell = toupper(Cell),
          site = toupper(site),
-         plot = paste0(site, "_",grid,Cell))
+         plot = paste0(site,grid,Cell))
 
 # List logger data files to read
 f <- list.files(paste0(datadir, "/", "GoldenGate/Golden_Gate_Tomsp_Final_reading_Feb2024"), pattern = "data_[0-9]", full.names = T, recursive = T)
@@ -98,7 +99,7 @@ fi <- fi[order(fi$plot),]
 fi %>% filter(is.na(plot)) %>% nrow 
 #there is one logger file that doesn't have info on which cell it was in. 
 #Go back to paper notes nad find that TMS 95223945 was installed in grid 4 B7
-fi[which(fi$TMS== 95223945), which(colnames(fi) %in% c("site", "grid", "Cell", "plot"))] <- c("GOLDENGATE", 4, "B7", "GOLDENGATE_4B7")
+fi[which(fi$TMS== 95223945), which(colnames(fi) %in% c("site", "grid", "Cell", "plot"))] <- c("GG", 4, "B7", "GG4B7")
 
 # read the Tomst data in
 mylist <- lapply(fi$file, readdata)
@@ -113,14 +114,14 @@ gg_microclim <- gg_microclim %>% rename(datetime = V2,
                                         vwc = V7, 
                                         cellref = plot) 
 
-gg_microclim <- gg_microclim %>% arrange(plot, datetime) 
+gg_microclim <- gg_microclim %>% arrange(cellref, datetime) 
 
 # Remove implausible dates
 #from TOMSt logger entry and extraction dates file
 mind <- ymd("2022-11-30") #loggers inserted on 29 Nov 2022, use data from one day after
 maxd <- ymd("2024-02-04") #loggers extracted on 5 Feb 2024
 gg_microclim2 <- gg_microclim |> filter(between(datetime, mind, maxd)) |> 
-  distinct(datetime, plot, .keep_all = T) #remove duplicate rows
+  distinct(datetime, cellref, .keep_all = T) #remove duplicate rows
 
 #look at the duplicate rows for quality control
 gg_microclim |> 
@@ -133,11 +134,12 @@ datadir <- "All_data/raw_data/raw_microclimate_data"
 
 # read names x tomst id table
 ids <- read.delim(paste0(datadir, "/", "tomst_ids.csv"), sep = ";") |>  
-  filter(site == "witsieshoek") |> 
+  filter(site == "witsieshoek") |>
+  mutate(site = "WH") |> 
   rename(Cell = plot) |> 
   mutate(Cell = toupper(Cell),
          site = toupper(site),
-         plot = paste0(site, "_",grid,Cell))
+         plot = paste0(site,grid,Cell))
 
 # List logger data files to read
 f <- list.files(paste0(datadir, "/", "Witsieshoek/Witsies_Tomst_data_final_reading_Feb2024"), pattern = "data_[0-9]", full.names = T, recursive = T)
@@ -170,14 +172,14 @@ wh_microclim <- wh_microclim %>% rename(datetime = V2,
                                         vwc = V7, 
                                         cellref = plot) 
 
-wh_microclim <- wh_microclim %>% arrange(plot, datetime) 
+wh_microclim <- wh_microclim %>% arrange(cellref, datetime) 
 
 # Remove implausible dates
 #from TOMSt logger entry and extraction dates file
 mind <- ymd("2022-12-03") #all entered on 2 Dec 2022
 maxd <- ymd("2024-02-06") #all extracted on 7 Feb
 wh_microclim2 <- wh_microclim |> filter(between(datetime, mind, maxd)) |> 
-  distinct(datetime, plot, .keep_all = T)
+  distinct(datetime, cellref, .keep_all = T)
 
 
 ####BOKONG####
@@ -186,10 +188,11 @@ datadir <- "All_data/raw_data/raw_microclimate_data"
 # read names x tomst id table
 ids <- read.delim(paste0(datadir, "/", "tomst_ids.csv"), sep = ";") |> 
   filter(site == "bokong") |> 
+  mutate(site = "BK") |> 
   rename(Cell = plot) |> 
   mutate(Cell = toupper(Cell),
          site = toupper(site),
-         plot = paste0(site, "_",grid,Cell))
+         plot = paste0(site,grid,Cell))
 
 # List logger data files to read
 f <- list.files(paste0(datadir, "/", "Bokong/Tomst_data_Final_reading_February2024"), pattern = "data_[0-9]", full.names = T, recursive = T)
@@ -222,7 +225,7 @@ bk_microclim <- bk_microclim %>% rename(datetime = V2,
               vwc = V7, 
               cellref = plot) 
 
-bk_microclim <- bk_microclim %>% arrange(plot, datetime) 
+bk_microclim <- bk_microclim %>% arrange(cellref, datetime) 
 
 # Remove implausible dates
 ##from TOMSt logger entry and extraction dates file
@@ -231,7 +234,7 @@ mind <- ymd("2023-01-12")
 #loggers were removed on 4feb, therefore remove all data after 3 feb
 maxd <- ymd("2024-02-03") #from bokong logger notes file
 bk_microclim2 <- bk_microclim |> filter(between(datetime, mind, maxd)) |> 
-  distinct(datetime, plot, .keep_all = T) #remove duplicate entries
+  distinct(datetime, cellref, .keep_all = T) #remove duplicate entries
 
 #look at the duplicate rows for quality control
 bk_microclim |> 
