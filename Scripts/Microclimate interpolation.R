@@ -1,6 +1,5 @@
 #Script to interpolate microclimate data
 
-install.packages(c("sp", "gstat", "raster"))
 library(sp)
 library(gstat)
 library(raster)
@@ -13,13 +12,13 @@ library(tidylog)
 
 surface_temp <- read.delim("All_data/clean_data/Tomst_data/Witsieshoek_tomst_data.txt") |> 
   filter(grid == 1) |> 
-  group_by(plot) |> 
+  group_by(cellref) |> 
   mutate(mean_surface_temp = mean(surface_temp)) |> 
   ungroup() |> 
-  distinct(mean_surface_temp, grid, cell, plot) |> 
+  distinct(mean_surface_temp, grid, cell, cellref) |> 
   mutate(column = str_match(cell, "^([A-H])([0-9]+)$")[,2], 
          row = str_match(cell, "^([A-H])([0-9]+)$")[,3], 
-         ncolumn =match(column, LETTERS[1:8])) |> 
+         ncolumn = match(column, LETTERS[1:8])) |> 
   mutate(row = as.numeric(row))
 
 #now convert to a spatial object
@@ -45,4 +44,12 @@ raster_surface_temp <- raster(idw_result)
 plot(raster_surface_temp, main = "Interpolated Temperature (IDW)")
 points(surface_temp, pch = 16, col = "red")
 
+
+####Let's try kriging
+#define variogram model
+varmod <- vgm()
+
+kriging_result <- krige(formula = mean_surface_temp ~ 1, 
+                        locations = surface_temp, newdata = grid, 
+                        model = "Exp") #exponential model fitted to variogram
   
