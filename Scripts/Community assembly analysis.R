@@ -70,7 +70,7 @@ ggplot(ab, aes(x = log(total_cover))) +
 lognormal_fit <- rad.lognormal(c(ab$abundance)) #AIC = 9448.980570
 plot(lognormal_fit)
 
-preston <- prestonfit(c(ab$abundance))
+preston <- prestonfit(c(ab$abundance), tiesplit = F)
 plot(preston) #does the weird binning
 
 
@@ -79,6 +79,7 @@ f_alpha <- fisher.alpha(c(ab$abundance))
 #alpha = 61.60134
 fisher <- fisherfit(c(ab$abundance))
 plot(fisher)
+AIC(fisher)
 
 
 #fit zsm
