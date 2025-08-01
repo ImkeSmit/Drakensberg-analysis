@@ -12,12 +12,28 @@ gp_binary = "C:/Program Files/Pari64-2-17-2/gp.exe"
 
 data("saunders")
 summary(saunders.tot)
-preston(saunders.tot, n= 9)
-optimal.theta(saunders.tot)
-optimal.params(saunders.tot, gp_binary = "C:/Program Files/Pari64-2-17-2/gp.exe")
-etienne(saunders.tot)
 
-logkda(saunders.tot, method = "R")
+#we have to calculate logkda with method R (not in optimal.params bcause Pari won't work)
+k <- logkda(saunders.tot, method = "R")
+zsm_params <- optimal.params(D = saunders.tot, log.kda = k)
+#theta          m 
+#31.5741581  0.9844249
+
+#now we can fit the zsm
+zsm_fit <- zsm(J = sum(saunders.tot), #J = size of local comm, the sum of abundances
+               P = 0.01, #Abundance in the metacommunity is correlated with theta
+               m = zsm_params[2]) #probability of immigration from metacomm
+
+
+prob_density <- data.frame(prob = zsm_fit, abundance = seq(from = 1, to = sum(saunders.tot) +1, by = 1))
+
+ggplot(prob_density, aes(x = abundance, y = prob)) +
+  geom_line() +
+  xlim(1, 100)
+
+exp_ab <- expected.abundance(J = 10, theta = zsm_params[1])
+
+
 
 
 ###Plot SAD for drakensberg data
