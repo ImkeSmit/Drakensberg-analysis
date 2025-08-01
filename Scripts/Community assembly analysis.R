@@ -21,7 +21,7 @@ zsm_params <- optimal.params(D = saunders.tot, log.kda = k)
 
 #now we can fit the zsm
 zsm_fit <- zsm(J = sum(saunders.tot), #J = size of local comm, the sum of abundances
-               P = 0.01, #Abundance in the metacommunity is correlated with theta
+               P = 0.001, #Abundance in the metacommunity is correlated with theta
                m = zsm_params[2]) #probability of immigration from metacomm
 
 
@@ -32,7 +32,7 @@ ggplot(prob_density, aes(x = abundance, y = prob)) +
   xlim(1, 100)
 
 exp_ab <- expected.abundance(J = 10, theta = zsm_params[1])
-
+sum(prob_density) #this should be one
 
 
 
