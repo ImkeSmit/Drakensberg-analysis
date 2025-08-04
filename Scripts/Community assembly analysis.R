@@ -70,3 +70,6 @@ plot(drak_octaves)
 lines(lognorm_pred, col = "red")
 lines(logseries_pred, col = "blue")
 lines(neutral_pred, col = "green")
+
+#compare AIC values
+AICtab(lognorm, logseries, neutral, base = T)
