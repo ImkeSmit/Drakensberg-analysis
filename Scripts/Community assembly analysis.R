@@ -38,6 +38,7 @@ lognorm
 summary(lognorm)
 AIC(lognorm)
 
+
 #fit fisher logseries
 logseries <- fitsad(ab$abundance, sad = "ls")
 summary(logseries)
@@ -73,3 +74,10 @@ lines(neutral_pred, col = "green")
 
 #compare AIC values
 AICtab(lognorm, logseries, neutral, base = T)
+
+#likelihood ratio test
+test <- anova(neutral, lognorm) #can we do a likelihood ratio test this way? the models are not nested
+
+#extract loglikelihood. Higher means better fit
+logLik(neutral) #-2158.167 (df=1)
+logLik(lognorm) #-2188.739 (df=2)
