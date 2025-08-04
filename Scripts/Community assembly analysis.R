@@ -2,9 +2,8 @@
 library(openxlsx)
 library(tidyverse)
 library(tidylog)
-library(untb)
+
 library(ggplot2)
-library(vegan)
-library(VGAM)
-library(elliptic)
+
+
 library(sads)
