@@ -4,6 +4,7 @@ library(tidyverse)
 library(tidylog)
 library(ggplot2)
 library(sads)
+library(vegan)
 
 drak <- read.xlsx("All_data/clean_data/micro_climb_occurrence.xlsx")
 
@@ -74,6 +75,7 @@ lines(neutral_pred, col = "green")
 
 #compare AIC values
 AICtab(lognorm, logseries, neutral, base = T)
+#neutral and logseries are equivalent
 
 #likelihood ratio test
 test <- anova(neutral, lognorm) #can we do a likelihood ratio test this way? the models are not nested
@@ -81,3 +83,22 @@ test <- anova(neutral, lognorm) #can we do a likelihood ratio test this way? the
 #extract loglikelihood. Higher means better fit
 logLik(neutral) #-2158.167 (df=1)
 logLik(lognorm) #-2188.739 (df=2)
+
+
+#####DO TRAITS PREDICT ABUNDANCES####
+FT <- read.xlsx("All_data/clean_data/micro-climb_traits.xlsx") |> 
+  filter(Taxon %in% c(unique(drak$taxon))) |>  #remove sp that aren't in abundance data
+  mutate(z_SLA = as.vector(scale(SLA)), #standardise traits to mean = 0 and sd = 1
+         z_LDMC = as.vector(scale(LDMC)), 
+         z_Height = as.vector(scale(Height_cm)), 
+         z_Thickness =  as.vector(scale(Thickness_mm)), 
+         z_LA =  as.vector(scale(Leaf_area_mm2))) |> 
+  select(z_LDMC, z_Height, z_Thickness, z_LA, z_SLA) |>
+  drop_na() #remove rows that have NA in any of the columns
+  
+
+pca <- princomp(FT)
+summary(pca)
+loadings(pca)
+plot(pca)
+biplot(pca)
