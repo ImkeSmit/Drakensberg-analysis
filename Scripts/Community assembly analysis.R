@@ -93,12 +93,23 @@ FT <- read.xlsx("All_data/clean_data/micro-climb_traits.xlsx") |>
          z_Height = as.vector(scale(Height_cm)), 
          z_Thickness =  as.vector(scale(Thickness_mm)), 
          z_LA =  as.vector(scale(Leaf_area_mm2))) |> 
-  select(z_LDMC, z_Height, z_Thickness, z_LA, z_SLA) |>
+  select(Sample_ID, Taxon, z_LDMC, z_Height, z_Thickness, z_LA, z_SLA) |>
   drop_na() #remove rows that have NA in any of the columns
   
 
-pca <- princomp(FT)
-summary(pca)
-loadings(pca)
+pca <- princomp(FT[, c(3:7)], scale = F)
+summary(pca) #proportion of variance is the variance explained by the PC
+loadings(pca) #How much each var contributed to building the PC
 plot(pca)
 biplot(pca)
+pca$scores
+pca$scale #scaling applied to each var. Should be 1 because I standardised all variables?
+
+#extract pca scores
+pca_scores <- data.frame(Sample_ID = FT$Sample_ID,
+                         taxon = FT$Taxon, 
+                         PC1 = pca$scores[, 1], 
+                         PC2 = pca$scores[, 2], 
+                         PC3 = pca$scores[, 3])
+
+
