@@ -86,18 +86,25 @@ logLik(lognorm) #-2188.739 (df=2)
 
 
 #####DO TRAITS PREDICT ABUNDANCES####
+#Import trait data and get mean trait for each sp
 FT <- read.xlsx("All_data/clean_data/micro-climb_traits.xlsx") |> 
   filter(Taxon %in% c(unique(drak$taxon))) |>  #remove sp that aren't in abundance data
-  mutate(z_SLA = as.vector(scale(SLA)), #standardise traits to mean = 0 and sd = 1
-         z_LDMC = as.vector(scale(LDMC)), 
-         z_Height = as.vector(scale(Height_cm)), 
-         z_Thickness =  as.vector(scale(Thickness_mm)), 
-         z_LA =  as.vector(scale(Leaf_area_mm2))) |> 
-  select(Sample_ID, Taxon, z_LDMC, z_Height, z_Thickness, z_LA, z_SLA) |>
+  group_by(Taxon) |> 
+  summarise(mean_SLA = mean(SLA, na.rm = T), #calculate mean trait per species
+            mean_LDMC = mean(LDMC, na.rm = T), #remove NA vals before calculating mean
+            mean_Height = mean(Height_cm, na.rm = T), 
+            mean_Thickness = mean(Thickness_mm, na.rm = T), 
+            mean_LA = mean(Leaf_area_mm2), na.rm = T) |> 
+  mutate(z_SLA = as.vector(scale(mean_SLA)), #standardise traits to mean = 0 and sd = 1
+         z_LDMC = as.vector(scale(mean_LDMC)), 
+         z_Height = as.vector(scale(mean_Height)), 
+         z_Thickness =  as.vector(scale(mean_Thickness)), 
+         z_LA =  as.vector(scale(mean_LA))) |> 
+  select(Taxon, z_LDMC, z_Height, z_Thickness, z_LA, z_SLA) |>
   drop_na() #remove rows that have NA in any of the columns
   
 
-pca <- princomp(FT[, c(3:7)], scale = F)
+pca <- princomp(FT[, c(2:6)])
 summary(pca) #proportion of variance is the variance explained by the PC
 loadings(pca) #How much each var contributed to building the PC
 plot(pca)
@@ -106,10 +113,29 @@ pca$scores
 pca$scale #scaling applied to each var. Should be 1 because I standardised all variables?
 
 #extract pca scores
-pca_scores <- data.frame(Sample_ID = FT$Sample_ID,
-                         taxon = FT$Taxon, 
+pca_scores <- data.frame(taxon = FT$Taxon, 
                          PC1 = pca$scores[, 1], 
                          PC2 = pca$scores[, 2], 
                          PC3 = pca$scores[, 3])
 
 
+
+#Now we need to get the relative abundances of each species
+ab <- ab |> 
+  mutate(rel_abundance = abundance/sum(abundance), 
+         rel_cover = total_cover/sum(total_cover))
+
+
+#join PC scores to relative abundances
+modeldat <- ab |> 
+  inner_join(pca_scores, by = "taxon")
+#in this dataset there is only one singleton, probably because we removed the sp that were not sampled for traits
+#many singletons in the occurrence data were likely not found again for trait sampling
+#problem???
+
+###model relative abundance ~ trait score
+hist(modeldat$rel_abundance)
+mod1 <- glmmTMB(rel_abundance ~ PC1 +PC2 + PC3, data = modeldat, family = lognormal(link = "log"))
+summary(mod1)
+
+#can also use standard effect size approach and not model
