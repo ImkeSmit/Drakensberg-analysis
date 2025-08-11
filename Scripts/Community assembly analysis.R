@@ -54,12 +54,15 @@ AIC(neutral_ML)
 #ANALYTICAL method of Volkov
 neutral_ana <- fitsad(ab$abundance, sad = "volkov") #this will take a long time
 #start 13:09
-
+#end 13:21
+summary(neutral_ana)
+AIC(neutral_ana)
 
 #visually inspect model fit
 plot(lognorm)
 plot(logseries)
-plot(neutral)
+plot(neutral_ML)
+plot(neutral_ana)
 
 #plot fitted models over observed abundance octaves
 drak_octaves <- octav(ab$abundance)
@@ -68,16 +71,18 @@ plot(drak_octaves)
 #get predictions from each model over the octaves
 lognorm_pred <- octavpred(lognorm)
 logseries_pred <- octavpred(logseries)
-neutral_pred <- octavpred(neutral)
+neutral_ML_pred <- octavpred(neutral_ML)
+neutral_ana_pred <- octavpred(neutral_ana)
 
 #plot predictions
 plot(drak_octaves)
 lines(lognorm_pred, col = "red")
 lines(logseries_pred, col = "blue")
-lines(neutral_pred, col = "green")
+lines(neutral_ML_pred, col = "green")
+lines(neutral_ana_pred, col = "orange")
 
 #compare AIC values
-AICtab(lognorm, logseries, neutral, base = T)
+AICtab(lognorm, logseries, neutral_ML, neutral_ana, base = T)
 #neutral and logseries are equivalent
 
 #likelihood ratio test
