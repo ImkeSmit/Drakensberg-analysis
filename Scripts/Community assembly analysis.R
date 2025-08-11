@@ -46,11 +46,14 @@ summary(logseries)
 AIC(logseries)
 
 #fit zsm
-#package can fit nuetral models from volkov or from Alonso and McKane. 
-#read papers to determine which is most appropriate
-neutral <- fitsad(ab$abundance, sad = "mzsm")
-summary(neutral)
-AIC(neutral)
+#ML method of alonso and McKane
+neutral_ML <- fitsad(ab$abundance, sad = "mzsm")
+summary(neutral_ML)
+AIC(neutral_ML)
+
+#ANALYTICAL method of Volkov
+neutral_ana <- fitsad(ab$abundance, sad = "volkov") #this will take a long time
+#start 13:09
 
 
 #visually inspect model fit
