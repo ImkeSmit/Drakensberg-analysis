@@ -113,7 +113,7 @@ alpbase2 <- alpbase2 |>
   mutate(Timestamp = mdy_hms(Timestamp))
 
 #date range
-range(alpbase2$Timestamp) #"10/1/2024, 12:00:00 AM" "9/9/2024, 12:00:00 AM"
+range(alpbase2$Timestamp) #"2024-07-09 UTC" "2024-12-11 UTC"
 
 #mean daily temperature
 mat_alpbase <- alpbase2 |> 
