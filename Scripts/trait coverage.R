@@ -21,8 +21,22 @@ nsp_occ <- occ |>
 nsp_traits <- comb |> 
   filter(!is.na(Sample_ID)) |> #keep only sp for which we have traits
   distinct(taxon) |> 
-  summarise(n = n())
+  summarise(n = n()) #146 sp have at least one trait val
 
 p_traits <- nsp_traits/nsp_occ *100 #we have at least one trait val for 35% of species
 
+
+###How much cover is accounted for by these 146 species?
+trait_sp <-  comb |> #names of sp for which we have traits
+  filter(!is.na(Sample_ID)) |> #keep only sp for which we have traits
+  distinct(taxon)
+
+total_cover <- occ |> #total veg cover in the occ data
+  summarise(total_cover = sum(cover))
+
+trait_cover <- comb |> 
+  filter(taxon %in% c(trait_sp$taxon)) |> #remember these are the SPECIES for which we have at least one trait
+  summarise(trait_cover = sum(cover))
+
+percent_trait_cover <- trait_cover/total_cover *100 #86.73%
 
