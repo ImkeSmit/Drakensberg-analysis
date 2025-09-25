@@ -22,12 +22,12 @@ surface_temp <- read.delim("All_data/clean_data/Tomst_data/Witsieshoek_tomst_dat
   mutate(row = as.numeric(row))
 
 #now convert to a spatial object
-coordinates(surface_temp) <- ~ncolumn + row #x + y
+coordinates(surface_temp) <- ~row +ncolumn #x + y
 proj4string(surface_temp) <- CRS("+proj=utm +zone=35 +south +datum=WGS84")
 
 # Define full grid (1x1 m resolution)
-x_range <- 1:8
-y_range <- 1:20
+x_range <- 1:20
+y_range <- 1:8
 
 grid <- expand.grid(x = x_range, y = y_range)
 coordinates(grid) <- ~x + y
@@ -42,7 +42,7 @@ raster_surface_temp <- raster(idw_result)
 
 # Plot
 plot(raster_surface_temp, main = "Interpolated Temperature (IDW)")
-points(surface_temp, pch = 16, col = "red")
+points(surface_temp, pch = 16, col = "black")
 
 
 ####Let's try kriging
