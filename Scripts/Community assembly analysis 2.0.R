@@ -74,6 +74,45 @@ for(r in 1:nrow(abun_matrix)) {
 }
 
 
+
+#calculate RaoQ for cells, one trait at a time
+
+traitlist <- c(colnames(mean_traits))
+RaoQ_results <- data.frame(cellref = NA, 
+                           RaoQ = NA, 
+                           trait = NA)
+
+for(trait in 1:length(traitlist)) {
+  
+  chosen_trait <- mean_traits[, trait]
+  names(chosen_trait)<- row.names(mean_traits)
+  
+  FD_cells <- dbFD(chosen_trait, abun_matrix,
+                   w.abun = F, #do not weight RaoQ by abundances
+                   corr = "cailliez", 
+                   calc.FRic = F, 
+                   scale.RaoQ = F, 
+                   calc.FGR = F, 
+                   calc.FDiv = F, 
+                   calc.CWM = F)
+  #fails because some communities have zero sum abundances
+  #I guess there are sommunities in which none of the sp had chlorphyll measured
+  
+  if(trait==1) {
+    RaoQ_results$cellref <- names(FD_cells$RaoQ)
+    RaoQ_results$RaoQ <- FD_cells$RaoQ
+    RaoQ_results$trait <- traitlist[trait]
+  }else {
+    more_results <- data.frame(cellref = names(FD_cells$RaoQ), 
+                               RaoQ = FD_cells$RaoQ,
+                               trait = traitlist[trait])
+    
+    RaoQ_results <- rbind(RaoQ_results, more_results)
+  }
+  
+}
+
+
 FD_cells <- dbFD(mean_traits, abun_matrix,
              w.abun = F, #do not weight RaoQ by abundances
              stand.x = T, #standardise traits to mean 0 and unit variance before doing calc
