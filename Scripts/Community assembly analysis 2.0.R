@@ -39,6 +39,37 @@ FT_join <- drak |>
 
 
 ###Now we can compute RaoQ at the cell, grid, and site levels###
+##Get mean traits for species
+mean_traits <- FT |> 
+  group_by(taxon, trait) |> 
+  summarise(mean_trait = mean(value, na.rm = T)) |> 
+  pivot_wider(names_from = trait, values_from = mean_trait)
+
+mean_traits <- as.data.frame(mean_traits)
+row.names(mean_traits) <- mean_traits$taxon
+mean_traits <- mean_traits[, -1]
+
+#create abundance matrix
+abun_matrix <- drak |> 
+  select(cellref, taxon, cover) |> 
+  pivot_wider(names_from = taxon, values_from = cover)
+
+abun_matrix <- as.data.frame(abun_matrix)
+row.names(abun_matrix) <- abun_matrix$cellref
+abun_matrix <- abun_matrix[, -1]
+
+#replace NA values with 0
+for(r in 1:nrow(abun_matrix)) {
+  for(c in 1:ncol(abun_matrix)) {
+    
+    if(is.na(abun_matrix[r,c])) {
+      abun_matrix[r,c] <- 0
+    }
+  }
+}
+
+
+
 #select the trait we want to work with 
 height <- FT_join |> 
   filter(trait == "Height_cm") |> 
@@ -73,6 +104,6 @@ RaoQ <- dbFD(x = trait,
              a = abun)
 #something wrong with species labels here... how to transform to matrix with rownames??
 
-
+test <- dbFD(dummy$trait, dummy$abun)
 
 
