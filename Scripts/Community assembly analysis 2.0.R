@@ -86,6 +86,7 @@ for(trait in 1:length(traitlist)) {
   
   chosen_trait <- mean_traits[, trait]
   names(chosen_trait)<- row.names(mean_traits)
+
   
   FD_cells <- dbFD(chosen_trait, abun_matrix,
                    w.abun = F, #do not weight RaoQ by abundances
