@@ -40,18 +40,23 @@ FT_join <- drak |>
 
 ###Now we can compute RaoQ at the cell, grid, and site levels###
 ##Get mean traits for species
-mean_traits <- FT |> 
+mean_traits <- FT_join |> 
   group_by(taxon, trait) |> 
   summarise(mean_trait = mean(value, na.rm = T)) |> 
-  pivot_wider(names_from = trait, values_from = mean_trait)
+  pivot_wider(names_from = trait, values_from = mean_trait) |> 
+  ungroup() |> 
+  arrange(taxon)
 
 mean_traits <- as.data.frame(mean_traits)
 row.names(mean_traits) <- mean_traits$taxon
 mean_traits <- mean_traits[, -1]
 
 #create abundance matrix
-abun_matrix <- drak |> 
+abun_matrix <- FT_join |> 
   select(cellref, taxon, cover) |> 
+  distinct(cellref, taxon, .keep_all = T) |> 
+  ungroup() |> 
+  arrange(taxon) |> 
   pivot_wider(names_from = taxon, values_from = cover)
 
 abun_matrix <- as.data.frame(abun_matrix)
@@ -69,41 +74,16 @@ for(r in 1:nrow(abun_matrix)) {
 }
 
 
+FD_cells <- dbFD(mean_traits, abun_matrix,
+             w.abun = F, #do not weight RaoQ by abundances
+             stand.x = T, #standardise traits to mean 0 and unit variance before doing calc
+             corr = "cailliez", 
+             calc.FRic = F, 
+             scale.RaoQ = F, 
+             calc.FGR = F, 
+             calc.FDiv = F, 
+             calc.CWM = F)
+FD_cells <- FD_cells$RaoQ
 
-#select the trait we want to work with 
-height <- FT_join |> 
-  filter(trait == "Height_cm") |> 
-  filter(!is.na(value)) 
-
-chosen_one <- height$cellref[1]
-
-FT_subset <- height |> 
-  filter(cellref == chosen_one) |>  #don't know why we have 2 trait measurements for erica alopecurus
-  select(taxon, trait, value) |> 
-  group_by(taxon) |> 
-  mutate(value = mean(value)) |> 
-  ungroup() |> 
-  distinct(taxon, .keep_all = T) |> 
-  pivot_wider(names_from = "trait", values_from = "value")
-trait <- c(FT_subset$Height_cm)
-names(trait) <- c(FT_subset$taxon)
-
-abun_subset <- FT_join |> 
-  filter(trait == "Height_cm", 
-         cellref == chosen_one) |> 
-  filter(!is.na(value)) |> 
-  select(taxon, cover) |> 
-  group_by(taxon) |> 
-  mutate(cover = mean(cover)) |> 
-  ungroup() |> 
-  distinct(taxon, .keep_all = T) |> 
-  pivot_wider(names_from = "taxon", values_from = "cover")
-abun <- c(abun_subset[1,])
-  
-RaoQ <- dbFD(x = trait, 
-             a = abun)
-#something wrong with species labels here... how to transform to matrix with rownames??
-
-test <- dbFD(dummy$trait, dummy$abun)
 
 
