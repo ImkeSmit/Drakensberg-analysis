@@ -82,12 +82,26 @@ RaoQ_results <- data.frame(cellref = NA,
                            RaoQ = NA, 
                            trait = NA)
 
-for(trait in 1:length(traitlist)) {
+for(t in 1:length(traitlist)) {
   
-  chosen_trait <- mean_traits[, trait]
+  chosen_trait <- mean_traits[, t]
   names(chosen_trait)<- row.names(mean_traits)
-
   
+  #Check for communities with zero-sum abundances
+  #Get cells from FT_join that do not have any measurements of chosen_trait
+  problems <- FT_join |> 
+    dplyr::filter(trait == traitlist[t]) |> 
+    mutate(value = if_else(is.na(value), 0, value))  |> 
+    group_by(cellref) |> 
+    mutate(sum_chlor = sum(value)) |> 
+    ungroup() |> 
+    filter(sum_chlor == 0) |> 
+    distinct(cellref)
+  
+  #remove these cells from the abundance matrix
+  abun_matrix <- abun_matrix[-which(rownames(abun_matrix) %in% c(problems$cellref)) , ]
+ 
+  #calculate RaoQ 
   FD_cells <- dbFD(chosen_trait, abun_matrix,
                    w.abun = F, #do not weight RaoQ by abundances
                    corr = "cailliez", 
@@ -96,17 +110,15 @@ for(trait in 1:length(traitlist)) {
                    calc.FGR = F, 
                    calc.FDiv = F, 
                    calc.CWM = F)
-  #fails because some communities have zero sum abundances
-  #I guess there are sommunities in which none of the sp had chlorphyll measured
   
   if(trait==1) {
     RaoQ_results$cellref <- names(FD_cells$RaoQ)
     RaoQ_results$RaoQ <- FD_cells$RaoQ
-    RaoQ_results$trait <- traitlist[trait]
+    RaoQ_results$trait <- traitlist[t]
   }else {
     more_results <- data.frame(cellref = names(FD_cells$RaoQ), 
                                RaoQ = FD_cells$RaoQ,
-                               trait = traitlist[trait])
+                               trait = traitlist[t])
     
     RaoQ_results <- rbind(RaoQ_results, more_results)
   }
