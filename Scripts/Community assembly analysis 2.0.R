@@ -78,9 +78,7 @@ for(r in 1:nrow(abun_matrix)) {
 #calculate RaoQ for cells, one trait at a time
 
 traitlist <- c(colnames(mean_traits))
-RaoQ_results <- data.frame(cellref = NA, 
-                           RaoQ = NA, 
-                           trait = NA)
+
 
 for(t in 1:length(traitlist)) {
   
@@ -104,11 +102,12 @@ for(t in 1:length(traitlist)) {
   #identify species that do not occur in any of the remaining cells, and remove them
   abundance_sums <- colSums(abun_matrix)
   empty_names <- names(abundance_sums[which(abundance_sums == 0)])
-  abun_matrix <- abun_matrix[, - which(colnames(abun_matrix) %in% c(empty_names))]
   
+  if(length(empty_names) > 0) {
+  abun_matrix <- abun_matrix[, - which(colnames(abun_matrix) %in% c(empty_names))]
   #also remove these sp from the trait matrix
   chosen_trait <- chosen_trait[-which(names(chosen_trait) %in% c(empty_names))]
-  
+  }
  
   #calculate RaoQ 
   FD_cells <- dbFD(chosen_trait, abun_matrix,
@@ -120,10 +119,12 @@ for(t in 1:length(traitlist)) {
                    calc.FDiv = F, 
                    calc.CWM = F)
   
-  if(trait==1) {
-    RaoQ_results$cellref <- names(FD_cells$RaoQ)
-    RaoQ_results$RaoQ <- FD_cells$RaoQ
-    RaoQ_results$trait <- traitlist[t]
+  if(t==1) {
+    
+    RaoQ_results <- data.frame(cellref = names(FD_cells$RaoQ), 
+                               RaoQ = FD_cells$RaoQ, 
+                               trait = traitlist[t])
+  
   }else {
     more_results <- data.frame(cellref = names(FD_cells$RaoQ), 
                                RaoQ = FD_cells$RaoQ,
