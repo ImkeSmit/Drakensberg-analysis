@@ -116,6 +116,30 @@ gg_microclim <- gg_microclim %>% rename(datetime = V2,
 
 gg_microclim <- gg_microclim %>% arrange(cellref, datetime) 
 
+
+###Look at timeseries of one logger, see if you can find the calibration window###
+###Calibration window: loggers were left in the seed room at 3 degrees celcius####
+
+p1 <- gg_microclim |> filter(cellref == "GG1A11", 
+                       datetime <= ymd("2023-01-01")) |> #only look at dates before insertion, and 1 month after insertion
+  ggplot(aes(x = datetime, y = air_temp)) +
+  geom_line()+
+  scale_y_continuous(breaks = seq(0, 40, by = 2)) +
+  geom_vline(xintercept = ymd("2022-11-30"), color = "red")
+
+
+p2 <- gg_microclim |> filter(cellref == "GG2H6", 
+                       datetime <= ymd("2023-01-01")) |> #only look at dates before insertion, and 1 month after insertion
+  ggplot(aes(x = datetime, y = air_temp)) +
+  geom_line()+
+  scale_y_continuous(breaks = seq(0, 40, by = 2)) +
+  geom_vline(xintercept = ymd("2022-11-30"), color = "red")
+
+comb <- ggarrange(p1, p2, ncol = 1, nrow = 2)
+ggsave("2_loggers.png", plot = comb, path = "Figures")
+
+
+
 # Remove implausible dates
 #from TOMSt logger entry and extraction dates file
 mind <- ymd("2022-11-30") #loggers inserted on 29 Nov 2022, use data from one day after
