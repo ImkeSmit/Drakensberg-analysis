@@ -100,6 +100,15 @@ for(t in 1:length(traitlist)) {
   
   #remove these cells from the abundance matrix
   abun_matrix <- abun_matrix[-which(rownames(abun_matrix) %in% c(problems$cellref)) , ]
+  
+  #identify species that do not occur in any of the remaining cells, and remove them
+  abundance_sums <- colSums(abun_matrix)
+  empty_names <- names(abundance_sums[which(abundance_sums == 0)])
+  abun_matrix <- abun_matrix[, - which(colnames(abun_matrix) %in% c(empty_names))]
+  
+  #also remove these sp from the trait matrix
+  chosen_trait <- chosen_trait[-which(names(chosen_trait) %in% c(empty_names))]
+  
  
   #calculate RaoQ 
   FD_cells <- dbFD(chosen_trait, abun_matrix,
