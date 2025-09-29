@@ -85,6 +85,8 @@ for(t in 1:length(traitlist)) {
   chosen_trait <- mean_traits[, t]
   names(chosen_trait)<- row.names(mean_traits)
   
+  abun_matrix2 <- abun_matrix
+  
   #Check for communities with zero-sum abundances
   #Get cells from FT_join that do not have any measurements of chosen_trait
   problems <- FT_join |> 
@@ -96,21 +98,23 @@ for(t in 1:length(traitlist)) {
     filter(sum_chlor == 0) |> 
     distinct(cellref)
   
+  if(nrow(problems) > 0) {
   #remove these cells from the abundance matrix
-  abun_matrix <- abun_matrix[-which(rownames(abun_matrix) %in% c(problems$cellref)) , ]
+  abun_matrix2 <- abun_matrix2[-which(rownames(abun_matrix2) %in% c(problems$cellref)) , ]
+  }
   
   #identify species that do not occur in any of the remaining cells, and remove them
-  abundance_sums <- colSums(abun_matrix)
+  abundance_sums <- colSums(abun_matrix2)
   empty_names <- names(abundance_sums[which(abundance_sums == 0)])
   
   if(length(empty_names) > 0) {
-  abun_matrix <- abun_matrix[, - which(colnames(abun_matrix) %in% c(empty_names))]
+  abun_matrix2 <- abun_matrix2[, - which(colnames(abun_matrix2) %in% c(empty_names))]
   #also remove these sp from the trait matrix
   chosen_trait <- chosen_trait[-which(names(chosen_trait) %in% c(empty_names))]
-  }
+  } 
  
   #calculate RaoQ 
-  FD_cells <- dbFD(chosen_trait, abun_matrix,
+  FD_cells <- dbFD(chosen_trait, abun_matrix2,
                    w.abun = F, #do not weight RaoQ by abundances
                    corr = "cailliez", 
                    calc.FRic = F, 
