@@ -154,7 +154,8 @@ RQ_obs <- calc_RaoQ(mean_traits, abun_matrix, FT_join)
 nullcom <- nullmodel(abun_matrix, method = "r2dtable")
 
 nullcom$data
-
+nullcom$colFreq
+nullcom$state
 
 
 
