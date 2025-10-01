@@ -144,16 +144,7 @@ for(t in 1:length(traitlist)) {
 }
 
 
-FD_cells <- dbFD(mean_traits, abun_matrix,
-             w.abun = F, #do not weight RaoQ by abundances
-             stand.x = T, #standardise traits to mean 0 and unit variance before doing calc
-             corr = "cailliez", 
-             calc.FRic = F, 
-             scale.RaoQ = F, 
-             calc.FGR = F, 
-             calc.FDiv = F, 
-             calc.CWM = F)
-FD_cells <- FD_cells$RaoQ
+
 
 
 
