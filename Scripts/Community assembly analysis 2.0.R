@@ -76,6 +76,10 @@ for(r in 1:nrow(abun_matrix)) {
 
 
 #calculate RaoQ for cells, one trait at a time
+#This is unweighted RaoQ based on euclidean distance. 
+#It uses the mean traits of species
+#Figure out: does trait filling make sense?
+#Should we use raw traits when we have them in cells and only mean traits to fill gaps?
 
 traitlist <- c(colnames(mean_traits))
 
