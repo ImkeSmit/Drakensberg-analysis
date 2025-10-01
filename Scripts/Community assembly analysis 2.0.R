@@ -57,7 +57,8 @@ abun_matrix <- FT_join |>
   distinct(cellref, taxon, .keep_all = T) |> 
   ungroup() |> 
   arrange(taxon) |> 
-  pivot_wider(names_from = taxon, values_from = cover)
+  mutate(cover = ceiling(cover)) |> #change cover values to integer to use in null models
+  pivot_wider(names_from = taxon, values_from = cover) 
 
 abun_matrix <- as.data.frame(abun_matrix)
 row.names(abun_matrix) <- abun_matrix$cellref
@@ -81,8 +82,9 @@ for(r in 1:nrow(abun_matrix)) {
 #Figure out: does trait filling make sense?
 #Should we use raw traits when we have them in cells and only mean traits to fill gaps?
 
-traitlist <- c(colnames(mean_traits))
+calc_RaoQ <- function(mean_traits, abun_matrix, FT_join) {
 
+traitlist <- c(colnames(mean_traits))
 
 for(t in 1:length(traitlist)) {
   
@@ -140,11 +142,18 @@ for(t in 1:length(traitlist)) {
     
     RaoQ_results <- rbind(RaoQ_results, more_results)
   }
-  
-  rownames(RaoQ_results) <- NULL #remove rownames
-}
+
+} 
+return(RaoQ_results) }
 
 
+RQ_obs <- calc_RaoQ(mean_traits, abun_matrix, FT_join)
+
+
+###Now we have to calculate RaoQ from null models
+nullcom <- nullmodel(abun_matrix, method = "r2dtable")
+
+nullcom$data
 
 
 
