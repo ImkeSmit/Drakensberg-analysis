@@ -141,6 +141,7 @@ for(t in 1:length(traitlist)) {
     RaoQ_results <- rbind(RaoQ_results, more_results)
   }
   
+  rownames(RaoQ_results) <- NULL #remove rownames
 }
 
 
