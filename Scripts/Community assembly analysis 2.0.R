@@ -150,12 +150,43 @@ return(RaoQ_results) }
 RQ_obs <- calc_RaoQ(mean_traits, abun_matrix, FT_join)
 
 
-###Now we have to calculate RaoQ from null models
-nullcom <- nullmodel(abun_matrix, method = "r2dtable")
+###Nullmodels####
+generate_C3_null <- function(comm, traits) {
+  null_comm <- comm * 0  # initialize matrix
+  
+  for (i in 1:nrow(comm)) {
+    site <- comm[i, ]
+    
+    # Species present at site (richness)
+    richness <- sum(site > 0)
+    
+    # Randomly choose species (without replacement) to occupy this site
+    chosen_species <- sample(colnames(comm), richness, replace = FALSE)
+    
+    #For C3, we can pick abundances from sites in the matrix where the sp occurs
+    possible_abundances <- comm |> 
+      select(chosen_species[1]) |>
+      distinct() |>  #should I only sample from the distinct vals or from the actual abundance vector??
+      pull(1) |>          # extract first column as vector
+      discard(~ .x <= 0)   # keep only positive values
+    
+    #total_abund <- sum(site)
+    r#and_abund <- rmultinom(1, total_abund, prob = rep(1, richness))
+    
+    null_comm[i, chosen_species] <- rand_abund
+  }
+  
+  # Now shuffle traits within abundance classes
+  traits_null <- traits
+  for (cl in unique(traits$ab_class)) {
+    trait_values <- traits$height[traits$ab_class == cl]
+    traits_null$height[traits$ab_class == cl] <- sample(trait_values)
+  }
+  
+  return(list(comm = null_comm, traits = traits_null))
+}
 
-nullcom$data
-nullcom$colFreq
-nullcom$state
+
 
 
 
