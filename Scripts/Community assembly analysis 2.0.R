@@ -156,7 +156,7 @@ generate_C3_null <- function(comm, iterations) {
   
   null_list <- vector(mode = "list", length = iterations)
   
-  for(n in 1:length(iterations)) {
+  for(n in 1:iterations) {
   
   for (i in 1:nrow(comm)) {
     site <- comm[i, ]
@@ -182,14 +182,15 @@ generate_C3_null <- function(comm, iterations) {
       null_comm[i, chosen_species[s]] <- chosen_abundance
     } #end loop through species
   }#end loop through sites
-    
-    null_list[n] <- null_comm
-    
-  }#finish iteration
+  
+    null_list[[n]] <- null_comm
+    }#finish iteration
+  
   
   return(null_list)
 }
 
+test<- generate_C3_null(abun_matrix, 3)
 
 
 
