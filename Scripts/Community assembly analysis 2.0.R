@@ -164,18 +164,19 @@ generate_C3_null <- function(comm, traits) {
     chosen_species <- sample(colnames(comm), richness, replace = FALSE)
     
     #For C3, we can pick abundances from sites in the matrix where the sp occurs
-    
-    possible_abundances <- comm |> 
-      select(all_of(chosen_species)) |>
-      distinct() |>  #should I only sample from the distinct vals or from the actual abundance vector??
-      pull(1) |>          # extract first column as vector
-      discard(~ .x <= 0)   # keep only positive values
-    
-    #total_abund <- sum(site)
-    r#and_abund <- rmultinom(1, total_abund, prob = rep(1, richness))
-    
-    null_comm[i, chosen_species] <- rand_abund
-  }
+    for (s in 1:length(chosen_species)) {
+      possible_abundances <-  comm |> 
+        select(all_of(chosen_species)) |> 
+        pull(chosen_species[s]) |> 
+        discard(~ .x <= 0)
+      
+      #abundances that are more frequent are more likely to be sampled
+      chosen_abundance <- sample(possible_abundances, 1)
+      
+      #assign abundance to species and site
+      null_comm[i, chosen_species[s]] <- chosen_abundance
+    } #end loop through species
+  }#end loop through sites
   
   # Now shuffle traits within abundance classes
   traits_null <- traits
