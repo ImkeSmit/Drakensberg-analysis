@@ -164,8 +164,9 @@ generate_C3_null <- function(comm, traits) {
     chosen_species <- sample(colnames(comm), richness, replace = FALSE)
     
     #For C3, we can pick abundances from sites in the matrix where the sp occurs
+    
     possible_abundances <- comm |> 
-      select(chosen_species[1]) |>
+      select(all_of(chosen_species)) |>
       distinct() |>  #should I only sample from the distinct vals or from the actual abundance vector??
       pull(1) |>          # extract first column as vector
       discard(~ .x <= 0)   # keep only positive values
