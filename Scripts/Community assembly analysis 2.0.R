@@ -151,12 +151,13 @@ RQ_obs <- calc_RaoQ(mean_traits, abun_matrix, FT_join)
 
 
 ###Nullmodels####
+set.seed(555)
 generate_C3_null <- function(comm, iterations) {
-  null_comm <- comm * 0  # initialize matrix
   
   null_list <- vector(mode = "list", length = iterations)
   
   for(n in 1:iterations) {
+  null_comm <- comm * 0  # initialize matrix
   
   for (i in 1:nrow(comm)) {
     site <- comm[i, ]
@@ -186,12 +187,21 @@ generate_C3_null <- function(comm, iterations) {
     null_list[[n]] <- null_comm
     }#finish iteration
   
-  
   return(null_list)
 }
 
 test<- generate_C3_null(abun_matrix, 3)
 
+null1 <- test[[1]]
+sum(null1[1, ])
+sum(null1[1, ] > 0)
 
+null2 <- test[[2]]
+sum(null2[1, ])
+sum(null2[1, ] > 0)
+
+null3 <- test[[3]]
+sum(null3[1, ])
+sum(null3[1, ]> 0)
 
 
