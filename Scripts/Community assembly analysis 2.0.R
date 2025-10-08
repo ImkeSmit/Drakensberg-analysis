@@ -151,8 +151,12 @@ RQ_obs <- calc_RaoQ(mean_traits, abun_matrix, FT_join)
 
 
 ###Nullmodels####
-generate_C3_null <- function(comm, traits) {
+generate_C3_null <- function(comm, iterations) {
   null_comm <- comm * 0  # initialize matrix
+  
+  null_list <- vector(mode = "list", length = iterations)
+  
+  for(n in 1:length(iterations)) {
   
   for (i in 1:nrow(comm)) {
     site <- comm[i, ]
@@ -161,6 +165,7 @@ generate_C3_null <- function(comm, traits) {
     richness <- sum(site > 0)
     
     # Randomly choose species (without replacement) to occupy this site
+    #Choose from all species in the matrix
     chosen_species <- sample(colnames(comm), richness, replace = FALSE)
     
     #For C3, we can pick abundances from sites in the matrix where the sp occurs
@@ -177,15 +182,12 @@ generate_C3_null <- function(comm, traits) {
       null_comm[i, chosen_species[s]] <- chosen_abundance
     } #end loop through species
   }#end loop through sites
+    
+    null_list[n] <- null_comm
+    
+  }#finish iteration
   
-  # Now shuffle traits within abundance classes
-  traits_null <- traits
-  for (cl in unique(traits$ab_class)) {
-    trait_values <- traits$height[traits$ab_class == cl]
-    traits_null$height[traits$ab_class == cl] <- sample(trait_values)
-  }
-  
-  return(list(comm = null_comm, traits = traits_null))
+  return(null_list)
 }
 
 
