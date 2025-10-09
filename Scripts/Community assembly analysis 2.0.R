@@ -218,4 +218,26 @@ for(l in 1:length(nullcomm_cells)) {
   }}
 
 
+RQ_summary <- null_RQ |> 
+  group_by(trait, cellref) |> 
+  summarise(sd_null = sd(RaoQ), 
+            mean_null = mean(RaoQ)) |> 
+  filter(sd_null > 0) |> #cannot divide by zero in SES calculation
+  inner_join(RQ_obs, by = c("trait", "cellref")) |> 
+  mutate(SES = (RaoQ - mean_null)/sd_null)
+
+
+#Now let's add elevation variable to graph
+RQ_summary$elevation = NA
+for(r in 1:nrow(RQ_summary)) {
+  
+  if(RQ_summary$cellref %like% "GG") {
+    RQ_summary$elevation <- 2000
+  } else {if(RQ_summary$cellref %like% "WH")
+  {RQ_summary$elevation <- 2500}
+    else { RQ_summary$elevation <- 3000 }} 
+}
+
+
+
 
