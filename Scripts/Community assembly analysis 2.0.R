@@ -82,7 +82,7 @@ for(r in 1:nrow(abun_matrix)) {
 #Figure out: does trait filling make sense?
 #Should we use raw traits when we have them in cells and only mean traits to fill gaps?
 
-calc_RaoQ <- function(mean_traits, abun_matrix, FT_join) {
+calc_RaoQ <- function(mean_traits, abun_matrix) {
 
 traitlist <- c(colnames(mean_traits))
 
@@ -136,6 +136,7 @@ for(t in 1:length(traitlist)) {
                    calc.FGR = F, 
                    calc.FDiv = F, 
                    calc.CWM = F)
+  #RAoQ = 0 if there is only one distinct trait value in a cell
   
   if(t==1) {
     
@@ -152,10 +153,10 @@ for(t in 1:length(traitlist)) {
   }
 
 } 
-return(RaoQ_results) }
+return(RaoQ_results) } 
 
 
-RQ_obs <- calc_RaoQ(mean_traits, abun_matrix, FT_join)
+RQ_obs <- calc_RaoQ(mean_traits, abun_matrix)
 
 
 ###Nullmodels####
