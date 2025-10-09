@@ -227,17 +227,18 @@ RQ_summary <- null_RQ |>
   mutate(SES = (RaoQ - mean_null)/sd_null)
 
 
-#Now let's add elevation variable to graph
-RQ_summary$elevation = NA
-for(r in 1:nrow(RQ_summary)) {
-  
-  if(RQ_summary$cellref %like% "GG") {
-    RQ_summary$elevation <- 2000
-  } else {if(RQ_summary$cellref %like% "WH")
-  {RQ_summary$elevation <- 2500}
-    else { RQ_summary$elevation <- 3000 }} 
-}
+RQ_ele <- drak |> 
+  select(cellref, site) |> 
+  distinct() |> 
+  right_join(RQ_summary, by = "cellref")
+RQ_ele$site <- factor(RQ_ele$site, levels = c("GG", "WH", "BK"))
 
+RQ_ele |> 
+  dplyr::filter(SES < 5) |> #lots of outlier SES values, logical??
+  ggplot(aes(x = site, y = SES)) +
+  geom_boxplot() +
+  facet_wrap(~trait) 
+  
 
 
 
