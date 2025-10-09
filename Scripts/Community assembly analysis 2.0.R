@@ -199,10 +199,23 @@ generate_C3_null <- function(comm, iterations) {
   return(null_list)
 }
 
-nullcomm_cells <- generate_C3_null(abun_matrix, 99)
+nullcomm_cells <- generate_C3_null(abun_matrix, 10)
 
 
 ####Calculate SES####
 #we need to calculate RaoQ for each of the observed null communities
+
+for(l in 1:length(nullcomm_cells)) {
+  chosen_null <- nullcomm_cells[[l]]
+  
+  RQ_result <- calc_RaoQ(mean_traits = mean_traits, abun_matrix = chosen_null)
+  RQ_result$counter <- paste0("null matrix ", l)
+  
+  if(l == 1) {
+  null_RQ <-  RQ_result
+  } else {
+    null_RQ <- rbind(null_RQ, RQ_result)
+  }}
+
 
 
