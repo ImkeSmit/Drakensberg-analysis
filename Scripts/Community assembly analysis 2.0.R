@@ -94,15 +94,23 @@ for(t in 1:length(traitlist)) {
   abun_matrix2 <- abun_matrix
   
   #Check for communities with zero-sum abundances
-  #Get cells from FT_join that do not have any measurements of chosen_trait
-  problems <- FT_join |> 
-    dplyr::filter(trait == traitlist[t]) |> 
+  #Get cells from that do not have any measurements of chosen_trait
+  abun_long <- abun_matrix2 |> 
+    rownames_to_column( var = "cellref") |> 
+    pivot_longer(cols = !cellref, names_to = "taxon", values_to = "cover")
+  
+  traits_long <- data.frame(value = mean_traits[, t], taxon = row.names(mean_traits))
+  
+  problems <- abun_long |> 
+    full_join(traits_long, by = "taxon") |> 
+    filter(cover > 0) |> 
     mutate(value = if_else(is.na(value), 0, value))  |> 
     group_by(cellref) |> 
     mutate(sum_chlor = sum(value)) |> 
     ungroup() |> 
     filter(sum_chlor == 0) |> 
     distinct(cellref)
+
   
   if(nrow(problems) > 0) {
   #remove these cells from the abundance matrix
@@ -190,18 +198,10 @@ generate_C3_null <- function(comm, iterations) {
   return(null_list)
 }
 
-test<- generate_C3_null(abun_matrix, 3)
+nullcomm_cells <- generate_C3_null(abun_matrix, 99)
 
-null1 <- test[[1]]
-sum(null1[1, ])
-sum(null1[1, ] > 0)
 
-null2 <- test[[2]]
-sum(null2[1, ])
-sum(null2[1, ] > 0)
-
-null3 <- test[[3]]
-sum(null3[1, ])
-sum(null3[1, ]> 0)
+####Calculate SES####
+#we need to calculate RaoQ for each of the observed null communities
 
 
