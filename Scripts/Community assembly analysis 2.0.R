@@ -133,6 +133,46 @@ generate_C3_null <- function(comm, iterations) {
 }
 
 
+###Null model C5###
+#good at detecting EF
+generate_C5_null <- function(comm, iterations) {
+  
+  null_list <- vector(mode = "list", length = iterations)
+  
+  for(n in 1:iterations) {
+    null_comm <- comm * 0  # initialize matrix
+    
+    for (i in 1:nrow(comm)) {
+      site <- comm[i, ]
+      
+      # Species present at site (richness)
+      richness <- sum(site > 0)
+      
+      # Randomly choose species (without replacement) to occupy this site
+      #Choose from all species in the matrix
+      chosen_species <- sample(colnames(comm), richness, replace = FALSE)
+      
+      #For C3, we can pick abundances from sites in the matrix where the sp occurs
+      for (s in 1:length(chosen_species)) {
+        possible_abundances <-  comm |> 
+          select(all_of(chosen_species)) |> 
+          pull(chosen_species[s]) |> 
+          discard(~ .x <= 0)
+        
+        #abundances that are more frequent are more likely to be sampled
+        chosen_abundance <- sample(possible_abundances, 1)
+        
+        #assign abundance to species and site
+        null_comm[i, chosen_species[s]] <- chosen_abundance
+      } #end loop through species
+    }#end loop through sites
+    
+    null_list[[n]] <- null_comm
+  }#finish iteration
+  
+  return(null_list)
+}
+
 
 ####Import community and trait data####
 #occurrence data
