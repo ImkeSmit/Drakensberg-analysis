@@ -3,7 +3,7 @@ library(openxlsx)
 library(tidyverse)
 library(tidylog)
 library(ggplot2)
-library(vegan)
+#library(vegan)
 library(traitstrap)
 library(FD)
 
@@ -148,7 +148,7 @@ FT <- read.xlsx("All_data/clean_data/micro-climb_traits.xlsx") |>
   
 #combine occurrence and trait data
 FT_join <- drak |> 
-  inner_join(FT, by = c("site", "grid", "cell", "taxon")) |> #do full join so that we can trait fill
+  inner_join(FT, by = c("site", "grid", "cell", "taxon")) |> #inner join to only work with taxa that have trait data
   mutate(cellref = paste0(site, grid, cell)) |> 
   select(!c(column, row))
 
@@ -245,6 +245,54 @@ RQ_ele |>
   ggplot(aes(x = site, y = SES)) +
   geom_boxplot() +
   facet_wrap(~trait) 
+
+
+####SES at the grid scale####
+##create abundance matrix at the grid level
+abun_matrix_grid <- FT_join |> 
+  mutate(gridref = paste0(site, grid)) |> 
+  select(gridref, taxon, cover) |> 
+  distinct(gridref, taxon, .keep_all = T) |>
+  mutate(cover = ceiling(cover)) |> #change cover values to integer to use in null models
+  group_by(gridref, taxon) |> 
+  summarise(gridlvl_cover = sum(cover)) |> #gridlevel cover is just the sum of cell level covers, ok?
+  ungroup() |> 
+  arrange(taxon) |> 
+  pivot_wider(names_from = taxon, values_from = gridlvl_cover) 
+
+abun_matrix_grid <- as.data.frame(abun_matrix_grid)
+row.names(abun_matrix_grid) <- abun_matrix_grid$gridref
+abun_matrix_grid <- abun_matrix_grid[, -1]
+
+#replace NA values with 0
+for(r in 1:nrow(abun_matrix_grid)) {
+  for(c in 1:ncol(abun_matrix_grid)) {
+    
+    if(is.na(abun_matrix_grid[r,c])) {
+      abun_matrix_grid[r,c] <- 0
+    }
+  }
+}
+
+#observed RaoQ
+RQ_obs_cells <- calc_RaoQ(mean_traits, abun_matrix)
+
+#Create null models
+nullcomm_cells <- generate_C3_null(abun_matrix, 10)
+
+#Calculate SES#
+#we need to calculate RaoQ for each of the observed null communities
+for(l in 1:length(nullcomm_cells)) {
+  chosen_null <- nullcomm_cells[[l]]
+  
+  RQ_result <- calc_RaoQ(mean_traits = mean_traits, abun_matrix = chosen_null)
+  RQ_result$counter <- paste0("null matrix ", l)
+  
+  if(l == 1) {
+    null_RQ <-  RQ_result
+  } else {
+    null_RQ <- rbind(null_RQ, RQ_result)
+  }}
   
 
 
