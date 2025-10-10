@@ -205,7 +205,7 @@ for(r in 1:nrow(abun_matrix)) {
 
 ####SES at cell scale####
 #observed RaoQ
-RQ_obs <- calc_RaoQ(mean_traits, abun_matrix)
+RQ_obs_cells <- calc_RaoQ(mean_traits, abun_matrix)
 
 #Create null models
 nullcomm_cells <- generate_C3_null(abun_matrix, 10)
@@ -225,19 +225,19 @@ for(l in 1:length(nullcomm_cells)) {
   }}
 
 #SES of each cell
-RQ_summary <- null_RQ |> 
+RQ_cells_summary <- null_RQ |> 
   group_by(trait, cellref) |> 
   summarise(sd_null = sd(RaoQ), 
             mean_null = mean(RaoQ)) |> 
   filter(sd_null > 0) |> #cannot divide by zero in SES calculation
-  inner_join(RQ_obs, by = c("trait", "cellref")) |> 
+  inner_join(RQ_obs_cells, by = c("trait", "cellref")) |> 
   mutate(SES = (RaoQ - mean_null)/sd_null)
 
-
+#some graphs
 RQ_ele <- drak |> 
   select(cellref, site) |> 
   distinct() |> 
-  right_join(RQ_summary, by = "cellref")
+  right_join(RQ_cells_summary, by = "cellref")
 RQ_ele$site <- factor(RQ_ele$site, levels = c("GG", "WH", "BK"))
 
 RQ_ele |> 
