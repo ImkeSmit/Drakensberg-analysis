@@ -156,12 +156,34 @@ generate_C5_null <- function(comm, iterations, pool) { #either entire, site, gri
       # Randomly choose species (without replacement) to occupy this site
       #Choose from all species in the matrix
       chosen_species <- sample(colnames(comm), richness, replace = FALSE)
+      
       } else { if(pool == "site"){
         
         #which site to draw sp from
         three_sites <- c("GG", "WH", "BK")
-        three_sites[str_detect(rownames(site), three_sites)]
-      }}
+        pool_site <- three_sites[str_detect(rownames(site), three_sites)]
+        
+        #isolate the species pool
+        sp_pool <- comm[grep(pool_site, rownames(comm)) , ]
+        sp_pool <- sp_pool[, which(colSums(sp_pool) > 0)]
+        
+        chosen_species <- sample(colnames(sp_pool), richness, replace = FALSE)
+        
+      } else { #pool == grid
+        
+        #which grid to draw sp from
+        grids_22 <- c("BK1","BK2","BK3", "BK4", "BK5","BK6", "BK7", 
+                      "WH1","WH2", "WH3","WH4","WH5", "WH6","WH7", 
+                       "GG1", "GG2", "GG3","GG4","GG5", "GG6","GG7", "GG8")
+        pool_site <- grids_22[str_detect(rownames(site), grids_22)]
+        
+        #isolate the species pool
+        sp_pool <- comm[grep(pool_site, rownames(comm)) , ]
+        sp_pool <- sp_pool[, which(colSums(sp_pool) > 0)]
+        
+        chosen_species <- sample(colnames(sp_pool), richness, replace = FALSE)
+      
+        }}
       
       #For C3, we can pick abundances from sites in the matrix where the sp occurs
       for (s in 1:length(chosen_species)) {
@@ -182,7 +204,8 @@ generate_C5_null <- function(comm, iterations, pool) { #either entire, site, gri
   }#finish iteration
   
   return(null_list)
-  print("Null model C5, Presences randomised accross sites and abundances chosen from species abundances in the observed community")
+  print(paste0("Null model C5, species pool =  ", pool, 
+               " Presences randomised accross sites and abundances chosen from species abundances in the observed community"))
 }
 
 
@@ -330,7 +353,7 @@ for(r in 1:nrow(abun_matrix_grid)) {
 RQ_obs_grid <- calc_RaoQ(mean_traits, abun_matrix_grid)
 
 #Create null models
-nullcomm_grids <- generate_C3_null(abun_matrix_grid, 10)
+nullcomm_grids <- generate_C5_null(abun_matrix_grid, 3, pool = "site")
 
 #Calculate SES#
 #we need to calculate RaoQ for each of the observed null communities
