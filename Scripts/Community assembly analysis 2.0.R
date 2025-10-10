@@ -133,15 +133,19 @@ generate_C3_null <- function(comm, iterations) {
 }
 
 
+
+####Import community and trait data####
+#occurrence data
 drak <- read.xlsx("All_data/clean_data/micro_climb_occurrence.xlsx") |> 
   mutate(cell = paste0(column, row))
+
+#trait data
 FT <- read.xlsx("All_data/clean_data/micro-climb_traits.xlsx") |> 
   rename(taxon = Taxon, 
          site = Site, grid = Grid, cell = Cell) |> 
   pivot_longer(cols = c(Wet_mass_mg, Dry_mass_mg, Chlorophyll_mg_per_m2, Ft, Height_cm, 
                         Thickness_mm, Leaf_area_mm2, SLA, LDMC), names_to = "trait", values_to = "value")
   
-
 #combine occurrence and trait data
 FT_join <- drak |> 
   inner_join(FT, by = c("site", "grid", "cell", "taxon")) |> #do full join so that we can trait fill
@@ -163,9 +167,7 @@ FT_join <- drak |>
 #  complete_only = FALSE
 #)
 
-
-###Now we can compute RaoQ at the cell, grid, and site levels###
-##Get mean traits for species
+#Get mean traits for species
 mean_traits <- FT_join |> 
   group_by(taxon, trait) |> 
   summarise(mean_trait = mean(value, na.rm = T)) |> 
@@ -201,72 +203,13 @@ for(r in 1:nrow(abun_matrix)) {
 }
 
 
-
-
-
-
+####SES at cell scale####
+#observed RaoQ
 RQ_obs <- calc_RaoQ(mean_traits, abun_matrix)
 
+#Create null models
 
-###Nullmodels####
-set.seed(555)
-generate_C3_null <- function(comm, iterations) {
-  
-  null_list <- vector(mode = "list", length = iterations)
-  
-  for(n in 1:iterations) {
-  null_comm <- comm * 0  # initialize matrix
-  
-  for (i in 1:nrow(comm)) {
-    site <- comm[i, ]
-    
-    # Species present at site (richness)
-    richness <- sum(site > 0)
-    
-    # Randomly choose species (without replacement) to occupy this site
-    #Choose from all species in the matrix
-    chosen_species <- sample(colnames(comm), richness, replace = FALSE)
-    
-    #For C3, we can pick abundances from sites in the matrix where the sp occurs
-    for (s in 1:length(chosen_species)) {
-      possible_abundances <-  comm |> 
-        select(all_of(chosen_species)) |> 
-        pull(chosen_species[s]) |> 
-        discard(~ .x <= 0)
-      
-      #abundances that are more frequent are more likely to be sampled
-      chosen_abundance <- sample(possible_abundances, 1)
-      
-      #assign abundance to species and site
-      null_comm[i, chosen_species[s]] <- chosen_abundance
-    } #end loop through species
-  }#end loop through sites
-  
-    null_list[[n]] <- null_comm
-    }#finish iteration
-  
-  return(null_list)
-}
-
-nullcomm_cells <- generate_C3_null(abun_matrix, 10)
-
-
-####Calculate SES####
-#we need to calculate RaoQ for each of the observed null communities
-
-for(l in 1:length(nullcomm_cells)) {
-  chosen_null <- nullcomm_cells[[l]]
-  
-  RQ_result <- calc_RaoQ(mean_traits = mean_traits, abun_matrix = chosen_null)
-  RQ_result$counter <- paste0("null matrix ", l)
-  
-  if(l == 1) {
-  null_RQ <-  RQ_result
-  } else {
-    null_RQ <- rbind(null_RQ, RQ_result)
-  }}
-
-
+#null RaoQ
 RQ_summary <- null_RQ |> 
   group_by(trait, cellref) |> 
   summarise(sd_null = sd(RaoQ), 
