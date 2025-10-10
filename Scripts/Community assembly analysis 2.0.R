@@ -7,6 +7,87 @@ library(vegan)
 library(traitstrap)
 library(FD)
 
+####Create required functions####
+#calculate RaoQ for cells, one trait at a time
+#This is unweighted RaoQ based on euclidean distance. 
+#It uses the mean traits of species
+#Figure out: does trait filling make sense?
+#Should we use raw traits when we have them in cells and only mean traits to fill gaps?
+
+calc_RaoQ <- function(mean_traits, abun_matrix) {
+  
+  traitlist <- c(colnames(mean_traits))
+  
+  for(t in 1:length(traitlist)) {
+    
+    chosen_trait <- mean_traits[, t]
+    names(chosen_trait)<- row.names(mean_traits)
+    
+    abun_matrix2 <- abun_matrix
+    
+    #Check for communities with zero-sum abundances
+    #Get cells from that do not have any measurements of chosen_trait
+    abun_long <- abun_matrix2 |> 
+      rownames_to_column( var = "cellref") |> 
+      pivot_longer(cols = !cellref, names_to = "taxon", values_to = "cover")
+    
+    traits_long <- data.frame(value = mean_traits[, t], taxon = row.names(mean_traits))
+    
+    problems <- abun_long |> 
+      full_join(traits_long, by = "taxon") |> 
+      filter(cover > 0) |> 
+      mutate(value = if_else(is.na(value), 0, value))  |> 
+      group_by(cellref) |> 
+      mutate(sum_chlor = sum(value)) |> 
+      ungroup() |> 
+      filter(sum_chlor == 0) |> 
+      distinct(cellref)
+    
+    
+    if(nrow(problems) > 0) {
+      #remove these cells from the abundance matrix
+      abun_matrix2 <- abun_matrix2[-which(rownames(abun_matrix2) %in% c(problems$cellref)) , ]
+    }
+    
+    #identify species that do not occur in any of the remaining cells, and remove them
+    abundance_sums <- colSums(abun_matrix2)
+    empty_names <- names(abundance_sums[which(abundance_sums == 0)])
+    
+    if(length(empty_names) > 0) {
+      abun_matrix2 <- abun_matrix2[, - which(colnames(abun_matrix2) %in% c(empty_names))]
+      #also remove these sp from the trait matrix
+      chosen_trait <- chosen_trait[-which(names(chosen_trait) %in% c(empty_names))]
+    } 
+    
+    #calculate RaoQ 
+    FD_cells <- dbFD(chosen_trait, abun_matrix2,
+                     w.abun = F, #do not weight RaoQ by abundances
+                     corr = "cailliez", 
+                     calc.FRic = F, 
+                     scale.RaoQ = F, 
+                     calc.FGR = F, 
+                     calc.FDiv = F, 
+                     calc.CWM = F)
+    #RAoQ = 0 if there is only one distinct trait value in a cell
+    
+    if(t==1) {
+      
+      RaoQ_results <- data.frame(cellref = names(FD_cells$RaoQ), 
+                                 RaoQ = FD_cells$RaoQ, 
+                                 trait = traitlist[t])
+      
+    }else {
+      more_results <- data.frame(cellref = names(FD_cells$RaoQ), 
+                                 RaoQ = FD_cells$RaoQ,
+                                 trait = traitlist[t])
+      
+      RaoQ_results <- rbind(RaoQ_results, more_results)
+    }
+    
+  } 
+  return(RaoQ_results) } 
+
+
 drak <- read.xlsx("All_data/clean_data/micro_climb_occurrence.xlsx") |> 
   mutate(cell = paste0(column, row))
 FT <- read.xlsx("All_data/clean_data/micro-climb_traits.xlsx") |> 
@@ -76,84 +157,7 @@ for(r in 1:nrow(abun_matrix)) {
 
 
 
-#calculate RaoQ for cells, one trait at a time
-#This is unweighted RaoQ based on euclidean distance. 
-#It uses the mean traits of species
-#Figure out: does trait filling make sense?
-#Should we use raw traits when we have them in cells and only mean traits to fill gaps?
 
-calc_RaoQ <- function(mean_traits, abun_matrix) {
-
-traitlist <- c(colnames(mean_traits))
-
-for(t in 1:length(traitlist)) {
-  
-  chosen_trait <- mean_traits[, t]
-  names(chosen_trait)<- row.names(mean_traits)
-  
-  abun_matrix2 <- abun_matrix
-  
-  #Check for communities with zero-sum abundances
-  #Get cells from that do not have any measurements of chosen_trait
-  abun_long <- abun_matrix2 |> 
-    rownames_to_column( var = "cellref") |> 
-    pivot_longer(cols = !cellref, names_to = "taxon", values_to = "cover")
-  
-  traits_long <- data.frame(value = mean_traits[, t], taxon = row.names(mean_traits))
-  
-  problems <- abun_long |> 
-    full_join(traits_long, by = "taxon") |> 
-    filter(cover > 0) |> 
-    mutate(value = if_else(is.na(value), 0, value))  |> 
-    group_by(cellref) |> 
-    mutate(sum_chlor = sum(value)) |> 
-    ungroup() |> 
-    filter(sum_chlor == 0) |> 
-    distinct(cellref)
-
-  
-  if(nrow(problems) > 0) {
-  #remove these cells from the abundance matrix
-  abun_matrix2 <- abun_matrix2[-which(rownames(abun_matrix2) %in% c(problems$cellref)) , ]
-  }
-  
-  #identify species that do not occur in any of the remaining cells, and remove them
-  abundance_sums <- colSums(abun_matrix2)
-  empty_names <- names(abundance_sums[which(abundance_sums == 0)])
-  
-  if(length(empty_names) > 0) {
-  abun_matrix2 <- abun_matrix2[, - which(colnames(abun_matrix2) %in% c(empty_names))]
-  #also remove these sp from the trait matrix
-  chosen_trait <- chosen_trait[-which(names(chosen_trait) %in% c(empty_names))]
-  } 
- 
-  #calculate RaoQ 
-  FD_cells <- dbFD(chosen_trait, abun_matrix2,
-                   w.abun = F, #do not weight RaoQ by abundances
-                   corr = "cailliez", 
-                   calc.FRic = F, 
-                   scale.RaoQ = F, 
-                   calc.FGR = F, 
-                   calc.FDiv = F, 
-                   calc.CWM = F)
-  #RAoQ = 0 if there is only one distinct trait value in a cell
-  
-  if(t==1) {
-    
-    RaoQ_results <- data.frame(cellref = names(FD_cells$RaoQ), 
-                               RaoQ = FD_cells$RaoQ, 
-                               trait = traitlist[t])
-  
-  }else {
-    more_results <- data.frame(cellref = names(FD_cells$RaoQ), 
-                               RaoQ = FD_cells$RaoQ,
-                               trait = traitlist[t])
-    
-    RaoQ_results <- rbind(RaoQ_results, more_results)
-  }
-
-} 
-return(RaoQ_results) } 
 
 
 RQ_obs <- calc_RaoQ(mean_traits, abun_matrix)
