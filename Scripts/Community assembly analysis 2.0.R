@@ -134,6 +134,7 @@ generate_C5_null <- function(comm, iterations) {
   }#finish iteration
   
   return(null_list)
+  print("Null model C5, Presences randomised accross sites and abundances chosen from species abundances in the observed community")
 }
 
 
