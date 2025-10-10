@@ -208,8 +208,23 @@ for(r in 1:nrow(abun_matrix)) {
 RQ_obs <- calc_RaoQ(mean_traits, abun_matrix)
 
 #Create null models
+nullcomm_cells <- generate_C3_null(abun_matrix, 10)
 
-#null RaoQ
+#Calculate SES#
+#we need to calculate RaoQ for each of the observed null communities
+for(l in 1:length(nullcomm_cells)) {
+  chosen_null <- nullcomm_cells[[l]]
+  
+  RQ_result <- calc_RaoQ(mean_traits = mean_traits, abun_matrix = chosen_null)
+  RQ_result$counter <- paste0("null matrix ", l)
+  
+  if(l == 1) {
+    null_RQ <-  RQ_result
+  } else {
+    null_RQ <- rbind(null_RQ, RQ_result)
+  }}
+
+#SES of each cell
 RQ_summary <- null_RQ |> 
   group_by(trait, cellref) |> 
   summarise(sd_null = sd(RaoQ), 
