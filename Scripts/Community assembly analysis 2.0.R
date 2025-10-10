@@ -275,25 +275,33 @@ for(r in 1:nrow(abun_matrix_grid)) {
 }
 
 #observed RaoQ
-RQ_obs_cells <- calc_RaoQ(mean_traits, abun_matrix)
+RQ_obs_grid <- calc_RaoQ(mean_traits, abun_matrix_grid)
 
 #Create null models
-nullcomm_cells <- generate_C3_null(abun_matrix, 10)
+nullcomm_grids <- generate_C3_null(abun_matrix_grid, 10)
 
 #Calculate SES#
 #we need to calculate RaoQ for each of the observed null communities
-for(l in 1:length(nullcomm_cells)) {
-  chosen_null <- nullcomm_cells[[l]]
+for(l in 1:length(nullcomm_grids)) {
+  chosen_null <- nullcomm_grids[[l]]
   
-  RQ_result <- calc_RaoQ(mean_traits = mean_traits, abun_matrix = chosen_null)
-  RQ_result$counter <- paste0("null matrix ", l)
+  RQ_result_grid <- calc_RaoQ(mean_traits = mean_traits, abun_matrix = chosen_null)
+  RQ_result_grid$counter <- paste0("null matrix ", l)
   
   if(l == 1) {
-    null_RQ <-  RQ_result
+    null_RQ_grid <-  RQ_result_grid
   } else {
-    null_RQ <- rbind(null_RQ, RQ_result)
+    null_RQ_grid <- rbind(null_RQ_grid, RQ_result_grid)
   }}
   
-
+#SES of each grid
+RQ_grids_summary <- null_RQ_grid |> 
+  group_by(trait, cellref) |> 
+  summarise(sd_null = sd(RaoQ), 
+            mean_null = mean(RaoQ)) |> 
+  ungroup() |> 
+  filter(sd_null > 0) |> #cannot divide by zero in SES calculation
+  inner_join(RQ_obs_grid, by = c("trait", "cellref")) |> 
+  mutate(SES = (RaoQ - mean_null)/sd_null)
 
 
