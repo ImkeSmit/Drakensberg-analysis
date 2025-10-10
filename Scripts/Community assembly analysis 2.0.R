@@ -355,8 +355,7 @@ RQ_obs_grid <- calc_RaoQ(mean_traits, abun_matrix_grid)
 #Create null models
 nullcomm_grids <- generate_C5_null(abun_matrix_grid, 3, pool = "site")
 
-#Calculate SES#
-#we need to calculate RaoQ for each of the observed null communities
+#Calculate RaoQ for each of the observed null communities
 for(l in 1:length(nullcomm_grids)) {
   chosen_null <- nullcomm_grids[[l]]
   
