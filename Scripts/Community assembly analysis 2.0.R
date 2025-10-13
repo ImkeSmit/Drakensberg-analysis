@@ -92,7 +92,6 @@ calc_RaoQ <- function(mean_traits, abun_matrix) {
 
 #~~~~~~~~~~~~~~~~~~~~~~~
 ###Nullmodels###
-set.seed(555)
 
 ###Null model C5###
 #good at detecting EF
