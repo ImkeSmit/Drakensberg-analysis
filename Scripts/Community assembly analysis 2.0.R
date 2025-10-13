@@ -242,7 +242,7 @@ for(r in 1:nrow(abun_matrix)) {
 }
 
 
-####SES at cell scale####
+####SES at cell scale, pool = entire####
 #observed RaoQ
 RQ_obs_cells <- calc_RaoQ(mean_traits, abun_matrix)
 
