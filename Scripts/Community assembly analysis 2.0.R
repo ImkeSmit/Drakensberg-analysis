@@ -206,6 +206,7 @@ FT_join <- drak |>
 
 #Get mean traits for species
 mean_traits <- FT_join |> 
+  filter(trait %in% c("Height_cm", "Leaf_area_mm2", "SLA", "LDMC")) |> 
   group_by(taxon, trait) |> 
   summarise(mean_trait = mean(value, na.rm = T)) |> 
   pivot_wider(names_from = trait, values_from = mean_trait) |> 
@@ -245,7 +246,8 @@ for(r in 1:nrow(abun_matrix)) {
 RQ_obs_cells <- calc_RaoQ(mean_traits, abun_matrix)
 
 #Create null models
-nullcomm_cells <- generate_C3_null(abun_matrix, 10)
+set.seed(123)
+nullcomm_cells <- generate_C5_null(abun_matrix, 10)
 
 #Calculate SES#
 #we need to calculate RaoQ for each of the observed null communities
