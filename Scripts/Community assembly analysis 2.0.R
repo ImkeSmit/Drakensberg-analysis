@@ -171,6 +171,70 @@ generate_C5_null <- function(comm, iterations, pool) { #either entire, site, gri
   return(null_list)
 }
 
+generate_C5_null_fast <- function(comm, iterations, pool) {
+  # Ensure comm is a matrix for speed
+  comm <- as.matrix(comm)
+  rownames_comm <- rownames(comm)
+  colnames_comm <- colnames(comm)
+  
+  # Precompute site groups
+  three_sites <- c("GG", "WH", "BK")
+  grids_22 <- c("BK1","BK2","BK3","BK4","BK5","BK6","BK7",
+                "WH1","WH2","WH3","WH4","WH5","WH6","WH7",
+                "GG1","GG2","GG3","GG4","GG5","GG6","GG7","GG8")
+  
+  # Precompute per-species nonzero abundances for faster sampling
+  abundance_lists <- lapply(1:ncol(comm), function(j) comm[comm[, j] > 0, j])
+  names(abundance_lists) <- colnames_comm
+  
+  # Function to run a single iteration
+  single_iter <- function(iter) {
+    null_comm <- matrix(0, nrow = nrow(comm), ncol = ncol(comm),
+                        dimnames = list(rownames_comm, colnames_comm))
+    
+    for (i in seq_len(nrow(comm))) {
+      site <- comm[i, ]
+      richness <- sum(site > 0)
+      if (richness == 0) next
+      
+      # Choose species pool
+      if (pool == "entire") {
+        chosen_species <- sample(colnames_comm, richness, replace = FALSE)
+      } else if (pool == "site") {
+        pool_site <- three_sites[grep(paste(three_sites, collapse = "|"), rownames_comm[i])]
+        sp_pool <- comm[grep(pool_site, rownames_comm), , drop = FALSE]
+        sp_pool <- sp_pool[, colSums(sp_pool) > 0, drop = FALSE]
+        chosen_species <- sample(colnames(sp_pool), richness, replace = FALSE)
+      } else if (pool == "grid") {
+        pool_site <- grids_22[grep(paste(grids_22, collapse = "|"), rownames_comm[i])]
+        sp_pool <- comm[grep(pool_site, rownames_comm), , drop = FALSE]
+        sp_pool <- sp_pool[, colSums(sp_pool) > 0, drop = FALSE]
+        chosen_species <- sample(colnames(sp_pool), richness, replace = FALSE)
+      }
+      
+      # Assign abundances
+      for (sp in chosen_species) {
+        abunds <- abundance_lists[[sp]]
+        if (length(abunds) > 0) {
+          null_comm[i, sp] <- sample(abunds, 1)
+        }
+      }
+    }
+    null_comm
+  }
+  
+
+  null_list <- lapply(seq_len(iterations), single_iter)
+  
+  message(sprintf(
+    "C5 null model completed (%d iterations, pool = %s).",
+    iterations, pool
+  ))
+  
+  return(null_list)
+}
+
+
 
 ####Import community and trait data####
 #occurrence data
