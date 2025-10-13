@@ -312,7 +312,7 @@ RQ_obs_cells <- calc_RaoQ(mean_traits, abun_matrix)
 
 #Create null models
 set.seed(123)
-nullcomm_cells <- generate_C5_null(abun_matrix, 999, pool = "entire")
+nullcomm_cells <- generate_C5_null_fast(abun_matrix, 999, pool = "entire")
 
 #Calculate SES#
 #we need to calculate RaoQ for each of the observed null communities
