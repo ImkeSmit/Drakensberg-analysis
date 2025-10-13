@@ -159,6 +159,7 @@ generate_C5_null <- function(comm, iterations, pool) { #either entire, site, gri
     }#end loop through sites
     
     null_list[[n]] <- null_comm
+    message(paste0("iteration ", n, " completed"))
   }#finish iteration
   
   message(paste0(
