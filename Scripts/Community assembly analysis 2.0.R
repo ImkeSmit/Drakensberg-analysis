@@ -19,32 +19,49 @@ library(FD)
 calc_RaoQ <- function(mean_traits, abun_matrix) {
   
   traitlist <- c(colnames(mean_traits))
+  abun_matrix2 <- as.data.frame(abun_matrix)
+  
+  abun_long <- abun_matrix2 |> 
+    rownames_to_column(var = "cellref") |> 
+    pivot_longer(cols = !cellref, names_to = "taxon", values_to = "cover")
+  
+  traits_long <- mean_traits |> 
+    rownames_to_column(var = "taxon") |> 
+    pivot_longer(!taxon, names_to = "trait", values_to = "value")
+  
+  trait_sum <- abun_long |> 
+    full_join(traits_long, by = "taxon") |> 
+    filter(cover > 0) |>
+    mutate(value = if_else(is.na(value), 0, value))  |>
+    group_by(cellref, trait) |> 
+    mutate(trait_sum = sum(value)) |> 
+    ungroup()
+
   
   for(t in 1:length(traitlist)) {
     
     chosen_trait <- mean_traits[, t]
     names(chosen_trait)<- row.names(mean_traits)
     
-    abun_matrix2 <- as.data.frame(abun_matrix)
-    
     #Check for communities with zero-sum abundances
     #Get cells from that do not have any measurements of chosen_trait
-    abun_long <- abun_matrix2 |> 
-      rownames_to_column( var = "cellref") |> 
-      pivot_longer(cols = !cellref, names_to = "taxon", values_to = "cover")
     
-    traits_long <- data.frame(value = mean_traits[, t], taxon = row.names(mean_traits))
+    #traits_long <- data.frame(value = mean_traits[, t], taxon = row.names(mean_traits))
     
-    problems <- abun_long |> 
-      full_join(traits_long, by = "taxon") |> 
-      filter(cover > 0) |> 
-      mutate(value = if_else(is.na(value), 0, value))  |> 
-      group_by(cellref) |> 
-      mutate(sum_chlor = sum(value)) |> 
-      ungroup() |> 
-      filter(sum_chlor == 0) |> 
-      distinct(cellref)
+    #problems <- abun_long |> 
+     # full_join(traits_long, by = "taxon") |> 
+     # filter(cover > 0) |> 
+      #mutate(value = if_else(is.na(value), 0, value))  |> 
+      #group_by(cellref) |> 
+      #mutate(sum_chlor = sum(value)) |> 
+      #ungroup() |> 
+      #filter(sum_chlor == 0) |> 
+      #distinct(cellref)
     
+    problems <- trait_sum |> 
+      filter(trait == traitlist[t]) |> 
+      filter(trait_sum == 0)
+
     
     if(nrow(problems) > 0) {
       #remove these cells from the abundance matrix
@@ -200,7 +217,7 @@ FT_join <- drak |>
 
 #Get mean traits for species
 mean_traits <- FT_join |> 
-  filter(trait %in% c("Height_cm", "Leaf_area_mm2", "SLA", "LDMC")) |> 
+  filter(trait %in% c("Chlorophyll_mg_per_m2", "Height_cm", "Leaf_area_mm2", "SLA", "LDMC")) |> 
   group_by(taxon, trait) |> 
   summarise(mean_trait = mean(value, na.rm = T)) |> 
   pivot_wider(names_from = trait, values_from = mean_trait) |> 
