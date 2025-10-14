@@ -97,68 +97,6 @@ calc_RaoQ <- function(mean_traits, abun_matrix) {
   return(RaoQ_results) } 
 
 
-library(future.apply)
-
-calc_RaoQ_fast <- function(mean_traits, abun_matrix, parallel = TRUE) {
-  
-  # Precompute constants
-  traitlist <- colnames(mean_traits)
-  abun_matrix <- as.data.frame(abun_matrix)
-  
-  # Precompute abundance long once
-  abun_long <- abun_matrix |>
-    rownames_to_column("cellref") |>
-    pivot_longer(-cellref, names_to = "taxon", values_to = "cover")
-  
-  # Function to process one trait at a time
-  compute_trait_RaoQ <- function(t) {
-    chosen_trait <- mean_traits[, t]
-    names(chosen_trait) <- rownames(mean_traits)
-    traits_long <- data.frame(value = chosen_trait, taxon = rownames(mean_traits))
-    
-    # Identify "problem" cells — no valid trait data
-    problems <- abun_long |>
-      filter(cover > 0) |>
-      left_join(traits_long, by = "taxon") |>
-      mutate(value = if_else(is.na(value), 0, value)) |>
-      group_by(cellref) |>
-      summarise(sum_trait = sum(value, na.rm = TRUE)) |>
-      filter(sum_trait == 0) |>
-      pull(cellref)
-    
-    # Subset abundance matrix (without copying full object each time)
-    abun_matrix2 <- abun_matrix[!rownames(abun_matrix) %in% problems, , drop = FALSE]
-    
-    # Drop species not present
-    abun_matrix2 <- abun_matrix2[, colSums(abun_matrix2) > 0, drop = FALSE]
-    chosen_trait <- chosen_trait[names(chosen_trait) %in% colnames(abun_matrix2)]
-    
-    # Compute RaoQ (skip weighting)
-    FD_cells <- dbFD(chosen_trait, abun_matrix2,
-                     w.abun = FALSE, corr = "cailliez",
-                     calc.FRic = FALSE, scale.RaoQ = FALSE,
-                     calc.FGR = FALSE, calc.FDiv = FALSE,
-                     calc.CWM = FALSE)
-    
-    tibble(cellref = names(FD_cells$RaoQ),
-           RaoQ = FD_cells$RaoQ,
-           trait = traitlist[t])
-  }
-  
-  # Parallelise across traits if possible
-  if (parallel) {
-    plan(multisession, workers = min(availableCores() - 1, length(traitlist)))
-    results <- future_lapply(seq_along(traitlist), compute_trait_RaoQ)
-    plan(sequential)
-  } else {
-    results <- lapply(seq_along(traitlist), compute_trait_RaoQ)
-  }
-  
-  RaoQ_results <- bind_rows(results)
-  return(RaoQ_results)
-}
-
-
 
 #~~~~~~~~~~~~~~~~~~~~~~~
 ###Nullmodels###
