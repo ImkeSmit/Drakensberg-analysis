@@ -253,46 +253,35 @@ nullcomm_cells <- generate_C5_null_fast(abun_matrix, 999, pool = "entire")
 
 #Calculate SES#
 #we need to calculate RaoQ for each of the observed null communities
-for(l in 1:length(nullcomm_cells)) {
-  chosen_null <- nullcomm_cells[[l]]
-  
-  RQ_result <- calc_RaoQ(mean_traits = mean_traits, abun_matrix = chosen_null, parallel = T)
-  RQ_result$counter <- paste0("null matrix ", l)
-  
-  if(l == 1) {
-    null_RQ <-  RQ_result
-  } else {
-    null_RQ <- rbind(null_RQ, RQ_result)
-  }} #start 11:05
-
 
 # Set up parallel backend
-plan(multisession, workers = parallel::detectCores() - 4)  # or plan(multicore) on Linux/mac
+plan(multisession, workers = parallel::detectCores() - 2)  # or plan(multicore) on Linux/mac
 
-chunks <- split(nullcomm_cells, ceiling(seq_along(nullcomm_cells) / 100))
+chunks <- split(nullcomm_cells, ceiling(seq_along(nullcomm_cells) / 50))
+#each chunk has 50 null matrices
 RaoQ_results <- list()
 
-for (i in seq_along(chunks)) {
+for (i in seq_along(chunks)) { #run chunks sequentially
   message("Processing chunk ", i, " of ", length(chunks))
   
   chunk_list <- chunks[[i]]  # smaller subset only
   
+  #each core receives one null matrix to run calc_RaoQ on. this happens until all matrices in the chunk are finished
   sub_RQ <- future_lapply(seq_along(chunk_list), function(idx) {
     chosen_null <- chunk_list[[idx]]
     RQ_result <- calc_RaoQ(mean_traits, chosen_null)
     RQ_result$counter <- paste0("null matrix ", (i - 1) * 100 + idx)
     RQ_result
-  }, future.seed = TRUE)
+  }, future.seed = TRUE) #generates a unique reproducible sub seed for each worker
+  #ensures that results are reproducible, and that there is no overlap in random processes for each core
   
-  RaoQ_results[[i]] <- bind_rows(sub_RQ)
+  RaoQ_results[[i]] <- bind_rows(sub_RQ) #results from the chunk are merged
   rm(sub_RQ, chunk_list); gc()
 }
 
 null_RQ <- bind_rows(RaoQ_results)
 
 plan(sequential)
-
-
 
 
 #SES of each cell
