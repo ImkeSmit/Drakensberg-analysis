@@ -57,7 +57,8 @@ calc_RaoQ <- function(mean_traits, abun_matrix) {
     }
     
     #identify species that do not occur in any of the remaining cells, and remove them
-    empty_names <- names(abundance_sums[which(colSums(abun_matrix2) == 0)])
+    abundance_sums <- colSums(abun_matrix2)
+    empty_names <- names(abundance_sums[which(abundance_sums == 0)])
     
     if(length(empty_names) > 0) {
       abun_matrix2 <- abun_matrix2[, - which(colnames(abun_matrix2) %in% c(empty_names))]
@@ -262,6 +263,36 @@ for(l in 1:length(nullcomm_cells)) {
   } else {
     null_RQ <- rbind(null_RQ, RQ_result)
   }} #start 11:05
+
+
+# Set up parallel backend
+plan(multisession, workers = parallel::detectCores() - 4)  # or plan(multicore) on Linux/mac
+
+chunks <- split(nullcomm_cells, ceiling(seq_along(nullcomm_cells) / 100))
+RaoQ_results <- list()
+
+for (i in seq_along(chunks)) {
+  message("Processing chunk ", i, " of ", length(chunks))
+  
+  chunk_list <- chunks[[i]]  # smaller subset only
+  
+  sub_RQ <- future_lapply(seq_along(chunk_list), function(idx) {
+    chosen_null <- chunk_list[[idx]]
+    RQ_result <- calc_RaoQ(mean_traits, chosen_null)
+    RQ_result$counter <- paste0("null matrix ", (i - 1) * 100 + idx)
+    RQ_result
+  }, future.seed = TRUE)
+  
+  RaoQ_results[[i]] <- bind_rows(sub_RQ)
+  rm(sub_RQ, chunk_list); gc()
+}
+
+null_RQ <- bind_rows(RaoQ_results)
+
+plan(sequential)
+
+
+
 
 #SES of each cell
 RQ_cells_summary <- null_RQ |> 
