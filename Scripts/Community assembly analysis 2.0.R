@@ -316,7 +316,7 @@ nullcomm_cells <- generate_C5_null_fast(abun_matrix, 999, pool = "entire")
 for(l in 1:length(nullcomm_cells)) {
   chosen_null <- nullcomm_cells[[l]]
   
-  RQ_result <- calc_RaoQ_fast(mean_traits = mean_traits, abun_matrix = chosen_null, parallel = T)
+  RQ_result <- calc_RaoQ(mean_traits = mean_traits, abun_matrix = chosen_null, parallel = T)
   RQ_result$counter <- paste0("null matrix ", l)
   
   if(l == 1) {
