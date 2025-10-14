@@ -44,19 +44,7 @@ calc_RaoQ <- function(mean_traits, abun_matrix) {
     names(chosen_trait)<- row.names(mean_traits)
     
     #Check for communities with zero-sum abundances
-    #Get cells from that do not have any measurements of chosen_trait
-    
-    #traits_long <- data.frame(value = mean_traits[, t], taxon = row.names(mean_traits))
-    
-    #problems <- abun_long |> 
-     # full_join(traits_long, by = "taxon") |> 
-     # filter(cover > 0) |> 
-      #mutate(value = if_else(is.na(value), 0, value))  |> 
-      #group_by(cellref) |> 
-      #mutate(sum_chlor = sum(value)) |> 
-      #ungroup() |> 
-      #filter(sum_chlor == 0) |> 
-      #distinct(cellref)
+    #Get cells that do not have any measurements of chosen_trait
     
     problems <- trait_sum |> 
       filter(trait == traitlist[t]) |> 
@@ -69,8 +57,7 @@ calc_RaoQ <- function(mean_traits, abun_matrix) {
     }
     
     #identify species that do not occur in any of the remaining cells, and remove them
-    abundance_sums <- colSums(abun_matrix2)
-    empty_names <- names(abundance_sums[which(abundance_sums == 0)])
+    empty_names <- names(abundance_sums[which(colSums(abun_matrix2) == 0)])
     
     if(length(empty_names) > 0) {
       abun_matrix2 <- abun_matrix2[, - which(colnames(abun_matrix2) %in% c(empty_names))]
@@ -86,7 +73,8 @@ calc_RaoQ <- function(mean_traits, abun_matrix) {
                      scale.RaoQ = F, 
                      calc.FGR = F, 
                      calc.FDiv = F, 
-                     calc.CWM = F)
+                     calc.CWM = F, 
+                     messages = F)
     #RAoQ = 0 if there is only one distinct trait value in a cell
     
     if(t==1) {
@@ -107,6 +95,69 @@ calc_RaoQ <- function(mean_traits, abun_matrix) {
     
   } 
   return(RaoQ_results) } 
+
+
+library(future.apply)
+
+calc_RaoQ_fast <- function(mean_traits, abun_matrix, parallel = TRUE) {
+  
+  # Precompute constants
+  traitlist <- colnames(mean_traits)
+  abun_matrix <- as.data.frame(abun_matrix)
+  
+  # Precompute abundance long once
+  abun_long <- abun_matrix |>
+    rownames_to_column("cellref") |>
+    pivot_longer(-cellref, names_to = "taxon", values_to = "cover")
+  
+  # Function to process one trait at a time
+  compute_trait_RaoQ <- function(t) {
+    chosen_trait <- mean_traits[, t]
+    names(chosen_trait) <- rownames(mean_traits)
+    traits_long <- data.frame(value = chosen_trait, taxon = rownames(mean_traits))
+    
+    # Identify "problem" cells — no valid trait data
+    problems <- abun_long |>
+      filter(cover > 0) |>
+      left_join(traits_long, by = "taxon") |>
+      mutate(value = if_else(is.na(value), 0, value)) |>
+      group_by(cellref) |>
+      summarise(sum_trait = sum(value, na.rm = TRUE)) |>
+      filter(sum_trait == 0) |>
+      pull(cellref)
+    
+    # Subset abundance matrix (without copying full object each time)
+    abun_matrix2 <- abun_matrix[!rownames(abun_matrix) %in% problems, , drop = FALSE]
+    
+    # Drop species not present
+    abun_matrix2 <- abun_matrix2[, colSums(abun_matrix2) > 0, drop = FALSE]
+    chosen_trait <- chosen_trait[names(chosen_trait) %in% colnames(abun_matrix2)]
+    
+    # Compute RaoQ (skip weighting)
+    FD_cells <- dbFD(chosen_trait, abun_matrix2,
+                     w.abun = FALSE, corr = "cailliez",
+                     calc.FRic = FALSE, scale.RaoQ = FALSE,
+                     calc.FGR = FALSE, calc.FDiv = FALSE,
+                     calc.CWM = FALSE)
+    
+    tibble(cellref = names(FD_cells$RaoQ),
+           RaoQ = FD_cells$RaoQ,
+           trait = traitlist[t])
+  }
+  
+  # Parallelise across traits if possible
+  if (parallel) {
+    plan(multisession, workers = min(availableCores() - 1, length(traitlist)))
+    results <- future_lapply(seq_along(traitlist), compute_trait_RaoQ)
+    plan(sequential)
+  } else {
+    results <- lapply(seq_along(traitlist), compute_trait_RaoQ)
+  }
+  
+  RaoQ_results <- bind_rows(results)
+  return(RaoQ_results)
+}
+
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~
@@ -217,7 +268,7 @@ FT_join <- drak |>
 
 #Get mean traits for species
 mean_traits <- FT_join |> 
-  filter(trait %in% c("Chlorophyll_mg_per_m2", "Height_cm", "Leaf_area_mm2", "SLA", "LDMC")) |> 
+  filter(trait %in% c("Height_cm", "Leaf_area_mm2", "SLA", "LDMC")) |> 
   group_by(taxon, trait) |> 
   summarise(mean_trait = mean(value, na.rm = T)) |> 
   pivot_wider(names_from = trait, values_from = mean_trait) |> 
@@ -256,8 +307,6 @@ for(r in 1:nrow(abun_matrix)) {
 #observed RaoQ
 RQ_obs_cells <- calc_RaoQ(mean_traits, abun_matrix)
 
-write.csv(RQ_obs_cells, "All_data/comm_assembly_results/RQ_obs_cells_C5_entire.csv")
-
 #Create null models
 set.seed(123)
 nullcomm_cells <- generate_C5_null_fast(abun_matrix, 999, pool = "entire")
@@ -267,14 +316,14 @@ nullcomm_cells <- generate_C5_null_fast(abun_matrix, 999, pool = "entire")
 for(l in 1:length(nullcomm_cells)) {
   chosen_null <- nullcomm_cells[[l]]
   
-  RQ_result <- calc_RaoQ(mean_traits = mean_traits, abun_matrix = chosen_null)
+  RQ_result <- calc_RaoQ_fast(mean_traits = mean_traits, abun_matrix = chosen_null, parallel = T)
   RQ_result$counter <- paste0("null matrix ", l)
   
   if(l == 1) {
     null_RQ <-  RQ_result
   } else {
     null_RQ <- rbind(null_RQ, RQ_result)
-  }}
+  }} #start 11:05
 
 #SES of each cell
 RQ_cells_summary <- null_RQ |> 
@@ -284,6 +333,8 @@ RQ_cells_summary <- null_RQ |>
   filter(sd_null > 0) |> #cannot divide by zero in SES calculation
   inner_join(RQ_obs_cells, by = c("trait", "cellref")) |> 
   mutate(SES = (RaoQ - mean_null)/sd_null)
+
+write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_cells_C5_entire.csv")
 
 #some graphs
 RQ_ele <- drak |> 
