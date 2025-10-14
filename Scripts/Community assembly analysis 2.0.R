@@ -6,6 +6,7 @@ library(ggplot2)
 #library(vegan)
 library(traitstrap)
 library(FD)
+library(future.apply)
 
 ####Create required functions####
 
