@@ -25,7 +25,7 @@ calc_RaoQ <- function(mean_traits, abun_matrix) {
     chosen_trait <- mean_traits[, t]
     names(chosen_trait)<- row.names(mean_traits)
     
-    abun_matrix2 <- abun_matrix
+    abun_matrix2 <- as.data.frame(abun_matrix)
     
     #Check for communities with zero-sum abundances
     #Get cells from that do not have any measurements of chosen_trait
@@ -77,11 +77,13 @@ calc_RaoQ <- function(mean_traits, abun_matrix) {
       RaoQ_results <- data.frame(cellref = names(FD_cells$RaoQ), 
                                  RaoQ = FD_cells$RaoQ, 
                                  trait = traitlist[t])
+      rownames(RaoQ_results) <- NULL
       
     }else {
       more_results <- data.frame(cellref = names(FD_cells$RaoQ), 
                                  RaoQ = FD_cells$RaoQ,
                                  trait = traitlist[t])
+      rownames(more_results) <- NULL
       
       RaoQ_results <- rbind(RaoQ_results, more_results)
     }
@@ -236,6 +238,8 @@ for(r in 1:nrow(abun_matrix)) {
 ####SES at cell scale, pool = entire####
 #observed RaoQ
 RQ_obs_cells <- calc_RaoQ(mean_traits, abun_matrix)
+
+write.csv(RQ_obs_cells, "All_data/comm_assembly_results/RQ_obs_cells_C5_entire.csv")
 
 #Create null models
 set.seed(123)
