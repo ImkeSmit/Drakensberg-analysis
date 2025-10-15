@@ -18,7 +18,7 @@ import_community <- function(metaTurfID, filepath){ #e.g., "All_data/raw_data/ra
   
   # need to break the workflow here, otherwise tedious to find problems
   metaComm <- metaComm_raw %>% 
-    select(sheet_name, Date, origSiteID, origBlockID, origPlotID, turfID, destSiteID, destBlockID, destPlotID, Recorder, Scribe) # %>% 
+    select(sheet_name, Date, turfID, destSiteID, destBlockID, destPlotID, Recorder, Scribe) # %>% 
     # fix wrong dates
     #mutate(Date = case_when(Date == "44025" ~ "13.7.2020",
                            # Date == "44046" ~ "3.8.2020",
@@ -30,9 +30,7 @@ import_community <- function(metaTurfID, filepath){ #e.g., "All_data/raw_data/ra
     # make date
     mutate(Date = ymd(Date),
            Year = year(Date),
-           origBlockID = as.numeric(origBlockID),
            destBlockID = as.numeric(destBlockID),
-           origPlotID = as.numeric(origPlotID),
            destPlotID = as.numeric(destPlotID),
            turfID = gsub("_", " ", turfID)) %>% 
     
@@ -90,3 +88,4 @@ import_community <- function(metaTurfID, filepath){ #e.g., "All_data/raw_data/ra
     select(origSiteID:origPlotID, destSiteID:turfID, warming:Nlevel, Date, Year, Species:Cover, Recorder, Scribe, Remark, file)
   
 }
+
