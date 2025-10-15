@@ -32,6 +32,12 @@ import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_d
            #Year = year(Date),
            destBlockID = as.numeric(destBlockID),
            destPlotID = as.numeric(destPlotID)) %>% 
+    #There is a turf naming mistake in the data
+    #turf 73_WN2I_158 should be 78_WN2I_158
+    mutate(turfID = ifelse(turfID == "73_WN2I_158", "78_WN2I_158", turfID), 
+           destSiteID = ifelse(turfID == "73_WN2I_158", "mid", destSiteID), 
+           destBlockID =  ifelse(turfID == "73_WN2I_158", 10, destBlockID), 
+           destPlotID = ifelse(turfID == "73_WN2I_158", 158, destPlotID)) %>%
     
     # Fix mistake in PlotID
     #mutate(origPlotID = ifelse(Date == "2019-07-02" & origPlotID == 83 & Recorder == "silje", 84, origPlotID)) %>% 
@@ -50,8 +56,8 @@ import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_d
     left_join(metaTurfID , by = "turfID") %>% 
     mutate(destSiteID = coalesce(destSiteID.x, destSiteID.y),
            destBlockID = coalesce(destBlockID.x, destBlockID.y),
-           destPlotID = coalesce(destPlotID.x, destPlotID.y)) %>% 
-    select(- c(destSiteID.x, destSiteID.y, destBlockID.x, destBlockID.y, destPlotID.x, destPlotID.y))# %>% 
+           destPlotID = coalesce(destPlotID.x, destPlotID.y))# %>% 
+    #select(- c(destSiteID.x, destSiteID.y, destBlockID.x, destBlockID.y, destPlotID.x, destPlotID.y))# %>% 
     # join for 2020 data
     #left_join(metaTurfID, by = c("destSiteID", "destBlockID", "destPlotID", "turfID")) %>% 
     #mutate(origSiteID = coalesce(origSiteID.x, origSiteID.y),
