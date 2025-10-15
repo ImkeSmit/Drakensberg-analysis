@@ -1,9 +1,9 @@
 # import community
-import_community <- function(metaTurfID, filepath){ #e.g., "All_data/raw_data/raw_threed_data"
+import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_data"
   
   #### COMMUNITY DATA ####
   ### Read in files
-  files <- dir(path = filepath, pattern = "\\.xlsx$", full.names = TRUE, recursive = TRUE)
+  files <- dir(path = "All_data/raw_data/raw_threed_data", pattern = "\\.xlsx$", full.names = TRUE, recursive = TRUE)
   
   #Function to read in meta data
   metaComm_raw <- map_df(set_names(files), function(file) {
@@ -18,7 +18,7 @@ import_community <- function(metaTurfID, filepath){ #e.g., "All_data/raw_data/ra
   
   # need to break the workflow here, otherwise tedious to find problems
   metaComm <- metaComm_raw %>% 
-    select(sheet_name, Date, turfID, destSiteID, destBlockID, destPlotID, Recorder, Scribe) # %>% 
+    select(sheet_name, Date, turfID, destSiteID, destBlockID, destPlotID, Recorder, Scribe)  %>% 
     # fix wrong dates
     #mutate(Date = case_when(Date == "44025" ~ "13.7.2020",
                            # Date == "44046" ~ "3.8.2020",
