@@ -12,23 +12,23 @@ import_community <- function(metaTurfID, filepath){ #e.g., "All_data/raw_data/ra
       excel_sheets() %>% 
       set_names() %>% 
       # exclude sheet to check data and taxonomy file
-      discard(. %in% c("CHECK", "taxonomy")) %>% 
+      discard(. %in% c("CHECK", "taxonomy", "empty", "Species list", "veg survey protocol")) %>% 
       map_df(~ read_xlsx(path = file, sheet = .x, n_max = 1, col_types = c("text", rep("text", 29))), .id = "sheet_name")
   }, .id = "file")
   
   # need to break the workflow here, otherwise tedious to find problems
   metaComm <- metaComm_raw %>% 
-    select(sheet_name, Date, origSiteID, origBlockID, origPlotID, turfID, destSiteID, destBlockID, destPlotID, Recorder, Scribe) %>% 
+    select(sheet_name, Date, origSiteID, origBlockID, origPlotID, turfID, destSiteID, destBlockID, destPlotID, Recorder, Scribe) # %>% 
     # fix wrong dates
-    mutate(Date = case_when(Date == "44025" ~ "13.7.2020",
-                            Date == "44046" ~ "3.8.2020",
-                            Date == "44047" ~ "5.8.2020",
-                            Date == "44048" ~ "5.8.2020",
-                            Date == "44049" ~ "6.8.2020",
-                            TRUE ~ as.character(Date))) %>% 
+    #mutate(Date = case_when(Date == "44025" ~ "13.7.2020",
+                           # Date == "44046" ~ "3.8.2020",
+                          #  Date == "44047" ~ "5.8.2020",
+                          #  Date == "44048" ~ "5.8.2020",
+                          #  Date == "44049" ~ "6.8.2020",
+                          #  TRUE ~ as.character(Date))) %>% 
     
     # make date
-    mutate(Date = dmy(Date),
+    mutate(Date = ymd(Date),
            Year = year(Date),
            origBlockID = as.numeric(origBlockID),
            destBlockID = as.numeric(destBlockID),
