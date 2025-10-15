@@ -68,14 +68,14 @@ metaTurfID <- left_join(
   #CHANGE PLOTID 23-103 TO 23 AMBIENT, AND 24 TO 24-103 WARMING (wrong turf was transplanted!)
   mutate(warming = ifelse(origSiteID == "high" & origPlotID == 23, "A", warming),
          destPlotID = ifelse(origSiteID == "high" & origPlotID == 23, 23, destPlotID),
-         turfID = ifelse(origSiteID == "high" & origPlotID == 23, "23 AN5N 23", turfID),
+         turfID = ifelse(origSiteID == "high" & origPlotID == 23, "23_AN5N_23", turfID),
          
          warming = ifelse(origSiteID == "high" & origPlotID == 24, "W", warming),
          destPlotID = ifelse(origSiteID == "high" & origPlotID == 24, 103, destPlotID),
-         turfID = ifelse(origSiteID == "high" & origPlotID == 24, "24 WN5N 103", turfID)) %>% 
+         turfID = ifelse(origSiteID == "high" & origPlotID == 24, "24_WN5N_103", turfID)) %>% 
   mutate(destSiteID = as.character(destSiteID)) %>% 
-  mutate(destSiteID = case_when(turfID == "23 AN5N 23" ~ "high",
-                                turfID == "24 WN5N 103" ~ "mid",
+  mutate(destSiteID = case_when(turfID == "23_AN5N_23" ~ "high",
+                                turfID == "24_WN5N_103" ~ "mid",
                                 TRUE ~ destSiteID))
 
 write.xlsx(metaTurfID, file = "All_data/clean_data/threed/metaTurfID.xlsx", colNames = TRUE)
@@ -84,7 +84,7 @@ write.xlsx(metaTurfID, file = "All_data/clean_data/threed/metaTurfID.xlsx", colN
 ####IMPORT VEG SURVEY DATA####
 #run import_community script first
 
-metaTurfID <- read.xlsx("All_data/clean_data/threed/metaTurfID.xlsx", colNames = T)
+metadat <- read.xlsx("All_data/clean_data/threed/metaTurfID.xlsx", colNames = T)
 
 high2025 <- import_community(metaTurfID)
 
