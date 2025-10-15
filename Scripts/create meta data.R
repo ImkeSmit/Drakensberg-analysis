@@ -65,19 +65,19 @@ metaTurfID <- left_join(
          destPlotID = ifelse(is.na(destPlotID), origPlotID, destPlotID),
          turfID = paste0(origPlotID, " ", warming, "N", Nlevel, grazing,  " ", destPlotID)) %>% 
   ungroup() %>% 
-  select(-fence, -rownr) #%>% 
-  # CHANGE PLOTID 23-103 TO 23 AMBIENT, AND 24 TO 24-103 WARMING (wrong turf was transplanted!)
-  #mutate(warming = ifelse(origSiteID == "Lia" & origPlotID == 23, "A", warming),
-  #       destPlotID = ifelse(origSiteID == "Lia" & origPlotID == 23, 23, destPlotID),
-  #       turfID = ifelse(origSiteID == "Lia" & origPlotID == 23, "23 AN5N 23", turfID),
-  #       
-  #       warming = ifelse(origSiteID == "Lia" & origPlotID == 24, "W", warming),
-  #       destPlotID = ifelse(origSiteID == "Lia" & origPlotID == 24, 103, destPlotID),
-  #       turfID = ifelse(origSiteID == "Lia" & origPlotID == 24, "24 WN5N 103", turfID)) %>% 
-  #mutate(destSiteID = as.character(destSiteID)) %>% 
-  #mutate(destSiteID = case_when(turfID == "23 AN5N 23" ~ "Lia",
-  #                              turfID == "24 WN5N 103" ~ "Joa",
-  #                              TRUE ~ destSiteID))
+  select(-fence, -rownr) %>% 
+  #CHANGE PLOTID 23-103 TO 23 AMBIENT, AND 24 TO 24-103 WARMING (wrong turf was transplanted!)
+  mutate(warming = ifelse(origSiteID == "high" & origPlotID == 23, "A", warming),
+         destPlotID = ifelse(origSiteID == "high" & origPlotID == 23, 23, destPlotID),
+         turfID = ifelse(origSiteID == "high" & origPlotID == 23, "23 AN5N 23", turfID),
+         
+         warming = ifelse(origSiteID == "high" & origPlotID == 24, "W", warming),
+         destPlotID = ifelse(origSiteID == "high" & origPlotID == 24, 103, destPlotID),
+         turfID = ifelse(origSiteID == "high" & origPlotID == 24, "24 WN5N 103", turfID)) %>% 
+  mutate(destSiteID = as.character(destSiteID)) %>% 
+  mutate(destSiteID = case_when(turfID == "23 AN5N 23" ~ "high",
+                                turfID == "24 WN5N 103" ~ "mid",
+                                TRUE ~ destSiteID))
 
 write.xlsx(metaTurfID, file = "All_data/clean_data/threed/metaTurfID.xlsx", colNames = TRUE)
 
