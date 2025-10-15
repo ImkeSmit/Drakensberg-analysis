@@ -1,9 +1,9 @@
 # import community
-import_community <- function(metaTurfID){
+import_community <- function(metaTurfID, filepath){ #e.g., "All_data/raw_data/raw_threed_data"
   
   #### COMMUNITY DATA ####
   ### Read in files
-  files <- dir(path = "data/community", pattern = "\\.xlsx$", full.names = TRUE, recursive = TRUE)
+  files <- dir(path = filepath, pattern = "\\.xlsx$", full.names = TRUE, recursive = TRUE)
   
   #Function to read in meta data
   metaComm_raw <- map_df(set_names(files), function(file) {
