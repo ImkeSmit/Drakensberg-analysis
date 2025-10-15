@@ -17,7 +17,13 @@ import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_d
       # exclude sheet to check data and taxonomy file
       discard(. %in% c("CHECK", "taxonomy", "empty", "Species list", "veg survey protocol")) %>% 
       map_df(~ read_xlsx(path = file, sheet = .x, n_max = 1, col_types = c("text", rep("text", 29))), .id = "sheet_name")
-  }, .id = "file")
+  }, .id = "file") %>%
+    mutate(
+      Date = dplyr::case_when(
+        suppressWarnings(!is.na(as.numeric(Date))) ~ as.Date(as.numeric(Date), origin = "1899-12-30"),
+        TRUE ~ lubridate::ymd(Date)
+      )
+    )
   
   # need to break the workflow here, otherwise tedious to find problems
   metaComm <- metaComm_raw %>% 
