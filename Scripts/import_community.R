@@ -1,4 +1,7 @@
 # import community
+library(tidyverse)
+library(stringi)
+library(readxl)
 import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_data"
   
   #### COMMUNITY DATA ####
@@ -28,8 +31,8 @@ import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_d
                           #  TRUE ~ as.character(Date))) %>% 
     
     # make date
-    mutate(#Date = ymd(Date),
-           #Year = year(Date),
+    mutate(Date = ymd(Date),
+           Year = year(Date),
            destBlockID = as.numeric(destBlockID),
            destPlotID = as.numeric(destPlotID)) %>% 
     #There is a turf naming mistake in the data
