@@ -23,7 +23,7 @@ import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_d
         suppressWarnings(!is.na(as.numeric(Date))) ~ as.Date(as.numeric(Date), origin = "1899-12-30"),
         TRUE ~ lubridate::ymd(Date)
       )
-    )
+    ) #there are two dates that are NA, fix them
   
   # need to break the workflow here, otherwise tedious to find problems
   metaComm <- metaComm_raw %>% 
