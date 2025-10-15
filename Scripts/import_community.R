@@ -37,16 +37,16 @@ import_community <- function(metaTurfID, filepath){ #e.g., "All_data/raw_data/ra
            turfID = gsub("_", " ", turfID)) %>% 
     
     # Fix mistake in PlotID
-    mutate(origPlotID = ifelse(Date == "2019-07-02" & origPlotID == 83 & Recorder == "silje", 84, origPlotID)) %>% 
+    #mutate(origPlotID = ifelse(Date == "2019-07-02" & origPlotID == 83 & Recorder == "silje", 84, origPlotID)) %>% 
     
     # change site names
-    mutate(origSiteID = case_when(origSiteID == "Joa" ~ "Joasete",
-                                  origSiteID == "Lia" ~ "Liahovden",
-                                  TRUE ~ origSiteID),
-           destSiteID = case_when(destSiteID == "Joa" ~ "Joasete",
-                                  destSiteID == "Lia" ~ "Liahovden",
-                                  destSiteID == "Vik" ~ "Vikesland",
-                                  TRUE ~ destSiteID)) |> 
+    #mutate(origSiteID = case_when(origSiteID == "Joa" ~ "Joasete",
+     #                             origSiteID == "Lia" ~ "Liahovden",
+      #                            TRUE ~ origSiteID),
+      #     destSiteID = case_when(destSiteID == "Joa" ~ "Joasete",
+       #                           destSiteID == "Lia" ~ "Liahovden",
+        #                          destSiteID == "Vik" ~ "Vikesland",
+         #                         TRUE ~ destSiteID)) |> 
     
     # join for 2019 data
     left_join(metaTurfID %>% select(origSiteID, origBlockID, origPlotID, destSiteID, destPlotID, destBlockID, turfID), by = c("origSiteID", "origBlockID", "origPlotID")) %>% 
