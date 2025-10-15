@@ -3,9 +3,9 @@ library(tidyverse)
 library(readxl)
 library(openxlsx)
 
-#Create metadata file detailing the treatemnts associated with each turfID
-# Create meta data
-# Lia and Joa
+####CREATE METADATA####
+#Create metadata file detailing the treatments associated with each turfID
+# high and mid
 origSiteID <-  c("high", "mid")
 origBlockID <-  c(1:10)
 origPlotID <- tibble(origPlotID = 1:160)
@@ -34,7 +34,6 @@ vik <- tibble(
 
 # randomize warming and grazing treatment
 set.seed(32) # seed is needed to replicate sample_frac
-#set.seed(33) # for Chinese experiment
 meta2 <- meta %>% 
   # create variable for grazing treatment inside or outside fence
   mutate(fence = if_else(grazing == "N", "out", "in")) %>% 
@@ -63,25 +62,17 @@ metaTurfID <- left_join(
   suffix = c("", "_dest")) %>% 
   mutate(destBlockID = origBlockID,
          destPlotID = ifelse(is.na(destPlotID), origPlotID, destPlotID),
-         turfID = paste0(origPlotID, " ", warming, "N", Nlevel, grazing,  " ", destPlotID)) %>% 
+         turfID = paste0(origPlotID, "_", warming, "N", Nlevel, grazing,  "_", destPlotID)) %>% 
   ungroup() %>% 
-  select(-fence, -rownr) #%>% 
-# CHANGE PLOTID 23-103 TO 23 AMBIENT, AND 24 TO 24-103 WARMING (wrong turf was transplanted!)
-#mutate(warming = ifelse(origSiteID == "Lia" & origPlotID == 23, "A", warming),
-#       destPlotID = ifelse(origSiteID == "Lia" & origPlotID == 23, 23, destPlotID),
-#       turfID = ifelse(origSiteID == "Lia" & origPlotID == 23, "23 AN5N 23", turfID),
-#       
-#       warming = ifelse(origSiteID == "Lia" & origPlotID == 24, "W", warming),
-#       destPlotID = ifelse(origSiteID == "Lia" & origPlotID == 24, 103, destPlotID),
-#       turfID = ifelse(origSiteID == "Lia" & origPlotID == 24, "24 WN5N 103", turfID)) %>% 
-#mutate(destSiteID = as.character(destSiteID)) %>% 
-#mutate(destSiteID = case_when(turfID == "23 AN5N 23" ~ "Lia",
-#                              turfID == "24 WN5N 103" ~ "Joa",
-#                              TRUE ~ destSiteID))
+  select(-fence, -rownr) 
 
 write.xlsx(metaTurfID, file = "All_data/clean_data/threed/metaTurfID.xlsx", colNames = TRUE)
 
 
+####IMPORT VEG SURVEY DATA####
 #run import_community script first
 
-high2025 <- import_community()
+metaTurfID <- read.xlsx("All_data/clean_data/threed/metaTurfID.xlsx", colNames = T)
+
+high2025 <- import_community(metaTurfID)
+
