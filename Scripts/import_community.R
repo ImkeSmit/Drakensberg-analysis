@@ -76,7 +76,7 @@ import_community <- function(metaTurfID, filepath){ #e.g., "All_data/raw_data/ra
     file %>% 
       excel_sheets() %>% 
       set_names() %>% 
-      discard(. == "CHECK") %>% 
+      discard(. %in% c("CHECK", "taxonomy", "empty", "Species list", "veg survey protocol")) %>% 
       map_df(~ read_xlsx(path = file, sheet = .x, skip = 2, n_max = 61, col_types = "text"), .id = "sheet_name")
   }, .id = "file") %>% 
     select(file:Remark) %>% 
