@@ -28,11 +28,10 @@ import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_d
                           #  TRUE ~ as.character(Date))) %>% 
     
     # make date
-    mutate(Date = ymd(Date),
-           Year = year(Date),
+    mutate(#Date = ymd(Date),
+           #Year = year(Date),
            destBlockID = as.numeric(destBlockID),
-           destPlotID = as.numeric(destPlotID),
-           turfID = gsub("_", " ", turfID)) %>% 
+           destPlotID = as.numeric(destPlotID)) %>% 
     
     # Fix mistake in PlotID
     #mutate(origPlotID = ifelse(Date == "2019-07-02" & origPlotID == 83 & Recorder == "silje", 84, origPlotID)) %>% 
@@ -47,18 +46,18 @@ import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_d
          #                         TRUE ~ destSiteID)) |> 
     
     # join for 2019 data
-    left_join(metaTurfID %>% select(origSiteID, origBlockID, origPlotID, destSiteID, destPlotID, destBlockID, turfID), by = c("origSiteID", "origBlockID", "origPlotID")) %>% 
+    #left_join(metaTurfID %>% select(origSiteID, origBlockID, origPlotID, destSiteID, destPlotID, destBlockID, turfID), by = "turfID") %>% 
+    left_join(metaTurfID , by = "turfID") %>% 
     mutate(destSiteID = coalesce(destSiteID.x, destSiteID.y),
            destBlockID = coalesce(destBlockID.x, destBlockID.y),
-           destPlotID = coalesce(destPlotID.x, destPlotID.y),
-           turfID = coalesce(turfID.x, turfID.y)) %>% 
-    select(- c(destSiteID.x, destSiteID.y, destBlockID.x, destBlockID.y, destPlotID.x, destPlotID.y, turfID.x, turfID.y)) %>% 
+           destPlotID = coalesce(destPlotID.x, destPlotID.y)) %>% 
+    select(- c(destSiteID.x, destSiteID.y, destBlockID.x, destBlockID.y, destPlotID.x, destPlotID.y))# %>% 
     # join for 2020 data
-    left_join(metaTurfID, by = c("destSiteID", "destBlockID", "destPlotID", "turfID")) %>% 
-    mutate(origSiteID = coalesce(origSiteID.x, origSiteID.y),
-           origBlockID = coalesce(origBlockID.x, origBlockID.y),
-           origPlotID = coalesce(origPlotID.x, origPlotID.y)) %>% 
-    select(- c(origSiteID.x, origSiteID.y, origBlockID.x, origBlockID.y, origPlotID.x, origPlotID.y))
+    #left_join(metaTurfID, by = c("destSiteID", "destBlockID", "destPlotID", "turfID")) %>% 
+    #mutate(origSiteID = coalesce(origSiteID.x, origSiteID.y),
+    #       origBlockID = coalesce(origBlockID.x, origBlockID.y),
+    #       origPlotID = coalesce(origPlotID.x, origPlotID.y)) %>% 
+    #select(- c(origSiteID.x, origSiteID.y, origBlockID.x, origBlockID.y, origPlotID.x, origPlotID.y))
   
   
   # validate input
