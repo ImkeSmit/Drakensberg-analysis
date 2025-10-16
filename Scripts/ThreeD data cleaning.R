@@ -101,6 +101,7 @@ write.xlsx(veg_only, "All_data/clean_data/threed/community_2025.xlsx")
 abiotic_only <- veg2025 |> 
   filter(Species %in% c("Vascular plants","Bryophyes","Lichen", "Litter","Bare soil",
                          "Bare rock","Poop","Vascular plant layer","Moss layer" )) |>
+  select(!Cover) |> 
   rename(Variable = Species) |> 
   #rename variable names
   mutate(Variable = case_when(Variable == "Vascular plants" ~ "Vascular plant cover", 
@@ -127,7 +128,31 @@ abiotic_only <- veg2025 |>
   mutate(`24` = case_when(`24` == "Ratio < 1 is wrong" ~ NA,
                           `24` == "Sum cover / Tot. Vascular (c. 1.3x)" ~ NA,
                           `24` == "Photo:" ~ NA,
-                          .default = `24`))
+                          .default = `24`)) #instead of doing all this maybe we should just make all numeric and lapply over th ecolumns
+
+abiotic_only$`1` <- as.numeric(abiotic_only$`1`)
+
+#replace NA's with 0 where appropriate
+replace_vars = c("Vascular plant cover","Bryophyte cover","Lichen cover","Litter cover",
+                 "Bare soil cover","Bare rock cover","Poop cover")
+replace_cols = colnames(abiotic_only)[14:38]
+for(r in 1:nrow(abiotic_only)) {
+  row = abiotic_only[r, ] 
+  
+  if(row$Variable %in% replace_vars) {
+    
+    for(i in 1:length(replace_cols)) {
+      
+      element <- abiotic_only[r, i]
+      
+      if(is.na(element)) {
+        abiotic_only[r, i] <- 0
+      }
+    }
+    
+  }
+  
+}
   
   
   
