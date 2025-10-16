@@ -94,9 +94,20 @@ veg2025 <- import_community(metadat, filepath = "All_data/raw_data/raw_threed_da
 ####Clean community data ####
 veg_only <- veg2025 |> #remove other variables besides veg cover
   filter(!Species %in% c("Total Cover (%)","Vascular plants","Bryophyes","Lichen", "Litter","Bare soil",
-                         "Bare rock","Poop","Height / depth (cm)","Vascular plant layer","Moss layer" ))
+                         "Bare rock","Poop","Height / depth (cm)","Vascular plant layer","Moss layer" )) |> 
+  mutate(Cover = as.numeric(Cover))
+
 
 #There are a few plots with no total cover measurements. Add them from looking at the pictures. 
+#which plots are % cover for species
+addcov <- veg_only |> 
+  group_by(turfID) |> 
+  summarise(coversum = sum(Cover, na.rm = T)) |> 
+  filter(coversum == 0) 
+
+turf_107_WN3M_175 <- veg_only |> 
+  filter(turfID == "107_WN3M_175") |> 
+  distinct(Species)
 
 write.xlsx(veg_only, "All_data/clean_data/threed/community_2025.xlsx")
 
