@@ -172,6 +172,7 @@ for(r in 1:nrow(abiotic_only2)) {
     }
   }
   
+write.xlsx(veg_only, "All_data/clean_data/threed/abiotic_and_veg_height_2025.xlsx")
 
   
   
