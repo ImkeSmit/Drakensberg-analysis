@@ -84,7 +84,9 @@ write.xlsx(metaTurfID, file = "All_data/clean_data/threed/metaTurfID.xlsx", colN
 
 ####IMPORT VEG SURVEY DATA####
 #run import_community script first
+#CHeck import community script again before importing 2026 data
+#script is custom for 2025 data
 metadat <- read.xlsx("All_data/clean_data/threed/metaTurfID.xlsx", colNames = T)
 
-veg2025 <- import_community(metadat)
-
+veg2025 <- import_community(metadat, filepath = "All_data/raw_data/raw_threed_data/2025")
+write.xlsx(veg2025, "All_data/clean_data/threed/community_2025.xlsx")
