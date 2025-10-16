@@ -113,24 +113,53 @@ abiotic_only <- veg2025 |>
                               Variable == "Poop" ~ "Poop cover",
                               Variable == "Vascular plant layer" ~ "Vascular plant layer height",
                               Variable == "Moss layer" ~ "Moss layer height", 
-                              .default = Variable)) |> 
+                              .default = Variable)) |>
+  mutate(across(c(`1`:`25`), as.numeric)) #|> #make nonsenical text vals NA
   #remove wrong values from the 
-  mutate(`5` = case_when(`5` == "> 0 and < 100cm" ~ NA, 
-                         `5` == "> 0 and < 20cm" ~ NA,
-                         .default = `5`)) |> 
-  mutate(`8` = case_when(`8` == "Exposure" ~ NA, 
-                         `8` == "Soil depth (cm)" ~ NA,
-                         .default = `8`)) |>
-  mutate(`16` = case_when(`16` == "Photo:" ~ NA, 
-                         .default = `16`)) |> 
-  mutate(`18` = case_when(`18` > 101 ~ NA, 
-                        .default = `18`)) |> 
-  mutate(`24` = case_when(`24` == "Ratio < 1 is wrong" ~ NA,
-                          `24` == "Sum cover / Tot. Vascular (c. 1.3x)" ~ NA,
-                          `24` == "Photo:" ~ NA,
-                          .default = `24`)) #instead of doing all this maybe we should just make all numeric and lapply over th ecolumns
+  #mutate(`5` = case_when(`5` == "> 0 and < 100cm" ~ NA, 
+  #                       `5` == "> 0 and < 20cm" ~ NA,
+  #                       .default = `5`)) |> 
+  #mutate(`8` = case_when(`8` == "Exposure" ~ NA, 
+  #                       `8` == "Soil depth (cm)" ~ NA,
+  #                       .default = `8`)) |>
+  #mutate(`16` = case_when(`16` == "Photo:" ~ NA, 
+  #                       .default = `16`)) |> 
+  #mutate(`18` = case_when(`18` > 101 ~ NA, #This was the photo number
+  #                      .default = `18`)) 
+  #mutate(`24` = case_when(`24` == "Ratio < 1 is wrong" ~ NA,
+  #                        `24` == "Sum cover / Tot. Vascular (c. 1.3x)" ~ NA,
+  #                        `24` == "Photo:" ~ NA,
+  #                        .default = `24`)) #instead of doing all this maybe we should just make all numeric and lapply over th ecolumns
 
-abiotic_only$`1` <- as.numeric(abiotic_only$`1`)
+vasc_height <- abiotic_only |> 
+  filter(Variable == "Vascular plant layer height") |> 
+  select(turfID, Variable, `1`:`4`) |> 
+  rename(Vascular_plant_height1 = `1`, 
+         Vascular_plant_height2 = `2`,
+         Vascular_plant_height3 = `3`,
+         Vascular_plant_height4 = `4`) |> 
+  select(!Variable)
+
+moss_height <- abiotic_only |> 
+  filter(Variable == "Moss layer height") |> 
+  select(turfID, Variable, `1`:`4`) |> 
+  rename(Moss_layer_height1 = `1`, 
+         Moss_layer_height2 = `2`,
+         Moss_layer_height3 = `3`,
+         Moss_layer_height4 = `4`) |> 
+  select(!Variable)
+
+abiotic_only2 <- abiotic_only |> 
+  filter(!Variable == c("Vascular plant layer height", "Moss layer height")) |> 
+  left_join(vasc_height, by = "turfID") |> 
+  left_join(moss_height, by = "turfID")
+
+
+#identify problematic cover values
+summary(abiotic_only)
+prob1 <- abiotic_only |> 
+  slice_max(`1`, n = 10)
+
 
 #replace NA's with 0 where appropriate
 replace_vars = c("Vascular plant cover","Bryophyte cover","Lichen cover","Litter cover",
