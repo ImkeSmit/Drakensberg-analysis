@@ -89,4 +89,15 @@ write.xlsx(metaTurfID, file = "All_data/clean_data/threed/metaTurfID.xlsx", colN
 metadat <- read.xlsx("All_data/clean_data/threed/metaTurfID.xlsx", colNames = T)
 
 veg2025 <- import_community(metadat, filepath = "All_data/raw_data/raw_threed_data/2025")
-write.xlsx(veg2025, "All_data/clean_data/threed/community_2025.xlsx")
+
+veg_only <- veg2025 |> 
+  filter(!Species %in% c("Total Cover (%)","Vascular plants","Bryophyes","Lichen", "Litter","Bare soil",
+                         "Bare rock","Poop","Height / depth (cm)","Vascular plant layer","Moss layer" ))
+
+#There are a few plots with no total cover measurements. Add them from looking at the pictures. 
+
+write.xlsx(veg_only, "All_data/clean_data/threed/community_2025.xlsx")
+
+abiotic_only <- veg2025 |> 
+  filter(!Species %in% c("Total Cover (%)","Vascular plants","Bryophyes","Lichen", "Litter","Bare soil",
+                         "Bare rock","Poop","Height / depth (cm)","Vascular plant layer","Moss layer" ))
