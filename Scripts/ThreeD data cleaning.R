@@ -114,23 +114,9 @@ abiotic_only <- veg2025 |>
                               Variable == "Vascular plant layer" ~ "Vascular plant layer height",
                               Variable == "Moss layer" ~ "Moss layer height", 
                               .default = Variable)) |>
-  mutate(across(c(`1`:`25`), as.numeric)) #|> #make nonsenical text vals NA
-  #remove wrong values from the 
-  #mutate(`5` = case_when(`5` == "> 0 and < 100cm" ~ NA, 
-  #                       `5` == "> 0 and < 20cm" ~ NA,
-  #                       .default = `5`)) |> 
-  #mutate(`8` = case_when(`8` == "Exposure" ~ NA, 
-  #                       `8` == "Soil depth (cm)" ~ NA,
-  #                       .default = `8`)) |>
-  #mutate(`16` = case_when(`16` == "Photo:" ~ NA, 
-  #                       .default = `16`)) |> 
-  #mutate(`18` = case_when(`18` > 101 ~ NA, #This was the photo number
-  #                      .default = `18`)) 
-  #mutate(`24` = case_when(`24` == "Ratio < 1 is wrong" ~ NA,
-  #                        `24` == "Sum cover / Tot. Vascular (c. 1.3x)" ~ NA,
-  #                        `24` == "Photo:" ~ NA,
-  #                        .default = `24`)) #instead of doing all this maybe we should just make all numeric and lapply over th ecolumns
+  mutate(across(c(`1`:`25`), as.numeric)) #make all numeric
 
+#create table of vascular height
 vasc_height <- abiotic_only |> 
   filter(Variable == "Vascular plant layer height") |> 
   select(turfID, Variable, `1`:`4`) |> 
@@ -140,6 +126,7 @@ vasc_height <- abiotic_only |>
          Vascular_plant_height4 = `4`) |> 
   select(!Variable)
 
+#create table of moss height
 moss_height <- abiotic_only |> 
   filter(Variable == "Moss layer height") |> 
   select(turfID, Variable, `1`:`4`) |> 
@@ -149,39 +136,43 @@ moss_height <- abiotic_only |>
          Moss_layer_height4 = `4`) |> 
   select(!Variable)
 
+#join moss and vascular height to other data
 abiotic_only2 <- abiotic_only |> 
-  filter(!Variable == c("Vascular plant layer height", "Moss layer height")) |> 
+  filter(!Variable %in% c("Vascular plant layer height", "Moss layer height")) |>
   left_join(vasc_height, by = "turfID") |> 
   left_join(moss_height, by = "turfID")
 
 
 #identify problematic cover values
-summary(abiotic_only)
-prob1 <- abiotic_only |> 
-  slice_max(`1`, n = 10)
+summary(abiotic_only2) #cols1 -25 must have max cover of 100.5
+#col 10 has max of 999
+
+prob10 <- abiotic_only2 |> 
+  slice_max(`10`, n = 10) #problem value is at 93_AN6M_93
+#fix it
+abiotic_only2[which(abiotic_only2$turfID == "93_AN6M_93" & abiotic_only2$Variable == "Vascular plant cover"), 
+              which(colnames(abiotic_only2) == "10")] <- 99
+
+
+
+
 
 
 #replace NA's with 0 where appropriate
-replace_vars = c("Vascular plant cover","Bryophyte cover","Lichen cover","Litter cover",
-                 "Bare soil cover","Bare rock cover","Poop cover")
-replace_cols = colnames(abiotic_only)[14:38]
-for(r in 1:nrow(abiotic_only)) {
-  row = abiotic_only[r, ] 
-  
-  if(row$Variable %in% replace_vars) {
+replace_cols = colnames(abiotic_only2)[14:38]
+for(r in 1:nrow(abiotic_only2)) {
     
     for(i in 1:length(replace_cols)) {
       
-      element <- abiotic_only[r, i]
+      element <- abiotic_only2[r, which(colnames(abiotic_only2) == replace_cols[i])]
       
       if(is.na(element)) {
-        abiotic_only[r, i] <- 0
+        abiotic_only2[r, which(colnames(abiotic_only2) == replace_cols[i])] <- 0
       }
     }
-    
   }
   
-}
+
   
   
   
