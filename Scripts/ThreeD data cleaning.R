@@ -2,6 +2,7 @@
 library(tidyverse)
 library(readxl)
 library(openxlsx)
+library(stringi)
 
 ####CREATE METADATA####
 #Create metadata file detailing the treatments associated with each turfID
@@ -83,8 +84,7 @@ write.xlsx(metaTurfID, file = "All_data/clean_data/threed/metaTurfID.xlsx", colN
 
 ####IMPORT VEG SURVEY DATA####
 #run import_community script first
-
 metadat <- read.xlsx("All_data/clean_data/threed/metaTurfID.xlsx", colNames = T)
 
-high2025 <- import_community(metaTurfID)
+veg2025 <- import_community(metadat)
 
