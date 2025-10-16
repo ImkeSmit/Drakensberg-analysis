@@ -90,7 +90,9 @@ metadat <- read.xlsx("All_data/clean_data/threed/metaTurfID.xlsx", colNames = T)
 
 veg2025 <- import_community(metadat, filepath = "All_data/raw_data/raw_threed_data/2025")
 
-veg_only <- veg2025 |> 
+
+####Clean community data ####
+veg_only <- veg2025 |> #remove other variables besides veg cover
   filter(!Species %in% c("Total Cover (%)","Vascular plants","Bryophyes","Lichen", "Litter","Bare soil",
                          "Bare rock","Poop","Height / depth (cm)","Vascular plant layer","Moss layer" ))
 
