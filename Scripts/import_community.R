@@ -74,8 +74,8 @@ import_community <- function(metaTurfID, filepath){ #e.g., "All_data/raw_data/ra
 
   community <- metaComm %>% 
     left_join(comm, by = c("sheet_name", "Year")) %>% 
-    select(origSiteID:origPlotID, destSiteID:turfID, warming:Nlevel, Date, Year, Species:Cover, Recorder, Scribe, Remark, file)
-  
+    select(origSiteID:origPlotID, destSiteID:turfID, warming:Nlevel, Date, Year, Species:Cover, Recorder, Scribe, Remark, file)  %>%
+  filter(!is.na(Species)) #remove empty rows, these were empty rows in the data sheets
     
 }
 
