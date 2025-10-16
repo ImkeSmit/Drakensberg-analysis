@@ -98,6 +98,9 @@ veg_only <- veg2025 |>
 
 write.xlsx(veg_only, "All_data/clean_data/threed/community_2025.xlsx")
 
+
+
+####Clean the veg height and abiotic data####
 abiotic_only <- veg2025 |> 
   filter(Species %in% c("Vascular plants","Bryophyes","Lichen", "Litter","Bare soil",
                          "Bare rock","Poop","Vascular plant layer","Moss layer" )) |>
@@ -152,9 +155,6 @@ prob10 <- abiotic_only2 |>
 #fix it
 abiotic_only2[which(abiotic_only2$turfID == "93_AN6M_93" & abiotic_only2$Variable == "Vascular plant cover"), 
               which(colnames(abiotic_only2) == "10")] <- 99
-
-
-
 
 
 
