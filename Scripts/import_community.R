@@ -23,7 +23,7 @@ import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_d
         suppressWarnings(!is.na(as.numeric(Date))) ~ as.Date(as.numeric(Date), origin = "1899-12-30"),
         TRUE ~ lubridate::ymd(Date)
       )
-    ) #there are two dates that are NA, fix them
+    ) #there are two dates that are NA, these sheets have no dates on them
   
   # need to break the workflow here, otherwise tedious to find problems
   metaComm <- metaComm_raw %>% 
@@ -40,7 +40,8 @@ import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_d
     mutate(Date = ymd(Date),
            Year = year(Date),
            destBlockID = as.numeric(destBlockID),
-           destPlotID = as.numeric(destPlotID)) %>% 
+           destPlotID = as.numeric(destPlotID)) %>%
+    mutate(Year = case_when(is.na(Year)~ 2025, .default = Year)) %>% #add a year for the two sheets that don't have dates
     #There is a turf naming mistake in the data
     #turf 73_WN2I_158 should be 78_WN2I_158
     mutate(turfID = ifelse(turfID == "73_WN2I_158", "78_WN2I_158", turfID), 
