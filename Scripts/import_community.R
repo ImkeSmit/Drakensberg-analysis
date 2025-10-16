@@ -2,11 +2,11 @@
 library(tidyverse)
 library(stringi)
 library(readxl)
-import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_data"
+import_community <- function(metaTurfID, filepath){ #e.g., "All_data/raw_data/raw_threed_data/2025"
   
   #### COMMUNITY DATA ####
   ### Read in files
-  files <- dir(path = "All_data/raw_data/raw_threed_data", pattern = "\\.xlsx$", full.names = TRUE, recursive = TRUE)
+  files <- dir(path = filepath, pattern = "\\.xlsx$", full.names = TRUE, recursive = TRUE)
   
   #Function to read in meta data
   metaComm_raw <- map_df(set_names(files), function(file) {
@@ -46,7 +46,8 @@ import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_d
     left_join(metaTurfID , by = "turfID") %>% 
     mutate(destSiteID = coalesce(destSiteID.x, destSiteID.y),
            destBlockID = coalesce(destBlockID.x, destBlockID.y),
-           destPlotID = coalesce(destPlotID.x, destPlotID.y))
+           destPlotID = coalesce(destPlotID.x, destPlotID.y)) %>%
+  select(- c(destSiteID.x, destSiteID.y, destBlockID.x, destBlockID.y, destPlotID.x, destPlotID.y))
   
   
   # validate input
@@ -67,13 +68,14 @@ import_community <- function(metaTurfID){ #e.g., "All_data/raw_data/raw_threed_d
   }, .id = "file") %>% 
     select(file:Remark) %>% 
     rename("Cover" = `%`) %>% 
+    #mutate(Year = 2025)
     mutate(Year = as.numeric(stri_extract_last_regex(file, "\\d{4}")))
   
-  # Join data and meta
+
   community <- metaComm %>% 
-    # anti join looses 18 turfs with NA as date, but its ok they are duplicates. Probably occur because of joining 2019 and 2020 data differently
     left_join(comm, by = c("sheet_name", "Year")) %>% 
     select(origSiteID:origPlotID, destSiteID:turfID, warming:Nlevel, Date, Year, Species:Cover, Recorder, Scribe, Remark, file)
   
+    
 }
 
