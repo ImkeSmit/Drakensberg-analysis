@@ -99,5 +99,35 @@ veg_only <- veg2025 |>
 write.xlsx(veg_only, "All_data/clean_data/threed/community_2025.xlsx")
 
 abiotic_only <- veg2025 |> 
-  filter(!Species %in% c("Total Cover (%)","Vascular plants","Bryophyes","Lichen", "Litter","Bare soil",
-                         "Bare rock","Poop","Height / depth (cm)","Vascular plant layer","Moss layer" ))
+  filter(Species %in% c("Vascular plants","Bryophyes","Lichen", "Litter","Bare soil",
+                         "Bare rock","Poop","Vascular plant layer","Moss layer" )) |>
+  rename(Variable = Species) |> 
+  #rename variable names
+  mutate(Variable = case_when(Variable == "Vascular plants" ~ "Vascular plant cover", 
+                              Variable == "Bryophyes" ~ "Bryophyte cover", 
+                              Variable == "Lichen" ~ "Lichen cover",
+                              Variable == "Litter" ~ "Litter cover",
+                              Variable == "Bare soil" ~ "Bare soil cover",
+                              Variable == "Bare rock" ~ "Bare rock cover", 
+                              Variable == "Poop" ~ "Poop cover",
+                              Variable == "Vascular plant layer" ~ "Vascular plant layer height",
+                              Variable == "Moss layer" ~ "Moss layer height", 
+                              .default = Variable)) |> 
+  #remove wrong values from the 
+  mutate(`5` = case_when(`5` == "> 0 and < 100cm" ~ NA, 
+                         `5` == "> 0 and < 20cm" ~ NA,
+                         .default = `5`)) |> 
+  mutate(`8` = case_when(`8` == "Exposure" ~ NA, 
+                         `8` == "Soil depth (cm)" ~ NA,
+                         .default = `8`)) |>
+  mutate(`16` = case_when(`16` == "Photo:" ~ NA, 
+                         .default = `16`)) |> 
+  mutate(`18` = case_when(`18` > 101 ~ NA, 
+                        .default = `18`)) |> 
+  mutate(`24` = case_when(`24` == "Ratio < 1 is wrong" ~ NA,
+                          `24` == "Sum cover / Tot. Vascular (c. 1.3x)" ~ NA,
+                          `24` == "Photo:" ~ NA,
+                          .default = `24`))
+  
+  
+  
