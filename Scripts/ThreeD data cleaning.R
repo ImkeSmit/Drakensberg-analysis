@@ -105,8 +105,12 @@ addcov <- veg_only |>
   summarise(coversum = sum(Cover, na.rm = T)) |> 
   filter(coversum == 0) 
 
-turf_107_WN3M_175 <- veg_only |> 
+turf_107_WN3M_175 <- veg_only |> #corresponds to photo 421
   filter(turfID == "107_WN3M_175") |> 
+  distinct(Species)
+
+turf_22_WN5M_102 <- veg_only |> #corresponds to photo 433
+  filter(turfID == "22_WN5M_102") |> 
   distinct(Species)
 
 write.xlsx(veg_only, "All_data/clean_data/threed/community_2025.xlsx")
