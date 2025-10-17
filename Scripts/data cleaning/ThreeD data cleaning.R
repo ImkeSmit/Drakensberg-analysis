@@ -94,7 +94,7 @@ veg2025 <- import_community(metadat, filepath = "All_data/raw_data/raw_threed_da
 ####Clean community data ####
 veg_only <- veg2025 |> #remove other variables besides veg cover
   filter(!Species %in% c("Total Cover (%)","Vascular plants","Bryophyes","Lichen", "Litter","Bare soil",
-                         "Bare rock","Poop","Height / depth (cm)","Vascular plant layer","Moss layer" )) |> 
+                         "Bare rock","Poop","Height / depth (cm)","Vascular plant layer","Moss layer" , "Subplot recording (highest level):")) |> 
   mutate(Cover = as.numeric(Cover))
 
 
@@ -117,7 +117,6 @@ turf_22_WN5M_102 <- veg_only |> #corresponds to photo 433
   mutate(Cover = c(25,50,2,12,2,2,0.5,0.5,1,1,0.5,1,0.5), 
          Remark = "cover estimated from photo")
 
-
 veg_only2<- veg_only |> 
   rows_update(turf_107_WN3M_175,
     by = c("Species", "turfID"),
@@ -127,7 +126,28 @@ veg_only2<- veg_only |>
               unmatched = "ignore")
 
 
-write.xlsx(veg_only, "All_data/clean_data/threed/community_2025.xlsx")
+##Overwrite NA's with zeroes
+replace_cols = colnames(veg_only2)[14:38]
+for(r in 1:nrow(veg_only2)) {
+  
+  for(i in 1:length(replace_cols)) {
+    
+    element <- veg_only2[r, which(colnames(veg_only2) == replace_cols[i])]
+    
+    if(is.na(element)) {
+      veg_only2[r, which(colnames(veg_only2) == replace_cols[i])] <- "0"
+    }
+  }
+}
+
+
+#Unknown seedlings often has a cover value of NA, replace these with 0.5
+#veg_only2[which(veg_only2$Species == "Unknown seedlings"), which(colnames(veg_only2) == "Cover")] <- 0.5
+
+test<- veg_only2[which(is.na(veg_only2$Cover)), ]
+
+
+write.xlsx(veg_only2, "All_data/clean_data/threed/community_2025.xlsx")
 
 
 
