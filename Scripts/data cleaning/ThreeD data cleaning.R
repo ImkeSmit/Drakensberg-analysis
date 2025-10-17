@@ -95,7 +95,8 @@ veg2025 <- import_community(metadat, filepath = "All_data/raw_data/raw_threed_da
 veg_only <- veg2025 |> #remove other variables besides veg cover
   filter(!Species %in% c("Total Cover (%)","Vascular plants","Bryophyes","Lichen", "Litter","Bare soil",
                          "Bare rock","Poop","Height / depth (cm)","Vascular plant layer","Moss layer" , "Subplot recording (highest level):")) |> 
-  mutate(Cover = as.numeric(Cover))
+  mutate(Cover = as.numeric(Cover)) |> 
+  filter(!is.na(Species))
 
 
 #There are a few plots with no total cover measurements. Add them from looking at the pictures. 
@@ -126,30 +127,39 @@ veg_only2<- veg_only |>
               unmatched = "ignore")
 
 
+#remove the unknown seedlings row if it has no entries
+veg_only3 <- veg_only2 |> 
+  #remove the row if thenumber of NA's equal the number of columns
+  filter(!(Species == "Unknown seedlings" & 
+             rowSums(is.na(across(14:38))) == (38 - 14 + 1))) |> 
+  #Give the Cover value of 0.5 if there is an entry in of 1 in any of the 25 columns
+  mutate(Cover = case_when(Species == "Unknown seedlings" & 
+                            rowSums(is.na(across(14:38))) < (38 - 14 + 1) ~ 0.5, 
+                           .default = Cover)) |> 
+  #there is one more row with Cover = NA. 
+  #This is for turf 41_WN7C_122 for sp Thesium high site
+  #There is no photo of this plot
+  #Safe to just give it 0.5
+  mutate(Cover = case_when(Species == "Thesium high site" & turfID == "41_WN7C_122" ~ 0.5, 
+                           .default = Cover))
+
 ##Overwrite NA's with zeroes
-replace_cols = colnames(veg_only2)[14:38]
-for(r in 1:nrow(veg_only2)) {
+replace_cols = colnames(veg_only3)[14:38]
+for(r in 1:nrow(veg_only3)) {
   
   for(i in 1:length(replace_cols)) {
     
-    element <- veg_only2[r, which(colnames(veg_only2) == replace_cols[i])]
+    element <- veg_only3[r, which(colnames(veg_only3) == replace_cols[i])]
     
     if(is.na(element)) {
-      veg_only2[r, which(colnames(veg_only2) == replace_cols[i])] <- "0"
+      veg_only3[r, which(colnames(veg_only3) == replace_cols[i])] <- "0"
     }
   }
 }
 
 
-#Unknown seedlings often has a cover value of NA,even if it was recorded replace these with 0.5
 
-
-#veg_only2[which(veg_only2$Species == "Unknown seedlings"), which(colnames(veg_only2) == "Cover")] <- 0.5
-
-test<- veg_only2[which(is.na(veg_only2$Cover)), ]
-
-
-write.xlsx(veg_only2, "All_data/clean_data/threed/community_2025.xlsx")
+write.xlsx(veg_only3, "All_data/clean_data/threed/community_2025.xlsx")
 
 
 
