@@ -99,7 +99,7 @@ veg_only <- veg2025 |> #remove other variables besides veg cover
 
 
 #There are a few plots with no total cover measurements. Add them from looking at the pictures. 
-#which plots are % cover for species
+#which plots are missing % cover for species
 addcov <- veg_only |> 
   group_by(turfID) |> 
   summarise(coversum = sum(Cover, na.rm = T)) |> 
@@ -107,11 +107,25 @@ addcov <- veg_only |>
 
 turf_107_WN3M_175 <- veg_only |> #corresponds to photo 421
   filter(turfID == "107_WN3M_175") |> 
-  distinct(Species)
+  select(Species, turfID, Remark) |> 
+  mutate(Cover = c(3,40,6,2,27,0.5,1,0.5,10,2,2,1,2,0.5), 
+         Remark = "cover estimated from photo")
 
 turf_22_WN5M_102 <- veg_only |> #corresponds to photo 433
   filter(turfID == "22_WN5M_102") |> 
-  distinct(Species)
+  select(Species, turfID, Remark) |> 
+  mutate(Cover = c(25,50,2,12,2,2,0.5,0.5,1,1,0.5,1,0.5), 
+         Remark = "cover estimated from photo")
+
+
+veg_only2<- veg_only |> 
+  rows_update(turf_107_WN3M_175,
+    by = c("Species", "turfID"),
+    unmatched = "ignore" ) |> # ignores species not found in estimates
+  rows_update(turf_22_WN5M_102,
+              by = c("Species", "turfID"),
+              unmatched = "ignore")
+
 
 write.xlsx(veg_only, "All_data/clean_data/threed/community_2025.xlsx")
 
