@@ -108,13 +108,13 @@ addcov <- veg_only |>
 turf_107_WN3M_175 <- veg_only |> #corresponds to photo 421
   filter(turfID == "107_WN3M_175") |> 
   select(Species, turfID, Remark) |> 
-  mutate(Cover = c(3,40,6,2,27,0.5,1,0.5,10,2,2,1,2,0.5), 
+  mutate(Cover = c(3,40,6,2,27,0.5,1,0.5,10,2,2,1,2,NA), #unknown seedlings was not recorded in any of the subcells
          Remark = "cover estimated from photo")
 
 turf_22_WN5M_102 <- veg_only |> #corresponds to photo 433
   filter(turfID == "22_WN5M_102") |> 
   select(Species, turfID, Remark) |> 
-  mutate(Cover = c(25,50,2,12,2,2,0.5,0.5,1,1,0.5,1,0.5), 
+  mutate(Cover = c(25,50,2,12,2,2,0.5,0.5,1,1,0.5,1,NA),#unknown seedlings was not recorded in any of the subcells 
          Remark = "cover estimated from photo")
 
 veg_only2<- veg_only |> 
@@ -141,7 +141,9 @@ for(r in 1:nrow(veg_only2)) {
 }
 
 
-#Unknown seedlings often has a cover value of NA, replace these with 0.5
+#Unknown seedlings often has a cover value of NA,even if it was recorded replace these with 0.5
+
+
 #veg_only2[which(veg_only2$Species == "Unknown seedlings"), which(colnames(veg_only2) == "Cover")] <- 0.5
 
 test<- veg_only2[which(is.na(veg_only2$Cover)), ]
