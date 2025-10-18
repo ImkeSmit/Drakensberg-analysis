@@ -399,9 +399,7 @@ plan(sequential)
 failed <- unlist(error_log, recursive = FALSE)
 length(failed)  # how many failed
 failed[[1]]  # details for the first failure
-#something is wrong with the null model creation. species frequencies are not staying fixed.
-#Eg null model 2 has no occurrences for senecio glaberrimus in any grid. 
-#This causes the calc_RaoQ loop to break, although I don't know why
+
 
 #SES of each grid
 RQ_grids_summary <- null_RQ_grids |> 
@@ -409,10 +407,10 @@ RQ_grids_summary <- null_RQ_grids |>
   summarise(sd_null = sd(RaoQ), 
             mean_null = mean(RaoQ)) |> 
   filter(sd_null > 0) |> #cannot divide by zero in SES calculation
-  inner_join(RQ_obs_grids, by = c("trait", "cellref")) |> 
+  inner_join(RQ_obs_grid, by = c("trait", "cellref")) |> 
   mutate(SES = (RaoQ - mean_null)/sd_null)
 
-write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_cells_C5_entire.csv")
+write.csv(RQ_grids_summary, "All_data/comm_assembly_results/RQ_grids_C5_entire.csv")
 
 
 
