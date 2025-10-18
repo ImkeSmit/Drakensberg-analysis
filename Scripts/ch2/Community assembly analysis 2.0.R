@@ -108,7 +108,7 @@ calc_RaoQ <- function(mean_traits, abun_matrix) {
 #first randomise presences accross sites. 
 #then assign abundances to those sites, pulling from the abundances where the sp occurs in the observed comm
 
-generate_C5_null_fast <- function(comm, iterations, pool) {
+generate_C5_null <- function(comm, iterations, pool) {
   # Ensure comm is a matrix for speed
   comm <- as.matrix(comm)
   rownames_comm <- rownames(comm)
@@ -249,7 +249,7 @@ RQ_obs_cells <- calc_RaoQ(mean_traits, abun_matrix)
 
 #Create null models
 set.seed(123)
-nullcomm_cells <- generate_C5_null_fast(abun_matrix, 999, pool = "entire")
+nullcomm_cells <- generate_C5_null(abun_matrix, 999, pool = "entire")
 
 #Calculate SES#
 #we need to calculate RaoQ for each of the observed null communities
