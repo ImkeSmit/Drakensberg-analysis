@@ -309,7 +309,7 @@ RQ_ele |>
   facet_wrap(~trait) 
 
 
-####SES at the grid scale####
+####SES at the grid scale, pool = entire####
 ##create abundance matrix at the grid level
 abun_matrix_grid <- FT_join |> 
   mutate(gridref = paste0(site, grid)) |> 
@@ -340,7 +340,8 @@ for(r in 1:nrow(abun_matrix_grid)) {
 RQ_obs_grid <- calc_RaoQ(mean_traits, abun_matrix_grid)
 
 #Create null models
-nullcomm_grids <- generate_C5_null(abun_matrix_grid, 3, pool = "site")
+set.seed(123) #set the sam eseed here, I guess so?
+nullcomm_grids <- generate_C5_null(abun_matrix_grid, 3, pool = "entire")
 
 #Calculate RaoQ for each of the observed null communities
 for(l in 1:length(nullcomm_grids)) {
