@@ -347,9 +347,9 @@ nullcomm_grids <- generate_C5_null(abun_matrix_grid, 999, pool = "entire")
 # Set up parallel backend
 plan(multisession, workers = parallel::detectCores() - 2)  # or plan(multicore) on Linux/mac
 
-chunks <- split(nullcomm_cells, ceiling(seq_along(nullcomm_cells) / 50))
+chunks <- split(nullcomm_grids, ceiling(seq_along(nullcomm_grids) / 50))
 #each chunk has 50 null matrices
-RaoQ_results <- list()
+RaoQ_grids_results <- list()
 
 for (i in seq_along(chunks)) { #run chunks sequentially
   message("Processing chunk ", i, " of ", length(chunks))
@@ -365,13 +365,25 @@ for (i in seq_along(chunks)) { #run chunks sequentially
   }, future.seed = TRUE) #generates a unique reproducible sub seed for each worker
   #ensures that results are reproducible, and that there is no overlap in random processes for each core
   
-  RaoQ_results[[i]] <- bind_rows(sub_RQ) #results from the chunk are merged
+  RaoQ_grids_results[[i]] <- bind_rows(sub_RQ) #results from the chunk are merged
   rm(sub_RQ, chunk_list); gc()
 }
 
-null_RQ <- bind_rows(RaoQ_results)
+null_RQ_grids <- bind_rows(RaoQ_grids_results)
 
 plan(sequential)
+
+
+#SES of each grid
+RQ_grids_summary <- null_RQ_grids |> 
+  group_by(trait, cellref) |> 
+  summarise(sd_null = sd(RaoQ), 
+            mean_null = mean(RaoQ)) |> 
+  filter(sd_null > 0) |> #cannot divide by zero in SES calculation
+  inner_join(RQ_obs_grids, by = c("trait", "cellref")) |> 
+  mutate(SES = (RaoQ - mean_null)/sd_null)
+
+write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_cells_C5_entire.csv")
 
 
 
