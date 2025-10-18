@@ -350,6 +350,7 @@ plan(multisession, workers = parallel::detectCores() - 2)  # or plan(multicore) 
 chunks <- split(nullcomm_grids, ceiling(seq_along(nullcomm_grids) / 50))
 #each chunk has 50 null matrices
 RaoQ_grids_results <- list()
+error_log <- list()  # store any errors
 
 for (i in seq_along(chunks)) { #run chunks sequentially
   message("Processing chunk ", i, " of ", length(chunks))
@@ -359,20 +360,46 @@ for (i in seq_along(chunks)) { #run chunks sequentially
   #each core receives one null matrix to run calc_RaoQ on. this happens until all matrices in the chunk are finished
   sub_RQ <- future_lapply(seq_along(chunk_list), function(idx) {
     chosen_null <- chunk_list[[idx]]
-    RQ_result <- calc_RaoQ(mean_traits, chosen_null)
-    RQ_result$counter <- paste0("null matrix ", (i - 1) * 100 + idx)
-    RQ_result
-  }, future.seed = TRUE) #generates a unique reproducible sub seed for each worker
-  #ensures that results are reproducible, and that there is no overlap in random processes for each core
   
-  RaoQ_grids_results[[i]] <- bind_rows(sub_RQ) #results from the chunk are merged
-  rm(sub_RQ, chunk_list); gc()
+    # Safely run calc_RaoQ without errors stopping it
+  result <- tryCatch({
+    RQ_result <- calc_RaoQ(mean_traits, chosen_null)
+    RQ_result$counter <- paste0("null matrix ", (i - 1) * 50 + idx)
+    list(success = TRUE, result = RQ_result)
+  }, error = function(e) {
+    list(success = FALSE, 
+         error = e$message, 
+         chunk = i, 
+         index_in_chunk = idx,
+         null_id = (i - 1) * 50 + idx)
+  })
+  
+  return(result)
+}, future.seed = TRUE)
+
+# Separate successes and errors
+successes <- lapply(sub_RQ, function(x) if (x$success) x$result else NULL)
+errors <- lapply(sub_RQ, function(x) if (!x$success) x else NULL)
+
+# Store results
+RaoQ_grids_results[[i]] <- bind_rows(Filter(Negate(is.null), successes))
+error_log[[i]] <- Filter(Negate(is.null), errors)
+
+rm(sub_RQ, chunk_list); gc() #garbage collection, returns memory to OS
 }
 
 null_RQ_grids <- bind_rows(RaoQ_grids_results)
 
 plan(sequential)
 
+
+###Look at errors
+failed <- unlist(error_log, recursive = FALSE)
+length(failed)  # how many failed
+failed[[1]]  # details for the first failure
+#something is wrong with the null model creation. species frequencies are not staying fixed.
+#Eg null model 2 has no occurrences for senecio glaberrimus in any grid. 
+#This causes the calc_RaoQ loop to break, although I don't know why
 
 #SES of each grid
 RQ_grids_summary <- null_RQ_grids |> 
