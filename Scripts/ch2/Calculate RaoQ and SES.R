@@ -133,7 +133,7 @@ generate_C5_null <- function(comm, iterations, pool) {
     
     for (i in seq_len(nrow(comm))) {
       site <- comm[i, ]
-      richness <- sum(site > 0)
+      richness <- sum(site)
       if (richness == 0) next
       
       # Choose species pool
