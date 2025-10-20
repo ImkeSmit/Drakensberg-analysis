@@ -175,28 +175,30 @@ generate_C5_null <- function(comm, iterations, pool) {
 
 
 ###improved function
-generate_C5_null_imp <- function(comm, iterations, pool = "entire") {
+generate_C5_null_imp <- function(comm, iterations = 10, pool = "entire") {
+  if (!requireNamespace("vegan", quietly = TRUE)) {
+    stop("Please install the 'vegan' package: install.packages('vegan')")
+  }
+  
   comm <- as.matrix(comm)
   rownames_comm <- rownames(comm)
   colnames_comm <- colnames(comm)
   
-  # Precompute species frequencies (number of sites where sp occurs)
-  species_freq <- colSums(comm > 0)
+  # Presence–absence and abundance data
+  pa <- (comm > 0) * 1
+  species_freq <- colSums(pa)
+  site_richness <- rowSums(pa)
   
-  # Precompute abundance lists (nonzero abundances for each sp)
+  # Per-species abundance distributions
   abundance_lists <- lapply(colnames_comm, function(sp) comm[comm[, sp] > 0, sp])
   names(abundance_lists) <- colnames_comm
   
-  # Site-level richness (number of species per site)
-  site_richness <- rowSums(comm > 0)
-  
-  # Define site pools
+  # Define site groups
   three_sites <- c("GG", "WH", "BK")
   grids_22 <- c("BK1","BK2","BK3","BK4","BK5","BK6","BK7",
                 "WH1","WH2","WH3","WH4","WH5","WH6","WH7",
                 "GG1","GG2","GG3","GG4","GG5","GG6","GG7","GG8")
   
-  # Helper: get subset of sites for current pool type
   get_sites_in_pool <- function(site_name) {
     if (pool == "entire") return(rownames_comm)
     if (pool == "site") {
@@ -210,79 +212,58 @@ generate_C5_null_imp <- function(comm, iterations, pool = "entire") {
     stop("Invalid pool type")
   }
   
-  # Main iteration
+  # ---- Function for one iteration ----
   single_iter <- function(iter) {
-    null_comm <- matrix(0, nrow = nrow(comm), ncol = ncol(comm),
-                        dimnames = list(rownames_comm, colnames_comm))
+    pres_matrix <- pa
     
-    # 1. Randomize species occurrences while keeping frequencies and site richness
-    # Create an empty presence-absence matrix
-    pres_matrix <- matrix(0, nrow = nrow(comm), ncol = ncol(comm),
-                          dimnames = list(rownames_comm, colnames_comm))
-    
-    # Keep site richness fixed
-    target_richness <- site_richness
-    
-    # For each pool (entire/site/grid)
-    for (site_group in unique(rownames_comm)) {
-      pool_sites <- get_sites_in_pool(site_group)
-    }
-    
-    # Randomize occurrences within chosen pool
     if (pool == "entire") {
-      # Generate presence matrix globally
-      repeat {
-        pres_matrix[,] <- 0
-        for (sp in colnames_comm) {
-          occ_sites <- sample(rownames_comm, species_freq[sp], replace = FALSE)
-          pres_matrix[occ_sites, sp] <- 1
-        }
-        # Check if site richness matches original
-        if (all(rowSums(pres_matrix) == target_richness)) break
-      }
+      perm <- vegan::permatswap(pres_matrix, fixedmar = "both", mtype = "prab", times = 1)
+      pres_matrix <- perm$perm[[1]]
     } else {
-      # Handle site- or grid-specific randomizations
       pres_matrix[,] <- 0
       site_groups <- unique(sapply(rownames_comm, function(x)
         get_sites_in_pool(x)[1]))
       for (sg in site_groups) {
         group_sites <- get_sites_in_pool(sg)
-        group_rows <- rownames_comm %in% group_sites
-        group_richness <- target_richness[group_rows]
-        group_species <- colnames_comm[colSums(comm[group_rows, , drop=FALSE] > 0) > 0]
-        group_freq <- species_freq[group_species]
+        group_rows <- which(rownames_comm %in% group_sites)
+        sp_in_group <- colnames_comm[colSums(pa[group_rows, , drop = FALSE]) > 0]
+        submat <- pa[group_rows, sp_in_group, drop = FALSE]
         
-        repeat {
-          pres_sub <- matrix(0, nrow = length(group_sites),
-                             ncol = length(group_species),
-                             dimnames = list(group_sites, group_species))
-          for (sp in group_species) {
-            occ_sites <- sample(group_sites, min(group_freq[sp], length(group_sites)), replace = FALSE)
-            pres_sub[occ_sites, sp] <- 1
-          }
-          if (all(rowSums(pres_sub) == group_richness)) break
+        if (sum(submat) > 0) {
+          perm_sub <- vegan::permatswap(submat, fixedmar = "both", mtype = "prab", times = 1)
+          pres_matrix[group_rows, sp_in_group] <- perm_sub$perm[[1]]
         }
-        pres_matrix[group_sites, group_species] <- pres_sub
       }
     }
     
-    # 2. Assign abundances for species occurrences
+    # Optional: check that species frequencies were preserved
+    freq_after <- colSums(pres_matrix)
+    if (!all(freq_after == species_freq)) {
+      warning("Species frequencies changed slightly after swap; abundance assignment uses replacement.")
+    }
+    
+    # ---- Assign abundances ----
+    null_comm <- matrix(0, nrow = nrow(comm), ncol = ncol(comm),
+                        dimnames = list(rownames_comm, colnames_comm))
+    
     for (sp in colnames_comm) {
       sp_sites <- which(pres_matrix[, sp] == 1)
       abunds <- abundance_lists[[sp]]
-      # Randomly assign abundance values from the observed set
-      if (length(sp_sites) > 0 && length(abunds) > 0) {
-        if (length(abunds) == length(sp_sites)) {
-          null_comm[sp_sites, sp] <- sample(abunds) # permute
-        } else {
-          null_comm[sp_sites, sp] <- sample(abunds, length(sp_sites), replace = TRUE)
-        }
+      
+      n_sites <- length(sp_sites)
+      n_abunds <- length(abunds)
+      
+      if (n_sites > 0 && n_abunds > 0) {
+        # If mismatch between number of sites and abundances, use replace = TRUE
+        replace_flag <- n_sites > n_abunds
+        null_comm[sp_sites, sp] <- sample(abunds, n_sites, replace = replace_flag)
       }
     }
     
     null_comm
   }
   
+  # ---- Run iterations ----
   null_list <- lapply(seq_len(iterations), single_iter)
   
   message(sprintf(
@@ -292,6 +273,9 @@ generate_C5_null_imp <- function(comm, iterations, pool = "entire") {
   
   return(null_list)
 }
+
+
+    
 
 
 
