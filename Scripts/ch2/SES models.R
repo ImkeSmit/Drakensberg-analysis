@@ -31,4 +31,18 @@ ses_ridges <- cell_ses |>
 #models of ses~ elevation
 hist(cell_ses$SES)
 
-cellmod <- 
+
+
+###Grid scale####
+grid_ses <- read.csv("All_data/comm_assembly_results/RQ_grids_C5_entire.csv", row.names = 1) |> 
+  mutate(elevation = case_when(grepl("BK", cellref) == T ~ 3000, #add elevation variable
+                               grepl("WH", cellref) == T ~ 2500,
+                               grepl("GG", cellref) == T ~ 2000,.default = NA))
+
+
+grid_ses_ridges <- grid_ses |> 
+  mutate(elevation_char = as.character(elevation)) |> 
+  ggplot(aes(x = SES, y = elevation_char, fill = elevation_char)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait) +
+  theme_classic()
