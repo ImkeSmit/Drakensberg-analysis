@@ -184,15 +184,6 @@ generate_C5_null_imp <- function(comm, iterations = 10, pool = "entire") {
   rownames_comm <- rownames(comm)
   colnames_comm <- colnames(comm)
   
-  # Presence–absence and abundance data
-  pa <- (comm > 0) * 1
-  species_freq <- colSums(pa)
-  site_richness <- rowSums(pa)
-  
-  # Per-species abundance distributions
-  abundance_lists <- lapply(colnames_comm, function(sp) comm[comm[, sp] > 0, sp])
-  names(abundance_lists) <- colnames_comm
-  
   # Define site groups
   three_sites <- c("GG", "WH", "BK")
   grids_22 <- c("BK1","BK2","BK3","BK4","BK5","BK6","BK7",
@@ -212,66 +203,44 @@ generate_C5_null_imp <- function(comm, iterations = 10, pool = "entire") {
     stop("Invalid pool type")
   }
   
-  # ---- Function for one iteration ----
+  # ---- Single iteration ----
   single_iter <- function(iter) {
-    pres_matrix <- pa
+    null_comm <- comm * 0
     
     if (pool == "entire") {
-      perm <- vegan::permatswap(pres_matrix, fixedmar = "col", mtype = "prab", times = 1)
-      pres_matrix <- perm$perm[[1]]
+      perm <- vegan::permatswap(comm, method = "swsh", shuffle ="samp", fixedmar = "columns", mtype = "count", times = 1)
+      null_comm <- perm$perm[[1]]
+      
     } else {
-      pres_matrix[,] <- 0
       site_groups <- unique(sapply(rownames_comm, function(x)
         get_sites_in_pool(x)[1]))
       for (sg in site_groups) {
         group_sites <- get_sites_in_pool(sg)
         group_rows <- which(rownames_comm %in% group_sites)
-        sp_in_group <- colnames_comm[colSums(pa[group_rows, , drop = FALSE]) > 0]
-        submat <- pa[group_rows, sp_in_group, drop = FALSE]
+        submat <- comm[group_rows, , drop = FALSE]
         
-        if (sum(submat) > 0) {
-          perm_sub <- vegan::permatswap(submat, fixedmar = "col", mtype = "prab", times = 1)
-          pres_matrix[group_rows, sp_in_group] <- perm_sub$perm[[1]]
-        }
+        perm_sub <- vegan::permatswap(submat, method = "swsh", shuffle ="samp", fixedmar = "columns", mtype = "count", times = 1)
+        null_comm[group_rows, ] <- perm_sub$perm[[1]]
       }
     }
     
-    # Optional: check that species frequencies were preserved
-    freq_after <- colSums(pres_matrix)
-    if (!all(freq_after == species_freq)) {
-      warning("Species frequencies changed slightly after swap; abundance assignment uses replacement.")
-    }
-    
-    # ---- Assign abundances ----
-    null_comm <- matrix(0, nrow = nrow(comm), ncol = ncol(comm),
-                        dimnames = list(rownames_comm, colnames_comm))
-    
-    for (sp in colnames_comm) {
-      sp_sites <- which(pres_matrix[, sp] == 1)
-      abunds <- abundance_lists[[sp]]
-      
-      n_sites <- length(sp_sites)
-      n_abunds <- length(abunds)
-      
-      if (n_sites > 0 && n_abunds > 0) {
-        # always sample without replacement
-        null_comm[sp_sites, sp] <- sample(abunds, n_sites, replace = F)
-      }
-    }
+    # Replace NAs (if any) with zeros
+    null_comm[is.na(null_comm)] <- 0
     
     null_comm
   }
   
   # ---- Run iterations ----
-  null_list <- lapply(seq_len(iterations), single_iter)
+  null_list <- vector("list", iterations)
+  for (n in seq_len(iterations)) {
+    null_list[[n]] <- single_iter(n)
+  }
   
-  message(sprintf(
-    "C5 null model completed (%d iterations, pool = %s).",
-    iterations, pool
-  ))
-  
+  message("✅ Finished generating ", iterations, " abundance-based null model(s).")
   return(null_list)
 }
+
+
 
 
     
