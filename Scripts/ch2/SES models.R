@@ -18,7 +18,7 @@ ses_density <- cell_ses |>
   ggplot(aes(x = SES, group = elevation_char, fill = elevation_char)) +
   geom_density(adjust = 1.5, alpha = 0.5) +
   facet_wrap(~trait) +
-  theme_classic
+  theme_classic()
 
 ses_ridges <- cell_ses |> 
   mutate(elevation_char = as.character(elevation)) |> 
