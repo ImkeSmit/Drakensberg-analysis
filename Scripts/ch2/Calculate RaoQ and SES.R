@@ -217,7 +217,7 @@ generate_C5_null_imp <- function(comm, iterations = 10, pool = "entire") {
     pres_matrix <- pa
     
     if (pool == "entire") {
-      perm <- vegan::permatswap(pres_matrix, fixedmar = "both", mtype = "prab", times = 1)
+      perm <- vegan::permatswap(pres_matrix, fixedmar = "col", mtype = "prab", times = 1)
       pres_matrix <- perm$perm[[1]]
     } else {
       pres_matrix[,] <- 0
@@ -230,7 +230,7 @@ generate_C5_null_imp <- function(comm, iterations = 10, pool = "entire") {
         submat <- pa[group_rows, sp_in_group, drop = FALSE]
         
         if (sum(submat) > 0) {
-          perm_sub <- vegan::permatswap(submat, fixedmar = "both", mtype = "prab", times = 1)
+          perm_sub <- vegan::permatswap(submat, fixedmar = "col", mtype = "prab", times = 1)
           pres_matrix[group_rows, sp_in_group] <- perm_sub$perm[[1]]
         }
       }
@@ -254,9 +254,8 @@ generate_C5_null_imp <- function(comm, iterations = 10, pool = "entire") {
       n_abunds <- length(abunds)
       
       if (n_sites > 0 && n_abunds > 0) {
-        # If mismatch between number of sites and abundances, use replace = TRUE
-        replace_flag <- n_sites > n_abunds
-        null_comm[sp_sites, sp] <- sample(abunds, n_sites, replace = replace_flag)
+        # always sample without replacement
+        null_comm[sp_sites, sp] <- sample(abunds, n_sites, replace = F)
       }
     }
     
