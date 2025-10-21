@@ -208,6 +208,7 @@ generate_C5_null_imp <- function(comm, iterations = 10, pool = "entire") {
     null_comm <- comm * 0
     
     if (pool == "entire") {
+      #swap abundances among the sites within a column 
       perm <- vegan::permatswap(comm, method = "swsh", shuffle ="samp", fixedmar = "columns", mtype = "count", times = 1)
       null_comm <- perm$perm[[1]]
       
