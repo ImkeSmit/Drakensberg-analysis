@@ -57,24 +57,30 @@ for(r in 1:nrow(abun_matrix)) {
 abun_mat_small <- abun_matrix[c(1:10), c(1:20)]
 
 
-set.seed(99)
-nullcomm_cells <- generate_C5_null_imp(abun_mat_small, 1, pool = "entire")
+set.seed(101)
+nullcomm_cells <- generate_C5_null_imp(abun_matrix, 1, pool = "entire")
 
 #let's check colsums and rowsums
-colSums(abun_mat_small)
+colSums(abun_matrix)
 colSums(nullcomm_cells[[1]]) #colsums (sum of sp abundances) stay the same
 
-rowSums(abun_mat_small)
+rowSums(abun_matrix)
 rowSums(nullcomm_cells[[1]]) #rowsums (sum of abundances in a site) not staying the same
 #that is ok
 
 sum(colSums(abun_matrix))
 sum(colSums(nullcomm_cells[[1]])) #total sum of matrix also not staying the same
 
-sum(rowSums(abun_mat_small))
+sum(rowSums(abun_matrix))
 sum(rowSums(nullcomm_cells[[1]]))
-#when the matrix is big, these are not equel. Problem???
+#when the matrix is big, these are not equal. Problem???
 
 
 test <- matrix(c(1,1,2,2,2,1),nrow = 3, ncol = 2)
 swapped <- swap_matrix(test, n_swaps = 1e5)
+
+comm <- as.matrix(abun_matrix[c(1:10), c(1:10)])
+comm[, 5] <- c(2,3,1, 0,0,0,5,9,9,8)
+comm[, 3] <- c(0,5,8,0,2,0,5,6,4,1)
+perm <- vegan::permatswap(comm,  method = "swsh", shuffle ="samp", fixedmar = "columns", mtype = "count", times = 1)
+perm$perm[[1]]
