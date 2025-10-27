@@ -1,6 +1,9 @@
 #This is a script to generate the C2 null model
+#Species abundances(including 0) are shuffled within the rows. 
+#Therefore, the species richness and total abundances of samples stay the same, 
+#but the frequency of species and species total abundances do not
 
-###improved function
+###C2 null model function
 generate_C2_null <- function(comm, iterations = 10, pool = "entire") {
   if (!requireNamespace("vegan", quietly = TRUE)) {
     stop("Please install the 'vegan' package: install.packages('vegan')")
@@ -16,6 +19,7 @@ generate_C2_null <- function(comm, iterations = 10, pool = "entire") {
                 "WH1","WH2","WH3","WH4","WH5","WH6","WH7",
                 "GG1","GG2","GG3","GG4","GG5","GG6","GG7","GG8")
   
+  #function to get the sites (plots) that are in teh specified pool
   get_sites_in_pool <- function(site_name) {
     if (pool == "entire") return(rownames_comm)
     if (pool == "site") {
@@ -41,6 +45,7 @@ generate_C2_null <- function(comm, iterations = 10, pool = "entire") {
     } else {
       site_groups <- unique(sapply(rownames_comm, function(x)
         get_sites_in_pool(x)[1]))
+      #if pool not entire, get the sites that are in the pool for each plot
       for (sg in site_groups) {
         group_sites <- get_sites_in_pool(sg)
         group_rows <- which(rownames_comm %in% group_sites)
@@ -66,3 +71,7 @@ generate_C2_null <- function(comm, iterations = 10, pool = "entire") {
   message("✅ Finished generating ", iterations, " C2 null models")
   return(null_list)
 }
+
+
+
+
