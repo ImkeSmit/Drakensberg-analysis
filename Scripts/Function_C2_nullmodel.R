@@ -3,6 +3,13 @@
 #Therefore, the species richness and total abundances of samples stay the same, 
 #but the frequency of species and species total abundances do not
 
+library(openxlsx)
+library(tidyverse)
+library(tidylog)
+library(ggplot2)
+library(vegan)
+library(FD)
+
 ###C2 null model function
 generate_C2_null <- function(comm, iterations = 10, pool = "entire") {
   if (!requireNamespace("vegan", quietly = TRUE)) {
