@@ -76,6 +76,8 @@ plot(test)#ja very badly
 #Let's try a GAM
 #USe skew t distribution as recommended by chatgpt.Can handle skewed and heavy tailed data with nonzero values
 test2 <- gamlss(SES ~ elevation, data = modeldat, family = ST1())
+#only one categorical predictor, thus it is equivalent to an anova under the specified distribution.
+#chatgpt says this is a totally sensible approach due to the right skewed nature of my response variable
 summary(test2)
 plot(test2) #looks much better
 
