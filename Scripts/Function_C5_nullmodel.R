@@ -136,10 +136,13 @@ for(r in 1:nrow(abun_matrix)) {
 testnull <- generate_C5_null_imp(abun_matrix, 10, pool = "entire")
 
 colSums(abun_matrix)
-colSums(testnull[[1]]) #colsums differ, that is correct
+colSums(testnull[[1]]) #colsums are the same, that is correct
 
 rowSums(abun_matrix)
-rowSums(testnull[[1]]) #rowsums are the same, that is correct
+rowSums(testnull[[1]]) #rowsums differ, that is correct
 
 sum(colSums(abun_matrix))
 sum(colSums(testnull[[1]])) #total matrix sum is the same, that is correct
+
+specnumber(abun_matrix)
+specnumber(testnull[[1]]) #richness of plots are the same, that is correct
