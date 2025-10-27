@@ -143,8 +143,14 @@ RQ_obs_cells <- calc_RaoQ(mean_traits, abun_matrix)
 
 #Create null models
 set.seed(123)
-nullcomm_cells <- generate_C2_null(abun_matrix, 999, pool = "site")
-saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/nullmodel_C2_cells.rds")
+nullcomm_cells_C2 <- generate_C2_null(abun_matrix, 999, pool = "site")
+saveRDS(nullcomm_cells_C2, file = "All_data/comm_assembly_results/nullmodel_C2_cells.rds")
+
+###BEWARE: the C2 null model creates empty columns, i.e. species with no occurrences. 
+#This is probably because the matrix has so many zeroes in it
+#maybe we should try to enforce that each sp has at least one occurrence??
+
+nullcomm_cells_C2 <- readRDS("All_data/comm_assembly_results/nullmodel_C2_cells.rds")
 
 #Calculate SES, with unscaled RaoQ#
 #we need to calculate RaoQ for each of the observed null communities
@@ -152,7 +158,7 @@ saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/nullmodel_C2_cell
 # Set up parallel backend
 plan(multisession, workers = parallel::detectCores() - 2)  # or plan(multicore) on Linux/mac
 
-chunks <- split(nullcomm_cells, ceiling(seq_along(nullcomm_cells) / 50))
+chunks <- split(nullcomm_cells_C2, ceiling(seq_along(nullcomm_cells_C2) / 50))
 #each chunk has 50 null matrices
 RaoQ_results <- list()
 
@@ -188,7 +194,7 @@ RQ_cells_summary <- null_RQ |>
   inner_join(RQ_obs_cells, by = c("trait", "cellref")) |> 
   mutate(SES = (RaoQ - mean_null)/sd_null)
 
-write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_cells_C5_entire.csv")
+write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_cells_C2_site.csv")
 
 
 ####SES at the grid scale, pool = entire####
