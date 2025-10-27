@@ -54,22 +54,9 @@ cell_ses <- read.csv("All_data/comm_assembly_results/RQ_cells_C5_entire.csv", ro
                                grepl("GG", cellref) == T ~ "2000",.default = NA))
 cell_ses$elevation <- as.factor(cell_ses$elevation)  
 
-#import SES at cell scale computed from scaled RaoQ
-cell_ses_scale <- read.csv("All_data/comm_assembly_results/RQ_scaled_cells_C5_entire.csv", row.names = 1) |> 
-  mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
-                               grepl("WH", cellref) == T ~ "2500",
-                               grepl("GG", cellref) == T ~ "2000",.default = NA))
-cell_ses_scale$elevation <- as.factor(cell_ses$elevation)  
-
 
 
 ses_ridges <- cell_ses |> 
-  ggplot(aes(x = SES, y = elevation, fill = elevation)) +
-  geom_density_ridges(alpha = 0.5) +
-  facet_wrap(~trait) +
-  theme_classic()
-
-ses_ridges_scale <- cell_ses_scale |> 
   ggplot(aes(x = SES, y = elevation, fill = elevation)) +
   geom_density_ridges(alpha = 0.5) +
   facet_wrap(~trait) +
