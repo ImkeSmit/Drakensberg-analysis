@@ -102,4 +102,3 @@ calc_RaoQ <- function(mean_traits, abun_matrix) {
   return(RaoQ_results) } 
 
 
-test <- calc_RaoQ(mean_traits, nullcomm_cells[[1]])
