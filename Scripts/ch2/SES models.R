@@ -114,6 +114,23 @@ ses2_ridges <- cell_ses2 |>
 #also removes 42% of plots
 
 
+###Cell Scale, C2, pool = site####
+#import SES at cell scale, computed from unscaled RaoQ
+cell_ses <- read.csv("All_data/comm_assembly_results/RQ_cells_C2_site.csv", row.names = 1) |> 
+  mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
+                               grepl("WH", cellref) == T ~ "2500",
+                               grepl("GG", cellref) == T ~ "2000",.default = NA))
+cell_ses$elevation <- as.factor(cell_ses$elevation)  
+
+
+
+ses_ridges <- cell_ses |> 
+  ggplot(aes(x = SES, y = elevation, fill = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait) +
+  theme_classic()
+#only GG sites retained! need to force each sp to have ant least one occurrence
+
 
 ###Grid scale####
 grid_ses <- read.csv("All_data/comm_assembly_results/RQ_grids_C5_entire.csv", row.names = 1) |> 
