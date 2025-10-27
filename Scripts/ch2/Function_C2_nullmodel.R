@@ -35,8 +35,11 @@ generate_C2_null <- function(comm, iterations = 10, pool = "entire") {
     null_comm <- comm * 0
     
     if (pool == "entire") {
-      #swap abundances among the sites within a column 
-      perm <- vegan::permatswap(comm, method = "swsh", shuffle ="samp", fixedmar = "columns", mtype = "count", times = 1)
+      #swap abundances in each row
+      #Thus, the species that occur in each site are changed
+      #the total abundance in each site stays constant
+      #Species frequencies and total abundances change
+      perm <- vegan::permatswap(comm, fixedmar = 'rows', mtype = "count", method = "swsh", shuffle = "samp", times = 1)
       null_comm <- perm$perm[[1]]
       
     } else {
@@ -47,7 +50,7 @@ generate_C2_null <- function(comm, iterations = 10, pool = "entire") {
         group_rows <- which(rownames_comm %in% group_sites)
         submat <- comm[group_rows, , drop = FALSE]
         
-        perm_sub <- vegan::permatswap(submat, method = "swsh", shuffle ="samp", fixedmar = "columns", mtype = "count", times = 1)
+        perm_sub <- vegan::permatswap(submat, method = "swsh", shuffle ="samp", fixedmar = "rows", mtype = "count", times = 1)
         null_comm[group_rows, ] <- perm_sub$perm[[1]]
       }
     }
@@ -64,7 +67,7 @@ generate_C2_null <- function(comm, iterations = 10, pool = "entire") {
     null_list[[n]] <- single_iter(n)
   }
   
-  message("✅ Finished generating ", iterations, " abundance-based null model(s).")
+  message("✅ Finished generating ", iterations, " aCC22ull model(s).")C
   return(null_list)
 }
 
