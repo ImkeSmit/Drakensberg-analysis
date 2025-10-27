@@ -405,12 +405,16 @@ for(r in 1:nrow(abun_matrix)) {
 
 
 ####SES at cell scale, pool = entire####
-#observed RaoQ
+#observed RaoQ, not scaled
 RQ_obs_cells <- calc_RaoQ(mean_traits, abun_matrix)
+
+#observed RaoQ, scaled
+RQ_obs_cells_scale <- calc_RaoQ_scale(mean_traits, abun_matrix)
 
 #Create null models
 set.seed(123)
 nullcomm_cells <- generate_C5_null_imp(abun_matrix, 999, pool = "entire")
+saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/nullmodel_C5_cells.rds")
 
 #Calculate SES#
 #we need to calculate RaoQ for each of the observed null communities
