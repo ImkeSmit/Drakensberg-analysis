@@ -501,10 +501,10 @@ RQ_cells_summary <- null_RQ |>
   summarise(sd_null = sd(RaoQ), 
             mean_null = mean(RaoQ)) |> 
   filter(sd_null > 0) |> #cannot divide by zero in SES calculation
-  inner_join(RQ_obs_cells, by = c("trait", "cellref")) |> 
+  inner_join(RQ_obs_cells_scale, by = c("trait", "cellref")) |> 
   mutate(SES = (RaoQ - mean_null)/sd_null)
 
-write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_cells_C5_entire.csv")
+write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_scaled_cells_C5_entire.csv")
 
 #some graphs
 RQ_ele <- drak |> 
