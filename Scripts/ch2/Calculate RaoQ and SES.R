@@ -1,4 +1,5 @@
-#Community assembly analysis 2.0###
+#Calculate RaoQ and SES###
+#at different scales and with different pools
 library(openxlsx)
 library(tidyverse)
 library(tidylog)
