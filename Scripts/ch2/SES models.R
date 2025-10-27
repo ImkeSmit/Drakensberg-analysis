@@ -5,6 +5,47 @@ library(openxlsx)
 library(ggplot2)
 library(ggridges)
 
+###Import original community data####
+#occurrence data
+drak <- read.xlsx("All_data/clean_data/micro_climb_occurrence.xlsx") |> 
+  mutate(cell = paste0(column, row))
+
+#trait data
+FT <- read.xlsx("All_data/clean_data/micro-climb_traits.xlsx") |> 
+  rename(taxon = Taxon, 
+         site = Site, grid = Grid, cell = Cell) |> 
+  pivot_longer(cols = c(Wet_mass_mg, Dry_mass_mg, Chlorophyll_mg_per_m2, Ft, Height_cm, 
+                        Thickness_mm, Leaf_area_mm2, SLA, LDMC), names_to = "trait", values_to = "value")
+
+#combine occurrence and trait data
+FT_join <- drak |> 
+  inner_join(FT, by = c("site", "grid", "cell", "taxon")) |> #inner join to only work with taxa that have trait data
+  mutate(cellref = paste0(site, grid, cell)) |> 
+  select(!c(column, row))
+
+#create abundance matrix
+abun_matrix <- FT_join |> 
+  select(cellref, taxon, cover) |> 
+  distinct(cellref, taxon, .keep_all = T) |> 
+  ungroup() |> 
+  arrange(taxon) |> 
+  mutate(cover = ceiling(cover)) |> #change cover values to integer to use in null models
+  pivot_wider(names_from = taxon, values_from = cover) 
+
+abun_matrix <- as.data.frame(abun_matrix)
+row.names(abun_matrix) <- abun_matrix$cellref
+abun_matrix <- abun_matrix[, -1]
+
+#replace NA values with 0
+for(r in 1:nrow(abun_matrix)) {
+  for(c in 1:ncol(abun_matrix)) {
+    
+    if(is.na(abun_matrix[r,c])) {
+      abun_matrix[r,c] <- 0
+    }
+  }
+}
+
 ###Cell Scale####
 #import SES at cell scale
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_cells_C5_entire.csv", row.names = 1) |> 
@@ -47,55 +88,27 @@ high_plots <- cell_ses |>
   slice_max(SES, n = 20) |> 
   distinct(cellref)
 
-#occurrence data
-drak <- read.xlsx("All_data/clean_data/micro_climb_occurrence.xlsx") |> 
-  mutate(cell = paste0(column, row))
-
-#trait data
-FT <- read.xlsx("All_data/clean_data/micro-climb_traits.xlsx") |> 
-  rename(taxon = Taxon, 
-         site = Site, grid = Grid, cell = Cell) |> 
-  pivot_longer(cols = c(Wet_mass_mg, Dry_mass_mg, Chlorophyll_mg_per_m2, Ft, Height_cm, 
-                        Thickness_mm, Leaf_area_mm2, SLA, LDMC), names_to = "trait", values_to = "value")
-
-#combine occurrence and trait data
-FT_join <- drak |> 
-  inner_join(FT, by = c("site", "grid", "cell", "taxon")) |> #inner join to only work with taxa that have trait data
-  mutate(cellref = paste0(site, grid, cell)) |> 
-  select(!c(column, row))
-
-#create abundance matrix
-abun_matrix <- FT_join |> 
-  select(cellref, taxon, cover) |> 
-  distinct(cellref, taxon, .keep_all = T) |> 
-  ungroup() |> 
-  arrange(taxon) |> 
-  mutate(cover = ceiling(cover)) |> #change cover values to integer to use in null models
-  pivot_wider(names_from = taxon, values_from = cover) 
-
-abun_matrix <- as.data.frame(abun_matrix)
-row.names(abun_matrix) <- abun_matrix$cellref
-abun_matrix <- abun_matrix[, -1]
-
-#replace NA values with 0
-for(r in 1:nrow(abun_matrix)) {
-  for(c in 1:ncol(abun_matrix)) {
-    
-    if(is.na(abun_matrix[r,c])) {
-      abun_matrix[r,c] <- 0
-    }
-  }
-}
-
 high_mat <- abun_matrix[which(row.names(abun_matrix) %in% c(high_plots$cellref)) , ]
 specnumber(high_mat) #all have between 2 and 6 species
 
 all_abun <- as.data.frame(specnumber(abun_matrix))
 all_abun$cellref <- row.names(all_abun)
 row.names(all_abun) <- NULL
+colnames(all_abun) <- c( "sprichness", "cellref")
+#NB!This is the number of sp in a plot that have trait values!!
 
 cell_ses2 <- cell_ses |> 
-  left_join(all_abun, by = "cellref")
+  left_join(all_abun, by = "cellref") 
+
+#Look at distribution of SES when we remove plots with 2 sp
+ses2_ridges <- cell_ses2 |> 
+  filter(sprichness > 2) |> 
+  ggplot(aes(x = SES, y = elevation, fill = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait) +
+  theme_classic()
+#does not really improve heavy tails
+#also removes 42% of plots
 
 
 #GG4F18 has the highest SES, look at it's diversity
