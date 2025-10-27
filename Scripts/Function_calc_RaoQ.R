@@ -63,6 +63,13 @@ calc_RaoQ <- function(mean_traits, abun_matrix) {
       chosen_trait <- chosen_trait[-which(names(chosen_trait) %in% c(empty_names)), drop = F]
     } 
     
+    #final check that all communities have at least one sp
+    zero_sum_comm <- which(specnumber(abun_temp) == 0)
+    if(length(zero_sum_comm) > 0) {
+      abun_temp <- abun_temp[-zero_sum_comm, ]
+    }
+    
+    
     #calculate RaoQ 
     FD_cells <- dbFD(chosen_trait, abun_temp,
                      w.abun = F, #do not weight RaoQ by abundances
@@ -93,3 +100,6 @@ calc_RaoQ <- function(mean_traits, abun_matrix) {
     
   } 
   return(RaoQ_results) } 
+
+
+test <- calc_RaoQ(mean_traits, nullcomm_cells[[1]])
