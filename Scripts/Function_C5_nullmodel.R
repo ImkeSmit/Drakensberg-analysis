@@ -74,7 +74,7 @@ generate_C5_null_imp <- function(comm, iterations = 10, pool = "entire") {
     null_list[[n]] <- single_iter(n)
   }
   
-  message("✅ Finished generating ", iterations, " abundance-based null model(s).")
+  message("✅ Finished generating ", iterations, " C5 null model(s).")
   return(null_list)
 }
 
@@ -132,7 +132,8 @@ for(r in 1:nrow(abun_matrix)) {
     }
   }
 }
-testnull <- generate_C2_null(abun_matrix, 10, pool = "entire")
+
+testnull <- generate_C5_null_imp(abun_matrix, 10, pool = "entire")
 
 colSums(abun_matrix)
 colSums(testnull[[1]]) #colsums differ, that is correct
