@@ -1,7 +1,6 @@
-###Function to generate null model C2####
+#This is a script to generate the C2 null model
 
-
-
+###improved function
 generate_C2_null <- function(comm, iterations = 10, pool = "entire") {
   if (!requireNamespace("vegan", quietly = TRUE)) {
     stop("Please install the 'vegan' package: install.packages('vegan')")
@@ -35,11 +34,8 @@ generate_C2_null <- function(comm, iterations = 10, pool = "entire") {
     null_comm <- comm * 0
     
     if (pool == "entire") {
-      #swap abundances in each row
-      #Thus, the species that occur in each site are changed
-      #the total abundance in each site stays constant
-      #Species frequencies and total abundances change
-      perm <- vegan::permatswap(comm, fixedmar = 'rows', mtype = "count", method = "swsh", shuffle = "samp", times = 1)
+      #swap abundances among the sites within a column 
+      perm <- vegan::permatswap(comm, method = "swsh", shuffle ="samp", fixedmar = "rows", mtype = "count", times = 1)
       null_comm <- perm$perm[[1]]
       
     } else {
@@ -67,12 +63,6 @@ generate_C2_null <- function(comm, iterations = 10, pool = "entire") {
     null_list[[n]] <- single_iter(n)
   }
   
-  message("✅ Finished generating ", iterations, " aCC22ull model(s).")C
+  message("✅ Finished generating ", iterations, " C2 null models")
   return(null_list)
 }
-
-
-
-
-permuted <- permatswap(testmat, fixedmar = 'rows', mtype = "count", method = "swsh", shuffle = "samp")
-permuted$perm[[1]]
