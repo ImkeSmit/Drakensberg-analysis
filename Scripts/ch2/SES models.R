@@ -4,6 +4,7 @@ library(tidylog)
 library(openxlsx)
 library(ggplot2)
 library(ggridges)
+library(gamlss)
 
 ###Import original community data####
 #occurrence data
