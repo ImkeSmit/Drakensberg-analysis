@@ -47,7 +47,7 @@ for(r in 1:nrow(abun_matrix)) {
   }
 }
 
-###Cell Scale####
+###Cell Scale, C5, pool = entire####
 #import SES at cell scale, computed from unscaled RaoQ
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_cells_C5_entire.csv", row.names = 1) |> 
   mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
@@ -113,15 +113,6 @@ ses2_ridges <- cell_ses2 |>
 #does not really improve heavy tails
 #also removes 42% of plots
 
-
-#GG4F18 has the highest SES, look at it's diversity
-s1 <- abun_matrix[which(rownames(abun_matrix) == "GG4F18") ,, drop = F]
-s2 <- s1[, -which(colSums(abun_matrix) == 0)]
-
-abun_matrix |> 
-  rownames_to_column(var = "cellref") |> 
-  filter(cellref == "GG4F18") |> 
-  select(where(~ sum(.) != 0))
 
 
 ###Grid scale####
