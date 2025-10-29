@@ -47,6 +47,7 @@ for(r in 1:nrow(abun_matrix)) {
   }
 }
 
+###TEST FOR EF####
 ###Cell Scale, C5, pool = entire####
 #import SES at cell scale, computed from unscaled RaoQ
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_cells_C5_entire.csv", row.names = 1) |> 
@@ -62,6 +63,12 @@ ses_ridges <- cell_ses |>
   geom_density_ridges(alpha = 0.5) +
   facet_wrap(~trait) +
   theme_classic()
+
+
+###Descriptive statistics####
+#How many cells are significantly less or more diverse than expected under null model?
+
+
 
 
 #models of ses~ elevation
@@ -81,6 +88,9 @@ test2 <- gamlss(SES ~ elevation, data = modeldat, family = ST1())
 #chatgpt says this is a totally sensible approach due to the right skewed nature of my response variable
 summary(test2)
 plot(test2) #looks much better
+
+
+
 
 
 ###What is going on in the cells with high SES values?
