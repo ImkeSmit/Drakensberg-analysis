@@ -56,7 +56,15 @@ cell_ses <- read.csv("All_data/comm_assembly_results/RQ_cells_C5_entire.csv", ro
                                grepl("GG", cellref) == T ~ "2000",.default = NA))
 cell_ses$elevation <- as.factor(cell_ses$elevation)  
 
+####Descriptive figures####
 
+RQ_ridges <- cell_ses |> 
+  ggplot(aes(x = RaoQ, y = elevation, fill = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait) +
+  theme_classic()
+#RaoQ distributions also very heavy tailed. Thus very few cells with high Fdiv. Is this normal?
+#Could using another Fdiv measure help? probably not...
 
 ses_ridges <- cell_ses |> 
   ggplot(aes(x = SES, y = elevation, fill = elevation)) +
@@ -67,31 +75,144 @@ ses_ridges <- cell_ses |>
 
 ###Descriptive statistics####
 #How many cells are significantly less or more diverse than expected under null model?
+sign_positive_ses <- cell_ses |> 
+  group_by(trait) |> 
+  filter(SES > 2) |> 
+  summarise(n = n())
+
+sign_negative_ses <- cell_ses |> 
+  group_by(trait) |> 
+  filter(SES < -2) |> 
+  summarise(n = n()) #hmm none have ses lower than -2, so none are significantly less diverse than null?
 
 
-
-
-#models of ses~ elevation
-hist(cell_ses$SES)
+###Models of SES ~ elevation####
+###Height####
 modeldat <- cell_ses[which(cell_ses$trait == "Height_cm"), ]
-test <- lm(SES ~ elevation, data = modeldat)
-summary(test)
-anova(test)
 
-#how badly are the assumptions violated?
-plot(test)#ja very badly
-
-#Let's try a GAM
-#USe skew t distribution as recommended by chatgpt.Can handle skewed and heavy tailed data with nonzero values
-test2 <- gamlss(SES ~ elevation, data = modeldat, family = ST1())
+#USe skew SHASHo distribution as recommended by chatgpt.Can handle skewed and heavy tailed data with nonzero values
+#other distribution to try is skew normal SN()
+test2 <- gamlss(SES ~ elevation, data = modeldat, family = SHASHo()) #skew t does not converge
 #only one categorical predictor, thus it is equivalent to an anova under the specified distribution.
 #chatgpt says this is a totally sensible approach due to the right skewed nature of my response variable
+#warning message, algorthm RS has not yet converged
 summary(test2)
 plot(test2) #looks much better
 
+#Kruskal-wallis test
+kr_height <- kruskal.test(SES ~ elevation, data = modeldat) #medians of at least two groups differ
+# Conduct pairwise comparisons with Wilcoxon rank-sum test
+pairwise_result <- pairwise.wilcox.test(modeldat$SES,  modeldat$elevation, p.adjust.method = "bonferroni")
+
+#get medians
+median_height <- cell_ses |> 
+  filter(trait == "Height_cm") |> 
+  group_by(elevation) |> 
+  summarise(median = median(SES,  na.rm = T))
+
+#2500 lower than 2000, 3000 lower than 2000, 3000 not lower than 2500
+#functional convergence increases with elevation (SES decreases with elevation)
+
+
+####LDMC####
+modeldat_LDMC <- cell_ses[which(cell_ses$trait == "LDMC"), ]
+
+test_LDMC <- gamlss(SES ~ elevation, data = modeldat_LDMC, family = SEP2()) #sshasho does not converge
+#only one categorical predictor, thus it is equivalent to an anova under the specified distribution.
+#chatgpt says this is a totally sensible approach due to the right skewed nature of my response variable
+#warning message, algorthm RS has not yet converged
+summary(test_LDMC)
+plot(test_LDMC) #looks much better
+
+#Kruskal-wallis test
+kr_LDMC <- kruskal.test(SES ~ elevation, data = modeldat_LDMC) #medians of at least two groups differ
+# Conduct pairwise comparisons with Wilcoxon rank-sum test
+pairwise_result <- pairwise.wilcox.test(modeldat_LDMC$SES,  modeldat_LDMC$elevation, p.adjust.method = "bonferroni")
+
+#get medians
+median_LDMC <- cell_ses |> 
+  filter(trait == "LDMC") |> 
+  group_by(elevation) |> 
+  summarise(median = median(SES,  na.rm = T))
+
+#2500 not different from 2000, 3000 higher than 2000, 3000 higher than 2500
+#Functional convergence decreases with elevation (median SES switches from negative to positive)
+
+
+###Leaf area####
+modeldat_LA <- cell_ses[which(cell_ses$trait == "Leaf_area_mm2"), ]
+
+test_LA <- gamlss(SES ~ elevation, data = modeldat_LA, family = ST3()) #sshasho does not converge
+summary(test_LA)
+plot(test_LA) 
+
+#Kruskal-wallis test
+kr_LA <- kruskal.test(SES ~ elevation, data = modeldat_LA) #medians of at least two groups differ
+# Conduct pairwise comparisons with Wilcoxon rank-sum test
+pairwise_result <- pairwise.wilcox.test(modeldat_LA$SES,  modeldat_LA$elevation, p.adjust.method = "bonferroni")
+#all medians differ significantly
+
+#get medians
+median_LA <- cell_ses |> 
+  filter(trait == "Leaf_area_mm2") |> 
+  group_by(elevation) |> 
+  summarise(median = median(SES,  na.rm = T))
+
+#2500 higher than 2000, 3000 lower than 2000, 3000 lower than 2500
+#Functional convergence decreases between 2000 and 2500, but increases at 3000.
+#EF is strongest at 3000, and weakest at 2500
 
 
 
+
+
+
+###Leaf area####
+modeldat_LA <- cell_ses[which(cell_ses$trait == "Leaf_area_mm2"), ]
+
+test_LA <- gamlss(SES ~ elevation, data = modeldat_LA, family = ST3()) #sshasho does not converge
+summary(test_LA)
+plot(test_LA) 
+
+#Kruskal-wallis test
+kr_LA <- kruskal.test(SES ~ elevation, data = modeldat_LA) #medians of at least two groups differ
+# Conduct pairwise comparisons with Wilcoxon rank-sum test
+pairwise_result <- pairwise.wilcox.test(modeldat_LA$SES,  modeldat_LA$elevation, p.adjust.method = "bonferroni")
+#all medians differ significantly
+
+#get medians
+median_LA <- cell_ses |> 
+  filter(trait == "Leaf_area_mm2") |> 
+  group_by(elevation) |> 
+  summarise(median = median(SES,  na.rm = T))
+
+#2500 higher than 2000, 3000 lower than 2000, 3000 lower than 2500
+#Functional convergence decreases between 2000 and 2500, but increases at 3000.
+#EF is strongest at 3000, and weakest at 2500
+
+####SLA####
+modeldat_SLA <- cell_ses[which(cell_ses$trait == "SLA"), ]
+
+test_SLA <- gamlss(SES ~ elevation, data = modeldat_SLA, family = ST4()) #sshasho does not converge
+
+summary(test_SLA)
+plot(test_SLA) #pretty good
+
+#Kruskal-wallis test
+kr_SLA <- kruskal.test(SES ~ elevation, data = modeldat_SLA) #medians of at least two groups differ
+# Conduct pairwise comparisons with Wilcoxon rank-sum test
+pairwise_result <- pairwise.wilcox.test(modeldat_SLA$SES,  modeldat_SLA$elevation, p.adjust.method = "bonferroni")
+#all are significantly different
+
+#get medians
+median_SLA <- cell_ses |> 
+  filter(trait == "SLA") |> 
+  group_by(elevation) |> 
+  summarise(median = median(SES,  na.rm = T))
+
+#2500 higher than 2000, 3000 lower than 2000, 3000 lower than 2500
+#Functional convergence decreases between 200 and 2500, then increases at 3000
+#strongets EF at 3000, weakest at 2500
 
 ###What is going on in the cells with high SES values?
 high <- cell_ses |> 
