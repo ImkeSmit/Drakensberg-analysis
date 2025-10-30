@@ -65,6 +65,7 @@ RQ_ridges <- cell_ses |>
   theme_classic()
 #RaoQ distributions also very heavy tailed. Thus very few cells with high Fdiv. Is this normal?
 #Could using another Fdiv measure help? probably not...
+ggsave(path = "Figures",plot = RQ_ridges, filename = "RaoQ_elevation_by_traits.png")
 
 ses_ridges <- cell_ses |> 
   ggplot(aes(x = SES, y = elevation, fill = elevation)) +
@@ -102,7 +103,7 @@ plot(test2) #looks much better
 #Kruskal-wallis test
 kr_height <- kruskal.test(SES ~ elevation, data = modeldat) #medians of at least two groups differ
 # Conduct pairwise comparisons with Wilcoxon rank-sum test
-pairwise_result <- pairwise.wilcox.test(modeldat$SES,  modeldat$elevation, p.adjust.method = "bonferroni")
+wx_height <- pairwise.wilcox.test(modeldat$SES,  modeldat$elevation, p.adjust.method = "bonferroni")
 
 #get medians
 median_height <- cell_ses |> 
@@ -127,7 +128,7 @@ plot(test_LDMC) #looks much better
 #Kruskal-wallis test
 kr_LDMC <- kruskal.test(SES ~ elevation, data = modeldat_LDMC) #medians of at least two groups differ
 # Conduct pairwise comparisons with Wilcoxon rank-sum test
-pairwise_result <- pairwise.wilcox.test(modeldat_LDMC$SES,  modeldat_LDMC$elevation, p.adjust.method = "bonferroni")
+wx_LDMC <- pairwise.wilcox.test(modeldat_LDMC$SES,  modeldat_LDMC$elevation, p.adjust.method = "bonferroni")
 
 #get medians
 median_LDMC <- cell_ses |> 
@@ -149,7 +150,7 @@ plot(test_LA)
 #Kruskal-wallis test
 kr_LA <- kruskal.test(SES ~ elevation, data = modeldat_LA) #medians of at least two groups differ
 # Conduct pairwise comparisons with Wilcoxon rank-sum test
-pairwise_result <- pairwise.wilcox.test(modeldat_LA$SES,  modeldat_LA$elevation, p.adjust.method = "bonferroni")
+wx_LA <- pairwise.wilcox.test(modeldat_LA$SES,  modeldat_LA$elevation, p.adjust.method = "bonferroni")
 #all medians differ significantly
 
 #get medians
@@ -162,33 +163,6 @@ median_LA <- cell_ses |>
 #Functional convergence decreases between 2000 and 2500, but increases at 3000.
 #EF is strongest at 3000, and weakest at 2500
 
-
-
-
-
-
-###Leaf area####
-modeldat_LA <- cell_ses[which(cell_ses$trait == "Leaf_area_mm2"), ]
-
-test_LA <- gamlss(SES ~ elevation, data = modeldat_LA, family = ST3()) #sshasho does not converge
-summary(test_LA)
-plot(test_LA) 
-
-#Kruskal-wallis test
-kr_LA <- kruskal.test(SES ~ elevation, data = modeldat_LA) #medians of at least two groups differ
-# Conduct pairwise comparisons with Wilcoxon rank-sum test
-pairwise_result <- pairwise.wilcox.test(modeldat_LA$SES,  modeldat_LA$elevation, p.adjust.method = "bonferroni")
-#all medians differ significantly
-
-#get medians
-median_LA <- cell_ses |> 
-  filter(trait == "Leaf_area_mm2") |> 
-  group_by(elevation) |> 
-  summarise(median = median(SES,  na.rm = T))
-
-#2500 higher than 2000, 3000 lower than 2000, 3000 lower than 2500
-#Functional convergence decreases between 2000 and 2500, but increases at 3000.
-#EF is strongest at 3000, and weakest at 2500
 
 ####SLA####
 modeldat_SLA <- cell_ses[which(cell_ses$trait == "SLA"), ]
@@ -201,7 +175,7 @@ plot(test_SLA) #pretty good
 #Kruskal-wallis test
 kr_SLA <- kruskal.test(SES ~ elevation, data = modeldat_SLA) #medians of at least two groups differ
 # Conduct pairwise comparisons with Wilcoxon rank-sum test
-pairwise_result <- pairwise.wilcox.test(modeldat_SLA$SES,  modeldat_SLA$elevation, p.adjust.method = "bonferroni")
+wx_SLA <- pairwise.wilcox.test(modeldat_SLA$SES,  modeldat_SLA$elevation, p.adjust.method = "bonferroni")
 #all are significantly different
 
 #get medians
