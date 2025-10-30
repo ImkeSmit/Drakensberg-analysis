@@ -75,8 +75,17 @@ cwm <- cwm |>
   rownames_to_column(var = "cellref") |> 
   mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
                                grepl("WH", cellref) == T ~ "2500",
-                               grepl("GG", cellref) == T ~ "2000",.default = NA))
+                               grepl("GG", cellref) == T ~ "2000",.default = NA)) |> 
+  pivot_longer(cols = c("Height_cm", "LDMC", "Leaf_area_mm2", "SLA"), names_to = "trait", values_to = "cwm_value")
 cwm$elevation <- as.factor(cwm$elevation)  
+
+cwm_ridges <- cwm |> 
+  ggplot(aes(x = cwm_value, y = elevation, fill = elevation)) +
+  geom_density_ridges(alpha = 0.5, linewidth = 0.3) +
+  facet_wrap(~trait, scales = "free_x") +
+  theme_classic() 
+
+ggsave(filename = "cwm_elevation.png", plot = cwm_ridges, path = "Figures")
 
 
 
