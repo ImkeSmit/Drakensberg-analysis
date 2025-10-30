@@ -5,6 +5,8 @@ library(openxlsx)
 library(ggplot2)
 library(ggridges)
 library(gamlss)
+library(rcompanion)
+library(multcompView)
 
 ###Import original community data####
 #occurrence data
@@ -104,6 +106,7 @@ plot(test2) #looks much better
 kr_height <- kruskal.test(SES ~ elevation, data = modeldat) #medians of at least two groups differ
 # Conduct pairwise comparisons with Wilcoxon rank-sum test
 wx_height <- pairwise.wilcox.test(modeldat$SES,  modeldat$elevation, p.adjust.method = "bonferroni")
+height_cld <- multcompLetters(fullPTable(wx_height$p.value))
 
 #get medians
 median_height <- cell_ses |> 
@@ -129,6 +132,8 @@ plot(test_LDMC) #looks much better
 kr_LDMC <- kruskal.test(SES ~ elevation, data = modeldat_LDMC) #medians of at least two groups differ
 # Conduct pairwise comparisons with Wilcoxon rank-sum test
 wx_LDMC <- pairwise.wilcox.test(modeldat_LDMC$SES,  modeldat_LDMC$elevation, p.adjust.method = "bonferroni")
+LDMC_cld <- multcompLetters(fullPTable(wx_LDMC$p.value))
+
 
 #get medians
 median_LDMC <- cell_ses |> 
@@ -152,6 +157,8 @@ kr_LA <- kruskal.test(SES ~ elevation, data = modeldat_LA) #medians of at least 
 # Conduct pairwise comparisons with Wilcoxon rank-sum test
 wx_LA <- pairwise.wilcox.test(modeldat_LA$SES,  modeldat_LA$elevation, p.adjust.method = "bonferroni")
 #all medians differ significantly
+LA_cld <- multcompLetters(fullPTable(wx_LA$p.value))
+
 
 #get medians
 median_LA <- cell_ses |> 
@@ -176,6 +183,8 @@ plot(test_SLA) #pretty good
 kr_SLA <- kruskal.test(SES ~ elevation, data = modeldat_SLA) #medians of at least two groups differ
 # Conduct pairwise comparisons with Wilcoxon rank-sum test
 wx_SLA <- pairwise.wilcox.test(modeldat_SLA$SES,  modeldat_SLA$elevation, p.adjust.method = "bonferroni")
+SLA_cld <- multcompLetters(fullPTable(wx_SLA$p.value))
+
 #all are significantly different
 
 #get medians
@@ -187,6 +196,21 @@ median_SLA <- cell_ses |>
 #2500 higher than 2000, 3000 lower than 2000, 3000 lower than 2500
 #Functional convergence decreases between 200 and 2500, then increases at 3000
 #strongets EF at 3000, weakest at 2500
+
+####SES~elevation summary figure####
+ses_ridges <- cell_ses |> 
+  ggplot(aes(x = SES, y = elevation, fill = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait) +
+  theme_classic() 
+
+letters_df <- tibble(trait = c(rep("Height", 3), rep("LDMC", 3), rep("Leaf_area_mm2", 3), rep("SLA", 3)), 
+                     elevation = rep(c("2000", "2500", "3000"), 4), 
+                     letters = c(multcompLetters(fullPTable(wx_height$p.value)), multcompLetters(fullPTable(wx_LDMC$p.value)), 
+                                 multcompLetters(fullPTable(wx_LA$p.value)), multcompLetters(fullPTable(wx_SLA$p.value))))
+  
+
+
 
 ###What is going on in the cells with high SES values?
 high <- cell_ses |> 
