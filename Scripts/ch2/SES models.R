@@ -204,11 +204,28 @@ ses_ridges <- cell_ses |>
   facet_wrap(~trait) +
   theme_classic() 
 
-letters_df <- tibble(trait = c(rep("Height", 3), rep("LDMC", 3), rep("Leaf_area_mm2", 3), rep("SLA", 3)), 
+#significance letters
+letters_df <- tibble(trait = c(rep("Height_cm", 3), rep("LDMC", 3), rep("Leaf_area_mm2", 3), rep("SLA", 3)), 
                      elevation = rep(c("2000", "2500", "3000"), 4), 
-                     letters = c(multcompLetters(fullPTable(wx_height$p.value)), multcompLetters(fullPTable(wx_LDMC$p.value)), 
-                                 multcompLetters(fullPTable(wx_LA$p.value)), multcompLetters(fullPTable(wx_SLA$p.value))))
-  
+                     letters = c(unlist(height_cld)[1:3], unlist(LDMC_cld)[1:3], 
+                                 unlist(LA_cld)[1:3], unlist(SLA_cld)[1:3]))
+#medians
+med_df <- cell_ses %>%
+  group_by(trait, elevation) %>%
+  summarize(med = median(SES, na.rm = TRUE))
+
+#improved figure
+ses_ridges2 <- ses_ridges+
+  geom_segment(data = med_df,
+    aes(x = med, xend = med,
+        y = as.numeric(elevation) - 0.01,
+        yend = as.numeric(elevation) + 0.1),
+    linetype = "solid",size = 0.6) +
+  geom_text(data = letters_df,
+    aes(x = 7, y = elevation, label = letters),
+    color = "black",size = 4) 
+
+ggsave(filename = "SES_elevation_by_traits.png", plot = ses_ridges2, path= "Figures")
 
 
 
