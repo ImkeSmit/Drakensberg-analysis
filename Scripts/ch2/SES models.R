@@ -200,7 +200,7 @@ median_SLA <- cell_ses |>
 ####SES~elevation summary figure####
 ses_ridges <- cell_ses |> 
   ggplot(aes(x = SES, y = elevation, fill = elevation)) +
-  geom_density_ridges(alpha = 0.5) +
+  geom_density_ridges(alpha = 0.5, linewidth = 0.3) +
   facet_wrap(~trait) +
   theme_classic() 
 
