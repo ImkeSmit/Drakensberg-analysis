@@ -100,6 +100,13 @@ cwm_xt <- cwm %>%
     median_val   = median(cwm_value)
   )
 
+abun_matrix[which(row.names(abun_matrix) == "GG2H15"), ]
+abun_matrix["GG2H15", abun_matrix[, "GG2H15"] > 0, drop = FALSE]
 
+site <- "WH7B5"
 
+present_df <- data.frame(
+  species   = colnames(abun_matrix)[abun_matrix[site, ] > 0],
+  abundance = abun_matrix[site, abun_matrix[site, ] > 0]
+) #something is wrong.. a lot of these extreme values come from cells with one sp, I thought they were discarded...
 
