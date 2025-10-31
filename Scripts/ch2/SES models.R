@@ -259,8 +259,7 @@ ses_ridges2 <- ses_ridges+
   geom_text(data = stars_df,
             aes(x = 6, y = elevation, label = stars),
             color = "black",size = 4) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "grey") +
-  theme(legend.position = "bottom")
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey") 
 
 ggsave(filename = "SES_elevation_by_traits.png", plot = ses_ridges2, path= "Figures")
 
