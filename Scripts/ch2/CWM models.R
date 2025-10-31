@@ -88,4 +88,18 @@ cwm_ridges <- cwm |>
 ggsave(filename = "cwm_elevation.png", plot = cwm_ridges, path = "Figures")
 
 
+###Which species lie where on the cwm trait spectrum? 
+cwm_xt <- cwm %>%
+  group_by(elevation, trait) %>%
+  summarise(
+    highest_cell = cellref[which.max(cwm_value)],
+    highest_val  = max(cwm_value),
+    lowest_cell  = cellref[which.min(cwm_value)],
+    lowest_val   = min(cwm_value),
+    median_cell  = cellref[which.min(abs(cwm_value - median(cwm_value)))],
+    median_val   = median(cwm_value)
+  )
+
+
+
 
