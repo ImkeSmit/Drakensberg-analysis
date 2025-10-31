@@ -241,6 +241,10 @@ med_df <- cell_ses %>%
   summarize(med = median(SES, na.rm = TRUE))
 
 #stars
+stars_df <- tibble(trait = c(rep("Height_cm", 3), rep("LDMC", 3), rep("Leaf_area_mm2", 3), rep("SLA", 3)), 
+                     elevation = rep(c("2000", "2500", "3000"), 4), 
+                     stars = c(height_stars, LDMC_stars, 
+                                 LA_stars, SLA_stars))
 
 #improved figure
 ses_ridges2 <- ses_ridges+
@@ -248,10 +252,15 @@ ses_ridges2 <- ses_ridges+
     aes(x = med, xend = med,
         y = as.numeric(elevation) - 0.01,
         yend = as.numeric(elevation) + 0.1),
-    linetype = "solid",size = 0.6) +
+    linetype = "solid", size = 0.6) +
   geom_text(data = letters_df,
     aes(x = 7, y = elevation, label = letters),
-    color = "black",size = 4) 
+    color = "black",size = 4) +
+  geom_text(data = stars_df,
+            aes(x = 6, y = elevation, label = stars),
+            color = "black",size = 4) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey") +
+  theme(legend.position = "bottom")
 
 ggsave(filename = "SES_elevation_by_traits.png", plot = ses_ridges2, path= "Figures")
 
