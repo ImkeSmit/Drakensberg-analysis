@@ -143,8 +143,9 @@ RQ_obs_cells <- calc_RaoQ_weighted(mean_traits, abun_matrix)
 #Create null models
 set.seed(123)
 nullcomm_cells <- generate_C5_null_imp(abun_matrix, 999, pool = "entire")
-saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/nullmodel_C5_cells.rds")
 
+saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/nullmodel_C5_cells.rds")
+nullcomm_cells <- readRDS("All_data/comm_assembly_results/nullmodel_C5_cells.rds")
 #Calculate SES, with unscaled RaoQ#
 #we need to calculate RaoQ for each of the observed null communities
 
@@ -163,7 +164,7 @@ for (i in seq_along(chunks)) { #run chunks sequentially
   #each core receives one null matrix to run calc_RaoQ on. this happens until all matrices in the chunk are finished
   sub_RQ <- future_lapply(seq_along(chunk_list), function(idx) {
     chosen_null <- chunk_list[[idx]]
-    RQ_result <- calc_RaoQ(mean_traits, chosen_null)
+    RQ_result <- calc_RaoQ_weighted(mean_traits, chosen_null)
     RQ_result$counter <- paste0("null matrix ", (i - 1) * 100 + idx)
     RQ_result
   }, future.seed = TRUE) #generates a unique reproducible sub seed for each worker
@@ -187,7 +188,7 @@ RQ_cells_summary <- null_RQ |>
   inner_join(RQ_obs_cells, by = c("trait", "cellref")) |> 
   mutate(SES = (RaoQ - mean_null)/sd_null)
 
-write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_cells_C5_entire.csv")
+write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv")
 
 
 
