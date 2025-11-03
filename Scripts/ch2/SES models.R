@@ -48,6 +48,9 @@ for(r in 1:nrow(abun_matrix)) {
     }
   }
 }
+#remove sites with only one sp
+no <- specnumber(abun_matrix)
+abun_matrix <- abun_matrix[which(no == 1), ]
 
 ###TEST FOR EF####
 ###Cell Scale, C5, pool = entire####
