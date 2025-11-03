@@ -146,3 +146,6 @@ cwm_xt_join <- cwm_xt |>
   rename(lowest_comp = comp_list) |> 
   left_join(cell_composition, by = join_by(median_cell == cell)) |> 
   rename(median_comp = comp_list)
+
+#export
+write.xlsx(cwm_xt_join, "All_data/comm_assembly_results/composition_extreme_cwm.xlsx")
