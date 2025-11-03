@@ -4,7 +4,8 @@ library(openxlsx)
 library(tidyverse)
 library(tidylog)
 
-####Import community and trait data####
+###Matrices for all life forms####
+####Import community and trait data###
 #occurrence data
 drak <- read.xlsx("All_data/clean_data/micro_climb_occurrence.xlsx") |> 
   mutate(cell = paste0(column, row))
@@ -69,3 +70,29 @@ row.names(mean_traits) <- mean_traits$taxon
 mean_traits <- mean_traits[, -1]
 
 write.csv(mean_traits, "All_data/comm_assembly_results/mean_traits.csv")
+
+
+####Matrices for forbs and graminoids separately####
+#create life form classification
+lf <- data.frame(taxon = colnames(abun_matrix), 
+                 growth_form = NA)
+
+graminoids <- c("andropogon_filiformes", "anthoxanthum_ecklonii","aristida_adscensionis", "aristida_junciformis","brachiaria_serrata","bulbostylis_humilis",
+                "carex_zuluensis","cymbopogon_dieterlenii","cymbopogon_prolixus","cyperus_rupestris",
+                "cyperus_semitrifidus","digitaria_monodactyla","digitaria_sanguinium","diheteropogon_filifolius",
+                "ehrharta_longiglumous","elionurus_muticus","eragrostis_capensis","eragrostis_curvula",
+                "eragrostis_plana","eragrostis_racemosa","eulalia_villosa","festuca_caprina","festuca_costata",
+                "festuca_scabra",
+                "ficinia_cinammomea","ficinia_stolonifera","harpochloa_falx","heteropogon_contortus","melinis_nerviglumis",
+                "merxmuellera_drakensbergensis","microchloa_caffra","miscanthus_capensis","pentameris_airoides",
+                "pentameris_exserta","pentameris_setifolia","poa_binata","rendlia_altera","sporobolus_centrifugus",
+                "stiburus_alopecuroides","tenaxia_disticha","themeda_triandra","tristachya_leucothrix")
+
+#classify each sp as a graminoid or not
+for(i in 1:nrow(lf)) {
+  sp <- lf[i,1]
+  
+  if(any(sp == graminoids)) {
+    lf[i,2] <- "graminoid"
+  }else {lf[i,2] <- "forb" }
+}
