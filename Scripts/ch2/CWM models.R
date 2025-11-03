@@ -78,7 +78,7 @@ for(r in 1:nrow(abun_matrix)) {
 }
 
 no <- specnumber(abun_matrix)
-abun_matrix <- abun_matrix[which(no == 1), ]
+abun_matrix <- abun_matrix[-which(no == 1), ]
 
 
 #compute CWM of each trait for each cell
@@ -116,7 +116,7 @@ cwm_xt <- cwm %>%
 abun_matrix[which(row.names(abun_matrix) == "GG2H15"), ]
 abun_matrix["GG2H15", abun_matrix[, "GG2H15"] > 0, drop = FALSE]
 
-site <- "WH7B5"
+site <- "GG2H16"
 
 present_df <- data.frame(
   species   = colnames(abun_matrix)[abun_matrix[site, ] > 0],

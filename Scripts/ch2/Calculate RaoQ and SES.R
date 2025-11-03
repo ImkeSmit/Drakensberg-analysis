@@ -82,7 +82,7 @@ for(r in 1:nrow(abun_matrix)) {
 
 #remove sites that have only one species 
 no <- specnumber(abun_matrix)
-abun_matrix <- abun_matrix[which(no == 1), ]
+abun_matrix <- abun_matrix[-which(no == 1), ]
 
 ####SES at cell scale, C5, pool = entire, unweighted RaoQ####
 #observed RaoQ, not weighted by abundance
