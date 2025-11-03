@@ -101,6 +101,7 @@ ggsave(filename = "cwm_elevation.png", plot = cwm_ridges, path = "Figures")
 
 
 ###Which species lie where on the cwm trait spectrum? 
+#get cells which have extremem or median cwm values
 cwm_xt <- cwm %>%
   group_by(elevation, trait) %>%
   summarise(
