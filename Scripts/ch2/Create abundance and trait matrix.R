@@ -83,6 +83,8 @@ row.names(mean_traits)[79] <- "helichrysum_albo_brunneum"
 #save trait matrix
 write.csv(mean_traits, "All_data/comm_assembly_results/mean_traits.csv")
 
+##looks like H. aureonites is in abun matrix but not in mean traits. fix
+
 
 ####Matrices for forbs and graminoids separately####
 #create life form classification
