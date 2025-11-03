@@ -96,3 +96,8 @@ for(i in 1:nrow(lf)) {
     lf[i,2] <- "graminoid"
   }else {lf[i,2] <- "forb" }
 }
+
+#Now subset the abundance and trait matrices for forbs and graminoids
+abun_graminoids <- abun_matrix[, graminoids]
+
+
