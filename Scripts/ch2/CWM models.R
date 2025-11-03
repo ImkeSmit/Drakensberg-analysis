@@ -113,13 +113,36 @@ cwm_xt <- cwm %>%
     median_val   = median(cwm_value)
   )
 
-abun_matrix[which(row.names(abun_matrix) == "GG2H15"), ]
-abun_matrix["GG2H15", abun_matrix[, "GG2H15"] > 0, drop = FALSE]
+#get the composition of each of these cells
+for(i in c(cwm_xt$highest_cell, cwm_xt$lowest_cell, cwm_xt$median_cell)) {
+  site <- i
 
-site <- "GG2H16"
-
+if (i == "GG2H9")  {
 present_df <- data.frame(
+  site = site,
   species   = colnames(abun_matrix)[abun_matrix[site, ] > 0],
-  abundance = abun_matrix[site, abun_matrix[site, ] > 0]
-) #something is wrong.. a lot of these extreme values come from cells with one sp, I thought they were discarded...
+  abundance = unlist(abun_matrix[site, abun_matrix[site, ] > 0]))
+rownames(present_df) <- NULL
+} else {
+  temp_present_df <- data.frame(
+    site = site,
+    species   = colnames(abun_matrix)[abun_matrix[site, ] > 0],
+    abundance = unlist(abun_matrix[site, abun_matrix[site, ] > 0]))
+  rownames(temp_present_df) <- NULL
+  
+  present_df <- rbind(present_df, temp_present_df)
+}}
 
+#join the composition to the cwm_xt table
+cell_composition <- present_df |> 
+  rename(cell = site) |> 
+  group_by(cell) |> 
+  summarise(comp_list = list(species))
+  
+cwm_xt_join <- cwm_xt |> 
+  left_join(cell_composition, by = join_by(highest_cell == cell)) |> 
+  rename(higest_comp = comp_list) |> 
+  left_join(cell_composition, by = join_by(lowest_cell == cell)) |> 
+  rename(lowest_comp = comp_list) |> 
+  left_join(cell_composition, by = join_by(median_cell == cell)) |> 
+  rename(median_comp = comp_list)
