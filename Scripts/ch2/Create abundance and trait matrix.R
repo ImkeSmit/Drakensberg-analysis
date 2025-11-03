@@ -98,6 +98,29 @@ for(i in 1:nrow(lf)) {
 }
 
 #Now subset the abundance and trait matrices for forbs and graminoids
-abun_graminoids <- abun_matrix[, graminoids]
 
+###graminoid abundance
+abun_graminoids <- abun_matrix[ , graminoids]
+#remove sites that have only one species 
+no <- specnumber(abun_graminoids)
+abun_graminoids <- abun_graminoids[-which(no < 2), ]
+
+###graminoid traits
+traits_graminoids <- mean_traits[graminoids, ]
+
+
+###forb abundance
+abun_forbs <- abun_matrix[ , -which(colnames(abun_matrix) %in% graminoids)]
+#remove sites that have only one species 
+no <- specnumber(abun_forbs)
+abun_forbs <- abun_forbs[-which(no < 2), ]
+
+###forb traits
+traits_forbs <- mean_traits[-which(rownames(mean_traits) %in% graminoids), ]
+
+#write to csv
+write.csv(abun_graminoids, "All_data/comm_assembly_results/abun_graminoids.csv")
+write.csv(traits_graminoids, "All_data/comm_assembly_results/traits_graminoids.csv")
+write.csv(abun_forbs, "All_data/comm_assembly_results/abun_forbs.csv")
+write.csv(traits_forbs, "All_data/comm_assembly_results/traits_forbs.csv")
 
