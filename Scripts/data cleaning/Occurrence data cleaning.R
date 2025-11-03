@@ -114,7 +114,7 @@ gg_summer[grep("gladiolus", gg_summer$taxon), ]
 ####get names from trait data####
 #for now, we'll just get the names from the trait data, and clean the rest of the FT data later
 
-gg_trait_names <- read_excel("All_data/raw_trait_data/GG_dataset_Functional_traits.xlsx") |> 
+gg_trait_names <- read_excel("All_data/raw_data/raw_trait_data/GG_dataset_Functional_traits.xlsx") |> 
   rename(taxon = Species) |> 
   mutate(taxon = str_to_lower(taxon),
          taxon = str_squish(taxon),
@@ -123,7 +123,7 @@ gg_trait_names <- read_excel("All_data/raw_trait_data/GG_dataset_Functional_trai
   mutate(site = "GG", dataset = "FT") |> 
   distinct(taxon, site, dataset)
 
-wh_trait_names <-read_excel("All_data/raw_trait_data/WH_Functional_traits_dataset.xlsx", sheet = "Data_entry") |> 
+wh_trait_names <-read_excel("All_data/raw_data/raw_trait_data/WH_Functional_traits_dataset.xlsx", sheet = "Data_entry") |> 
   select(Date:Notes) |> 
   rename(taxon = Species) |> 
   mutate(taxon = str_to_lower(taxon),
@@ -133,7 +133,7 @@ wh_trait_names <-read_excel("All_data/raw_trait_data/WH_Functional_traits_datase
   mutate(site = "WH", dataset = "FT") |> 
   distinct(taxon, site, dataset)
 
-bk_trait_names <- read_excel("All_data/raw_trait_data/FT_Bokong_19Nov.xlsx", sheet = "FT measurements") |> 
+bk_trait_names <- read_excel("All_data/raw_data/raw_trait_data/FT_Bokong_Edited.xlsx", sheet = "FT measurements") |> 
   rename(taxon = Species) |> 
   mutate(taxon = str_to_lower(taxon),
          taxon = str_squish(taxon),
