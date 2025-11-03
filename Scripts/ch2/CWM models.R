@@ -1,4 +1,13 @@
 ####How does CWM traits vary with elevation?####
+library(openxlsx)
+library(tidyverse)
+library(tidylog)
+library(ggplot2)
+library(vegan)
+library(traitstrap)
+library(FD)
+library(ggridges)
+
 ####Import community and trait data####
 #occurrence data
 drak <- read.xlsx("All_data/clean_data/micro_climb_occurrence.xlsx") |> 
@@ -67,6 +76,9 @@ for(r in 1:nrow(abun_matrix)) {
     }
   }
 }
+
+no <- specnumber(abun_matrix)
+abun_matrix <- abun_matrix[which(no == 1), ]
 
 
 #compute CWM of each trait for each cell
