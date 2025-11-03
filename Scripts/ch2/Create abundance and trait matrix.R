@@ -19,7 +19,7 @@ FT <- read.xlsx("All_data/clean_data/micro-climb_traits.xlsx") |>
 
 
 #Get mean traits for species
-mean_traits <- FT |> 
+mean_traits_all <- FT |> 
   filter(trait %in% c("Height_cm", "Leaf_area_mm2","Thickness_mm", "SLA", "LDMC")) |> 
   group_by(taxon, trait) |> 
   summarise(mean_trait = mean(value, na.rm = T)) |> 
@@ -29,7 +29,7 @@ mean_traits <- FT |>
 
 #Do inner join between trait and cover data to get sp that match between the two
 FT_join <- drak |> 
-  inner_join(mean_traits, by = "taxon") |> #inner join to only work with taxa that have trait data
+  inner_join(mean_traits_all, by = "taxon") |> #inner join to only work with taxa that have trait data
   mutate(cellref = paste0(site, grid, cell)) |> 
   select(!c(column, row))
 
@@ -63,12 +63,16 @@ abun_matrix <- abun_matrix[-which(no == 1), ]
 #Save abundance matrix:
 write.csv(abun_matrix, "All_data/comm_assembly_results/abun_matrix.csv")
 
-#Save trait matrix: 
-#first get row and columns names right
+#Polish trait matrix:
+#remove species that aren't also in the abun_matrix
+mean_traits <- mean_traits_all[which(mean_traits_all$taxon %in% colnames(abun_matrix)) , ]
+
+#get row and columns names right
 mean_traits <- as.data.frame(mean_traits)
 row.names(mean_traits) <- mean_traits$taxon
 mean_traits <- mean_traits[, -1]
 
+#save trait matrix
 write.csv(mean_traits, "All_data/comm_assembly_results/mean_traits.csv")
 
 
