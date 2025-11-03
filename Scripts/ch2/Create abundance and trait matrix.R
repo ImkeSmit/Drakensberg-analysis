@@ -62,6 +62,7 @@ abun_matrix <- abun_matrix[-which(no == 1), ]
 
 #order species alphabetically
 abun_matrix <- abun_matrix[, order(colnames(abun_matrix))]
+colnames(abun_matrix)[79] <- "helichrysum_albo_brunneum" #this names causes problems in csv format
 
 #Save abundance matrix:
 write.csv(abun_matrix, "All_data/comm_assembly_results/abun_matrix.csv")
@@ -77,6 +78,7 @@ mean_traits <- mean_traits[, -1]
 
 #order rownames alphabetically
 mean_traits <- mean_traits[order(row.names(mean_traits)), ]
+row.names(mean_traits)[79] <- "helichrysum_albo_brunneum"
 
 #save trait matrix
 write.csv(mean_traits, "All_data/comm_assembly_results/mean_traits.csv")
