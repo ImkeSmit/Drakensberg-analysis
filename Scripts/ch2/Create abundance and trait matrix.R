@@ -81,3 +81,4 @@ abun_matrix <- abun_matrix[-which(no == 1), ]
 write.csv(abun_matrix, "All_data/comm_assembly_results/abun_matrix.csv")
 
 #Save trait matrix: 
+write.csv(mean_traits, "All_data/comm_assembly_results/mean_traits.csv")
