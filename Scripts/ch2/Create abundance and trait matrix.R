@@ -63,7 +63,9 @@ abun_matrix <- abun_matrix[-which(no < 2), ]
 
 #order species alphabetically
 abun_matrix <- abun_matrix[, order(colnames(abun_matrix))]
-colnames(abun_matrix)[79] <- "helichrysum_albo_brunneum" #this names causes problems in csv format
+colnames(abun_matrix)[which(colnames(abun_matrix) == "helichrysum_albo-brunneum")] <- "helichrysum_albo_brunneum" #this names causes problems in csv format
+colnames(abun_matrix)[which(colnames(abun_matrix) == "diospyros_austro-africana")] <- "diospyros_austro_africana" #this names causes problems in csv format
+
 
 #Save abundance matrix:
 write.csv(abun_matrix, "All_data/comm_assembly_results/abun_matrix.csv")
@@ -79,6 +81,8 @@ mean_traits <- mean_traits[, -1]
 mean_traits <- mean_traits[order(row.names(mean_traits)), ]
 #fix the helichrysum name to be the same as in abun_matrix
 row.names(mean_traits)[which(row.names(mean_traits) == "helichrysum_albo-brunneum")] <- "helichrysum_albo_brunneum"
+row.names(mean_traits)[which(row.names(mean_traits) == "diospyros_austro-africana")] <- "diospyros_austro_africana"
+
 
 #remove species that aren't also in the abun_matrix
 mean_traits <- mean_traits[which(row.names(mean_traits) %in% colnames(abun_matrix)) , ]
