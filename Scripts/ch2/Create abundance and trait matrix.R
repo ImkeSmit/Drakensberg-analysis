@@ -3,6 +3,7 @@
 library(openxlsx)
 library(tidyverse)
 library(tidylog)
+library(vegan)
 
 ###Matrices for all life forms####
 ####Import community and trait data###
@@ -67,23 +68,25 @@ colnames(abun_matrix)[79] <- "helichrysum_albo_brunneum" #this names causes prob
 #Save abundance matrix:
 write.csv(abun_matrix, "All_data/comm_assembly_results/abun_matrix.csv")
 
-#Polish trait matrix:
-#remove species that aren't also in the abun_matrix
-mean_traits <- mean_traits_all[which(mean_traits_all$taxon %in% colnames(abun_matrix)) , ]
 
+###Polish trait matrix:
 #get row and columns names right
-mean_traits <- as.data.frame(mean_traits)
+mean_traits <- as.data.frame(mean_traits_all)
 row.names(mean_traits) <- mean_traits$taxon
 mean_traits <- mean_traits[, -1]
 
 #order rownames alphabetically
 mean_traits <- mean_traits[order(row.names(mean_traits)), ]
-row.names(mean_traits)[79] <- "helichrysum_albo_brunneum"
+#fix the helichrysum name to be the same as in abun_matrix
+row.names(mean_traits)[which(row.names(mean_traits) == "helichrysum_albo-brunneum")] <- "helichrysum_albo_brunneum"
+
+#remove species that aren't also in the abun_matrix
+mean_traits <- mean_traits[which(row.names(mean_traits) %in% colnames(abun_matrix)) , ]
 
 #save trait matrix
 write.csv(mean_traits, "All_data/comm_assembly_results/mean_traits.csv")
 
-##looks like H. aureonites is in abun matrix but not in mean traits. fix
+
 
 
 ####Matrices for forbs and graminoids separately####
