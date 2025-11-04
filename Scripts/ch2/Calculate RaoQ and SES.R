@@ -85,7 +85,7 @@ nullcomm_cells <- readRDS("All_data/comm_assembly_results/nullmodel_C5_cells.rds
 #we need to calculate RaoQ for each of the observed null communities
 
 # Set up parallel backend
-plan(multisession, workers = parallel::detectCores() - 2)  # or plan(multicore) on Linux/mac
+plan(multisession, workers = parallel::detectCores() - 2)  
 
 chunks <- split(nullcomm_cells, ceiling(seq_along(nullcomm_cells) / 50))
 #each chunk has 50 null matrices
