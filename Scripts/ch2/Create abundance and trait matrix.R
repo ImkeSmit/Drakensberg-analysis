@@ -59,7 +59,7 @@ for(r in 1:nrow(abun_matrix)) {
 
 #remove sites that have only one species 
 no <- specnumber(abun_matrix)
-abun_matrix <- abun_matrix[-which(no == 1), ]
+abun_matrix <- abun_matrix[-which(no < 2), ]
 
 #order species alphabetically
 abun_matrix <- abun_matrix[, order(colnames(abun_matrix))]
