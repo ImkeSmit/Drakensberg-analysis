@@ -17,7 +17,7 @@ abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.nam
 mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
 
 
-####SES at cell scale, C5, pool = entire, weighted RaoQ####
+####All species - SES at cell scale, C5, pool = entire, weighted RaoQ####
 #observed RaoQ, weighted by abundance
 RQ_obs_cells <- calc_RaoQ_weighted(mean_traits, abun_matrix)
 
