@@ -80,7 +80,7 @@ median_height <- cell_ses |>
   group_by(elevation) |> 
   summarise(median = median(SES,  na.rm = T))
 
-#2500 lower than 2000, 3000 lower than 2000, 3000 not lower than 2500
+#2500 lower than 2000, 3000 lower than 2000, 3000 higher than 2500
 #functional convergence increases with elevation (SES decreases with elevation)
 
 #test if medians differ from zero - wilcoxon signed rank test
@@ -111,7 +111,6 @@ median_LDMC <- cell_ses |>
   filter(trait == "LDMC") |> 
   group_by(elevation) |> 
   summarise(median = median(SES,  na.rm = T))
-#2500 not different from 2000, 3000 higher than 2000, 3000 higher than 2500
 #Functional convergence decreases with elevation (median SES switches from negative to positive)
 
 #test if medians differ from zero - wilcoxon signed rank test
@@ -151,7 +150,7 @@ median_LA <- cell_ses |>
 LA_2000 <- wilcox.test(modeldat_LA[which(modeldat_LA$elevation == "2000"), ]$SES, mu = 0, alternative = "two.sided")
 LA_2500 <- wilcox.test(modeldat_LA[which(modeldat_LA$elevation == "2500"), ]$SES, mu = 0, alternative = "two.sided")
 LA_3000 <- wilcox.test(modeldat_LA[which(modeldat_LA$elevation == "3000"), ]$SES, mu = 0, alternative = "two.sided")
-LA_stars <- c("*", " ", "*")
+LA_stars <- c("*", "*", "*")
 
 
 
@@ -159,7 +158,6 @@ LA_stars <- c("*", " ", "*")
 modeldat_SLA <- cell_ses[which(cell_ses$trait == "SLA"), ]
 
 test_SLA <- gamlss(SES ~ elevation, data = modeldat_SLA, family = ST4()) #sshasho does not converge
-
 summary(test_SLA)
 plot(test_SLA) #pretty good
 
@@ -177,7 +175,7 @@ median_SLA <- cell_ses |>
   group_by(elevation) |> 
   summarise(median = median(SES,  na.rm = T))
 
-#2500 higher than 2000, 3000 lower than 2000, 3000 lower than 2500
+#2500 higher than 2000, 3000 higher than 2000, 3000 lower than 2500
 #Functional convergence decreases between 200 and 2500, then increases at 3000
 #strongets EF at 3000, weakest at 2500
 
@@ -186,6 +184,33 @@ SLA_2000 <- wilcox.test(modeldat_SLA[which(modeldat_SLA$elevation == "2000"), ]$
 SLA_2500 <- wilcox.test(modeldat_SLA[which(modeldat_SLA$elevation == "2500"), ]$SES, mu = 0, alternative = "two.sided")
 SLA_3000 <- wilcox.test(modeldat_SLA[which(modeldat_SLA$elevation == "3000"), ]$SES, mu = 0, alternative = "two.sided")
 SLA_stars <- c("*", "*", "*")
+
+
+####Leaf thickness####
+modeldat_LT <- cell_ses[which(cell_ses$trait == "Thickness_mm"), ]
+
+#Kruskal-wallis test
+kr_LT <- kruskal.test(SES ~ elevation, data = modeldat_LT) #medians of at least two groups differ
+# Conduct pairwise comparisons with Wilcoxon rank-sum test
+wx_LT <- pairwise.wilcox.test(modeldat_LT$SES,  modeldat_LT$elevation, p.adjust.method = "bonferroni")
+LT_cld <- multcompLetters(fullPTable(wx_LT$p.value))
+
+#all are significantly different
+
+#get medians
+median_LT <- cell_ses |> 
+  filter(trait == "Thickness_mm") |> 
+  group_by(elevation) |> 
+  summarise(median = median(SES,  na.rm = T))
+
+#2500 higher than 2000, 3000 lower than 2000, 3000 lower than 2500
+#Functional divergence at 2500, convergence at low and high elevation. 
+
+#test if medians differ from zero - wilcoxon signed rank test
+LT_2000 <- wilcox.test(modeldat_LT[which(modeldat_LT$elevation == "2000"), ]$SES, mu = 0, alternative = "two.sided")
+LT_2500 <- wilcox.test(modeldat_LT[which(modeldat_LT$elevation == "2500"), ]$SES, mu = 0, alternative = "two.sided")
+LT_3000 <- wilcox.test(modeldat_LT[which(modeldat_LT$elevation == "3000"), ]$SES, mu = 0, alternative = "two.sided")
+LT_stars <- c("*", "*", "*")
 
 
 ####SES~elevation summary figure####
