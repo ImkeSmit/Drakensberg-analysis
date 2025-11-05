@@ -14,9 +14,9 @@ abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.nam
 mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
 
 ###TEST FOR EF####
-###Cell Scale, C5, pool = entire####
+###All sp - Cell Scale, C5, pool = entire####
 #import SES at cell scale, computed from unscaled RaoQ
-cell_ses <- read.csv("All_data/comm_assembly_results/RQ_cells_C5_entire.csv", row.names = 1) |> 
+cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
   mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
                                grepl("WH", cellref) == T ~ "2500",
                                grepl("GG", cellref) == T ~ "2000",.default = NA))
@@ -26,12 +26,13 @@ cell_ses$elevation <- as.factor(cell_ses$elevation)
 
 RQ_ridges <- cell_ses |> 
   ggplot(aes(x = RaoQ, y = elevation, fill = elevation)) +
-  geom_density_ridges(alpha = 0.5) +
-  facet_wrap(~trait) +
+  geom_density_ridges(alpha = 0.5, linewidth = 0.3) +
+  facet_wrap(~trait, scale = "free_x", nrow = 3, ncol = 2) +
   theme_classic()
 #RaoQ distributions also very heavy tailed. Thus very few cells with high Fdiv. Is this normal?
 #Could using another Fdiv measure help? probably not...
-ggsave(path = "Figures",plot = RQ_ridges, filename = "RaoQ_elevation_by_traits.png")
+ggsave(path = "Figures",plot = RQ_ridges, filename = "RaoQ_elevation_by_traits.png",
+       width = 1200, height = 1400, units = "px")
 
 ses_ridges <- cell_ses |> 
   ggplot(aes(x = SES, y = elevation, fill = elevation)) +
@@ -50,7 +51,7 @@ sign_positive_ses <- cell_ses |>
 sign_negative_ses <- cell_ses |> 
   group_by(trait) |> 
   filter(SES < -2) |> 
-  summarise(n = n()) #hmm none have ses lower than -2, so none are significantly less diverse than null?
+  summarise(n = n()) #very few have significant negative ses
 
 
 ###Models of SES ~ elevation####
