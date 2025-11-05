@@ -10,13 +10,13 @@ library(rcompanion)
 library(multcompView)
 
 ###Import original community data####
-abun_matrix <-read.csv("All_data/comm_assembly_results/abun_forbs.csv", row.names = 1)
-mean_traits <- read.csv("All_data/comm_assembly_results/traits_forbs.csv", row.names = 1)
+abun_matrix <-read.csv("All_data/comm_assembly_results/abun_graminoids.csv", row.names = 1)
+mean_traits <- read.csv("All_data/comm_assembly_results/traits_graminoids.csv", row.names = 1)
 
 ###TEST FOR EF####
-###forbs only - Cell Scale, C5, pool = entire####
+###graminoids only - Cell Scale, C5, pool = entire####
 #import SES at cell scale, computed from unscaled RaoQ
-cell_ses <- read.csv("All_data/comm_assembly_results/forbs_only_RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
+cell_ses <- read.csv("All_data/comm_assembly_results/graminoids_only_RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
   mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
                                grepl("WH", cellref) == T ~ "2500",
                                grepl("GG", cellref) == T ~ "2000",.default = NA))
@@ -31,7 +31,7 @@ RQ_ridges <- cell_ses |>
   theme_classic()
 #RaoQ distributions also very heavy tailed. Thus very few cells with high Fdiv. Is this normal?
 #Could using another Fdiv measure help? probably not...
-ggsave(path = "Figures",plot = RQ_ridges, filename = "RaoQ_elevation_by_traits_forbs_only.png",
+ggsave(path = "Figures",plot = RQ_ridges, filename = "RaoQ_elevation_by_traits_graminoids_only.png",
        width = 1200, height = 1400, units = "px")
 
 ses_ridges <- cell_ses |> 
@@ -51,7 +51,7 @@ sign_positive_ses <- cell_ses |>
 sign_negative_ses <- cell_ses |> 
   group_by(trait) |> 
   filter(SES < -2) |> 
-  summarise(n = n()) #very few have significant negative ses
+  summarise(n = n()) #none
 
 
 ###Models of SES ~ elevation####
