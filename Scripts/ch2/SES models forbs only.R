@@ -10,14 +10,13 @@ library(rcompanion)
 library(multcompView)
 
 ###Import original community data####
-abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
-
-mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
+abun_matrix <-read.csv("All_data/comm_assembly_results/abun_forbs.csv", row.names = 1)
+mean_traits <- read.csv("All_data/comm_assembly_results/traits_forbs.csv", row.names = 1)
 
 ###TEST FOR EF####
-###All sp - Cell Scale, C5, pool = entire####
+###forbs only - Cell Scale, C5, pool = entire####
 #import SES at cell scale, computed from unscaled RaoQ
-cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
+cell_ses <- read.csv("All_data/comm_assembly_results/forbs_only_RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
   mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
                                grepl("WH", cellref) == T ~ "2500",
                                grepl("GG", cellref) == T ~ "2000",.default = NA))
@@ -32,7 +31,7 @@ RQ_ridges <- cell_ses |>
   theme_classic()
 #RaoQ distributions also very heavy tailed. Thus very few cells with high Fdiv. Is this normal?
 #Could using another Fdiv measure help? probably not...
-ggsave(path = "Figures",plot = RQ_ridges, filename = "RaoQ_elevation_by_traits.png",
+ggsave(path = "Figures",plot = RQ_ridges, filename = "RaoQ_elevation_by_traits_forbs_only.png",
        width = 1200, height = 1400, units = "px")
 
 ses_ridges <- cell_ses |> 
@@ -88,7 +87,7 @@ median_height <- cell_ses |>
 height_2000 <- wilcox.test(modeldat[which(modeldat$elevation == "2000"), ]$SES, mu = 0, alternative = "two.sided")
 height_2500 <- wilcox.test(modeldat[which(modeldat$elevation == "2500"), ]$SES, mu = 0, alternative = "two.sided")
 height_3000 <- wilcox.test(modeldat[which(modeldat$elevation == "3000"), ]$SES, mu = 0, alternative = "two.sided")
-height_stars <- c(" ", "*", "*")
+height_stars <- c("*", "*", "*")
 
 ####LDMC####
 modeldat_LDMC <- cell_ses[which(cell_ses$trait == "LDMC"), ]
@@ -184,7 +183,7 @@ median_SLA <- cell_ses |>
 SLA_2000 <- wilcox.test(modeldat_SLA[which(modeldat_SLA$elevation == "2000"), ]$SES, mu = 0, alternative = "two.sided")
 SLA_2500 <- wilcox.test(modeldat_SLA[which(modeldat_SLA$elevation == "2500"), ]$SES, mu = 0, alternative = "two.sided")
 SLA_3000 <- wilcox.test(modeldat_SLA[which(modeldat_SLA$elevation == "3000"), ]$SES, mu = 0, alternative = "two.sided")
-SLA_stars <- c("*", "*", "*")
+SLA_stars <- c("*", "*", " ")
 
 
 ####Leaf thickness####
@@ -255,7 +254,7 @@ ses_ridges2 <- ses_ridges+
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey") +
   theme(legend.position = "bottom")
 
-ggsave(filename = "SES_elevation_by_traits.png", plot = ses_ridges2, path= "Figures", 
+ggsave(filename = "SES_elevation_by_traits_forbs_only.png", plot = ses_ridges2, path= "Figures", 
        width = 1200, height = 1500, units = "px")
 
 
