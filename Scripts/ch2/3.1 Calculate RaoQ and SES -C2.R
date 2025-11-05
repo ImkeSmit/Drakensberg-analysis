@@ -23,8 +23,8 @@ mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.na
 RQ_obs_cells <- calc_RaoQ_weighted(mean_traits, abun_matrix)
 
 #Create null models
-set.seed(123)
-nullcomm_cells <- generate_C2_null(abun_matrix, 999, pool = "entire")
+set.seed(150)
+nullcomm_cells <- generate_C2_null(abun_matrix, 999, pool = "site")
 
 saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/nullmodel_C2_cells.rds")
 nullcomm_cells <- readRDS("All_data/comm_assembly_results/nullmodel_C2_cells.rds")
@@ -84,7 +84,7 @@ forb_mean_traits <- read.csv("All_data/comm_assembly_results/traits_forbs.csv", 
 RQ_obs_cells <- calc_RaoQ_weighted(forb_mean_traits, forb_abun_matrix)
 
 #Create null models
-set.seed(123)
+set.seed(150)
 nullcomm_cells <- generate_C5_null_imp(forb_abun_matrix, 999, pool = "entire")
 
 saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/forbs_only_nullmodel_C5_cells.rds")
@@ -145,7 +145,7 @@ gram_mean_traits <- read.csv("All_data/comm_assembly_results/traits_graminoids.c
 RQ_obs_cells <- calc_RaoQ_weighted(gram_mean_traits, gram_abun_matrix)
 
 #Create null models
-set.seed(123)
+set.seed(150)
 nullcomm_cells <- generate_C5_null_imp(gram_abun_matrix, 999, pool = "entire")
 
 saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/graminoids_only_nullmodel_C5_cells.rds")
