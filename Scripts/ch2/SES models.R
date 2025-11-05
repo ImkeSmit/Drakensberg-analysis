@@ -217,24 +217,26 @@ LT_stars <- c("*", "*", "*")
 ses_ridges <- cell_ses |> 
   ggplot(aes(x = SES, y = elevation, fill = elevation)) +
   geom_density_ridges(alpha = 0.5, linewidth = 0.3) +
-  facet_wrap(~trait) +
+  facet_wrap(~trait, nrow = 3, ncol = 2) +
   theme_classic() 
 
 #significance letters
-letters_df <- tibble(trait = c(rep("Height_cm", 3), rep("LDMC", 3), rep("Leaf_area_mm2", 3), rep("SLA", 3)), 
-                     elevation = rep(c("2000", "2500", "3000"), 4), 
+letters_df <- tibble(trait = c(rep("Height_cm", 3), rep("LDMC", 3), rep("Leaf_area_mm2", 3), 
+                               rep("SLA", 3), rep("Thickness_mm", 3)),
+                     elevation = rep(c("2000", "2500", "3000"), 5), 
                      letters = c(unlist(height_cld)[1:3], unlist(LDMC_cld)[1:3], 
-                                 unlist(LA_cld)[1:3], unlist(SLA_cld)[1:3]))
+                                 unlist(LA_cld)[1:3], unlist(SLA_cld)[1:3], unlist(LT_cld)[1:3]))
 #medians
 med_df <- cell_ses %>%
   group_by(trait, elevation) %>%
   summarize(med = median(SES, na.rm = TRUE))
 
 #stars
-stars_df <- tibble(trait = c(rep("Height_cm", 3), rep("LDMC", 3), rep("Leaf_area_mm2", 3), rep("SLA", 3)), 
-                     elevation = rep(c("2000", "2500", "3000"), 4), 
+stars_df <- tibble(trait = c(rep("Height_cm", 3), rep("LDMC", 3), rep("Leaf_area_mm2", 3), 
+                             rep("SLA", 3), rep("Thickness_mm", 3)), 
+                     elevation = rep(c("2000", "2500", "3000"), 5), 
                      stars = c(height_stars, LDMC_stars, 
-                                 LA_stars, SLA_stars))
+                                 LA_stars, SLA_stars, LT_stars))
 
 #improved figure
 ses_ridges2 <- ses_ridges+
