@@ -21,16 +21,18 @@ cwm <- cwm |>
   mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
                                grepl("WH", cellref) == T ~ "2500",
                                grepl("GG", cellref) == T ~ "2000",.default = NA)) |> 
-  pivot_longer(cols = c("Height_cm", "LDMC", "Leaf_area_mm2", "SLA"), names_to = "trait", values_to = "cwm_value")
+  pivot_longer(cols = c("Height_cm", "LDMC", "Leaf_area_mm2", "SLA", "Thickness_mm"), names_to = "trait", values_to = "cwm_value")
 cwm$elevation <- as.factor(cwm$elevation)  
 
 cwm_ridges <- cwm |> 
   ggplot(aes(x = cwm_value, y = elevation, fill = elevation)) +
   geom_density_ridges(alpha = 0.5, linewidth = 0.3) +
-  facet_wrap(~trait, scales = "free_x") +
-  theme_classic() 
+  facet_wrap(~trait, scales = "free_x", ncol = 2, nrow = 3) +
+  theme_classic() +
+  theme(legend.position = "bottom")
 
-ggsave(filename = "cwm_elevation.png", plot = cwm_ridges, path = "Figures")
+ggsave(filename = "cwm_elevation.png", plot = cwm_ridges, path = "Figures", 
+       width = 1200, height = 1500, units = "px")
 
 
 ###Which species lie where on the cwm trait spectrum? 
@@ -50,7 +52,7 @@ cwm_xt <- cwm %>%
 for(i in c(cwm_xt$highest_cell, cwm_xt$lowest_cell, cwm_xt$median_cell)) {
   site <- i
 
-if (i == "GG2H9")  {
+if (i == "GG4H14")  {
 present_df <- data.frame(
   site = site,
   species   = colnames(abun_matrix)[abun_matrix[site, ] > 0],
