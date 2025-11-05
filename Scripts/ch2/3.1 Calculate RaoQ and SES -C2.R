@@ -1,5 +1,6 @@
 #Calculate RaoQ and SES###
 #at different scales and with different pools
+#Using the C2 null model to test for limiting similarity
 library(openxlsx)
 library(tidyverse)
 library(tidylog)
