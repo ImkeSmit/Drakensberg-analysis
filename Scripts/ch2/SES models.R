@@ -251,9 +251,11 @@ ses_ridges2 <- ses_ridges+
   geom_text(data = stars_df,
             aes(x = 6, y = elevation, label = stars),
             color = "black",size = 4) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "grey") 
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey") +
+  theme(legend.position = "bottom")
 
-ggsave(filename = "SES_elevation_by_traits.png", plot = ses_ridges2, path= "Figures")
+ggsave(filename = "SES_elevation_by_traits.png", plot = ses_ridges2, path= "Figures", 
+       width = 1200, height = 1500, units = "px")
 
 
 
@@ -266,13 +268,14 @@ high_plots <- cell_ses |>
   distinct(cellref)
 
 high_mat <- abun_matrix[which(row.names(abun_matrix) %in% c(high_plots$cellref)) , ]
-specnumber(high_mat) #all have between 2 and 6 species
+specnumber(high_mat) #do not necessarily have few species
 
 all_abun <- as.data.frame(specnumber(abun_matrix))
 all_abun$cellref <- row.names(all_abun)
 row.names(all_abun) <- NULL
 colnames(all_abun) <- c( "sprichness", "cellref")
-#NB!This is the number of sp in a plot that have trait values!!
+#NB!This is the number of sp in a plot that have trait values
+#lowest is 2, highest is 30
 
 cell_ses2 <- cell_ses |> 
   left_join(all_abun, by = "cellref") 
@@ -285,7 +288,7 @@ ses2_ridges <- cell_ses2 |>
   facet_wrap(~trait) +
   theme_classic()
 #does not really improve heavy tails
-#also removes 42% of plots
+#but now only remove 16 plots
 
 
 ###Cell Scale, C2, pool = site####
