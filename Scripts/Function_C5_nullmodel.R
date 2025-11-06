@@ -27,14 +27,15 @@ generate_C5_null_imp <- function(comm, iterations = 10, pool = "entire") {
                 "WH1","WH2","WH3","WH4","WH5","WH6","WH7",
                 "GG1","GG2","GG3","GG4","GG5","GG6","GG7","GG8")
   
+  #function to get the sites (plots) that are in the specified pool
   get_sites_in_pool <- function(site_name) {
     if (pool == "entire") return(rownames_comm)
     if (pool == "site") {
-      site_prefix <- three_sites[grepl(paste(three_sites, collapse="|"), site_name)]
+      site_prefix <- three_sites[str_detect(site_name, three_sites)]
       return(rownames_comm[grepl(site_prefix, rownames_comm)])
     }
     if (pool == "grid") {
-      grid_prefix <- grids_22[grepl(paste(grids_22, collapse="|"), site_name)]
+      grid_prefix <- grids_22[str_detect(site_name, grids_22)]
       return(rownames_comm[grepl(grid_prefix, rownames_comm)])
     }
     stop("Invalid pool type")
