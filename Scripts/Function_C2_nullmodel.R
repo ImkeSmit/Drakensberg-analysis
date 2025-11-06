@@ -26,7 +26,7 @@ generate_C2_null <- function(comm, iterations = 10, pool = "entire") {
                 "WH1","WH2","WH3","WH4","WH5","WH6","WH7",
                 "GG1","GG2","GG3","GG4","GG5","GG6","GG7","GG8")
   
-  #function to get the sites (plots) that are in teh specified pool
+  #function to get the sites (plots) that are in the specified pool
   get_sites_in_pool <- function(site_name) {
     if (pool == "entire") return(rownames_comm)
     if (pool == "site") {
