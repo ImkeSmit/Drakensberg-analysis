@@ -70,7 +70,7 @@ RQ_cells_summary <- null_RQ |>
   inner_join(RQ_obs_cells, by = c("trait", "cellref")) |> 
   mutate(SES = (RaoQ - mean_null)/sd_null)
 
-write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_weighted_cells_C2_entire.csv")
+write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_weighted_cells_C2_site.csv")
 
 ##NB! Using this null model, RQnull may have been calculated with less sites and less species than RQobs
 #This is because the C2 nullmodel may create empty species columns.
