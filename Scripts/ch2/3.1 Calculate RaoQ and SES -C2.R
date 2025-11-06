@@ -72,6 +72,8 @@ RQ_cells_summary <- null_RQ |>
 
 write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_weighted_cells_C2_entire.csv")
 
+##NB! Using this null model, RQnull may have been calculated with less sites and less species than RQobs
+
 
 ####Forbs only - SES at cell scale, C5, pool = entire, weighted RaoQ####
 
