@@ -15,10 +15,10 @@ abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.nam
 
 mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
 
-###TEST FOR EF####
-###All sp - Cell Scale, C5, pool = entire####
+###TEST FOR LS####
+###All sp - Cell Scale, C2, pool = site####
 #import SES at cell scale, computed from unscaled RaoQ
-cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
+cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C2_site.csv", row.names = 1) |> 
   mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
                                grepl("WH", cellref) == T ~ "2500",
                                grepl("GG", cellref) == T ~ "2000",.default = NA))
