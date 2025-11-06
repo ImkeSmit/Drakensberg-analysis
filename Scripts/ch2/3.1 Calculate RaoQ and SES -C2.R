@@ -34,8 +34,8 @@ nullcomm_cells <- readRDS("All_data/comm_assembly_results/nullmodel_C2_cells.rds
 # Set up parallel backend
 plan(multisession, workers = parallel::detectCores() - 2)  
 
-chunks <- split(nullcomm_cells, ceiling(seq_along(nullcomm_cells) / 50))
-#each chunk has 50 null matrices
+chunks <- split(nullcomm_cells, ceiling(seq_along(nullcomm_cells) / 25))
+#each chunk has 25 null matrices
 RaoQ_results <- list()
 
 for (i in seq_along(chunks)) { #run chunks sequentially
