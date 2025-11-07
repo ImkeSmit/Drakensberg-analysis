@@ -60,15 +60,6 @@ sign_negative_ses <- cell_ses |>
 ###Height####
 modeldat <- cell_ses[which(cell_ses$trait == "Height_cm"), ]
 
-#USe skew SHASHo distribution as recommended by chatgpt.Can handle skewed and heavy tailed data with nonzero values
-#other distribution to try is skew normal SN()
-test2 <- gamlss(SES ~ elevation, data = modeldat, family = SHASHo()) #skew t does not converge
-#only one categorical predictor, thus it is equivalent to an anova under the specified distribution.
-#chatgpt says this is a totally sensible approach due to the right skewed nature of my response variable
-#warning message, algorthm RS has not yet converged
-summary(test2)
-plot(test2) #looks much better
-
 #Kruskal-wallis test
 #test if median ses differ between elevation groups
 kr_height <- kruskal.test(SES ~ elevation, data = modeldat) #medians of at least two groups differ
@@ -82,24 +73,16 @@ median_height <- cell_ses |>
   group_by(elevation) |> 
   summarise(median = median(SES,  na.rm = T))
 
-#2500 lower than 2000, 3000 lower than 2000, 3000 higher than 2500
-#functional convergence increases with elevation (SES decreases with elevation)
+#functional convergence decreases with elevation
 
 #test if medians differ from zero - wilcoxon signed rank test
 height_2000 <- wilcox.test(modeldat[which(modeldat$elevation == "2000"), ]$SES, mu = 0, alternative = "two.sided")
 height_2500 <- wilcox.test(modeldat[which(modeldat$elevation == "2500"), ]$SES, mu = 0, alternative = "two.sided")
 height_3000 <- wilcox.test(modeldat[which(modeldat$elevation == "3000"), ]$SES, mu = 0, alternative = "two.sided")
-height_stars <- c(" ", "*", "*")
+height_stars <- c("*", "*", "*")
 
 ####LDMC####
 modeldat_LDMC <- cell_ses[which(cell_ses$trait == "LDMC"), ]
-
-test_LDMC <- gamlss(SES ~ elevation, data = modeldat_LDMC, family = SEP2()) #sshasho does not converge
-#only one categorical predictor, thus it is equivalent to an anova under the specified distribution.
-#chatgpt says this is a totally sensible approach due to the right skewed nature of my response variable
-#warning message, algorthm RS has not yet converged
-summary(test_LDMC)
-plot(test_LDMC) #looks much better
 
 #Kruskal-wallis test
 kr_LDMC <- kruskal.test(SES ~ elevation, data = modeldat_LDMC) #medians of at least two groups differ
@@ -113,22 +96,18 @@ median_LDMC <- cell_ses |>
   filter(trait == "LDMC") |> 
   group_by(elevation) |> 
   summarise(median = median(SES,  na.rm = T))
-#Functional convergence decreases with elevation (median SES switches from negative to positive)
 
 #test if medians differ from zero - wilcoxon signed rank test
 LDMC_2000 <- wilcox.test(modeldat_LDMC[which(modeldat_LDMC$elevation == "2000"), ]$SES, mu = 0, alternative = "two.sided")
 LDMC_2500 <- wilcox.test(modeldat_LDMC[which(modeldat_LDMC$elevation == "2500"), ]$SES, mu = 0, alternative = "two.sided")
 LDMC_3000 <- wilcox.test(modeldat_LDMC[which(modeldat_LDMC$elevation == "3000"), ]$SES, mu = 0, alternative = "two.sided")
-LDMC_stars <- c("*", "*", "*")
+LDMC_stars <- c("*", "*", " ")
+#??? How can the high meadian be equal to zero but not the mid mean?
 
 
 
 ###Leaf area####
 modeldat_LA <- cell_ses[which(cell_ses$trait == "Leaf_area_mm2"), ]
-
-test_LA <- gamlss(SES ~ elevation, data = modeldat_LA, family = ST3()) #sshasho does not converge
-summary(test_LA)
-plot(test_LA) 
 
 #Kruskal-wallis test
 kr_LA <- kruskal.test(SES ~ elevation, data = modeldat_LA) #medians of at least two groups differ
@@ -159,10 +138,6 @@ LA_stars <- c("*", "*", "*")
 ####SLA####
 modeldat_SLA <- cell_ses[which(cell_ses$trait == "SLA"), ]
 
-test_SLA <- gamlss(SES ~ elevation, data = modeldat_SLA, family = ST4()) #sshasho does not converge
-summary(test_SLA)
-plot(test_SLA) #pretty good
-
 #Kruskal-wallis test
 kr_SLA <- kruskal.test(SES ~ elevation, data = modeldat_SLA) #medians of at least two groups differ
 # Conduct pairwise comparisons with Wilcoxon rank-sum test
@@ -177,9 +152,7 @@ median_SLA <- cell_ses |>
   group_by(elevation) |> 
   summarise(median = median(SES,  na.rm = T))
 
-#2500 higher than 2000, 3000 higher than 2000, 3000 lower than 2500
-#Functional convergence decreases between 200 and 2500, then increases at 3000
-#strongets EF at 3000, weakest at 2500
+#convergence gets stronger with elevation
 
 #test if medians differ from zero - wilcoxon signed rank test
 SLA_2000 <- wilcox.test(modeldat_SLA[which(modeldat_SLA$elevation == "2000"), ]$SES, mu = 0, alternative = "two.sided")
@@ -205,8 +178,6 @@ median_LT <- cell_ses |>
   group_by(elevation) |> 
   summarise(median = median(SES,  na.rm = T))
 
-#2500 higher than 2000, 3000 lower than 2000, 3000 lower than 2500
-#Functional divergence at 2500, convergence at low and high elevation. 
 
 #test if medians differ from zero - wilcoxon signed rank test
 LT_2000 <- wilcox.test(modeldat_LT[which(modeldat_LT$elevation == "2000"), ]$SES, mu = 0, alternative = "two.sided")
@@ -256,7 +227,7 @@ ses_ridges2 <- ses_ridges+
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey") +
   theme(legend.position = "bottom")
 
-ggsave(filename = "SES_elevation_by_traits.png", plot = ses_ridges2, path= "Figures", 
+ggsave(filename = "C2_SES_elevation_by_traits.png", plot = ses_ridges2, path= "Figures", 
        width = 1200, height = 1500, units = "px")
 
 
