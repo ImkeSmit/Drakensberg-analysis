@@ -34,6 +34,14 @@ cwm_ridges <- cwm |>
 ggsave(filename = "cwm_elevation.png", plot = cwm_ridges, path = "Figures", 
        width = 1200, height = 1500, units = "px")
 
+cwm_ridges2 <- cwm |> 
+  ggplot(aes(x = cwm_value, group = elevation, fill = elevation)) +
+  geom_histogram(alpha = 0.5, stat = "bin", position = "identity") +
+  facet_wrap(~trait, scales = "free_x", ncol = 2, nrow = 3) +
+  theme_classic() +
+  theme(legend.position = "bottom")
+
+
 
 ###Which species lie where on the cwm trait spectrum? 
 #get cells which have extremem or median cwm values
