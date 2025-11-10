@@ -145,3 +145,24 @@ write.csv(traits_graminoids, "All_data/comm_assembly_results/traits_graminoids.c
 write.csv(abun_forbs, "All_data/comm_assembly_results/abun_forbs.csv")
 write.csv(traits_forbs, "All_data/comm_assembly_results/traits_forbs.csv")
 
+###Descriptive statistics####
+abun_matrix <- read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
+mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
+
+nsp <- ncol(abun_matrix)
+
+#how many sp from each site? 
+incl_sp <- c(colnames(abun_matrix))
+
+p <- drak |> 
+  filter(taxon %in% incl_sp) |> 
+  group_by(site) |> 
+  distinct(taxon) |> 
+  summarise(nsp = n())
+
+#how many sites
+nrow(abun_matrix)
+#max sp richness
+max(specnumber(abun_matrix))
+mean(specnumber(abun_matrix))
+min(specnumber(abun_matrix))
