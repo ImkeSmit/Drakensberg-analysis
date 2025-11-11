@@ -247,10 +247,10 @@ ses_ridges2 <- ses_ridges+
         yend = as.numeric(elevation) + 0.1),
     linetype = "solid", size = 0.6) +
   geom_text(data = letters_df,
-    aes(x = 7, y = elevation, label = letters),
+    aes(x = 3, y = elevation, label = letters),
     color = "black",size = 4) +
   geom_text(data = stars_df,
-            aes(x = 6, y = elevation, label = stars),
+            aes(x = 2.5, y = elevation, label = stars),
             color = "black",size = 4) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey") +
   theme(legend.position = "bottom")
