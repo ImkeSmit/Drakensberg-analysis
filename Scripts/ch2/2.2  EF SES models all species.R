@@ -255,7 +255,10 @@ ses_ridges2 <- ses_ridges+
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey") +
   theme(legend.position = "bottom")
 
-ggsave(filename = "SES_elevation_by_traits.png", plot = ses_ridges2, path= "Figures", 
+ses_ridges3 <- ses_ridges2 +
+  xlim(min(cell_ses$SES),3)
+
+ggsave(filename = "C5_SES_elevation_by_traits.png", plot = ses_ridges3, path= "Figures", 
        width = 1200, height = 1500, units = "px")
 
 
