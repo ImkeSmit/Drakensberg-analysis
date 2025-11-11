@@ -24,6 +24,8 @@ cwm <- cwm |>
   pivot_longer(cols = c("Height_cm", "LDMC", "Leaf_area_mm2", "SLA", "Thickness_mm"), names_to = "trait", values_to = "cwm_value")
 cwm$elevation <- as.factor(cwm$elevation)  
 
+###Figures of cwm####
+
 cwm_ridges <- cwm |> 
   ggplot(aes(x = cwm_value, y = elevation, fill = elevation)) +
   geom_density_ridges(alpha = 0.5, linewidth = 0.3) +
@@ -93,6 +95,58 @@ ggplot(binned) +
   theme(legend.position = "bottom")
 
 
+####CWM of forbs and grasses separately
+###FORBS
+forb_abun <-read.csv("All_data/comm_assembly_results/abun_forbs.csv", row.names = 1)
+forb_traits <- read.csv("All_data/comm_assembly_results/traits_forbs.csv", row.names = 1)
+
+#compute CWM of each trait for each cell
+cwm_forbs <- functcomp(x = forb_traits, a = as.matrix(forb_abun))
+cwm_forbs <- cwm_forbs |>
+  rownames_to_column(var = "cellref") |> 
+  mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
+                               grepl("WH", cellref) == T ~ "2500",
+                               grepl("GG", cellref) == T ~ "2000",.default = NA)) |> 
+  pivot_longer(cols = c("Height_cm", "LDMC", "Leaf_area_mm2", "SLA", "Thickness_mm"), names_to = "trait", values_to = "cwm_value")
+cwm_forbs$elevation <- as.factor(cwm_forbs$elevation)  
+
+cwm_ridges_forbs <- cwm_forbs |> 
+  ggplot(aes(x = cwm_value, y = elevation, fill = elevation)) +
+  geom_density_ridges(alpha = 0.5, linewidth = 0.3) +
+  facet_wrap(~trait, scales = "free_x", ncol = 2, nrow = 3) +
+  theme_classic() +
+  xlab("cwm value forb community")+
+  theme(legend.position = "bottom")
+
+ggsave(filename = "cwm_forbs_elevation.png", plot = cwm_ridges_forbs, path = "Figures", 
+       width = 1200, height = 1500, units = "px")
+
+
+
+###GRAMINOIDS
+gram_abun <-read.csv("All_data/comm_assembly_results/abun_graminoids.csv", row.names = 1)
+gram_traits <- read.csv("All_data/comm_assembly_results/traits_graminoids.csv", row.names = 1)
+
+#compute CWM of each trait for each cell
+cwm_gram <- functcomp(x = gram_traits, a = as.matrix(gram_abun))
+cwm_gram <- cwm_gram |>
+  rownames_to_column(var = "cellref") |> 
+  mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
+                               grepl("WH", cellref) == T ~ "2500",
+                               grepl("GG", cellref) == T ~ "2000",.default = NA)) |> 
+  pivot_longer(cols = c("Height_cm", "LDMC", "Leaf_area_mm2", "SLA", "Thickness_mm"), names_to = "trait", values_to = "cwm_value")
+cwm_gram$elevation <- as.factor(cwm_gram$elevation)  
+
+cwm_ridges_graminoids <- cwm_gram |> 
+  ggplot(aes(x = cwm_value, y = elevation, fill = elevation)) +
+  geom_density_ridges(alpha = 0.5, linewidth = 0.3) +
+  facet_wrap(~trait, scales = "free_x", ncol = 2, nrow = 3) +
+  theme_classic() +
+  xlab("cwm value graminoid community")+
+  theme(legend.position = "bottom")
+
+ggsave(filename = "cwm_graminoids_elevation.png", plot = cwm_ridges_graminoids, path = "Figures", 
+       width = 1200, height = 1500, units = "px")
 
 
 
