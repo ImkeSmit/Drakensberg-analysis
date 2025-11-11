@@ -219,15 +219,18 @@ ses_ridges2 <- ses_ridges+
                    yend = as.numeric(elevation) + 0.1),
                linetype = "solid", size = 0.6) +
   geom_text(data = letters_df,
-            aes(x = 7, y = elevation, label = letters),
+            aes(x = 3, y = elevation, label = letters),
             color = "black",size = 4) +
   geom_text(data = stars_df,
-            aes(x = 6, y = elevation, label = stars),
+            aes(x = 2.5, y = elevation, label = stars),
             color = "black",size = 4) +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey") +
   theme(legend.position = "bottom")
 
-ggsave(filename = "C2_SES_elevation_by_traits.png", plot = ses_ridges2, path= "Figures", 
+ses_ridges3 <- ses_ridges2 +
+  xlim(min(cell_ses$SES),3) #remove heavy tails for now
+
+ggsave(filename = "C2_SES_elevation_by_traits.png", plot = ses_ridges3, path= "Figures", 
        width = 1200, height = 1500, units = "px")
 
 
