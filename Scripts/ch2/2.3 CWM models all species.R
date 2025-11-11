@@ -34,12 +34,65 @@ cwm_ridges <- cwm |>
 ggsave(filename = "cwm_elevation.png", plot = cwm_ridges, path = "Figures", 
        width = 1200, height = 1500, units = "px")
 
-cwm_ridges2 <- cwm |> 
-  ggplot(aes(x = cwm_value, group = elevation, fill = elevation)) +
-  geom_histogram(alpha = 0.5, stat = "bin", position = "identity") +
+
+## Same graph but with histograms:
+
+scale_height <- 0.06  # tweak this: bigger -> taller bars
+
+binwidth <- NULL   # use pretty() bins; or set e.g. binwidth <- 2
+
+# Step 1 — compute histogram bins per trait × elevation
+binned <- cwm |>
+  group_by(trait, elevation) |>
+  nest() |>
+  mutate(
+    bins = map(data, ~ {
+      x <- .x$cwm_value
+      brk <- pretty(x, 30)               # ~30 bins; adjust if needed
+      h <- hist(x, breaks = brk, plot = FALSE)
+      data.frame(
+        left = head(h$breaks, -1),
+        right = tail(h$breaks, -1),
+        mid = h$mids,
+        count = h$counts
+      )
+    })
+  ) |>
+  select(-data) |>
+  unnest(bins)
+
+# Step 2 — scale histogram heights so bars don’t overlap elevations
+height_scale <- 0.9
+
+binned <- binned |>
+  group_by(trait) |>
+  mutate(height_scaled = count / max(count, na.rm = TRUE) * height_scale) |>
+  ungroup() |>
+  mutate(y_base = as.numeric(elevation))   # vertical offset for each elevation
+
+# Step 3 — draw bars as rectangles offset at y_base
+ggplot(binned) +
+  geom_rect(
+    aes(
+      xmin = left,
+      xmax = right,
+      ymin = y_base,
+      ymax = y_base + height_scaled,
+      fill = elevation
+    ),
+    color = "black", size = 0.2, alpha = 0.6
+  ) +
   facet_wrap(~trait, scales = "free_x", ncol = 2, nrow = 3) +
+  scale_y_continuous(
+    breaks = seq_along(levels(cwm$elevation)),
+    labels = levels(cwm$elevation),
+    expand = expansion(mult = c(0.02, 0.1))
+  ) +
+  labs(x = "cwm_value", y = "elevation") +
   theme_classic() +
   theme(legend.position = "bottom")
+
+
 
 
 
