@@ -256,7 +256,7 @@ ses_ridges2 <- ses_ridges+
   theme(legend.position = "bottom")
 
 ses_ridges3 <- ses_ridges2 +
-  xlim(min(cell_ses$SES),3)
+  xlim(min(cell_ses$SES),3) #remove heavy tails for now
 
 ggsave(filename = "C5_SES_elevation_by_traits.png", plot = ses_ridges3, path= "Figures", 
        width = 1200, height = 1500, units = "px")
