@@ -11,23 +11,10 @@ cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire
                                grepl("GG", cellref) == T ~ "2000",.default = NA)) |> 
   mutate(grid = substr(cellref, 1,3),
          column = substr(cellref, 4,4), 
-         row = substr(cellref, 5,5),
+         row = substr(cellref, 5,6),
          ncolumn = match(column, LETTERS[1:8])) |> 
   mutate(row = as.numeric(row)) 
 cell_ses$elevation <- as.factor(cell_ses$elevation)
-
-# Define full grid (1x1 m resolution)
-x_range <- 1:20
-y_range <- 1:8
-
-grid <- expand.grid(x = x_range, y = y_range)
-coordinates(grid) <- ~x + y
-gridded(grid) <- TRUE
-proj4string(grid) <- CRS(proj4string(surface_temp))
-
-ses_raster <- raster(grid)
-ses_raster <- setValues(ses_raster, cell_ses$SES)
-plot(ses_raster, main = "SES of height, BK1")
 
 
 ###Create maps of SES of all traits in all grids####
@@ -78,11 +65,14 @@ for (tr in traits) {
     g_dat <- trait_dat %>% filter(grid == g)
     
     # need values sorted to match the raster cell order:
-    g_dat <- g_dat[order(g_dat$row, g_dat$ncolumn),]
+    g_dat <- g_dat[order(g_dat$ncolumn, g_dat$row), ]
     
     #add NA values to cells missing SES
     possible_cells <- expand.grid(row = 1:20, ncolumn = 1:8)
-    present_cells <- g_dat[, which(colnames(g_dat) %in% c("row", "ncolumn"))]
+    possible_cells <- paste(possible_cells$row, possible_cells$ncolumn, sep = "_")
+    present_cells<- paste(g_dat$row, g_dat$ncolumn, sep = "_")
+    
+    match(possible_cells, present_cells)
     
     make_ses_raster(g_dat)
   }
