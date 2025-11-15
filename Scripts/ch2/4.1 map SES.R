@@ -67,14 +67,19 @@ for (tr in traits) {
     # need values sorted to match the raster cell order:
     g_dat <- g_dat[order(g_dat$ncolumn, g_dat$row), ]
     
-    #add NA values to cells missing SES
-    possible_cells <- expand.grid(row = 1:20, ncolumn = 1:8)
-    possible_cells <- paste(possible_cells$row, possible_cells$ncolumn, sep = "_")
-    present_cells<- paste(g_dat$row, g_dat$ncolumn, sep = "_")
+    # ---- RECREATE THE GRID FRESH EACH TIME ----
+    x_range <- 1:20
+    y_range <- 1:8
     
-    match(possible_cells, present_cells)
+    grid_obj <- expand.grid(x = x_range, y = y_range)
+    coordinates(grid_obj) <- ~x + y
+    gridded(grid_obj) <- TRUE
+    r <- raster(grid_obj)        # <—— Newly created per iteration
     
-    make_ses_raster(g_dat)
+    # ---- NOW SAFE ----
+    r <- setValues(r, g_dat$SES)
+    
+    plot(r, main = paste0("SES - ", tr, " - ", g))
   }
   
   dev.off()
