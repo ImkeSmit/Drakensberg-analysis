@@ -63,11 +63,11 @@ for (tr in traits) {
   for (g in trait_grids) {
     
     g_dat <- trait_dat %>% filter(grid == g)
+  
+    #remove extra columns
+    g_dat <- g_dat[, which(colnames(g_dat) %in% c("row", "ncolumn", "SES"))]
     
-    # need values sorted to match the raster cell order:
-    g_dat <- g_dat[order(g_dat$ncolumn, g_dat$row), ]
-    
-    # Create spatial grod object
+    # Create spatial grid object
     x_range <- 1:20
     y_range <- 1:8
     
@@ -77,6 +77,19 @@ for (tr in traits) {
     r <- raster(grid_obj) 
     
     #Insert here something to add NA values to any cells that may be missing
+    #Check if there are missing cells in data
+    possible_cells <- paste(grid_obj$x, grid_obj$y, sep = "_")
+    observed_cells <- paste(g_dat$row, g_dat$ncolumn, sep = "_")
+    missing <- which(is.na(match(possible_cells, observed_cells)))
+  
+    if(length(missing) > 0) { #create a filler
+    
+    filler <- data.frame(row = grid_obj$x[missing], ncolumn = grid_obj$y[missing], SES = NA)
+    
+    g_dat <- rbind(g_dat, filler) }
+    
+    # need values sorted to match the raster cell order:
+    g_dat <- g_dat[order(g_dat$ncolumn, g_dat$row), ]
     
     # add SES values to raster
     r <- setValues(r, g_dat$SES)
