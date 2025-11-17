@@ -9,7 +9,8 @@ cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire
   mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
                                grepl("WH", cellref) == T ~ "2500",
                                grepl("GG", cellref) == T ~ "2000",.default = NA)) |> 
-  mutate(grid = substr(cellref, 1,3),
+  mutate(site = substr(cellref, 1,2),
+        grid = substr(cellref, 1,3),
          column = substr(cellref, 4,4), 
          row = substr(cellref, 5,6),
          ncolumn = match(column, LETTERS[1:8])) |> 
@@ -22,7 +23,7 @@ cell_ses$elevation <- as.factor(cell_ses$elevation)
 ##Loop over traits and grids
 traits <- unique(cell_ses$trait)
 grids  <- unique(cell_ses$grid)
-sites <- c("BK", "GG", "WH")   # site prefixes
+sitelist <- c("BK", "GG", "WH")   # site prefixes
 
 for (tr in traits) {
   
@@ -42,19 +43,19 @@ for (tr in traits) {
   pdf(paste0("Figures/SES_maps_trait_", tr, ".pdf"), width = 12, height = 10)
   
   # ---- LOOP OVER SITES: BK → GG → WH ----
-  for (site in sites) {
+  for (s in sitelist) {
     
-    site_dat <- trait_dat %>% filter(grepl(site, grid))
+    site_dat <- trait_dat %>% filter(site == s)
     site_grids <- unique(site_dat$grid)
   
   # define plotting layout
-  n <- length(trait_grids)
+  n <- length(site_grids)
   nr <- ceiling(sqrt(n))
   nc <- ceiling(n / nr)
   par(mfrow = c(nr, nc))
   
   # loop over grids
-  for (g in trait_grids) {
+  for (g in site_grids) {
     
     g_dat <- trait_dat %>% filter(grid == g)
   
