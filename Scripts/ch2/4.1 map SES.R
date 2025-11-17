@@ -100,7 +100,16 @@ for (tr in traits) {
 #end function
   }
 
+#map observed RaoQ
 map_grid_variation(data = cell_ses, variable = "RaoQ", traits = unique(cell_ses$trait), 
                   grids = unique(cell_ses$grid), sitelist = unique(cell_ses$site))
+
+#map SES
+map_grid_variation(data = cell_ses, variable = "SES", traits = unique(cell_ses$trait), 
+                   grids = unique(cell_ses$grid), sitelist = unique(cell_ses$site))
+
+#map mean RaoQ of null communities
+map_grid_variation(data = cell_ses, variable = "mean_null", traits = unique(cell_ses$trait), 
+                   grids = unique(cell_ses$grid), sitelist = unique(cell_ses$site))
 
 
