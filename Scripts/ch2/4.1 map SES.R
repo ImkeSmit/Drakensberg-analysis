@@ -4,7 +4,7 @@ library(sp)
 library(gstat)
 library(raster)
 
-#import SES at cell scale, computed from unscaled RaoQ
+#import SES at cell scale
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
   mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
                                grepl("WH", cellref) == T ~ "2500",
@@ -18,23 +18,6 @@ cell_ses$elevation <- as.factor(cell_ses$elevation)
 
 
 ###Create maps of SES of all traits in all grids####
-
-#function to make the ratser of each grid
-make_ses_raster <- function(dat) {
-  
-  # full 20 × 8 grid
-  x_range <- 1:20
-  y_range <- 1:8
-  
-  grid <- expand.grid(x = x_range, y = y_range)
-  coordinates(grid) <- ~x + y
-  gridded(grid) <- TRUE
-  
-  r <- raster(grid)
-  r <- setValues(r, dat$SES)
-  
-  plot(r, main = paste0("SES - ", dat$trait[1], " - ", dat$grid[1]))
-}
 
 ##Loop over traits and grids
 traits <- unique(cell_ses$trait)
