@@ -25,22 +25,24 @@ traits <- unique(cell_ses$trait)
 grids  <- unique(cell_ses$grid)
 sitelist <- c("BK", "GG", "WH")   # site prefixes
 
+map_grid_variation <- function(data, variable, traits, grids, sitelist) {
+
 for (tr in traits) {
   
   message("Processing trait: ", tr)
   
   # filter data for this trait
-  trait_dat <- cell_ses %>% filter(trait == tr)
+  trait_dat <- data %>% filter(trait == tr)
   
   # get grids that contain this trait
   trait_grids <- unique(trait_dat$grid)
   
   # Compute global min and max SES
-  zmin <- min(trait_dat$SES, na.rm = TRUE)
-  zmax <- max(trait_dat$SES, na.rm = TRUE)
+  zmin <- min(trait_dat[, which(colnames(data) == variable)], na.rm = TRUE)
+  zmax <- max(trait_dat[, which(colnames(data) == variable)], na.rm = TRUE)
   
   # open PDF
-  pdf(paste0("Figures/SES_maps_trait_", tr, ".pdf"), width = 12, height = 10)
+  pdf(paste0("Figures/", variable , "_maps_trait_", tr, ".pdf"), width = 12, height = 10)
   
   # ---- LOOP OVER SITES: BK → GG → WH ----
   for (s in sitelist) {
@@ -60,7 +62,7 @@ for (tr in traits) {
     g_dat <- trait_dat %>% filter(grid == g)
   
     #remove extra columns
-    g_dat <- g_dat[, which(colnames(g_dat) %in% c("row", "ncolumn", "SES"))]
+    g_dat <- g_dat[, which(colnames(g_dat) %in% c("row", "ncolumn", variable))]
     
     # Create spatial grid object
     x_range <- 1:20
@@ -78,7 +80,8 @@ for (tr in traits) {
   
     if(length(missing) > 0) { #create a filler
     
-    filler <- data.frame(row = grid_obj$x[missing], ncolumn = grid_obj$y[missing], SES = NA)
+    filler <- data.frame(row = grid_obj$x[missing], ncolumn = grid_obj$y[missing])
+    filler[[variable]] <- NA #the variable is set to NA
     
     g_dat <- rbind(g_dat, filler) }
     
@@ -86,13 +89,18 @@ for (tr in traits) {
     g_dat <- g_dat[order(g_dat$ncolumn, g_dat$row), ]
     
     # add SES values to raster
-    r <- setValues(r, g_dat$SES)
+    r <- setValues(r, g_dat[, which(colnames(g_dat) == variable)])
     
-    plot(r, main = paste0("SES - ", tr, " - ", g), 
+    plot(r, main = paste0(variable, " - ", tr, " - ", g), 
          zlim = c(zmin, zmax))
   }}
   
   dev.off()
 }
+#end function
+  }
+
+map_grid_variation(data = cell_ses, variable = "RaoQ", traits = unique(cell_ses$trait), 
+                  grids = unique(cell_ses$grid), sitelist = unique(cell_ses$site))
 
 
