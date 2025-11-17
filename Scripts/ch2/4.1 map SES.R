@@ -50,6 +50,10 @@ for (tr in traits) {
   # get grids that contain this trait
   trait_grids <- unique(trait_dat$grid)
   
+  # Compute global min and max SES
+  zmin <- min(trait_dat$SES, na.rm = TRUE)
+  zmax <- max(trait_dat$SES, na.rm = TRUE)
+  
   # open PDF
   pdf(paste0("Figures/SES_maps_trait_", tr, ".pdf"), width = 12, height = 10)
   
@@ -94,7 +98,8 @@ for (tr in traits) {
     # add SES values to raster
     r <- setValues(r, g_dat$SES)
     
-    plot(r, main = paste0("SES - ", tr, " - ", g))
+    plot(r, main = paste0("SES - ", tr, " - ", g), 
+         zlim = c(zmin, zmax))
   }
   
   dev.off()
