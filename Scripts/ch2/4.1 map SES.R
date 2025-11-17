@@ -22,6 +22,7 @@ cell_ses$elevation <- as.factor(cell_ses$elevation)
 ##Loop over traits and grids
 traits <- unique(cell_ses$trait)
 grids  <- unique(cell_ses$grid)
+sites <- c("BK", "GG", "WH")   # site prefixes
 
 for (tr in traits) {
   
@@ -39,6 +40,12 @@ for (tr in traits) {
   
   # open PDF
   pdf(paste0("Figures/SES_maps_trait_", tr, ".pdf"), width = 12, height = 10)
+  
+  # ---- LOOP OVER SITES: BK → GG → WH ----
+  for (site in sites) {
+    
+    site_dat <- trait_dat %>% filter(grepl(site, grid))
+    site_grids <- unique(site_dat$grid)
   
   # define plotting layout
   n <- length(trait_grids)
@@ -63,7 +70,6 @@ for (tr in traits) {
     gridded(grid_obj) <- TRUE
     r <- raster(grid_obj) 
     
-    #Insert here something to add NA values to any cells that may be missing
     #Check if there are missing cells in data
     possible_cells <- paste(grid_obj$x, grid_obj$y, sep = "_")
     observed_cells <- paste(g_dat$row, g_dat$ncolumn, sep = "_")
@@ -83,7 +89,7 @@ for (tr in traits) {
     
     plot(r, main = paste0("SES - ", tr, " - ", g), 
          zlim = c(zmin, zmax))
-  }
+  }}
   
   dev.off()
 }
