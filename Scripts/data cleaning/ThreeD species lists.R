@@ -14,3 +14,12 @@ plotsp <- comm |>
   select(survey_date, destSiteID, origBlockID, destplotID, turfID, Species)
 
 write.xlsx(plotsp, "All_data/clean_data/threed/plot_composition_2025.xlsx")
+
+##Ceate list of plots that need clipping
+metaturfid <- read.xlsx("All_data/clean_data/threed/metaTurfID.xlsx") 
+
+toclip <- metaturfid |> 
+  filter(grazing %in% c("M", "I")) |> 
+  arrange(destPlotID)
+
+write.xlsx(toclip, "All_data/clean_data/threed/plots_to_clip.xlsx")
