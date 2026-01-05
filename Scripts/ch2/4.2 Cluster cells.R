@@ -55,6 +55,7 @@ ggplot(clusters, aes(x = cluster, y = vascular_cover)) +
 ggplot(clusters, aes(x = cluster, y = SES)) +
   geom_boxplot()
 
-
+#Are these clusters MEANINGFUL? 
+#May be better to create groups based on deviation from the mean for each variable separately. That will be easier to interpret than these multivariate clusters
 
 
