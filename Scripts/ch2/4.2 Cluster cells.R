@@ -36,8 +36,25 @@ cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire
          row = substr(cellref, 5,6),
          ncolumn = match(column, LETTERS[1:8])) |> 
   mutate(row = as.numeric(row), 
-         cell_ID = paste0(site, "_G", grid, "_", column, row))
+         Cell_ID = paste0(site, "_G", grid, "_", column, row))
 
-clusters <- tibble(cell_ID = names(cut), 
-                   cluster = cut) |> 
-  left_join(cell_ses, by = "cell_ID")
+clusters <- tibble(Cell_ID = names(cut), 
+                   cluster = as.factor(cut)) |> 
+  left_join(cell_ses, by = "Cell_ID") |> 
+  left_join(env, by = "Cell_ID")
+
+ggplot(clusters, aes(x = cluster, y = mean_soil_depth)) +
+  geom_boxplot()
+
+ggplot(clusters, aes(x = cluster, y = aspect)) +
+  geom_boxplot()
+
+ggplot(clusters, aes(x = cluster, y = vascular_cover)) +
+  geom_boxplot()
+
+ggplot(clusters, aes(x = cluster, y = SES)) +
+  geom_boxplot()
+
+
+
+
