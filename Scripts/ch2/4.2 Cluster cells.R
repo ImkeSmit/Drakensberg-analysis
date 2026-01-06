@@ -1,13 +1,14 @@
 ###Cluster cells according to environmental similarity###
 library(tidyverse)
 library(tidylog)
+library(ggplot2)
 
 #import environmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
   mutate(mean_soil_depth = as.numeric(mean_soil_depth))
 
 sdepth <- env |> 
-  dplyr::select(Cell_ID, mean_soil_depth, aspect, vascular_cover) |> 
+  dplyr::select(Cell_ID, mean_soil_depth, northness, vascular_cover) |> 
   filter(!is.na(mean_soil_depth)) |> 
   column_to_rownames("Cell_ID")
 #should add elevation in here
@@ -46,7 +47,7 @@ clusters <- tibble(Cell_ID = names(cut),
 ggplot(clusters, aes(x = cluster, y = mean_soil_depth)) +
   geom_boxplot()
 
-ggplot(clusters, aes(x = cluster, y = aspect)) +
+ggplot(clusters, aes(x = cluster, y = northness)) +
   geom_boxplot()
 
 ggplot(clusters, aes(x = cluster, y = vascular_cover)) +
@@ -57,5 +58,23 @@ ggplot(clusters, aes(x = cluster, y = SES)) +
 
 #Are these clusters MEANINGFUL? 
 #May be better to create groups based on deviation from the mean for each variable separately. That will be easier to interpret than these multivariate clusters
+
+
+###PCA of environmental variables
+env_subset <- env |> 
+  select(Cell_ID, vascular_cover, rock_cover, northness, soil_moisture_adj_campaign2, 
+         soil_temperature_adj_campaign1, veg_median_height, mean_soil_depth, slope_height) |> 
+  mutate(soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2), 
+         soil_temperature_adj_campaign1 = as.numeric(soil_temperature_adj_campaign1)) |> 
+  mutate(elevation = case_when(grepl("BK", Cell_ID) == T ~ 3000, #add elevation variable
+                               grepl("WH", Cell_ID) == T ~ 2500,
+                               grepl("GG", Cell_ID) == T ~ 2000,.default = NA)) |> 
+  column_to_rownames(var = "Cell_ID") |> 
+  filter(vascular_cover < 110) |> 
+  drop_na() 
+
+env_pca <- prcomp(env_subset, scale = T)
+biplot(env_pca)
+env_pca$loadings
 
 
