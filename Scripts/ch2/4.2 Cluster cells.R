@@ -77,4 +77,19 @@ env_pca <- prcomp(env_subset, scale = T)
 biplot(env_pca)
 env_pca$loadings
 
+#perform kmeans clustering
+env_scaled <- scale(env_subset)
+env_kmeans <- kmeans(env_scaled, centers = 4, iter.max = 20, nstart = 1)
 
+#visualise clusters
+library(factoextra)
+fviz_cluster(env_kmeans, data = env_scaled)
+
+kmeans_clusters <- env_subset |> 
+  rownames_to_column(var = "Cell_ID") |> 
+  inner_join(tibble(k_cluster = env_kmeans$cluster, 
+                          Cell_ID = names(env_kmeans$cluster)), by = "Cell_ID") |> 
+  left_join(cell_ses, by = "Cell_ID")
+
+#
+  
