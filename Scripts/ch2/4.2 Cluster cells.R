@@ -87,9 +87,37 @@ fviz_cluster(env_kmeans, data = env_scaled)
 
 kmeans_clusters <- env_subset |> 
   rownames_to_column(var = "Cell_ID") |> 
-  inner_join(tibble(k_cluster = env_kmeans$cluster, 
+  inner_join(tibble(k_cluster = as.factor(env_kmeans$cluster), 
                           Cell_ID = names(env_kmeans$cluster)), by = "Cell_ID") |> 
   left_join(cell_ses, by = "Cell_ID")
 
-#
-  
+#visualise variation in SES of height accross clusters
+kmeans_clusters |> 
+  filter(trait == "Height_cm") |> 
+ggplot(aes(x = k_cluster, y = SES)) +
+  geom_boxplot()
+
+#test for differences in SES between clusters
+#HEIGHT
+#test if median ses of height differ between elevation groups
+modeldat <- kmeans_clusters[which(kmeans_clusters$trait == "Height_cm"), ]
+kr_height <- kruskal.test(SES ~ k_cluster, data = modeldat) #medians of at least two groups differ
+# Conduct pairwise comparisons with Wilcoxon rank-sum test
+wx_height <- pairwise.wilcox.test(modeldat$SES,  modeldat$k_cluster, p.adjust.method = "bonferroni")
+height_cld <- multcompLetters(fullPTable(wx_height$p.value))
+#only cluster 1 and 4 do not differ
+
+
+#SLA
+kmeans_clusters |> 
+  filter(trait == "SLA") |> 
+  ggplot(aes(x = k_cluster, y = SES)) +
+  geom_boxplot()
+
+#test if median ses of SLA differ between elevation groups
+modeldat <- kmeans_clusters[which(kmeans_clusters$trait == "SLA"), ]
+kr_SLA <- kruskal.test(SES ~ k_cluster, data = modeldat) #medians of at least two groups differ
+# Conduct pairwise comparisons with Wilcoxon rank-sum test
+wx_SLA <- pairwise.wilcox.test(modeldat$SES,  modeldat$k_cluster, p.adjust.method = "bonferroni")
+SLA_cld <- multcompLetters(fullPTable(wx_SLA$p.value))
+#cluster 1 is lower than the other clusters
