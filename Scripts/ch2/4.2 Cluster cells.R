@@ -83,7 +83,7 @@ env_pca$loadings
 
 #perform kmeans clustering
 env_scaled <- scale(env_subset)
-env_kmeans <- kmeans(env_scaled, centers = 4, iter.max = 20, nstart = 10)
+env_kmeans <- kmeans(env_scaled, centers = 3, iter.max = 20, nstart = 10)
 
 #visualise clusters
 library(factoextra)
@@ -142,7 +142,7 @@ kr_height <- kruskal.test(SES ~ k_cluster, data = modeldat) #medians of at least
 # Conduct pairwise comparisons with Wilcoxon rank-sum test
 wx_height <- pairwise.wilcox.test(modeldat$SES,  modeldat$k_cluster, p.adjust.method = "bonferroni")
 height_cld <- multcompLetters(fullPTable(wx_height$p.value))
-#only cluster 1 and 4 do not differ
+#only cluster 1 and 3 differ (a, ab, b) #hmm these significance letters are sus
 
 #get medians
 median_height <- kmeans_clusters |> 
@@ -154,8 +154,13 @@ median_height <- kmeans_clusters |>
 height_1 <- wilcox.test(modeldat[which(modeldat$k_cluster == "1"), ]$SES, mu = 0, alternative = "two.sided")
 height_2 <- wilcox.test(modeldat[which(modeldat$k_cluster == "2"), ]$SES, mu = 0, alternative = "two.sided")
 height_3 <- wilcox.test(modeldat[which(modeldat$k_cluster == "3"), ]$SES, mu = 0, alternative = "two.sided")
-height_4 <- wilcox.test(modeldat[which(modeldat$k_cluster == "4"), ]$SES, mu = 0, alternative = "two.sided")
-height_stars <- c("*", "*", "*". "*")
+height_stars <- c("*", "*", "*")
+
+##Graph the heights across clusters
+kmeans_clusters |> 
+  filter(trait == "Height_cm") |> 
+  ggplot(aes(x = k_cluster, y = Height)) +
+  geom_boxplot()
 
 
 
@@ -171,4 +176,37 @@ kr_SLA <- kruskal.test(SES ~ k_cluster, data = modeldat) #medians of at least tw
 # Conduct pairwise comparisons with Wilcoxon rank-sum test
 wx_SLA <- pairwise.wilcox.test(modeldat$SES,  modeldat$k_cluster, p.adjust.method = "bonferroni")
 SLA_cld <- multcompLetters(fullPTable(wx_SLA$p.value))
-#cluster 1 is lower than the other clusters
+#all 3 differ
+
+
+#get medians
+median_SLA <- kmeans_clusters |> 
+  filter(trait == "SLA") |> 
+  group_by(k_cluster) |> 
+  summarise(median = median(SES,  na.rm = T))
+
+#test if medians differ from zero - wilcoxon signed rank test
+height_1 <- wilcox.test(modeldat[which(modeldat$k_cluster == "1"), ]$SES, mu = 0, alternative = "two.sided")
+height_2 <- wilcox.test(modeldat[which(modeldat$k_cluster == "2"), ]$SES, mu = 0, alternative = "two.sided")
+height_3 <- wilcox.test(modeldat[which(modeldat$k_cluster == "3"), ]$SES, mu = 0, alternative = "two.sided")
+height_stars <- c("*", "*", "*")
+
+
+####Graph cwm traits accross clusters
+####Import community and trait data####
+abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
+
+mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
+
+
+#compute CWM of each trait for each cell
+cwm <- functcomp(x = mean_traits, a = as.matrix(abun_matrix))
+cwm <- cwm |>
+  rownames_to_column(var = "cellref") |> 
+  pivot_longer(cols = c("Height_cm", "LDMC", "Leaf_area_mm2", "SLA", "Thickness_mm"), names_to = "trait", values_to = "cwm_value") |> 
+  right_join(kmeans_clusters, by = c("cellref", "trait"))
+
+
+ggplot(cwm, aes(x = k_cluster, y = cwm_value)) +
+  geom_boxplot()+
+  facet_wrap(~trait, scale = "free_y")
