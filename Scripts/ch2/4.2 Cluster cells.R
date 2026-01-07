@@ -77,13 +77,13 @@ env_subset <- env |>
   filter(vascular_cover < 110) |> 
   drop_na() 
 
-env_pca <- prcomp(env_subset, scale = T)
+env_pca <- prcomp(env_subset[, c(1,2,4,7)], scale = T)
 biplot(env_pca)
 env_pca$loadings
 
 #perform kmeans clustering
 env_scaled <- scale(env_subset)
-env_kmeans <- kmeans(env_scaled, centers = 4, iter.max = 20, nstart = 1)
+env_kmeans <- kmeans(env_scaled, centers = 4, iter.max = 20, nstart = 10)
 
 #visualise clusters
 library(factoextra)
@@ -96,7 +96,8 @@ kmeans_clusters <- env_subset |>
   left_join(cell_ses, by = "Cell_ID")
 
 ##another way of visualising
-env_pca2 <- prcomp(kmeans_clusters[, 2:10], scale = T)
+env_pca2 <- prcomp(kmeans_clusters[, c(2,3,5,8)], scale = T)
+
 
 ggbiplot(env_pca2,
          groups = kmeans_clusters$k_cluster,
@@ -109,6 +110,21 @@ ggbiplot(env_pca2,
          varname.color = "black") +
   labs(fill = "Region", color = "Region") +
   theme(legend.direction = 'horizontal', legend.position = 'top')
+
+
+###Characteristics of each cluster
+cluster_char <- kmeans_clusters |> 
+  group_by(k_cluster) |> 
+  summarise(mean_vascular_cover = mean(vascular_cover), 
+            mean_rock_cover = mean(rock_cover), 
+            mean_soil_moist = mean(soil_moisture_adj_campaign2), 
+            mean_soil_depth = mean(mean_soil_depth)) |> 
+  pivot_longer(cols = !k_cluster, names_to = "variable", values_to = "value")
+
+
+ggplot(cluster_char, aes(x = k_cluster, y = value)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~variable, scale = "free_y")
 
 
 
@@ -127,6 +143,20 @@ kr_height <- kruskal.test(SES ~ k_cluster, data = modeldat) #medians of at least
 wx_height <- pairwise.wilcox.test(modeldat$SES,  modeldat$k_cluster, p.adjust.method = "bonferroni")
 height_cld <- multcompLetters(fullPTable(wx_height$p.value))
 #only cluster 1 and 4 do not differ
+
+#get medians
+median_height <- kmeans_clusters |> 
+  filter(trait == "Height_cm") |> 
+  group_by(k_cluster) |> 
+  summarise(median = median(SES,  na.rm = T))
+
+#test if medians differ from zero - wilcoxon signed rank test
+height_1 <- wilcox.test(modeldat[which(modeldat$k_cluster == "1"), ]$SES, mu = 0, alternative = "two.sided")
+height_2 <- wilcox.test(modeldat[which(modeldat$k_cluster == "2"), ]$SES, mu = 0, alternative = "two.sided")
+height_3 <- wilcox.test(modeldat[which(modeldat$k_cluster == "3"), ]$SES, mu = 0, alternative = "two.sided")
+height_4 <- wilcox.test(modeldat[which(modeldat$k_cluster == "4"), ]$SES, mu = 0, alternative = "two.sided")
+height_stars <- c("*", "*", "*". "*")
+
 
 
 #SLA
