@@ -2,6 +2,10 @@
 library(tidyverse)
 library(tidylog)
 library(ggplot2)
+library(ggbiplot)
+library(multcomp)
+library(multcompView)
+library(rcompanion)
 
 #import environmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
@@ -83,13 +87,30 @@ env_kmeans <- kmeans(env_scaled, centers = 4, iter.max = 20, nstart = 1)
 
 #visualise clusters
 library(factoextra)
-fviz_cluster(env_kmeans, data = env_scaled)
+fviz_cluster(env_kmeans, data = env_scaled, show_labels = T)
 
 kmeans_clusters <- env_subset |> 
   rownames_to_column(var = "Cell_ID") |> 
   inner_join(tibble(k_cluster = as.factor(env_kmeans$cluster), 
                           Cell_ID = names(env_kmeans$cluster)), by = "Cell_ID") |> 
   left_join(cell_ses, by = "Cell_ID")
+
+##another way of visualising
+env_pca2 <- prcomp(kmeans_clusters[, 2:10], scale = T)
+
+ggbiplot(env_pca2,
+         groups = kmeans_clusters$k_cluster,
+         labels = kmeans_clusters$Cell_ID,
+         labels.size = 2,
+         var.factor = 1.4,
+         ellipse = TRUE, ellipse.level = 0.5, ellipse.alpha = 0.1,
+         circle = F,
+         varname.size = 4,
+         varname.color = "black") +
+  labs(fill = "Region", color = "Region") +
+  theme(legend.direction = 'horizontal', legend.position = 'top')
+
+
 
 #visualise variation in SES of height accross clusters
 kmeans_clusters |> 
