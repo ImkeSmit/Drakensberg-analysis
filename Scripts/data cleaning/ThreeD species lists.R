@@ -15,12 +15,23 @@ plotsp <- comm |>
 
 write.xlsx(plotsp, "All_data/clean_data/threed/plot_composition_2025.xlsx")
 
-##Ceate list of plots that need clipping
+##Ceate list of plots that need clipping, M and I
 metaturfid <- read.xlsx("All_data/clean_data/threed/metaTurfID.xlsx") 
 
 toclip <- metaturfid |> 
   filter(grazing %in% c("M", "I")) |> 
   arrange(destPlotID)
 
-write.xlsx(toclip, "All_data/clean_data/threed/plots_to_clip.xlsx")
+write.xlsx(toclip, "All_data/clean_data/threed/plots_to_clip_M_I.xlsx")
+
+
+
+##Ceate list of plots that need clipping, only I
+metaturfid <- read.xlsx("All_data/clean_data/threed/metaTurfID.xlsx") 
+
+toclip <- metaturfid |> 
+  filter(grazing %in% c("I")) |> 
+  arrange(destPlotID)
+
+write.xlsx(toclip, "All_data/clean_data/threed/plots_to_clip_I.xlsx")
 
