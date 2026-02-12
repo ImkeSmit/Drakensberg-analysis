@@ -149,7 +149,7 @@ gg_microclim2 <- gg_microclim |> filter(between(datetime, mind, maxd)) |>
 
 #look at the duplicate rows for quality control
 gg_microclim |> 
-  group_by_all() |> 
+  dplyr::group_by_all() |> 
   filter(n() >1)
 
 
