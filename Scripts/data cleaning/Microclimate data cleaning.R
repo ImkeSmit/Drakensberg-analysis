@@ -176,7 +176,8 @@ gg_microclim4 <- gg_microclim3 |>
   filter(!(as.Date(datetime) %in% ymd(c("2023-03-29", "2023-06-24", "2023-08-13", "2023-11-12"))))
 
 ##remove moisture measurements from days with soil temp below zero
-
+gg_microclim5 <- gg_microclim4 |> ###These values look wack anyway, remove all these measurements
+  filter(!soil_temp < 0)
 
 
 ####WITSIESHOEK####
