@@ -300,7 +300,7 @@ write.table(bk_microclim2, file = "All_data/clean_data/Tomst_data/Bokong_tomst_d
 write.table(wh_microclim2, file = "All_data/clean_data/Tomst_data/Witsieshoek_tomst_data.txt", sep = "\t",
             row.names = TRUE, col.names = c(colnames(wh_microclim2)))
 
-write.table(gg_microclim2, file = "All_data/clean_data/Tomst_data/GoldenGate_tomst_data.txt", sep = "\t",
+write.table(gg_microclim5, file = "All_data/clean_data/Tomst_data/GoldenGate_tomst_data.txt", sep = "\t",
             row.names = TRUE, col.names = c(colnames(gg_microclim2)))
 
 
