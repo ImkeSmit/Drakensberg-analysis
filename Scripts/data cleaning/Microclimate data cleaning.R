@@ -114,8 +114,16 @@ gg_microclim <- gg_microclim %>% rename(datetime = V2,
                                         raw_moisture = V7, 
                                         cellref = plot) 
 
-gg_microclim <- gg_microclim %>% arrange(cellref, datetime) 
 
+#join TMS codes to ggmicroclim
+tms_codes <- fi |> 
+  select(TMS, site, grid, Cell) |> 
+  rename(cell = Cell) |> 
+  mutate(grid = as.factor(grid))
+
+gg_microclim <- gg_microclim |>  
+  arrange(cellref, datetime) |>  #arrange by date
+  left_join(tms_codes, by = join_by(site, grid, cell))
 
 ###Look at timeseries of one logger, see if you can find the calibration window###
 ###Calibration window: loggers were left in the seed room at 3 degrees celcius####
@@ -148,9 +156,20 @@ gg_microclim2 <- gg_microclim |> filter(between(datetime, mind, maxd)) |>
   distinct(datetime, cellref, .keep_all = T) #remove duplicate rows
 
 #look at the duplicate rows for quality control
-gg_microclim |> 
+gg_microclim2 |> 
   dplyr::group_by_all() |> 
-  filter(n() >1)
+  filter(n() >1) #no duplicates
+
+
+###Remove times when the logger was out of the soil or the shield was off etc
+gg_microclim3 <- gg_microclim2 |> 
+  filter(!(TMS %in% c(95223945, 95223819, 95223918, 95223917) & 
+             between(datetime, mind, ymd("2023-03-29")))) |>   #shields missing on 29 march download date
+  filter(!(TMS %in% c(95223928, 95223917) & between(datetime, ymd("2023-03-29"), ymd("2023-06-24")))) |>  #shields missing on 24 June download date
+  filter(!(TMS %in% c(95223928, 95223921, 95223804) & between(datetime,ymd("2023-06-24"), ymd("2023-08-13")))) |>  #shields missing on 13 Aug download date
+  filter(!(TMS %in% c(95223826, 95223918) & between(datetime, ymd("2023-08-13"), ymd("2023-11-12")))) |>  #shields missing on 12 Nov download date
+  filter(!(TMS == 95223838 & between(datetime, ymd("2023-11-12"), maxd))) #top shield missing on extraction date
+  
 
 
 ####WITSIESHOEK####
