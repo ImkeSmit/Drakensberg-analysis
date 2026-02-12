@@ -42,3 +42,8 @@ for(t in 1:length(TMS_codes)) {
 }
 
 dev.off()
+
+
+prob <- GG[which(GG$TMS == 95223917), ]
+max(prob$datetime)
+min(prob$datetime)
