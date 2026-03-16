@@ -16,7 +16,7 @@ gg_summer <- read_excel("All_data/raw_data/raw_occurrence_data/GoldenGate/Golden
   mutate(site = "GG", 
          grid = as.numeric(grid), 
          row = as.numeric(row),
-         cellref = paste0(site, grid, column, row), 
+         cellref = paste0(site, "_", "G", grid, "_", column, row), 
          cover = as.numeric(cover)) |> 
   filter(!cover == 0)
 
@@ -37,7 +37,7 @@ wh <- read_excel("All_data/raw_data/raw_occurrence_data/Witsieshoek/Data entry 2
   select(!species_richness) |> 
   pivot_longer(cols= 4:187, names_to = "taxon", values_to = "cover") |> 
   mutate(site = "WH", 
-         cellref = paste0(site, grid, column, row)) |> 
+         cellref = paste0(site, "_", "G", grid, "_", column, row)) |> 
   filter(!cover == 0)
 
 #check that all grids and cells are there:
@@ -62,7 +62,7 @@ bk <- read_excel("All_data/raw_data/raw_occurrence_data/Bokong/BNR_vegetation_su
   select(!date) |> 
   pivot_longer(cols= 4:103, names_to = "taxon", values_to = "cover") |> 
   mutate(site = "BK", 
-         cellref = paste0(site, grid, column, row), 
+         cellref = paste0(site, "_", "G", grid, "_", column, row), 
          cover = str_replace_all(cover, ",", ".")) |> 
   filter(!is.na(cover)) |> 
   mutate(cover2 = as.numeric(cover), 
@@ -223,6 +223,7 @@ unique(bk_clean_names$change_tracker)
 micro_climb_veg_survey <- gg_summer_clean_names |> 
   bind_rows(wh_clean_names) |> 
   bind_rows(bk_clean_names) |> 
-  select(!change_tracker)
+  select(!change_tracker) |> 
+  rename(Cell_ID = cellref)
 
 write.xlsx(micro_climb_veg_survey, "All_data/clean_data/micro_climb_occurrence.xlsx")
