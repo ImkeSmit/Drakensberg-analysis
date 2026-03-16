@@ -72,10 +72,10 @@ bk <- read_excel("All_data/raw_data/raw_occurrence_data/Bokong/BNR_vegetation_su
 #there are still NA's in the cover column, let's sort them out
 bk[which(is.na(bk$cover2)) , ] #get Na rows
 #Go back to paper data sheets and check these values
-bk[which(bk$cellref == "BK1A13" & bk$taxon == "new_alternate_anthospermum") , which(colnames(bk) == "cover2")] <- 0.5
-bk[which(bk$cellref == "BK2A5" & bk$taxon == "festuca_caprina") , which(colnames(bk) == "cover2")] <- 25
-bk <- bk[-which(bk$cellref == "BK6G12" & bk$taxon == "afroaster_erucifolius") , ] #sp not present on sheet
-bk[which(bk$cellref == "BK7B20" & bk$taxon == "gazania_krebsiana") , which(colnames(bk) == "cover2")] <- 0.5
+bk[which(bk$cellref == "BK_G1A_13" & bk$taxon == "new_alternate_anthospermum") , which(colnames(bk) == "cover2")] <- 0.5
+bk[which(bk$cellref == "BK_G2_A5" & bk$taxon == "festuca_caprina") , which(colnames(bk) == "cover2")] <- 25
+bk <- bk[-which(bk$cellref == "BK_G6_G12" & bk$taxon == "afroaster_erucifolius") , ] #sp not present on sheet
+bk[which(bk$cellref == "BK_G7_B20" & bk$taxon == "gazania_krebsiana") , which(colnames(bk) == "cover2")] <- 0.5
 
 
 #delete the character cover column and rename cover2
