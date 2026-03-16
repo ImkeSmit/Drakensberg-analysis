@@ -523,5 +523,6 @@ FT_final <- FT_checked |>
          SLA = Leaf_area_mm2/Dry_mass_mg) |>  #now we have to work out SLA again
 select(Sample_ID, Site, Grid, Cell, Taxon, Wet_mass_mg, Dry_mass_mg, Chlorophyll_mg_per_m2, Ft, 
        Height_cm, Thickness_mm, Leaf_area_mm2, SLA, LDMC, Scan_name, SLA_notes) |> 
-  arrange(Sample_ID)
-write.xlsx(FT_final, "All_data/clean_data/micro-climb_traits.xlsx")
+  arrange(Sample_ID) |> 
+  mutate(Cell_ID = paste0(Site, "_", "G", Grid, "_", Cell))
+write.csv(FT_final, "All_data/clean_data/micro-climb_traits.csv")
