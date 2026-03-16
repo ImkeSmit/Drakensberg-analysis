@@ -226,4 +226,4 @@ micro_climb_veg_survey <- gg_summer_clean_names |>
   select(!change_tracker) |> 
   rename(Cell_ID = cellref)
 
-write.xlsx(micro_climb_veg_survey, "All_data/clean_data/micro_climb_occurrence.xlsx")
+write.csv(micro_climb_veg_survey, "All_data/clean_data/micro_climb_occurrence.csv")
