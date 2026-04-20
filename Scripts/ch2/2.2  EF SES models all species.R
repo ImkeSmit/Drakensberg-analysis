@@ -22,7 +22,11 @@ mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.na
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
   mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
                                grepl("WH", cellref) == T ~ "2500",
-                               grepl("GG", cellref) == T ~ "2000",.default = NA))
+                               grepl("GG", cellref) == T ~ "2000",.default = NA), 
+         grid = str_sub(cellref, 1, 3), 
+         column = str_sub(cellref, 4,4), 
+         row = as.numeric(str_sub(cellref, 5,6)), 
+         ncolumn = match(column, LETTERS[1:8]))
 cell_ses$elevation <- as.factor(cell_ses$elevation)  
 
 ####Descriptive figures####
