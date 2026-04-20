@@ -8,6 +8,8 @@ library(ggridges)
 library(gamlss)
 library(rcompanion)
 library(multcompView)
+library(spdep)
+library(spatialreg)
 
 ###Import original community data####
 abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
@@ -53,6 +55,29 @@ sign_negative_ses <- cell_ses |>
   group_by(trait) |> 
   filter(SES < -2) |> 
   summarise(n = n()) #very few have significant negative ses
+
+###Spatial lag models of SES ~elevation####
+
+# Fit observed model
+observed_model <- lagsarlm(trait ~ soil, data = df, listw = lw)
+observed_coef  <- coef(observed_model)["soil"]   # observed soil coefficient
+
+# Permutation test
+n_perm <- 999
+perm_coefs <- numeric(n_perm)
+
+set.seed(123)
+for (i in 1:n_perm) {
+  df_perm        <- df
+  df_perm$trait  <- sample(df$trait)             # shuffle response
+  perm_model     <- lagsarlm(trait ~ soil, data = df_perm, listw = lw)
+  perm_coefs[i]  <- coef(perm_model)["soil"]
+}
+
+# Two-tailed p-value
+p_value <- mean(abs(perm_coefs) >= abs(observed_coef))
+cat("Observed coefficient:", observed_coef, "\n")
+cat("Permutation p-value:", p_value, "\n")
 
 
 ###Models of SES ~ elevation####
