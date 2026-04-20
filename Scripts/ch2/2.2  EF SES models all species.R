@@ -61,6 +61,15 @@ sign_negative_ses <- cell_ses |>
   summarise(n = n()) #very few have significant negative ses
 
 ###Spatial lag models of SES ~elevation####
+###Height###
+Hdat <- cell_ses |> 
+  filter(trait == "Height_cm")
+
+#We have to compute the spatial weights per grid. How to model?
+coords <- cbind(Hdat$row, Hdat$ncolumn)
+knn <- knearneigh(coords, k = 8)   # k = number of neighbors
+nb     <- knn2nb(knn) #transform neighbours to a list object
+lw     <- nb2listw(nb, style = "W")   #compute spatial weights
 
 # Fit observed model
 observed_model <- lagsarlm(trait ~ soil, data = df, listw = lw)
