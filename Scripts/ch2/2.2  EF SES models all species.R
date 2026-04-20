@@ -61,18 +61,20 @@ sign_negative_ses <- cell_ses |>
   summarise(n = n()) #very few have significant negative ses
 
 ###Spatial lag models of SES ~elevation####
+#spatial lag model may not work because you need to compute spatial weights for the entire dataset. 
+#Here we want to compute spatial weights per grid. 
 ###Height###
 Hdat <- cell_ses |> 
-  filter(trait == "Height_cm")
+  filter(trait == "Height_cm", grid == "BK1")
 
 #We have to compute the spatial weights per grid. How to model?
 coords <- cbind(Hdat$row, Hdat$ncolumn)
 knn <- knearneigh(coords, k = 8)   # k = number of neighbors
 nb     <- knn2nb(knn) #transform neighbours to a list object
-lw     <- nb2listw(nb, style = "W")   #compute spatial weights
+weights     <- nb2listw(nb, style = "W")   #compute spatial weights
 
 # Fit observed model
-observed_model <- lagsarlm(trait ~ soil, data = df, listw = lw)
+observed_model <- spatialreg::lagsarlm(SES ~ elevation, data = Hdat, listw = weights)
 observed_coef  <- coef(observed_model)["soil"]   # observed soil coefficient
 
 # Permutation test
