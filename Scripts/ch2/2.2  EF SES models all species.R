@@ -10,6 +10,7 @@ library(rcompanion)
 library(multcompView)
 library(spdep)
 library(spatialreg)
+library(spind)
 
 ###Import original community data####
 abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
@@ -60,9 +61,16 @@ sign_negative_ses <- cell_ses |>
   filter(SES < -2) |> 
   summarise(n = n()) #very few have significant negative ses
 
+###General estimating equations####
+#Requires that all predictors be continuous. We'll need to add large distances between the sites, and smaller distances between the grids to mimic the spatial structure.
+coords <- cbind(Hdat$row, Hdat$ncolumn)
+
+gee1 <- GEE(SES ~ elevation, family = "gaussian", data = Hdat,
+            coord = coords, corstr = "fixed", scale.fix = FALSE)
+
 ###Spatial lag models of SES ~elevation####
 #spatial lag model may not work because you need to compute spatial weights for the entire dataset. 
-#Here we want to compute spatial weights per grid. 
+#Here we want to compute spatial weights per grid. Each grid may have different autocorrelation and weights
 ###Height###
 Hdat <- cell_ses |> 
   filter(trait == "Height_cm", grid == "BK1")
