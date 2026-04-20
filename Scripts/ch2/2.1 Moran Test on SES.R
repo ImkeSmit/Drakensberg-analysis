@@ -26,7 +26,7 @@ Moran_result <- data.frame(grid = NA, trait = NA, MoranI = NA, p_value = NA)
 l = 1
 for(g in grids) {
   for(tr in traits) {
-   g_dat <- cell_ses %>% filter(grid == "BK1", trait == "Height_cm")
+   g_dat <- cell_ses %>% filter(grid == g, trait == tr)
    #remove extra columns
     g_dat <- g_dat[, which(colnames(g_dat) %in% c("row", "ncolumn", "SES"))] 
     
@@ -44,17 +44,19 @@ for(g in grids) {
     Moran_result[l, 4] <- MI$p.value
     
     l = l+1
+    
+    rm(MI)
   }
 }
 
+#Which grids and traits show significant spatial autocorrelation
+sig <- Moran_result |> 
+  filter(p_value<0.05)
+#only one trait in one grid is not significantly spatially autocrrelated
 
+nonsig <-Moran_result |> 
+  filter(p_value>0.05) #That is thickness in WH6
 
-
-
-##Now get Moran's I for g_dat
-coords <- cbind(g_dat$row, g_dat$ncolumn)
-knn <- knearneigh(coords, k = 8)   # k = number of neighbors
-nb     <- knn2nb(knn)
-lw     <- nb2listw(nb, style = "W")   # row-standardized weights
-
-MI <- moran.test(g_dat$SES, lw)
+#Are all positively autocorellated?
+pos <- Moran_result |> 
+  filter(MoranI > 0) #all are positively autocorrelated.
