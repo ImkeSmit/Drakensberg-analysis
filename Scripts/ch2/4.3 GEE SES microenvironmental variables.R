@@ -23,8 +23,18 @@ mutate(Cell_ID = paste0(site, "_G", str_sub(cellref, 3, 3), "_", column, row)) |
 cell_ses$elevation <- as.factor(cell_ses$elevation) 
 
 #import microenvironmental data
-env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv")
+env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
+  mutate(mean_soil_depth = as.numeric(mean_soil_depth))
 
 comb_H <- cell_ses |> 
-  filter(trait == "Height_cm") |> 
+  filter(trait == "Height_cm", grid == "WH1") |> #right now we can only model one grid at a time
   inner_join(env, by = "Cell_ID")
+
+coords <- cbind(comb_H$row.x, comb_H$ncolumn)
+
+gee1 <- GEE(SES ~ rock_cover + mean_soil_depth, 
+            family = "gaussian", data = comb_H,
+            coord = coords, corstr = "fixed", scale.fix = FALSE)
+summary(gee1, printAutoCorPars = TRUE)
+
+plot(gee1)
