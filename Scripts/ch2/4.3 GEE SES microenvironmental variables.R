@@ -5,6 +5,8 @@ library(spind)
 library(remotes)
 library(dataDownloader)
 library(osfr)
+library(tidyverse)
+library(tidylog)
 
 #imort SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
@@ -18,13 +20,38 @@ cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire
          column = str_sub(cellref, 4,4), 
          row = as.numeric(str_sub(cellref, 5,6)), 
          ncolumn = match(column, LETTERS[1:8])) |> 
-mutate(Cell_ID = paste0(site, "_G", str_sub(cellref, 3, 3), "_", column, row)) |> 
-  select(-cellref)
+          mutate(Cell_ID = paste0(site, "_G", str_sub(cellref, 3, 3), "_", column, row)) |> 
+          select(-cellref)
 cell_ses$elevation <- as.factor(cell_ses$elevation) 
 
 #import microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
   mutate(mean_soil_depth = as.numeric(mean_soil_depth))
+
+
+##Combine SES and environmental data
+comb <- env |> 
+  select(-c(site, grid, column,row)) |> 
+  inner_join(cell_ses, by = "Cell_ID") |> 
+##Now we need to change the coordinates to reflect the spatial structure of the whole dataset
+##Coordinates within a site differ by 80
+##Coordinates between sites differ by 1000
+  mutate(y_new = case_when(site == "GG" ~ ncolumn, 
+                           site == "WH" ~ ncolumn+1000, 
+                           site == "BK" ~ ncolumn+2000, .default = NA)) |> 
+  group_by(site) |> 
+  mutate(y_coord = case_when(grepl("1", grid) ~ y_new, 
+                           grepl("2", grid) ~ y_new+80, 
+                           grepl("3", grid) ~ y_new+160,
+                           grepl("4", grid) ~ y_new+240, 
+                           grepl("5", grid) ~ y_new+320, 
+                           grepl("6", grid) ~ y_new+400, 
+                           grepl("7", grid) ~ y_new+480, 
+                           grepl("8", grid) ~ y_new+560, .default = NA)) |> 
+  mutate(x_coord = row)
+
+
+
 
 comb_H <- cell_ses |> 
   filter(trait == "Height_cm", grid == "WH1") |> #right now we can only model one grid at a time
