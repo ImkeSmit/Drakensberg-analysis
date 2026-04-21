@@ -59,7 +59,7 @@ comb <- env |>
 #isolate trait
 Hdat <- comb |> filter(trait == "Height_cm") |> 
                  #drop_na(SES, rock_cover, mean_soil_depth) |> #remove rows with na's
-                select(Cell_ID, x_coord, y_coord, SES, rock_cover, mean_soil_depth)
+                select(Cell_ID,grid, x_coord, y_coord, SES, rock_cover, mean_soil_depth) 
 
 ###We have to create the missing coordinates (between the girds and sites)
 y_sequence <- unique(Hdat$y_coord)[order(unique(Hdat$y_coord))]
@@ -73,25 +73,34 @@ addcoords <- tibble(Cell_ID = NA, x_coord = missing_xcoord, y_coord = missing_yc
 Hdat <- bind_rows(Hdat, addcoords) |> #add missing coordinates
   arrange(y_coord) 
 
-Hdat <- Hdat |> filter(!is.na(SES))
+Hdat <- Hdat |> filter(!is.na(SES)) |> 
+  filter(grid %in% c("BK1", "BK2", "BK4")) #lets first only look at these grids because they are all the same size
 
 coords <- cbind(Hdat$x_coord, Hdat$y_coord)
 
+# Compute pairwise distances WITHIN each grid
+# First, get one representative grid to build R from
+# (assuming all grids have the same 8x20 layout)
+Hdat |> group_by(grid) |> 
+  summarise(length(unique(Cell_ID)))
 
-#Let's specify a cutoff distance above which sptaial autocorrelation is not a problem anymore
-dist_matrix <- as.matrix(dist(coords))
+grid1_dat <- Hdat |> filter(grid == unique(grid)[1])
+grid_coords <- cbind(grid1_dat$x_coord, grid1_dat$y_coord)
 
-# Set your cutoff distance (in same units as your coordinates)
-cutoff <- 80
+dist_within <- as.matrix(dist(grid_coords))
 
-# Binary: 1 if within cutoff, 0 if beyond
-weight_matrix <- ifelse(dist_matrix <= cutoff, 1, 0)
-diag(weight_matrix) <- 0  # no self-correlation
+cutoff <- 80  # your autocorrelation range from variogram
 
-gee2 <- GEE(SES ~ rock_cover + mean_soil_depth,
+# Option A: Binary cutoff
+R <- ifelse(dist_within <= cutoff, 1, 0)
+diag(R) <- 1  # gee::gee expects 1s on diagonal
+#This identifies which cells belong to the cluster to compute spatial weights within
+
+gee2 <- gee::gee(SES ~ rock_cover + mean_soil_depth,
             family = "gaussian", data = Hdat,
-            coord = weight_matrix,
+            id = grid,
             corstr = "fixed",
+            R= R, 
             scale.fix = FALSE)
 
 
