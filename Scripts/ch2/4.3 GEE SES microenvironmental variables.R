@@ -54,9 +54,8 @@ comb$rock_cover <- as.numeric(comb$rock_cover)
 comb$mean_soil_depth <- as.numeric(comb$mean_soil_depth)
 
 ###model for SES of height###model rock_coverfor SES of height
-Hdat <- comb |> filter(trait == "Height_cm", 
-                       !is.na(rock_cover), 
-                       !is.na(mean_soil_depth)) |> 
+Hdat <- comb |> filter(trait == "Height_cm",
+                       drop_na(SES, rock_cover, mean_soil_depth) |> #remove rows with na's
   select(Cell_ID, x_coord, y_coord, SES, rock_cover, mean_soil_depth)
 coords <- cbind(Hdat$x_coord, Hdat$y_coord)
 
