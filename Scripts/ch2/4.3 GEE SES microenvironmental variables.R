@@ -69,7 +69,7 @@ missing_ycoord <- rep(missing_ycoord, each = 8) #repeat each ycoord 8 times, bec
 missing_xcoord <- rep(c(1:8), length(unique(missing_ycoord)))
 #Create table to bind to Hdat
 addcoords <- tibble(Cell_ID = NA, x_coord = missing_xcoord, y_coord = missing_ycoord, 
-                    SES = NA, rock_cover = NA, mean_soil_depth = NA)
+                    SES = 0, rock_cover = NA, mean_soil_depth = NA)
 Hdat <- bind_rows(Hdat, addcoords) |> #add missing coordinates
   arrange(y_coord) 
 
