@@ -48,23 +48,25 @@ comb <- env |>
                            grepl("6", grid) ~ y_new+400, 
                            grepl("7", grid) ~ y_new+480, 
                            grepl("8", grid) ~ y_new+560, .default = NA)) |> 
-  mutate(x_coord = row) |> 
-  ungroup()
-comb$rock_cover <- as.numeric(comb$rock_cover)
-comb$mean_soil_depth <- as.numeric(comb$mean_soil_depth)
+  mutate(x_coord = row, 
+         rock_cover = as.numeric(rock_cover), 
+         mean_soil_depth = as.numeric(mean_soil_depth)) |> 
+  ungroup() 
+
 
 ###model for SES of height###model rock_coverfor SES of height
-Hdat <- comb |> filter(trait == "Height_cm",
-                       drop_na(SES, rock_cover, mean_soil_depth) |> #remove rows with na's
-  select(Cell_ID, x_coord, y_coord, SES, rock_cover, mean_soil_depth)
+Hdat <- comb |> filter(trait == "Height_cm") |> 
+                 #drop_na(SES, rock_cover, mean_soil_depth) |> #remove rows with na's
+                select(Cell_ID, x_coord, y_coord, SES, rock_cover, mean_soil_depth)
+
 coords <- cbind(Hdat$x_coord, Hdat$y_coord)
 
-gee1 <- spind::GEE(SES ~ rock_cover + mean_soil_depth, 
+gee1 <- spind::GEE(SES ~ mean_soil_depth, 
             family = "gaussian", data = Hdat,
             coord = coords, 
             corstr = "exchangeable", #can be fixed, exchangeable or quadratic
             #fixed means the same autocorrelation structure is applied to the whole dataset
-            cluster = 4,
+            cluster = 3,
             scale.fix = FALSE)
 summary(gee1, printAutoCorPars = TRUE)
 
