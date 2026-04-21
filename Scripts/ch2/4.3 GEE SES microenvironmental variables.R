@@ -53,25 +53,25 @@ comb <- env |>
          mean_soil_depth = as.numeric(mean_soil_depth)) |> 
   ungroup() 
 
-###Now we have to create the missing coordinates (between the girds and sites)
-y_sequence <- unique(comb$y_coord)[order(unique(comb$y_coord))]
-complete_y <- c(y_sequence[1]:y_sequence[length(y_sequence)])
-missing_ycoord <- setdiff(complete_y, y_sequence)
-missing_ycoord <- rep(missing_ycoord, each = 8) #repeat each ycoord 8 times, because there are 8 possible x coords
-missing_xcoord <- rep(c(1:8), length(unique(missing_ycoord)))
 
 
-###model for SES of height###model rock_coverfor SES of height
+###model for SES of height
+#isolate trait
 Hdat <- comb |> filter(trait == "Height_cm") |> 
                  #drop_na(SES, rock_cover, mean_soil_depth) |> #remove rows with na's
                 select(Cell_ID, x_coord, y_coord, SES, rock_cover, mean_soil_depth)
 
 ###We have to create the missing coordinates (between the girds and sites)
-y_sequence <- unique(comb$y_coord)[order(unique(comb$y_coord))]
+y_sequence <- unique(Hdat$y_coord)[order(unique(Hdat$y_coord))]
 complete_y <- c(y_sequence[1]:y_sequence[length(y_sequence)])
 missing_ycoord <- setdiff(complete_y, y_sequence)
 missing_ycoord <- rep(missing_ycoord, each = 8) #repeat each ycoord 8 times, because there are 8 possible x coords
 missing_xcoord <- rep(c(1:8), length(unique(missing_ycoord)))
+#Create table to bind to Hdat
+addcoords <- tibble(Cell_ID = NA, x_coord = missing_xcoord, y_coord = missing_ycoord, 
+                    SES = NA, rock_cover = NA, mean_soil_depth = NA)
+Hdat <- bind_rows(Hdat, addcoords) |> #add missing coordinates
+  arrange(y_coord) 
 
 coords <- cbind(Hdat$x_coord, Hdat$y_coord)
 
