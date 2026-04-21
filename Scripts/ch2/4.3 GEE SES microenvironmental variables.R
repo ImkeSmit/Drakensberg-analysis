@@ -69,11 +69,31 @@ missing_ycoord <- rep(missing_ycoord, each = 8) #repeat each ycoord 8 times, bec
 missing_xcoord <- rep(c(1:8), length(unique(missing_ycoord)))
 #Create table to bind to Hdat
 addcoords <- tibble(Cell_ID = NA, x_coord = missing_xcoord, y_coord = missing_ycoord, 
-                    SES = 0, rock_cover = NA, mean_soil_depth = NA)
+                    SES = NA, rock_cover = NA, mean_soil_depth = NA)
 Hdat <- bind_rows(Hdat, addcoords) |> #add missing coordinates
   arrange(y_coord) 
 
+Hdat <- Hdat |> filter(!is.na(SES))
+
 coords <- cbind(Hdat$x_coord, Hdat$y_coord)
+
+
+#Let's specify a cutoff distance above which sptaial autocorrelation is not a problem anymore
+dist_matrix <- as.matrix(dist(coords))
+
+# Set your cutoff distance (in same units as your coordinates)
+cutoff <- 80
+
+# Binary: 1 if within cutoff, 0 if beyond
+weight_matrix <- ifelse(dist_matrix <= cutoff, 1, 0)
+diag(weight_matrix) <- 0  # no self-correlation
+
+gee2 <- GEE(SES ~ rock_cover + mean_soil_depth,
+            family = "gaussian", data = Hdat,
+            coord = weight_matrix,
+            corstr = "fixed",
+            scale.fix = FALSE)
+
 
 gee1 <- spind::GEE(SES ~ mean_soil_depth, 
             family = "gaussian", data = Hdat,
