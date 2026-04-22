@@ -134,7 +134,7 @@ ExtractGEE <- function (ModelOutput, QIC.value = QIC.values, OutputFile = Output
 create.Saana.correlation.matrix <- function(data3, formula2, family1, Do.plot = TRUE, Save.plot = TRUE) {
     
     # set parameters
-    NumberSites <- 8
+    NumberSites <- 2 #number of grids
     NumberRows <- 20
     NumberColumns <- 8
         
@@ -149,6 +149,7 @@ create.Saana.correlation.matrix <- function(data3, formula2, family1, Do.plot = 
     DecayValues <- matrix(data = 0, nrow = NumberSites, ncol = 2)
     
     # if plotting...
+    model.counter <- "model counter test"
     if (Save.plot == TRUE) {tiff(paste("Mod_", model.counter, "_exponential_fit.tif", sep = ""), units = "cm", height = 16, width = 24, res = 60)}
     if (Do.plot == TRUE) {par(mfrow=c(2, 4))}
     
@@ -231,7 +232,7 @@ create.Saana.correlation.matrix <- function(data3, formula2, family1, Do.plot = 
 ###############
 # GEEcode.txt #
 ###############
-# Carl & Kühn: Analyzing Spatial Autocorrelation in Species Distributions using Gaussian and Logit Models
+# Carl & K?hn: Analyzing Spatial Autocorrelation in Species Distributions using Gaussian and Logit Models
 
 GEE <- function(model.name, model, family1 = "poisson", data2, coord, corstr = "independence", cluster = 3, plot.ac = FALSE, graph = TRUE, output = TRUE, OutputFile = OutputFileName) {
 
