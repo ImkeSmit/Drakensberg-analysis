@@ -78,6 +78,32 @@ grid_coords <- cbind(grid1_dat$x_coord, grid1_dat$y_coord)
 dist_within <- as.matrix(dist(grid_coords))
 
 
+###Draw a variogram
+# Load libraries
+library(gstat)
+library(sp)
+
+coordinates(Hdat2) = ~x_coord + y_coord
+
+# 2. Compute the empirical variogram
+# The formula 'log(zinc) ~ 1' assumes a constant mean (no spatial trend)
+v_empirical <- variogram(SES ~ 1, data = Hdat2)
+
+# 3. Plot the empirical variogram
+plot(v_empirical)
+
+# 4. Define an initial model (e.g., Spherical with sill=1, range=900, nugget=0.1)
+initial_model <- vgm(psill = 1, model = "Sph", range = 10, nugget = 0.1)
+
+# 5. Fit the model to empirical data
+v_fitted <- fit.variogram(v_empirical, initial_model)
+
+# 6. Plot empirical points and the fitted model together
+plot(v_empirical, model = v_fitted)
+
+
+
+
 #Draw a correlogram to see at which distance the spatial autocorrelation in model residuals decreases
 testlm <- lm(SES ~ rock_cover + mean_soil_depth, data = Hdat2)
 resid <- resid(testlm)
@@ -94,11 +120,16 @@ diag(R) <- 1  # gee::gee expects 1s on diagonal
 #This identifies which cells belong to the cluster to compute spatial weights within
 
 
+##Option 2 build in distance decay based on correlogram
+R2 <- exp(-dist_within / cutoff)
+diag(R2) <- 1
+
+
 gee2 <- gee::gee(SES ~ rock_cover + mean_soil_depth,
             family = gaussian, data = Hdat2,
             id = grid,
-            corstr = "exchangeable",
-            R= R, 
+            corstr = "fixed",
+            R= R2, 
             scale.fix = FALSE)
 
 summary(gee2)
