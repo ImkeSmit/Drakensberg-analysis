@@ -36,9 +36,9 @@ comb <- env |>
 ##Now we need to change the coordinates to reflect the spatial structure of the whole dataset
 ##Coordinates within a site differ by 80
 ##Coordinates between sites differ by 1000
-  mutate(y_new = case_when(site == "GG" ~ ncolumn, 
-                           site == "WH" ~ ncolumn+160, 
-                           site == "BK" ~ ncolumn+140, .default = NA)) |> 
+  mutate(y_new = case_when(site == "GG" ~ row, 
+                           site == "WH" ~ row+160, 
+                           site == "BK" ~ row+140, .default = NA)) |> 
   group_by(site) |> 
   mutate(y_coord = case_when(grepl("1", grid) ~ y_new, 
                            grepl("2", grid) ~ y_new+20, 
@@ -48,7 +48,7 @@ comb <- env |>
                            grepl("6", grid) ~ y_new+20*5, 
                            grepl("7", grid) ~ y_new+20*6, 
                            grepl("8", grid) ~ y_new+20*7, .default = NA)) |> 
-  mutate(x_coord = row, 
+  mutate(x_coord = ncolumn, 
          rock_cover = as.numeric(rock_cover), 
          mean_soil_depth = as.numeric(mean_soil_depth)) |> 
   ungroup() 
@@ -70,17 +70,19 @@ missing_xcoord <- rep(c(1:8), length(unique(missing_ycoord)))
 #Create table to bind to Hdat
 addcoords <- tibble(Cell_ID = NA, x_coord = missing_xcoord, y_coord = missing_ycoord, 
                     SES = NA, rock_cover = NA, mean_soil_depth = NA)
-Hdat <- bind_rows(Hdat, addcoords) |> #add missing coordinates
-  arrange(y_coord) 
+#Hdat <- bind_rows(Hdat, addcoords) |> #add missing coordinates
+#  arrange(y_coord) 
 
-#Hdat <- Hdat |> filter(!is.na(SES)) |> 
-#  filter(grid %in% c("BK1", "BK2", "BK4")) #lets first only look at these grids because they are all the same size
-
+Hdat2 <- Hdat |> filter(!is.na(SES)) |> 
+  filter(grid %in% c("BK1", "BK2")) |>  #lets first only look at these grids because they are all the same size
+  arrange(grid, y_coord) |> 
+  mutate(grid = as.factor(grid))
+  
 #Select 3 complete grids to model, and the spaces between them
-startrow <- which(Hdat$grid == "BK1")[1]
-endrow <- which(Hdat$grid == "BK2")[length(which(Hdat$grid == "BK2"))]
+#startrow <- which(Hdat$grid == "BK1")[1]
+#endrow <- which(Hdat$grid == "BK2")[length(which(Hdat$grid == "BK2"))]
 
-Hdat2 <- Hdat[c(startrow:endrow), ]  
+#Hdat2 <- Hdat[c(startrow:endrow), ]  
 
 
 coords <- cbind(Hdat2$x_coord, Hdat2$y_coord)
@@ -96,8 +98,6 @@ grid_coords <- cbind(grid1_dat$x_coord, grid1_dat$y_coord)
 
 dist_within <- as.matrix(dist(grid_coords))
 
-neibs <- knn2nb(knearneigh(coords, k = 2))
-sp.correlogram(neighbours = neibs)
 cutoff <- 5  # your autocorrelation range from variogram
 
 # Option A: Binary cutoff
@@ -109,15 +109,17 @@ testlm <- lm(SES ~ rock_cover + mean_soil_depth,
    family = "gaussian", data = Hdat2)
 
 gee2 <- gee::gee(SES ~ rock_cover + mean_soil_depth,
-            family = "gaussian", data = Hdat2,
+            family = gaussian, data = Hdat2,
             id = grid,
             corstr = "fixed",
             R= R, 
             scale.fix = FALSE)
 
+summary(gee2)
+
 
 gee1 <- spind::GEE(SES ~ mean_soil_depth, 
-            family = "gaussian", data = Hdat,
+            family = gaussian, data = Hdat,
             coord = coords, 
             corstr = "exchangeable", #can be fixed, exchangeable or quadratic
             #fixed means the same autocorrelation structure is applied to the whole dataset
