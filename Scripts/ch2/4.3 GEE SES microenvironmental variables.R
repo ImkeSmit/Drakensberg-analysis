@@ -20,9 +20,9 @@ cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire
          column = str_sub(cellref, 4,4), 
          row = as.numeric(str_sub(cellref, 5,6)), 
          ncolumn = match(column, LETTERS[1:8])) |> 
-          mutate(Cell_ID = paste0(site, "_G", str_sub(cellref, 3, 3), "_", column, row)) |> 
+          mutate(Cell_ID = paste0(site, "_G", str_sub(cellref, 3, 3), "_", column, row), 
+                 elevation = as.numeric(elevation)) |> 
           select(-cellref)
-cell_ses$elevation <- as.factor(cell_ses$elevation) 
 
 #import microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
@@ -37,17 +37,17 @@ comb <- env |>
 ##Coordinates within a site differ by 80
 ##Coordinates between sites differ by 1000
   mutate(y_new = case_when(site == "GG" ~ ncolumn, 
-                           site == "WH" ~ ncolumn+1000, 
-                           site == "BK" ~ ncolumn+2000, .default = NA)) |> 
+                           site == "WH" ~ ncolumn+160, 
+                           site == "BK" ~ ncolumn+140, .default = NA)) |> 
   group_by(site) |> 
   mutate(y_coord = case_when(grepl("1", grid) ~ y_new, 
-                           grepl("2", grid) ~ y_new+80, 
-                           grepl("3", grid) ~ y_new+160,
-                           grepl("4", grid) ~ y_new+240, 
-                           grepl("5", grid) ~ y_new+320, 
-                           grepl("6", grid) ~ y_new+400, 
-                           grepl("7", grid) ~ y_new+480, 
-                           grepl("8", grid) ~ y_new+560, .default = NA)) |> 
+                           grepl("2", grid) ~ y_new+20, 
+                           grepl("3", grid) ~ y_new+20*2,
+                           grepl("4", grid) ~ y_new+20*3, 
+                           grepl("5", grid) ~ y_new+20*4, 
+                           grepl("6", grid) ~ y_new+20*5, 
+                           grepl("7", grid) ~ y_new+20*6, 
+                           grepl("8", grid) ~ y_new+20*7, .default = NA)) |> 
   mutate(x_coord = row, 
          rock_cover = as.numeric(rock_cover), 
          mean_soil_depth = as.numeric(mean_soil_depth)) |> 
@@ -58,7 +58,7 @@ comb <- env |>
 ###model for SES of height
 #isolate trait
 Hdat <- comb |> filter(trait == "Height_cm") |> 
-                 #drop_na(SES, rock_cover, mean_soil_depth) |> #remove rows with na's
+                 drop_na(SES, rock_cover, mean_soil_depth) |> #remove rows with na's
                 select(Cell_ID,grid, x_coord, y_coord, SES, rock_cover, mean_soil_depth) 
 
 ###We have to create the missing coordinates (between the girds and sites)
@@ -73,10 +73,17 @@ addcoords <- tibble(Cell_ID = NA, x_coord = missing_xcoord, y_coord = missing_yc
 Hdat <- bind_rows(Hdat, addcoords) |> #add missing coordinates
   arrange(y_coord) 
 
-Hdat <- Hdat |> filter(!is.na(SES)) |> 
-  filter(grid %in% c("BK1", "BK2", "BK4")) #lets first only look at these grids because they are all the same size
+#Hdat <- Hdat |> filter(!is.na(SES)) |> 
+#  filter(grid %in% c("BK1", "BK2", "BK4")) #lets first only look at these grids because they are all the same size
 
-coords <- cbind(Hdat$x_coord, Hdat$y_coord)
+#Select 3 complete grids to model, and the spaces between them
+startrow <- which(Hdat$grid == "BK1")[1]
+endrow <- which(Hdat$grid == "BK2")[length(which(Hdat$grid == "BK2"))]
+
+Hdat2 <- Hdat[c(startrow:endrow), ]  
+
+
+coords <- cbind(Hdat2$x_coord, Hdat2$y_coord)
 
 # Compute pairwise distances WITHIN each grid
 # First, get one representative grid to build R from
@@ -84,20 +91,25 @@ coords <- cbind(Hdat$x_coord, Hdat$y_coord)
 Hdat |> group_by(grid) |> 
   summarise(length(unique(Cell_ID)))
 
-grid1_dat <- Hdat |> filter(grid == unique(grid)[1])
+grid1_dat <- Hdat2 |> filter(grid == unique(grid)[1])
 grid_coords <- cbind(grid1_dat$x_coord, grid1_dat$y_coord)
 
 dist_within <- as.matrix(dist(grid_coords))
 
-cutoff <- 80  # your autocorrelation range from variogram
+neibs <- knn2nb(knearneigh(coords, k = 2))
+sp.correlogram(neighbours = neibs)
+cutoff <- 5  # your autocorrelation range from variogram
 
 # Option A: Binary cutoff
 R <- ifelse(dist_within <= cutoff, 1, 0)
 diag(R) <- 1  # gee::gee expects 1s on diagonal
 #This identifies which cells belong to the cluster to compute spatial weights within
 
+testlm <- lm(SES ~ rock_cover + mean_soil_depth,
+   family = "gaussian", data = Hdat2)
+
 gee2 <- gee::gee(SES ~ rock_cover + mean_soil_depth,
-            family = "gaussian", data = Hdat,
+            family = "gaussian", data = Hdat2,
             id = grid,
             corstr = "fixed",
             R= R, 
