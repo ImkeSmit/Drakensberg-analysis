@@ -78,10 +78,15 @@ grid_coords <- cbind(grid1_dat$x_coord, grid1_dat$y_coord)
 dist_within <- as.matrix(dist(grid_coords))
 
 
+#Draw a correlogram to see at which distance the spatial autocorrelation in model residuals decreases
+testlm <- lm(SES ~ rock_cover + mean_soil_depth, data = Hdat2)
+resid <- resid(testlm)
 
+neibs <- knn2nb(knearneigh(coords, k = 4))
+spcor <- sp.correlogram(neibs, resid, method = "I", order = 20)
+plot(spcor)
 
-
-cutoff <- 5  # your autocorrelation range from variogram
+cutoff <- 9  # your autocorrelation range from correlogram
 
 # Option A: Binary cutoff
 R <- ifelse(dist_within <= cutoff, 1, 0)
@@ -92,11 +97,15 @@ diag(R) <- 1  # gee::gee expects 1s on diagonal
 gee2 <- gee::gee(SES ~ rock_cover + mean_soil_depth,
             family = gaussian, data = Hdat2,
             id = grid,
-            corstr = "fixed",
+            corstr = "exchangeable",
             R= R, 
             scale.fix = FALSE)
 
 summary(gee2)
 
+#Get p values
+coefs <- summary(gee2)$coefficients
+p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
+cbind(coefs, p_value = round(p_values, 4))
 
 
