@@ -52,6 +52,8 @@ comb <- env |>
          mean_soil_depth = as.numeric(mean_soil_depth)) |> 
   ungroup() 
 
+#
+
 
 ###model for SES of height
 #isolate trait
@@ -62,8 +64,8 @@ Hdat <- comb |> filter(trait == "Height_cm") |>
 ##We may have to impute values for missing cells to be able to run the gee model
 
 #isolate two grids to model for now
-Hdat2 <- Hdat |> filter(!is.na(SES)) |> 
-  filter(grid %in% c("BK1", "BK2")) |>  #lets first only look at these grids because they are all the same size
+Hdat2 <- Hdat |> #filter(!is.na(SES)) |> 
+  #filter(grid %in% c("BK1", "BK2")) |>  #lets first only look at these grids because they are all the same size
   arrange(grid, y_coord) |> 
   mutate(grid = as.factor(grid))
 
