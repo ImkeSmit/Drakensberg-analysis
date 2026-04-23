@@ -43,7 +43,7 @@ comb <- env |>
 #make the grids contiguous, differing by 20m along the y axis
   mutate(y_new = case_when(site == "GG" ~ row, 
                            site == "WH" ~ row+160, 
-                           site == "BK" ~ row+140, .default = NA)) |> 
+                           site == "BK" ~ row+160+140, .default = NA)) |> 
   group_by(site) |> 
   mutate(y_coord = case_when(grepl("1", grid) ~ y_new, 
                            grepl("2", grid) ~ y_new+20, 
@@ -58,23 +58,16 @@ comb <- env |>
          mean_soil_depth = as.numeric(mean_soil_depth)) |> 
   ungroup() 
 
-#Check how many missing cells we have
-narows <- comb |> filter(if_any(everything(), is.na))
-
-comb |> filter(is.na(SES)) 
-
-comb |> group_by(trait, grid) |> 
-  summarise(n = n()) 
 
 ###Fill in the x and y coordinates of cells that do not have SES
 comb2 <- comb |> 
   mutate(ncolumn = match(column, LETTERS[1:8]),
-         elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
-                               grepl("WH", cellref) == T ~ "2500",
-                               grepl("GG", cellref) == T ~ "2000",.default = NA),
+         elevation = case_when(grepl("BK", Cell_ID) == T ~ "3000", #add elevation variable
+                               grepl("WH", Cell_ID) == T ~ "2500",
+                               grepl("GG", Cell_ID) == T ~ "2000", .default = NA),
          y_new = case_when(site == "GG" ~ row, 
                            site == "WH" ~ row+160, 
-                           site == "BK" ~ row+140, .default = NA)) |> 
+                           site == "BK" ~ row+160 +140, .default = NA)) |> 
   group_by(site) |> 
   mutate(y_coord = case_when(grepl("1", grid) ~ y_new, 
                              grepl("2", grid) ~ y_new+20, 
@@ -85,7 +78,12 @@ comb2 <- comb |>
                              grepl("7", grid) ~ y_new+20*6, 
                              grepl("8", grid) ~ y_new+20*7, .default = NA)) |> 
   mutate(x_coord = ncolumn) |> 
-  ungroup
+  ungroup()
+
+
+#All grids must have 160 cells, check this
+comb2 |> group_by(trait, site, grid) |> 
+  summarise(n = n()) 
 
 
 ###model for SES of height
