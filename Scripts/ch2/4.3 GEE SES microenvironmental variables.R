@@ -84,15 +84,18 @@ comb2 <- comb |>
 Hdat <- comb2 |> 
   filter(trait %in% c("Height_cm", NA)) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
   arrange(y_coord, x_coord) |> 
-  mutate(trait = "Height_cm") #give all records a trait
+  mutate(trait = "Height_cm",  #give all records a trait
+         grid = paste0(site, grid))  #grid variable must be unique accross sites for the impute function
   
 #All grids must have 160 cells, check this
 check <- Hdat |> group_by(site, grid) |> 
   summarise(n = n()) #all ok
 
-
+###Imputation##
 #now we need to impute the missing SES or predictor variables because the Gee won't work if there are NA's
 #for now, we fill fill the NA cells with the mean of it's 8 nearest neighbours
+#run Function_impute_cells.R
+
 
 
 
