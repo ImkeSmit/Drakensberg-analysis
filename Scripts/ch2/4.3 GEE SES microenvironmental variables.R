@@ -79,8 +79,9 @@ comb2 <- comb |>
   mutate(x_coord = ncolumn) |> 
   ungroup()
 
-
+#=====================================
 #####GEE FOR SES OF HEIGHT####
+#=====================================
 Hdat <- comb2 |> 
   filter(trait %in% c("Height_cm", NA)) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
   arrange(y_coord, x_coord) |> 
@@ -111,6 +112,17 @@ for (col in cols) {
     col, n_before, n_after, n_before - n_after
   ))
 }
+
+
+###LM###
+#Check autocorrelation first 
+cordf <- Hdat_filled |> select(c(colnames(Hdat)[c(6:13, 15:20, 25)]))
+cormat<- cor(cordf)
+cormat[cormat >0.7]
+cormat[cormat <-0.7]
+#none are highly correlated
+corrplot(cormat, type = "lower", method = "number")
+
 
 
 
