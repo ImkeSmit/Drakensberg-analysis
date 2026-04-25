@@ -22,8 +22,7 @@ cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire
          ncolumn = match(column, LETTERS[1:8])) |> 
           mutate(Cell_ID = paste0(site, "_G", str_sub(cellref, 3, 3), "_", column, row), 
                  elevation = as.numeric(elevation)) |> 
-          select(-c(cellref, site, grid, column, row)) |> 
-  filter(trait == "Height_cm")
+          select(-c(cellref, site, grid, column, row)) 
 
 #import microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
@@ -37,8 +36,8 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
 
 ##Combine SES and environmental data
 comb <- env |> 
-  #select(-c(site, grid, column,row)) |> 
-  full_join(cell_ses, by = "Cell_ID") |> 
+  #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
+  full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
 ##Now we need to change the coordinates to reflect the spatial structure of the whole dataset
 #make the grids contiguous, differing by 20m along the y axis
   mutate(y_new = case_when(site == "GG" ~ row, 
@@ -82,8 +81,8 @@ comb2 <- comb |>
 
 
 #All grids must have 160 cells, check this
-comb2 |> group_by(trait, site, grid) |> 
-  summarise(n = n()) 
+probs <- comb2 |> group_by(site, grid) |> 
+  summarise(n = n()) #all ok
 
 
 ###model for SES of height
