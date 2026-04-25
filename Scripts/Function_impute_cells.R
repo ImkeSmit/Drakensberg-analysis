@@ -84,31 +84,3 @@ impute_cells <- function(df, cols_to_impute) {
     }) |>
     ungroup()
 }
-
-# =============================================================================
-# Usage
-# =============================================================================
-
-Hdat_filled <- fill_neighbours(
-  df             = Hdat,
-  cols_to_impute = c("SES", "mean_soil_depth", "soil_moisture_adj_campaign2")
-)
-
-# --- Diagnostic summary ------------------------------------------------------
-
-cols <- c("SES", "mean_soil_depth", "soil_moisture_adj_campaign2")
-
-cat("=== NA summary before and after imputation ===\n\n")
-for (col in cols) {
-  if (!col %in% names(Hdat)) next
-  n_before <- sum(is.na(Hdat[[col]]))
-  n_after  <- sum(is.na(Hdat_filled[[col]]))
-  cat(sprintf(
-    "%-35s  NAs before: %3d  |  NAs after: %3d  |  Filled: %3d\n",
-    col, n_before, n_after, n_before - n_after
-  ))
-}
-
-# --- Optional: write to CSV --------------------------------------------------
-
-# write.csv(Hdat_filled, "Hdat_filled.csv", row.names = FALSE)
