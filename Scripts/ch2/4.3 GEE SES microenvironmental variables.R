@@ -95,7 +95,22 @@ check <- Hdat |> group_by(site, grid) |>
 #now we need to impute the missing SES or predictor variables because the Gee won't work if there are NA's
 #for now, we fill fill the NA cells with the mean of it's 8 nearest neighbours
 #run Function_impute_cells.R
+Hdat_filled <- impute_cells(df = Hdat, 
+                            cols_to_impute = colnames(Hdat)[c(6:20, 25)])
 
+#Check what was filled
+cols <- c(colnames(Hdat)[c(6:20, 25)])
+
+cat("=== NA summary before and after imputation ===\n\n")
+for (col in cols) {
+  if (!col %in% names(Hdat)) next
+  n_before <- sum(is.na(Hdat[[col]]))
+  n_after  <- sum(is.na(Hdat_filled[[col]]))
+  cat(sprintf(
+    "%-35s  NAs before: %3d  |  NAs after: %3d  |  Filled: %3d\n",
+    col, n_before, n_after, n_before - n_after
+  ))
+}
 
 
 
