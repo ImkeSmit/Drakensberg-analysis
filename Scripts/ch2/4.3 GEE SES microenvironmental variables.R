@@ -170,7 +170,7 @@ for(g in grid_vector) {
     lag   = 1:max_order,
     I     = one_grid_cor$res[, 1],
     lower = one_grid_cor$res[, 1] - 1.96 * sqrt(one_grid_cor$res[, 3]),
-    upper = one_grid_cor$res[, 1] + 1.96 * sqrt(one_grid_cor$res[, 3]), 
+    upper = one_grid_cor$res[, 1] + 1.96 * sqrt(one_grid_cor$res[, 3]) 
   )
   #evaluate whether moranI not different from zero
   morans_df$nonsig_diff_from_zero = morans_df$lower < 0 & morans_df$upper > 0 
@@ -245,94 +245,12 @@ for (g in grid_vector) {
 
 
 
-###Look at spatial autocorrelation in residuals
-#First we need to define the neighbourhood- run Function_same_grid_neighbours.R
-neibs <- same_grid_neighbours(data = Hdat_filled, 
-                              grid_col = "grid", 
-                              coord_cols = c("x_coord", "y_coord"), 
-                              k = 4)
-summary(neibs)
-spcor <- sp.correlogram(neibs, lm_resid, method = "I", order = 10) #compute MoranI up to distance of 20 meters
-#plot correlogram
-plot(spcor, ylim = c(-1,1))
-
-###Now we need to find the decay constant, i.e. the rate at which spatial autocorrelation decays
 
 
 
 
 
 
-###model for SES of height
-#isolate trait
-Hdat <- comb |> filter(trait == "Height_cm") |> 
-                 drop_na(SES, rock_cover, mean_soil_depth) |> #remove rows with na's
-                select(Cell_ID,grid, x_coord, y_coord, SES, rock_cover, mean_soil_depth, elevation) 
-
-##We may have to impute values for missing cells to be able to run the gee model
-
-#isolate two grids to model for now
-Hdat2 <- Hdat |> #filter(!is.na(SES)) |> 
-  #filter(grid %in% c("BK1", "BK2")) |>  #lets first only look at these grids because they are all the same size
-  arrange(grid, y_coord) |> 
-  mutate(grid = as.factor(grid))
-
-#Coordinates to compute spatial relationships from
-coords <- cbind(Hdat2$x_coord, Hdat2$y_coord)
-
-# Compute pairwise distances WITHIN each grid
-# First, get one representative grid to build R from
-# (assuming all grids have the same 8x20 layout)
-grid1_dat <- Hdat2 |> filter(grid == unique(grid)[1])
-grid_coords <- cbind(grid1_dat$x_coord, grid1_dat$y_coord)
-dist_within <- as.matrix(dist(grid_coords))
-
-
-###Draw a variogram
-# Load libraries
-library(gstat)
-library(sp)
-
-coordinates(Hdat2) = ~x_coord + y_coord
-
-# 2. Compute the empirical variogram
-# The formula 'log(zinc) ~ 1' assumes a constant mean (no spatial trend)
-v_empirical <- variogram(SES ~ 1, data = Hdat2)
-
-# 3. Plot the empirical variogram
-plot(v_empirical)
-
-# 4. Define an initial model (e.g., Spherical with sill=1, range=900, nugget=0.1)
-initial_model <- vgm(psill = 1, model = "Sph", range = 10, nugget = 0.1)
-
-# 5. Fit the model to empirical data
-v_fitted <- fit.variogram(v_empirical, initial_model)
-
-# 6. Plot empirical points and the fitted model together
-plot(v_empirical, model = v_fitted)
-
-
-
-
-#Draw a correlogram to see at which distance the spatial autocorrelation in model residuals decreases
-testlm <- lm(SES ~ rock_cover + mean_soil_depth, data = Hdat2)
-resid <- resid(testlm)
-
-neibs <- knn2nb(knearneigh(coords, k = 4))
-spcor <- sp.correlogram(neibs, resid, method = "I", order = 20)
-plot(spcor)
-
-cutoff <- 9  # your autocorrelation range from correlogram
-
-# Option A: Binary cutoff
-R <- ifelse(dist_within <= cutoff, 1, 0)
-diag(R) <- 1  # gee::gee expects 1s on diagonal
-#This identifies which cells belong to the cluster to compute spatial weights within
-
-
-##Option 2 build in distance decay based on correlogram
-R2 <- exp(-dist_within / cutoff)
-diag(R2) <- 1
 
 
 gee2 <- gee::gee(SES ~ rock_cover + mean_soil_depth,
