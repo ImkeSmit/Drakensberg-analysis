@@ -140,19 +140,24 @@ for(g in grid_vector) {
   cat("Processing grid:", g, "\n")
   
   #subset one grid
-  one_grid_resid <- lm_resid |> filter(grid == g)
   one_grid_dat <- Hdat_filled |>  filter(grid == g)
+  
+  #linear model
+  lm <- lm(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height, 
+           data = one_grid_dat)
+  one_grid_resid <- c(resid(lm))
   
   
   #Build neighbour list within grid
-  grid_coords <- cbind(one_grid$x_coord, one_grid$y_coord)
+  grid_coords <- cbind(one_grid_dat$x_coord, one_grid_dat$y_coord)
   k_local    <- min(4, nrow(one_grid_dat) - 1) #make sure grid has enough cells to compute 4 nearest neighbours
   grid_neighbours <- knn2nb(knearneigh(grid_coords, k = k_local))
   
   #Generate correlogram
-  max_order <- min(4, floor(nrow(one_grid_dat) / 5))
+  max_order <- min(15, floor(nrow(one_grid_dat) / 5))
   one_grid_cor <- tryCatch(
-    sp.correlogram(grid_neighbours, one_grid_resid$res, method = "I", order = max_order),
+    sp.correlogram(grid_neighbours, one_grid_resid, method = "I", order = max_order, 
+                   zero.policy = T), #tolerate zero neighbour sets (e.g., cells with less than 4 neighbours)
     error = function(e) { cat("  Correlogram failed for grid", g, ":", e$message, "\n"); NULL }
   )
   
@@ -185,7 +190,7 @@ for(g in grid_vector) {
   coefs_g <- coef(fit_g)
   decay_df[decay_df$grid == g, c("a", "b", "c")] <- coefs_g[c("a", "b", "c")]
   decay_df[decay_df$grid == g, "range_dist"]      <- -log(0.05) / coefs_g["b"]
-} ##This is failing because there are too few observations included in higher lags? Something is wrong... 
+} 
 
 
 
