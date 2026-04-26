@@ -1,14 +1,12 @@
 ####Function to get the neighbours of cells belonging to the same grid####
-
-
 library(spdep)
 
 # Assuming Hdat_filled has a column called 'grid' identifying grid membership
 
 # Build a neighbour list restricted to same-grid cells
 same_grid_neighbours <- function(data, #df with SES and environmental data
-                         grid_col, #column identifying grid memebrship
-                         coord_cols, #columns with the coordinates
+                         grid_col, #column identifying grid membership, text
+                         coord_cols, #columns with the coordinates, text vector
                          k = 4) {    #How many cells to use in moranI calculation
   
   grids <- unique(data[[grid_col]])
