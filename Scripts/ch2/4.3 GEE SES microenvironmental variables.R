@@ -129,8 +129,11 @@ lm_height <- lm(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mea
 lm_resid <- data.frame(res = resid(lm_height), grid = Hdat_filled$grid, x_coord = Hdat_filled$x_coord, 
                        y_coord = Hdat_filled$x_coord)
 
+
+###Plot correlograms and get decay constant for each grid separately
 grid_vector <- c(unique(Hdat_filled$grid))
 grid_correlograms <- vector(mode = "list", length = 22)
+names(grid_correlograms) <- grid_vector
 decay_df <- data.frame(grid = grid_vector, b = NA, a = NA, c = NA, range_dist = NA)
 
 for(g in grid_vector) {
@@ -147,14 +150,14 @@ for(g in grid_vector) {
   grid_neighbours <- knn2nb(knearneigh(grid_coords, k = k_local))
   
   #Generate correlogram
-  max_order <- min(15, floor(nrow(one_grid_dat) / 5))
+  max_order <- min(4, floor(nrow(one_grid_dat) / 5))
   one_grid_cor <- tryCatch(
     sp.correlogram(grid_neighbours, one_grid_resid$res, method = "I", order = max_order),
     error = function(e) { cat("  Correlogram failed for grid", g, ":", e$message, "\n"); NULL }
   )
   
   if (is.null(one_grid_cor)) next
-  grid_correlograms[[as.character(g)]] <- one_grid_cor
+  grid_correlograms[[which(names(grid_correlograms) == g)]]<- one_grid_cor
   
   
   #Extract Moran's I values
@@ -182,7 +185,7 @@ for(g in grid_vector) {
   coefs_g <- coef(fit_g)
   decay_df[decay_df$grid == g, c("a", "b", "c")] <- coefs_g[c("a", "b", "c")]
   decay_df[decay_df$grid == g, "range_dist"]      <- -log(0.05) / coefs_g["b"]
-}
+} ##This is failing because there are too few observations included in higher lags? Something is wrong... 
 
 
 
