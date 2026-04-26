@@ -130,11 +130,17 @@ lm_resid <- resid(lm_height)
 
 
 ###Look at spatial autocorrelation in residuals
-coords <- cbind(Hdat_filled$x_coord, Hdat_filled$y_coord) #coordinates of residuals
-neibs <- knn2nb(knearneigh(coords, k = 4)) #Define neighbours
+#First we need to define the neighbourhood- run Function_same_grid_neighbours.R
+neibs <- same_grid_neighbours(data = Hdat_filled, 
+                              grid_col = "grid", 
+                              coord_cols = c("x_coord", "y_coord"), 
+                              k = 4)
+summary(neibs)
 spcor <- sp.correlogram(neibs, lm_resid, method = "I", order = 10) #compute MoranI up to distance of 20 meters
 #plot correlogram
 plot(spcor, ylim = c(-1,1))
+
+
 
 
 
