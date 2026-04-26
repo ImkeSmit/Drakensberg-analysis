@@ -126,16 +126,64 @@ corrplot(cormat, type = "lower", method = "number")
 ##LM
 lm_height <- lm(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height + grid, 
                 data = Hdat_filled)
-lm_resid <- data.frame(res = resid(lm_height), grid = Hdat_filled$grid)
+lm_resid <- data.frame(res = resid(lm_height), grid = Hdat_filled$grid, x_coord = Hdat_filled$x_coord, 
+                       y_coord = Hdat_filled$x_coord)
 
 grid_vector <- c(unique(Hdat_filled$grid))
+grid_correlograms <- vector(mode = "list", length = 22)
+decay_df <- data.frame(grid = grid_vector, b = NA, a = NA, c = NA, range_dist = NA)
+
 for(g in grid_vector) {
-  one_grid <- Hdat_filled |> filter(grid == g)
+  cat("Processing grid:", g, "\n")
   
+  #subset one grid
+  one_grid_resid <- lm_resid |> filter(grid == g)
+  one_grid_dat <- Hdat_filled |>  filter(grid == g)
+  
+  
+  #Build neighbour list within grid
   grid_coords <- cbind(one_grid$x_coord, one_grid$y_coord)
-  grid_neighbours <- knn2nb(knearneigh(grid_coords, k = 4))
+  k_local    <- min(4, nrow(one_grid_dat) - 1) #make sure grid has enough cells to compute 4 nearest neighbours
+  grid_neighbours <- knn2nb(knearneigh(grid_coords, k = k_local))
   
+  #Generate correlogram
+  max_order <- min(15, floor(nrow(one_grid_dat) / 5))
+  one_grid_cor <- tryCatch(
+    sp.correlogram(grid_neighbours, one_grid_resid$res, method = "I", order = max_order),
+    error = function(e) { cat("  Correlogram failed for grid", g, ":", e$message, "\n"); NULL }
+  )
+  
+  if (is.null(one_grid_cor)) next
+  grid_correlograms[[as.character(g)]] <- one_grid_cor
+  
+  
+  #Extract Moran's I values
+  morans_df <- data.frame(
+    lag   = 1:max_order,
+    I     = one_grid_cor$res[, 1],
+    lower = one_grid_cor$res[, 1] - 1.96 * sqrt(one_grid_cor$res[, 3]),
+    upper = one_grid_cor$res[, 1] + 1.96 * sqrt(one_grid_cor$res[, 3])
+  )
+  
+  # --- Fit negative exponential ---
+  fit_g <- tryCatch(
+    nls(
+      I ~ a * exp(-b * lag) + c,
+      data    = morans_df,
+      start   = list(a = max(morans_df$I), b = 0.3, c = 0),
+      control = nls.control(maxiter = 200)
+    ),
+    error = function(e) { cat("  NLS failed for grid", g, ":", e$message, "\n"); NULL }
+  )
+  
+  if (is.null(fit_g)) next
+  
+  # --- Store results ---
+  coefs_g <- coef(fit_g)
+  decay_df[decay_df$grid == g, c("a", "b", "c")] <- coefs_g[c("a", "b", "c")]
+  decay_df[decay_df$grid == g, "range_dist"]      <- -log(0.05) / coefs_g["b"]
 }
+
 
 
 ###Look at spatial autocorrelation in residuals
