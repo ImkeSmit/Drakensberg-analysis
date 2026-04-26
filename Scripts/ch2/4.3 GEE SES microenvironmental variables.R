@@ -123,6 +123,19 @@ cormat[cormat <-0.7]
 #none are highly correlated
 corrplot(cormat, type = "lower", method = "number")
 
+##LM
+lm_height <- lm(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height + grid, 
+                data = Hdat_filled)
+lm_resid <- resid(lm_height)
+
+
+###Look at spatial autocorrelation in residuals
+coords <- cbind(Hdat_filled$x_coord, Hdat_filled$y_coord) #coordinates of residuals
+neibs <- knn2nb(knearneigh(coords, k = 4)) #Define neighbours
+spcor <- sp.correlogram(neibs, lm_resid, method = "I", order = 10) #compute MoranI up to distance of 20 meters
+#plot correlogram
+plot(spcor, ylim = c(-1,1))
+
 
 
 
