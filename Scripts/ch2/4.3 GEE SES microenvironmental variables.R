@@ -126,7 +126,16 @@ corrplot(cormat, type = "lower", method = "number")
 ##LM
 lm_height <- lm(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height + grid, 
                 data = Hdat_filled)
-lm_resid <- resid(lm_height)
+lm_resid <- data.frame(res = resid(lm_height), grid = Hdat_filled$grid)
+
+grid_vector <- c(unique(Hdat_filled$grid))
+for(g in grid_vector) {
+  one_grid <- Hdat_filled |> filter(grid == g)
+  
+  grid_coords <- cbind(one_grid$x_coord, one_grid$y_coord)
+  grid_neighbours <- knn2nb(knearneigh(grid_coords, k = 4))
+  
+}
 
 
 ###Look at spatial autocorrelation in residuals
@@ -139,6 +148,8 @@ summary(neibs)
 spcor <- sp.correlogram(neibs, lm_resid, method = "I", order = 10) #compute MoranI up to distance of 20 meters
 #plot correlogram
 plot(spcor, ylim = c(-1,1))
+
+###Now we need to find the decay constant, i.e. the rate at which spatial autocorrelation decays
 
 
 
