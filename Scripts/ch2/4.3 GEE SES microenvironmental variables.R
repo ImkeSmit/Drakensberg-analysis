@@ -349,9 +349,9 @@ cat("Off-diagonal range  :", range(R2[row(R2) != col(R2)]), "\n")  # should be [
 
 
 
-
+Hdat_filled$grid <- as.factor(Hdat_filled$grid)
 gee2 <- gee::gee(SES ~ rock_cover + mean_soil_depth,
-            family = gaussian, data = Hdat2,
+            family = gaussian, data = Hdat_filled,
             id = grid,
             corstr = "fixed",
             R= R2, 
