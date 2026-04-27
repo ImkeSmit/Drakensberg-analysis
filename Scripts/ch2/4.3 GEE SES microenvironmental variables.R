@@ -266,15 +266,39 @@ make_grid_corr <- function(b, first_nonsig_lag, coords) {
   corr[dmat > first_nonsig_lag] <- 0
   diag(corr) <- 1
   
-  # Ensure positive definiteness by flooring negative eigenvalues
-  eig <- eigen(corr, symmetric = TRUE)
-  if (any(eig$values < 1e-8)) {
-    eig$values  <- pmax(eig$values, 1e-8)
-    corr        <- eig$vectors %*% diag(eig$values) %*% t(eig$vectors)
-    # Re-standardise so diagonal is exactly 1
+  ###Fix negative eigenvalues###
+  #For a matrix to be valid the variance explained along any axis should be positive, zero or negative variance is impossible
+  #However, because of the truncation when building R (autocorrelation beyon nonsig lag = 0), negative eigenvalues can arise
+  #E.g. Point A correlates with point B (close together)
+  #Point B correlates with point C (close together)
+  #But A→C distance exceeds the lag cutoff, so their correlation is forced to 0
+  #This can produce negative eigenvalues
+  
+  
+  # Iterative correction: alternate between
+  #   (1) flooring negative off-diagonals to 0
+  #   (2) flooring negative eigenvalues to small positive
+  # until both conditions are satisfied simultaneously
+  max_iter <- 20
+  for (iter in seq_len(max_iter)) {
+    
+    # Step 1: fix any negative off-diagonal values
+    corr[corr < 0] <- 0
+    diag(corr)     <- 1
+    
+    # Step 2: check and fix positive definiteness
+    eig <- eigen(corr, symmetric = TRUE)
+    if (all(eig$values >= 1e-8)) break  # both conditions met, done
+    
+    eig$values <- pmax(eig$values, 1e-8)
+    corr       <- eig$vectors %*% diag(eig$values) %*% t(eig$vectors)
+    
+    # Rescale diagonal back to 1
     d    <- 1 / sqrt(diag(corr))
     corr <- diag(d) %*% corr %*% diag(d)
   }
+  
+  if (iter == max_iter) warning("Convergence not reached for a grid block — inspect manually")
   
   corr
 }
@@ -301,7 +325,23 @@ for (i in seq_along(grid_order)) {
   )
 }
 
+
+##Build a block diagonal matrix from the list of matrices. 
+#This places the autoccrelation structure of each grid along the diagonal of a large matrix, with xeroes everywhere else
+        #GG1-block  GG2-block  ...  BK7-block
+#GG1  [ 160×160  |    0      |  0  |    0    ]
+#GG2  [    0     | 160×160   |  0  |    0    ]
+ #.   [    0     |    0      |  .  |    0    ]
+#BK7  [    0     |    0      |  0  | 160×160 ]
 R2 <- as.matrix(Matrix::bdiag(block_list))
+
+# ── 6. Sanity checks ──────────────────────────────────────────────────────────
+cat("R2 dimensions       :", dim(R2), "\n")          # 3520 × 3520
+cat("All diagonal = 1    :", all(abs(diag(R2) - 1) < 1e-8), "\n")
+cat("Symmetric           :", isSymmetric(R2), "\n")
+cat("Min eigenvalue      :", min(eigen(R2, only.values = TRUE)$values), "\n")  # must be > 0
+cat("Off-diagonal range  :", range(R2[row(R2) != col(R2)]), "\n")  # should be [0, <1)
+
 
 
 
