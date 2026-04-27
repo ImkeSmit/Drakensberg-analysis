@@ -2,11 +2,9 @@
 library(spdep)
 library(spatialreg)
 library(spind)
-library(remotes)
-library(dataDownloader)
-library(osfr)
 library(tidyverse)
 library(tidylog)
+library(corrplot)
 
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
@@ -92,7 +90,7 @@ Hdat <- comb2 |>
 check <- Hdat |> group_by(site, grid) |> 
   summarise(n = n()) #all ok
 
-###Imputation##
+###Imputation####
 #now we need to impute the missing SES or predictor variables because the Gee won't work if there are NA's
 #for now, we fill fill the NA cells with the mean of it's 8 nearest neighbours
 #run Function_impute_cells.R
@@ -114,8 +112,7 @@ for (col in cols) {
 }
 
 
-###LM###
-#Check autocorrelation first 
+###Check collinearity#### 
 cordf <- Hdat_filled |> select(c(colnames(Hdat)[c(6:13, 15:20, 25)]))
 cormat<- cor(cordf)
 cormat[cormat >0.7]
@@ -123,13 +120,8 @@ cormat[cormat <-0.7]
 #none are highly correlated
 corrplot(cormat, type = "lower", method = "number")
 
-##LM
-lm_height <- lm(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height + grid, 
-                data = Hdat_filled)
-lm_resid <- data.frame(res = resid(lm_height), grid = Hdat_filled$grid, x_coord = Hdat_filled$x_coord, 
-                       y_coord = Hdat_filled$x_coord)
 
-
+####Spatial autocorrelation structure for each grid####
 ###Plot correlograms and get decay constant for each grid separately
 grid_vector <- c(unique(Hdat_filled$grid))
 grid_correlograms <- vector(mode = "list", length = 22)
