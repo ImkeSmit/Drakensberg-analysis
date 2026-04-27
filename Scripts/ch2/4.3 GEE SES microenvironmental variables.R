@@ -236,11 +236,72 @@ for (g in grid_vector) {
 }
 
 
+####Build correlation structure, R####
+grid_params <- decay_df
+
+#For some grids, th enegative exponential curve could not be fitted succesfully
+#Give these grids the average decay constant from all the grids
+mean_b   <- mean(grid_params$b,na.rm = TRUE)
+mean_lag <- round(mean(grid_params$first_nonsig_lag, na.rm = TRUE))
+
+grid_params <- grid_params %>%
+  mutate(b = ifelse(is.na(b),mean_b,b),
+    first_nonsig_lag = ifelse(is.na(first_nonsig_lag), mean_lag, first_nonsig_lag))
 
 
+coords_template <- expand.grid(
+  x_coord = seq(1, 8),   # 8 x-positions
+  y_coord = seq(1,  20)   # 20 y-positions
+)
 
+# ── 4. Function: build one 160×160 correlation block ─────────────────────────
+# Coordinates are integer grid steps; first_nonsig_lag is in the same units
+make_grid_corr <- function(b, first_nonsig_lag, coords) {
+  
+  # Euclidean distance matrix in grid-step units
+  dmat <- as.matrix(dist(coords[, c("x_coord", "row")])) #row is in steps of 1-20
+  
+  # Exponential correlation, zeroed beyond first_nonsig_lag steps
+  corr <- exp(-b * dmat)
+  corr[dmat > first_nonsig_lag] <- 0
+  diag(corr) <- 1
+  
+  # Ensure positive definiteness by flooring negative eigenvalues
+  eig <- eigen(corr, symmetric = TRUE)
+  if (any(eig$values < 1e-8)) {
+    eig$values  <- pmax(eig$values, 1e-8)
+    corr        <- eig$vectors %*% diag(eig$values) %*% t(eig$vectors)
+    # Re-standardise so diagonal is exactly 1
+    d    <- 1 / sqrt(diag(corr))
+    corr <- diag(d) %*% corr %*% diag(d)
+  }
+  
+  corr
+}
 
+# ── 5. Build block-diagonal R2 ────────────────────────────────────────────────
+# Preserve the grid order as they appear in Hdat2
+grid_order <- unique(Hdat_filled$grid)
+stopifnot(all(grid_order %in% grid_params$grid))
 
+block_list <- vector("list", length(grid_order))
+
+for (i in seq_along(grid_order)) {
+  g        <- grid_order[i]
+  params   <- grid_params[grid_params$grid == g, ]
+  coords_g <- Hdat_filled[Hdat_filled$grid == g, c("x_coord", "row")] #row is the y coord in steps of 1-20
+  
+  # Safety check: each grid must have exactly 160 points
+  stopifnot(nrow(coords_g) == 160)
+  
+  block_list[[i]] <- make_grid_corr(
+    b                = params$b,
+    first_nonsig_lag = params$first_nonsig_lag,
+    coords           = coords_g
+  )
+}
+
+R2 <- as.matrix(Matrix::bdiag(block_list))
 
 
 
