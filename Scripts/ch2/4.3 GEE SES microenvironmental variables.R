@@ -243,10 +243,12 @@ grid_params <- decay_df
 #Give these grids the average decay constant from all the grids
 mean_b   <- mean(grid_params$b,na.rm = TRUE)
 mean_lag <- round(mean(grid_params$first_nonsig_lag, na.rm = TRUE))
+mean_range_dist <- round(mean(grid_params$range_dist, na.rm = TRUE))
 
 grid_params <- grid_params %>%
   mutate(b = ifelse(is.na(b),mean_b,b),
-    first_nonsig_lag = ifelse(is.na(first_nonsig_lag), mean_lag, first_nonsig_lag))
+    first_nonsig_lag = ifelse(is.na(first_nonsig_lag), mean_lag, first_nonsig_lag), 
+    range_dist = ifelse(is.na(range_dist), mean_range_dist, range_dist))
 
 
 coords_template <- expand.grid(
@@ -263,7 +265,7 @@ make_grid_corr <- function(b, first_nonsig_lag, coords) {
   
   # Exponential correlation, zeroed beyond first_nonsig_lag steps
   corr <- exp(-b * dmat)
-  corr[dmat > first_nonsig_lag] <- 0
+  corr[dmat > first_nonsig_lag] <- 0 #replace with range_dist to make it more conservative
   diag(corr) <- 1
   
   ###Fix negative eigenvalues###
@@ -320,7 +322,9 @@ for (i in seq_along(grid_order)) {
   
   block_list[[i]] <- make_grid_corr(
     b                = params$b,
-    first_nonsig_lag = params$first_nonsig_lag,
+    first_nonsig_lag = params$range_dist, 
+    #replace with range_dist to make it more conservative
+    #using the first nonsignificant lag produces negative eigenvalues, especially in grids with slower decay
     coords           = coords_g
   )
 }
