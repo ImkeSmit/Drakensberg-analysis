@@ -5,6 +5,7 @@ library(spind)
 library(tidyverse)
 library(tidylog)
 library(corrplot)
+library(Matrix)
 
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
