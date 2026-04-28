@@ -86,14 +86,24 @@ for(g in grid_vector) {
   #range dist = the lag distance at which autocorrelation has decayed to 5% of its initial value. 
   #Beyond this distance, cells can be treated as independent
 
-
+}#end loop through grids to fit negitve exponential curve
 
 # --- Plot all 22 correlograms in one figure ---
 par(mfrow = c(4, 6), mar = c(2, 2, 2, 1))  # adjust layout to taste
 
-  if (is.null(one_grid_cor)) next
+for (g in grid_vector) {
   
-  max_order <- nrow(one_grid_cor$res)
+  g_char <- as.character(g)
+  spcor_g <- grid_correlograms[[g_char]]
+  if (is.null(spcor_g)) next
+  
+  max_order <- nrow(spcor_g$res)
+  morans_df <- data.frame(
+    lag   = 1:max_order,
+    I     = spcor_g$res[, 1],
+    lower = spcor_g$res[, 1] - 1.96 * sqrt(spcor_g$res[, 3]),
+    upper = spcor_g$res[, 1] + 1.96 * sqrt(spcor_g$res[, 3])
+  )
   
   # Base plot
   plot(morans_df$lag, morans_df$I,
@@ -115,10 +125,9 @@ par(mfrow = c(4, 6), mar = c(2, 2, 2, 1))  # adjust layout to taste
     I_pred   <- row_g$a * exp(-row_g$b * lag_seq) + row_g$c
     lines(lag_seq, I_pred, col = "firebrick", lwd = 1.5)
     abline(v = row_g$range_dist, lty = 2, col = "steelblue")
-    
-    p <- recordPlot()
   }
-}
+} #end loop to create figures
+
 
 return(decay_df) #return decay df
 return(p) #return plot
