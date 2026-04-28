@@ -22,40 +22,7 @@ make_grid_corr <- function(b, first_nonsig_lag, coords) {
   corr <- exp(-b * dmat)
   corr[dmat > first_nonsig_lag] <- 0 #replace with range_dist to make it more conservative
   diag(corr) <- 1
-  
-  ###Fix negative eigenvalues###
-  #For a matrix to be valid the variance explained along any axis should be positive, zero or negative variance is impossible
-  #However, because of the truncation when building R (autocorrelation beyon nonsig lag = 0), negative eigenvalues can arise
-  #E.g. Point A correlates with point B (close together)
-  #Point B correlates with point C (close together)
-  #But A→C distance exceeds the lag cutoff, so their correlation is forced to 0
-  #This can produce negative eigenvalues
-  
-  
-  # Iterative correction: alternate between
-  #   (1) flooring negative off-diagonals to 0
-  #   (2) flooring negative eigenvalues to small positive
-  # until both conditions are satisfied simultaneously
-  max_iter <- 20
-  for (iter in seq_len(max_iter)) {
-    
-    # Step 1: fix any negative off-diagonal values
-    corr[corr < 0] <- 0
-    diag(corr)     <- 1
-    
-    # Step 2: check and fix positive definiteness
-    eig <- eigen(corr, symmetric = TRUE)
-    if (all(eig$values >= 1e-8)) break  # both conditions met, done
-    
-    eig$values <- pmax(eig$values, 1e-8)
-    corr       <- eig$vectors %*% diag(eig$values) %*% t(eig$vectors)
-    
-    # Rescale diagonal back to 1
-    d    <- 1 / sqrt(diag(corr))
-    corr <- diag(d) %*% corr %*% diag(d)
-  }
-  
-  if (iter == max_iter) warning("Convergence not reached for a grid block — inspect manually")
+  corr[corr < 0] <- 0 #replace all negative values with zero, we do not model negative spatial autocorrelation here
   
   corr
 }#end make grid coor
