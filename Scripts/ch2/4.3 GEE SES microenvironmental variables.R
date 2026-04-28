@@ -119,7 +119,7 @@ cormat<- cor(cordf)
 cormat[cormat >0.7]
 cormat[cormat <-0.7]
 #none are highly correlated
-corrplot(cormat, type = "lower", method = "number")
+corrplot(as.matrix(cormat), type = "lower", method = "number")
 
 
 ####Spatial autocorrelation structure for each grid####
@@ -157,8 +157,8 @@ gee2 <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + me
             family = gaussian, data = Hdat_filled,
             id = grid,
             corstr = "fixed",
-            R= Rtest, 
-            scale.fix = FALSE)
+            R= Rtest[1:160, 1:160], #needs to be the same dimension as one group
+            scale.fix = FALSE) #start 12:15
 
 summary(gee2)
 
@@ -167,4 +167,19 @@ coefs <- summary(gee2)$coefficients
 p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
 cbind(coefs, p_value = round(p_values, 4))
 
+Hdat_final <- Hdat_filled |> 
+  arrange(y_coord) |> 
+  group_by(grid) |> 
+  mutate(order_in_grid = c(1:160))
+  
 
+zcor <- fixed2Zcor(cor.fixed = Rtest, 
+                   id = Hdat_final$grid, 
+                   waves = Hdat_final$order_in_grid)
+
+test2<- geepack::geeglm(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
+                        family = "gaussian", 
+                        data = Hdat_final, 
+                        id = c(Hdat_final$grid), 
+                        zcor = zcor, 
+                        corstr = "userdefined")
