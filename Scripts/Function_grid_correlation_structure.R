@@ -13,7 +13,7 @@
 #Beyond this distance, cells can be treated as independent
 
 grid_correlation_structure <- function(grid_vector, #vector of grid names c("GG1", "GG2")
-                                       data         #Gridded data with response and predictor variables
+                                       data,         #Gridded data with response and predictor variables
                                        formula,     #formula to use in lm() to get residuals, a character string "y~x1 +x2"
                                        k_specified) {   #how many neighbours to use in the calculation of Moran's I, an integer
 #create list to store correlograms
