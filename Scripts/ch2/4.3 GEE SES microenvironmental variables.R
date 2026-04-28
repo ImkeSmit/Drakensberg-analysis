@@ -153,11 +153,11 @@ Rtest <- build_R(data = Hdat_filled,
 
 ####Run GEE####
 Hdat_filled$grid <- as.factor(Hdat_filled$grid)
-gee2 <- gee::gee(SES ~ rock_cover + mean_soil_depth,
+gee2 <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
             family = gaussian, data = Hdat_filled,
             id = grid,
             corstr = "fixed",
-            R= R2, 
+            R= Rtest, 
             scale.fix = FALSE)
 
 summary(gee2)
