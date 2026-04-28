@@ -134,6 +134,24 @@ decay_df <- grid_correlation_structure(grid_vector = c(unique(Hdat_filled$grid))
 
 ####Build correlation matrix, R####
 grid_params <- decay_df
+#For some grids, the negative exponential curve could not be fitted succesfully
+#Give these grids the average decay constant from all the grids
+mean_b   <- mean(grid_params$b,na.rm = TRUE)
+mean_lag <- round(mean(grid_params$first_nonsig_lag, na.rm = TRUE))
+mean_range_dist <- round(mean(grid_params$range_dist, na.rm = TRUE))
+
+grid_params <- grid_params %>%
+  mutate(b = ifelse(is.na(b),mean_b,b),
+         first_nonsig_lag = ifelse(is.na(first_nonsig_lag), mean_lag, first_nonsig_lag), 
+         range_dist = ifelse(is.na(range_dist), mean_range_dist, range_dist))
+
+Rtest <- build_R(data = Hdat_filled, 
+                grid_params = grid_params, 
+                cutoff = "range_dist")
+
+
+
+grid_params <- decay_df
 
 #For some grids, th enegative exponential curve could not be fitted succesfully
 #Give these grids the average decay constant from all the grids
@@ -146,11 +164,6 @@ grid_params <- grid_params %>%
     first_nonsig_lag = ifelse(is.na(first_nonsig_lag), mean_lag, first_nonsig_lag), 
     range_dist = ifelse(is.na(range_dist), mean_range_dist, range_dist))
 
-
-coords_template <- expand.grid(
-  x_coord = seq(1, 8),   # 8 x-positions
-  y_coord = seq(1,  20)   # 20 y-positions
-)
 
 # ── 4. Function: build one 160×160 correlation block ─────────────────────────
 # Coordinates are integer grid steps; first_nonsig_lag is in the same units
