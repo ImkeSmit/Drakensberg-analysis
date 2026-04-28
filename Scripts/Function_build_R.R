@@ -66,8 +66,10 @@ R2 <- as.matrix(Matrix::bdiag(block_list))
 cat("R dimensions       :", dim(R2), "\n")          # 3520 × 3520
 cat("All diagonal = 1    :", all(abs(diag(R2) - 1) < 1e-8), "\n")
 cat("Symmetric           :", isSymmetric(R2), "\n")
-cat("Min eigenvalue      :", min(eigen(R2, only.values = TRUE)$values), "\n")  # must be > 0
-cat("Off-diagonal range  :", range(R2[row(R2) != col(R2)]), "\n")  # should be [0, <1)
+cat("Min value            :", min(R2))
+cat("Max value            :", max(R2))
+#cat("Min eigenvalue      :", min(eigen(R2, only.values = TRUE)$values), "\n")  # must be  0
+#cat("Off-diagonal range  :", range(R2[row(R2) != col(R2)]), "\n")  # should be [0, <1)
 
 return(R2)
 
