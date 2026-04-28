@@ -123,121 +123,16 @@ corrplot(cormat, type = "lower", method = "number")
 
 
 ####Spatial autocorrelation structure for each grid####
-###Plot correlograms and get decay constant for each grid separately
-grid_vector <- c(unique(Hdat_filled$grid))
-grid_correlograms <- vector(mode = "list", length = 22)
-names(grid_correlograms) <- grid_vector
-decay_df <- data.frame(grid = grid_vector, b = NA, a = NA, c = NA, range_dist = NA, first_nonsig_lag = NA)
-
-for(g in grid_vector) {
-  cat("Processing grid:", g, "\n")
-  
-  #subset one grid
-  one_grid_dat <- Hdat_filled |>  filter(grid == g)
-  
-  #linear model
-  lm <- lm(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height, 
-           data = one_grid_dat)
-  one_grid_resid <- c(resid(lm))
-  
-  
-  #Build neighbour list within grid
-  grid_coords <- cbind(one_grid_dat$x_coord, one_grid_dat$y_coord)
-  k_local    <- min(4, nrow(one_grid_dat) - 1) #make sure grid has enough cells to compute 4 nearest neighbours
-  grid_neighbours <- knn2nb(knearneigh(grid_coords, k = k_local))
-  
-  #Generate correlogram
-  max_order <- min(15, floor(nrow(one_grid_dat) / 5))
-  one_grid_cor <- tryCatch(
-    sp.correlogram(grid_neighbours, one_grid_resid, method = "I", order = max_order, 
-                   zero.policy = T), #tolerate zero neighbour sets (e.g., cells with less than 4 neighbours)
-    error = function(e) { cat("  Correlogram failed for grid", g, ":", e$message, "\n"); NULL }
-  )
-  
-  if (is.null(one_grid_cor)) next
-  grid_correlograms[[which(names(grid_correlograms) == g)]]<- one_grid_cor
-  
-  
-  #Extract Moran's I values
-  morans_df <- data.frame(
-    lag   = 1:max_order,
-    I     = one_grid_cor$res[, 1],
-    lower = one_grid_cor$res[, 1] - 1.96 * sqrt(one_grid_cor$res[, 3]),
-    upper = one_grid_cor$res[, 1] + 1.96 * sqrt(one_grid_cor$res[, 3]) 
-  )
-  #evaluate whether moranI not different from zero
-  morans_df$nonsig_diff_from_zero = morans_df$lower < 0 & morans_df$upper > 0 
-  
-  # --- Fit negative exponential ---
-  fit_g <- tryCatch(
-    nls(
-      I ~ a * exp(-b * lag) + c,
-      data    = morans_df,
-      start   = list(a = max(morans_df$I), b = 0.3, c = 0),
-      control = nls.control(maxiter = 200)
-    ),
-    error = function(e) { cat("  NLS failed for grid", g, ":", e$message, "\n"); NULL }
-  )
-  
-  if (is.null(fit_g)) next
-  
-  # --- Store results ---
-  coefs_g <- coef(fit_g)
-  decay_df[decay_df$grid == g, c("a", "b", "c")] <- coefs_g[c("a", "b", "c")]
-  decay_df[decay_df$grid == g, "range_dist"]      <- -log(0.05) / coefs_g["b"]
-  decay_df[decay_df$grid == g, "first_nonsig_lag"] <- which(morans_df$nonsig_diff_from_zero == TRUE)[1]
-  #a = the value of MoranI at lag = 0, i.e. between adjacent cells
-  #b = decay rate. How rapidly spatial autocorrelation breaks down with increasing lag distance. 
-    #large b -> autocorrelation disappears quickly over short distances
-  #c = asymptote. The value that Moran's I tends to at large lag distances
-  #range dist = the lag distance at which autocorrelation has decayed to 5% of its initial value. 
-  #Beyond this distance, cells can be treated as independent
-} #end loop
+#Run Function_grid_correlation_structure.R
+decay_df <- grid_correlation_structure(grid_vector = c(unique(Hdat_filled$grid)), 
+                                   data = Hdat_filled, 
+                                   formula = "SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height", 
+                                   k_specified = 4)
 
 
 
-# --- Plot all 22 correlograms in one figure ---
-par(mfrow = c(4, 6), mar = c(2, 2, 2, 1))  # adjust layout to taste
 
-for (g in grid_vector) {
-  
-  g_char <- as.character(g)
-  spcor_g <- grid_correlograms[[g_char]]
-  if (is.null(spcor_g)) next
-  
-  max_order <- nrow(spcor_g$res)
-  morans_df <- data.frame(
-    lag   = 1:max_order,
-    I     = spcor_g$res[, 1],
-    lower = spcor_g$res[, 1] - 1.96 * sqrt(spcor_g$res[, 3]),
-    upper = spcor_g$res[, 1] + 1.96 * sqrt(spcor_g$res[, 3])
-  )
-  
-  # Base plot
-  plot(morans_df$lag, morans_df$I,
-       pch  = 16, cex = 0.7,
-       xlab = "Lag", ylab = "Moran's I",
-       ylim = c(min(morans_df$lower, 0), max(morans_df$upper)),
-       main = paste("Grid", g))
-  
-  arrows(morans_df$lag, morans_df$lower,
-         morans_df$lag, morans_df$upper,
-         length = 0.03, angle = 90, code = 3, col = "grey60")
-  
-  abline(h = 0, lty = 3, col = "grey40")
-  
-  # Overlay fitted curve if available
-  row_g <- decay_df[decay_df$grid == g, ]
-  if (!is.na(row_g$b)) {
-    lag_seq  <- seq(1, max_order, length.out = 200)
-    I_pred   <- row_g$a * exp(-row_g$b * lag_seq) + row_g$c
-    lines(lag_seq, I_pred, col = "firebrick", lwd = 1.5)
-    abline(v = row_g$range_dist, lty = 2, col = "steelblue")
-  }
-}
-
-
-####Build correlation structure, R####
+####Build correlation matrix, R####
 grid_params <- decay_df
 
 #For some grids, th enegative exponential curve could not be fitted succesfully
