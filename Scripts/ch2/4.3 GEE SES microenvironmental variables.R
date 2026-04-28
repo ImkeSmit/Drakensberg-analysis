@@ -149,6 +149,18 @@ Rtest <- build_R(data = Hdat_filled,
                 grid_params = grid_params, 
                 cutoff = "range_dist")
 
+#map R as a sanity check
+df <- melt(Rtest)
+colnames(df) <- c("row", "col", "correlation")
+
+pdf("Figures/R_plot.pdf")
+ggplot(df, aes(x = col, y = row, fill = correlation)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  coord_fixed() +
+  theme_minimal() 
+dev.off()
+
 
 
 ####Run GEE####
