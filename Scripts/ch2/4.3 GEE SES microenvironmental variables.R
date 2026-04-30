@@ -172,9 +172,11 @@ dev.off()
 
 ####Run GEE####
 Hdat_filled$grid <- as.factor(Hdat_filled$grid)
+Hdat_filled$Cell_ID <- as.factor(Hdat_filled$Cell_ID)
+
 gee2 <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
             family = gaussian, data = Hdat_filled,
-            id = grid,
+            id = Cell_ID,
             corstr = "fixed",
             R= Rtest, #needs to be the same dimension as one group
             scale.fix = T, scale.value = 1, #this is what Pete used in his code 
@@ -186,20 +188,3 @@ summary(gee2)
 coefs <- summary(gee2)$coefficients
 p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
 cbind(coefs, p_value = round(p_values, 4))
-
-Hdat_final <- Hdat_filled |> 
-  arrange(y_coord) |> 
-  group_by(grid) |> 
-  mutate(order_in_grid = c(1:160))
-  
-
-zcor <- fixed2Zcor(cor.fixed = Rtest, 
-                   id = Hdat_final$grid, 
-                   waves = Hdat_final$order_in_grid)
-
-test2<- geepack::geeglm(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
-                        family = "gaussian", 
-                        data = Hdat_final, 
-                        id = c(Hdat_final$grid), 
-                        zcor = zcor, 
-                        corstr = "userdefined")
