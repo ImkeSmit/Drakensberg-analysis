@@ -1,5 +1,5 @@
 ###Script to analyse relationship between SES and microenvironmental variables
-#library(spdep)
+library(spdep)
 #library(spatialreg)
 #library(spind)
 library(tidyverse)
@@ -148,7 +148,7 @@ grid_params <- grid_params %>%
 
 Rtest <- build_R(data = Hdat_filled, 
                 grid_params = grid_params, 
-                cutoff = "range_dist")
+                cutoff = "first_nonsig_lag")
 
 #map R as a sanity check
 df <- melt(Rtest)
