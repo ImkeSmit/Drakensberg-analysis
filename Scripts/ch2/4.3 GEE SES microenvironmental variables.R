@@ -4,6 +4,8 @@ library(spdep)
 #library(spind)
 library(tidyverse)
 library(tidylog)
+library(reshape2)
+library(ggplot2)
 library(corrplot)
 library(Matrix)
 library(gee)
@@ -98,6 +100,7 @@ check <- Hdat |> group_by(site, grid) |>
 #run Function_impute_cells.R
 Hdat_filled <- impute_cells(df = Hdat, 
                             cols_to_impute = colnames(Hdat)[c(6:20, 25)])
+Hdat_filled <- Hdat_filled |> arrange(y_coord)
 
 #Check what was filled
 cols <- c(colnames(Hdat)[c(6:20, 25)])
@@ -117,8 +120,8 @@ for (col in cols) {
 ###Check collinearity#### 
 cordf <- Hdat_filled |> select(c(colnames(Hdat)[c(6:13, 15:20, 25)]))
 cormat<- cor(cordf)
-cormat[cormat >0.7]
-cormat[cormat <-0.7]
+#cormat[cormat >0.7]
+#cormat[cormat <-0.7]
 #none are highly correlated
 corrplot(cormat, type = "lower", method = "number")
 
@@ -140,15 +143,18 @@ grid_params <- decay_df
 mean_b   <- mean(grid_params$b,na.rm = TRUE)
 mean_lag <- round(mean(grid_params$first_nonsig_lag, na.rm = TRUE))
 mean_range_dist <- round(mean(grid_params$range_dist, na.rm = TRUE))
+mean_first_nonsig_lag <- round(mean(grid_params$first_nonsig_lag, na.rm = TRUE))
 
 grid_params <- grid_params %>%
   mutate(b = ifelse(is.na(b),mean_b,b),
          first_nonsig_lag = ifelse(is.na(first_nonsig_lag), mean_lag, first_nonsig_lag), 
-         range_dist = ifelse(is.na(range_dist), mean_range_dist, range_dist))
+         range_dist = ifelse(is.na(range_dist), mean_range_dist, range_dist), 
+         first_nonsig_lag = ifelse(is.na(first_nonsig_lag), mean_first_nonsig_lag, first_nonsig_lag))
 
 Rtest <- build_R(data = Hdat_filled, 
                 grid_params = grid_params, 
                 cutoff = "first_nonsig_lag")
+
 
 #map R as a sanity check
 df <- melt(Rtest)
@@ -158,7 +164,7 @@ pdf("Figures/R_plot.pdf")
 ggplot(df, aes(x = col, y = row, fill = correlation)) +
   geom_tile() +
   scale_fill_viridis_c() +
-  coord_fixed() +
+  coord_flip() +
   theme_minimal() 
 dev.off()
 
@@ -170,8 +176,9 @@ gee2 <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + me
             family = gaussian, data = Hdat_filled,
             id = grid,
             corstr = "fixed",
-            R= Rtest[1:160, 1:160], #needs to be the same dimension as one group
-            scale.fix = FALSE) #start 12:15
+            R= Rtest, #needs to be the same dimension as one group
+            scale.fix = T, scale.value = 1, #this is what Pete used in his code 
+            silent = F) #start 09:44
 
 summary(gee2)
 
