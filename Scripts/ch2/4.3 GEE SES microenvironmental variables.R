@@ -1,11 +1,12 @@
 ###Script to analyse relationship between SES and microenvironmental variables
-library(spdep)
-library(spatialreg)
-library(spind)
+#library(spdep)
+#library(spatialreg)
+#library(spind)
 library(tidyverse)
 library(tidylog)
 library(corrplot)
 library(Matrix)
+library(gee)
 
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
@@ -119,7 +120,7 @@ cormat<- cor(cordf)
 cormat[cormat >0.7]
 cormat[cormat <-0.7]
 #none are highly correlated
-corrplot(as.matrix(cormat), type = "lower", method = "number")
+corrplot(cormat, type = "lower", method = "number")
 
 
 ####Spatial autocorrelation structure for each grid####
