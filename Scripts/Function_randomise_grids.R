@@ -5,7 +5,7 @@
 
 randomise_grids <- function(data, var) {
 
-  grids_22 <- c(unique(data$grid)
+  grids_22 <- c(unique(data$grid))
   
   for(g in grids_22) {
     #select grid to randomise
