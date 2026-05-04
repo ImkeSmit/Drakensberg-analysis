@@ -47,6 +47,6 @@ randomise_grids <- function(data, var, iterations) {
 }#end function
 
 #example use
-test <- randomise_grids(data = Hdat_filled, 
-                        var = "SES",
-                        iterations = 10)
+#test <- randomise_grids(data = Hdat_filled, 
+#                        var = "SES",
+#                        iterations = 10)
