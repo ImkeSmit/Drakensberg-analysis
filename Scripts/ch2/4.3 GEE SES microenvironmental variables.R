@@ -137,7 +137,22 @@ decay_df <- grid_correlation_structure(grid_vector = c(unique(Hdat_filled$grid))
 
 ###Build 3 correlation matrices####
 #with lowest b, mean b and highest b
+#function for correlation matrices of one grid
+make_grid_corr <- function(b, first_nonsig_lag, coords) {
+  
+  # Euclidean distance matrix in grid-step units
+  dmat <- as.matrix(dist(coords[, c("x_coord", "row")])) #row is in steps of 1-20
+  
+  # Exponential correlation, zeroed beyond first_nonsig_lag steps
+  corr <- exp(-b * dmat)
+  corr[dmat > first_nonsig_lag] <- 0 #replace with range_dist to make it more conservative
+  diag(corr) <- 1
+  corr[corr < 0] <- 0 #replace all negative values with zero, we do not model negative spatial autocorrelation here
+  
+  corr
+}#end make grid corr
 
+#get lowest, highest and mean distance decay
 lowest_b <- decay_df |> #slowest distance decay
   filter(b == min(b, na.rm = T))
 
@@ -152,26 +167,21 @@ coordinates_one_grid <- Hdat_filled |> #get the coordinates of one grid
   filter(grid == "GG1") |> 
 select(x_coord, row)
 
-
-make_grid_corr <- function(b, first_nonsig_lag, coords) {
-  
-  # Euclidean distance matrix in grid-step units
-  dmat <- as.matrix(dist(coords[, c("x_coord", "row")])) #row is in steps of 1-20
-  
-  # Exponential correlation, zeroed beyond first_nonsig_lag steps
-  corr <- exp(-b * dmat)
-  corr[dmat > first_nonsig_lag] <- 0 #replace with range_dist to make it more conservative
-  diag(corr) <- 1
-  corr[corr < 0] <- 0 #replace all negative values with zero, we do not model negative spatial autocorrelation here
-  
-  corr
-}#end make grid coor
-
+#lowest distance decay
 lowest_R <- make_grid_corr(b = lowest_b$b, 
                            first_nonsig_lag = lowest_b$first_nonsig_lag, 
                            coords = coordinates_one_grid)
+
+highest_R <- make_grid_corr(b = highest_b$b, 
+                            first_nonsig_lag = highest_b$first_nonsig_lag, 
+                            coords = coordinates_one_grid)
+
+mean_R <- make_grid_corr(b = mean_b$b, 
+                         first_nonsig_lag = mean_b$first_nonsig_lag, 
+                         coords = coordinates_one_grid)
+
 #map R as a sanity check
-df <- melt(lowest_R)
+df <- melt(highest_R)
 colnames(df) <- c("row", "col", "correlation")
 
 pdf("Figures/R_plot.pdf")
