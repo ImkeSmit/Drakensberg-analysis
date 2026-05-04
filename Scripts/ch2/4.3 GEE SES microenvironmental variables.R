@@ -270,7 +270,7 @@ for (l in 1:length(random_list)) {
   data <- random_list[[l]]
   
   one_gee <- gee::gee(randomised_SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
-                       family = gaussian, data = Hdat_filled,
+                       family = gaussian, data = data,
                        id = grid,
                        corstr = "fixed",
                        R = mean_R, #needs to be the same dimension as one group
@@ -285,7 +285,7 @@ for (l in 1:length(random_list)) {
   results_table$l = l
   results_table$variable <- row.names(results_table)
   row.names(results_table) <- NULL
-  }
+  } else {
   
   results_temp <- as.data.frame(cbind(coefs, p_value = round(p_values, 4)))
   results_temp$l = l
@@ -293,5 +293,6 @@ for (l in 1:length(random_list)) {
   row.names(results_temp) <- NULL
   
   results_table <- rbind(results_table, results_temp)
+  }
   
 }
