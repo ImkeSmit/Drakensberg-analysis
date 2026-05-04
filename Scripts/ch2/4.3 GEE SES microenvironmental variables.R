@@ -193,40 +193,6 @@ ggplot(df, aes(x = col, y = row, fill = correlation)) +
 dev.off()
 
 
-####Build correlation matrix, R####
-grid_params <- decay_df
-#For some grids, the negative exponential curve could not be fitted succesfully
-#Give these grids the average decay constant from all the grids
-mean_b   <- mean(grid_params$b,na.rm = TRUE)
-mean_lag <- round(mean(grid_params$first_nonsig_lag, na.rm = TRUE))
-mean_range_dist <- round(mean(grid_params$range_dist, na.rm = TRUE))
-mean_first_nonsig_lag <- round(mean(grid_params$first_nonsig_lag, na.rm = TRUE))
-
-grid_params <- grid_params %>%
-  mutate(b = ifelse(is.na(b),mean_b,b),
-         first_nonsig_lag = ifelse(is.na(first_nonsig_lag), mean_lag, first_nonsig_lag), 
-         range_dist = ifelse(is.na(range_dist), mean_range_dist, range_dist), 
-         first_nonsig_lag = ifelse(is.na(first_nonsig_lag), mean_first_nonsig_lag, first_nonsig_lag))
-
-Rtest <- build_R(data = Hdat_filled, 
-                grid_params = grid_params, 
-                cutoff = "first_nonsig_lag")
-
-
-#map R as a sanity check
-df <- melt(Rtest)
-colnames(df) <- c("row", "col", "correlation")
-
-pdf("Figures/R_plot.pdf")
-ggplot(df, aes(x = col, y = row, fill = correlation)) +
-  geom_tile() +
-  scale_fill_viridis_c() +
-  coord_flip() +
-  theme_minimal() 
-dev.off()
-
-
-
 ####Run GEE####
 Hdat_filled$grid <- as.factor(Hdat_filled$grid)
 Hdat_filled$Cell_ID <- as.factor(Hdat_filled$Cell_ID)
