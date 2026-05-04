@@ -197,6 +197,7 @@ dev.off()
 
 
 ####Run GEE####
+#LOWEST DECAY RATE
 gee_lowest <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
             family = gaussian, data = Hdat_filled,
             id = grid,
@@ -213,3 +214,51 @@ p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
 cbind(coefs, p_value = round(p_values, 4))
 
 
+#HIGHEST DECAY RATE
+gee_highest <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
+                       family = gaussian, data = Hdat_filled,
+                       id = grid,
+                       corstr = "fixed",
+                       R = highest_R, #needs to be the same dimension as one group
+                       scale.fix = T, scale.value = 1, #this is what Pete used in his code 
+                       silent = F) 
+
+summary(gee_highest)
+
+#Get p values
+coefs <- summary(gee_highest)$coefficients
+p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
+cbind(coefs, p_value = round(p_values, 4))
+
+
+#MEAN DECAY RATE
+gee_mean <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
+                        family = gaussian, data = Hdat_filled,
+                        id = grid,
+                        corstr = "fixed",
+                        R = mean_R, #needs to be the same dimension as one group
+                        scale.fix = T, scale.value = 1, #this is what Pete used in his code 
+                        silent = F) 
+
+summary(gee_mean)
+
+#Get p values
+coefs <- summary(gee_mean)$coefficients
+p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
+cbind(coefs, p_value = round(p_values, 4))
+
+##Try gee for elevation
+gee_ele <- gee::gee(SES ~ elevation,
+                     family = gaussian, data = Hdat_filled,
+                     id = grid,
+                     corstr = "fixed",
+                     R = mean_R, #needs to be the same dimension as one group
+                     scale.fix = T, scale.value = 1, #this is what Pete used in his code 
+                     silent = F) 
+
+summary(gee_ele)
+
+#Get p values
+coefs <- summary(gee_ele)$coefficients
+p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
+cbind(coefs, p_value = round(p_values, 4))
