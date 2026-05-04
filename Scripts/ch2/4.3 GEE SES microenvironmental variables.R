@@ -194,11 +194,18 @@ cbind(coefs, p_value = round(p_values, 4))
 R_estimated <- summary(gee2)$working.correlation
 
 
+testdat  <- Hdat_filled |> 
+  filter(grid %in% c("GG1", "GG2"))
+
+R2 <- Rtest[1:320,1:320]
 gee3 <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
-                 family = gaussian, data = Hdat_filled,
+                 family = gaussian, data = testdat,
                  id = ID_gee,
                  corstr = "fixed",
-                 R= Rtest, #needs to be the same dimension as one group
+                 R= R2, #needs to be the same dimension as one group
                  scale.fix = T, scale.value = 1, #this is what Pete used in his code 
                  silent = F) #start 09:44
 summary(gee3)
+coefs <- summary(gee3)$coefficients
+p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
+cbind(coefs, p_value = round(p_values, 4))
