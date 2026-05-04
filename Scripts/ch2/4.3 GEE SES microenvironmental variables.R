@@ -100,7 +100,10 @@ check <- Hdat |> group_by(site, grid) |>
 #run Function_impute_cells.R
 Hdat_filled <- impute_cells(df = Hdat, 
                             cols_to_impute = colnames(Hdat)[c(6:20, 25)])
-Hdat_filled <- Hdat_filled |> arrange(y_coord)
+Hdat_filled <- Hdat_filled |> 
+  arrange(y_coord) |> 
+  mutate(grid = as.factor(grid), #cluster ID must be a factor
+         elevation = as.numeric(elevation))
 
 #Check what was filled
 cols <- c(colnames(Hdat)[c(6:20, 25)])
@@ -194,41 +197,19 @@ dev.off()
 
 
 ####Run GEE####
-Hdat_filled$grid <- as.factor(Hdat_filled$grid)
-Hdat_filled$Cell_ID <- as.factor(Hdat_filled$Cell_ID)
-Hdat_filled$ID_gee <- as.factor("one_cluster") #make the whole dataset one cluster
-
-gee2 <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
+gee_lowest <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
             family = gaussian, data = Hdat_filled,
             id = grid,
-            corstr = "unstructured",
-            #R= Rtest, #needs to be the same dimension as one group
+            corstr = "fixed",
+            R = lowest_R, #needs to be the same dimension as one group
             scale.fix = T, scale.value = 1, #this is what Pete used in his code 
-            silent = F) #start 09:44
+            silent = F) 
 
-summary(gee2)
+summary(gee_lowest)
 
 #Get p values
-coefs <- summary(gee2)$coefficients
+coefs <- summary(gee_lowest)$coefficients
 p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
 cbind(coefs, p_value = round(p_values, 4))
 
-#look at working correlation
-R_estimated <- summary(gee2)$working.correlation
 
-
-testdat  <- Hdat_filled |> 
-  filter(grid %in% c("GG1", "GG2"))
-
-R2 <- Rtest[1:320,1:320]
-gee3 <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
-                 family = gaussian, data = testdat,
-                 id = ID_gee,
-                 corstr = "fixed",
-                 R= R2, #needs to be the same dimension as one group
-                 scale.fix = T, scale.value = 1, #this is what Pete used in his code 
-                 silent = F) #start 09:44
-summary(gee3)
-coefs <- summary(gee3)$coefficients
-p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
-cbind(coefs, p_value = round(p_values, 4))
