@@ -135,6 +135,21 @@ decay_df <- grid_correlation_structure(grid_vector = c(unique(Hdat_filled$grid))
 
 
 
+###Build 3 correlation matrices####
+#with lowest b, mean b and highest b
+
+lowest_b <- decay_df |> #slowest distance decay
+  filter(b == min(b, na.rm = T))
+
+highest_b <- decay_df |> #fastest distance decay
+  filter(b == max(b, na.rm = T))
+
+mean_b <- decay_df |> 
+  summarise(b = mean(b, na.rm = T), 
+            first_nonsig_lag = ceiling(mean(first_nonsig_lag, na.rm = T)))
+
+
+
 
 ####Build correlation matrix, R####
 grid_params <- decay_df
