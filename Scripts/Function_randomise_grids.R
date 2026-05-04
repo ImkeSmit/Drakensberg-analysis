@@ -34,6 +34,7 @@ randomise_grids <- function(data, var, iterations) {
       randomised_dat <- data |> 
         left_join(new_var, by = "Cell_ID")
     }#end loop through grids
+    return(randomised_dat)
   }#end single_iter
   
   # ---- Run iterations ----#
@@ -45,3 +46,7 @@ randomise_grids <- function(data, var, iterations) {
   return(randomised_list)
 }#end function
 
+
+test <- randomise_grids(data = Hdat_filled, 
+                        var = "SES",
+                        iterations = 10)
