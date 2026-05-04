@@ -26,10 +26,10 @@ randomise_grids <- function(data, var, iterations) {
       
       if(g == "GG1") {
         new_var <- data.frame(Cell_ID = rnames, randomised_SES = shuffled_var)
-      }
-      
+      } else{
       temp <- data.frame(Cell_ID = rnames, randomised_SES = shuffled_var)
       new_var <- rbind(new_var, temp)
+      }
       
       randomised_dat <- data |> 
         left_join(new_var, by = "Cell_ID")
