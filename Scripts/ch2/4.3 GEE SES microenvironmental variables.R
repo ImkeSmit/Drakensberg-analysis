@@ -249,10 +249,49 @@ summary(gee_mean)
 #Get p values
 coefs <- summary(gee_mean)$coefficients
 p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
-cbind(coefs, p_value = round(p_values, 4))
+results_table <- cbind(coefs, p_value = round(p_values, 4))
 
 
 #===============================#
 ######PERMUTATION TEST###########
 #===============================#
 
+#Build 999 randomised grids
+#for now, we will randomise only SES
+#Run Function_randomise_grids
+
+random_list <- randomise_grids(data = Hdat_filled, 
+                               var = "SES",
+                               iterations = 10)
+
+
+#Loop through random_list, performing gee and extracting p value for each one
+for (l in 1:length(random_list)) {
+  data <- random_list[[l]]
+  
+  one_gee <- gee::gee(randomised_SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
+                       family = gaussian, data = Hdat_filled,
+                       id = grid,
+                       corstr = "fixed",
+                       R = mean_R, #needs to be the same dimension as one group
+                       scale.fix = T, scale.value = 1, #this is what Pete used in his code 
+                       silent = F) 
+  
+  coefs <- summary(gee_mean)$coefficients
+  p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
+  
+  if(l == 1) {
+  results_table <- as.data.frame(cbind(coefs, p_value = round(p_values, 4)))
+  results_table$l = l
+  results_table$variable <- row.names(results_table)
+  row.names(results_table) <- NULL
+  }
+  
+  results_temp <- as.data.frame(cbind(coefs, p_value = round(p_values, 4)))
+  results_temp$l = l
+  results_temp$variable <- row.names(results_temp)
+  row.names(results_temp) <- NULL
+  
+  results_table <- rbind(results_table, results_temp)
+  
+}
