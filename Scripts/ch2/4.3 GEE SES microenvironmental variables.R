@@ -94,7 +94,9 @@ Hdat <- comb2 |>
 check <- Hdat |> group_by(site, grid) |> 
   summarise(n = n()) #all ok
 
+#===============#
 ###Imputation####
+#===============#
 #now we need to impute the missing SES or predictor variables because the Gee won't work if there are NA's
 #for now, we fill fill the NA cells with the mean of it's 8 nearest neighbours
 #run Function_impute_cells.R
@@ -128,8 +130,9 @@ cormat<- cor(cordf)
 #none are highly correlated
 corrplot(cormat, type = "lower", method = "number")
 
-
+#=====================================================#
 ####Spatial autocorrelation structure for each grid####
+#=====================================================#
 #Run Function_grid_correlation_structure.R
 decay_df <- grid_correlation_structure(grid_vector = c(unique(Hdat_filled$grid)), 
                                    data = Hdat_filled, 
@@ -195,8 +198,9 @@ ggplot(df, aes(x = col, y = row, fill = correlation)) +
   theme_minimal() 
 dev.off()
 
-
+#=============#
 ####Run GEE####
+#=============#
 #LOWEST DECAY RATE
 gee_lowest <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
             family = gaussian, data = Hdat_filled,
@@ -247,18 +251,8 @@ coefs <- summary(gee_mean)$coefficients
 p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
 cbind(coefs, p_value = round(p_values, 4))
 
-##Try gee for elevation
-gee_ele <- gee::gee(SES ~ elevation,
-                     family = gaussian, data = Hdat_filled,
-                     id = grid,
-                     corstr = "fixed",
-                     R = mean_R, #needs to be the same dimension as one group
-                     scale.fix = T, scale.value = 1, #this is what Pete used in his code 
-                     silent = F) 
 
-summary(gee_ele)
+#===============================#
+######PERMUTATION TEST###########
+#===============================#
 
-#Get p values
-coefs <- summary(gee_ele)$coefficients
-p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
-cbind(coefs, p_value = round(p_values, 4))
