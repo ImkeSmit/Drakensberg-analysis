@@ -249,7 +249,9 @@ summary(gee_mean)
 #Get p values
 coefs <- summary(gee_mean)$coefficients
 p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
-results_table <- cbind(coefs, p_value = round(p_values, 4))
+gee_mean_results <- as.data.frame(cbind(coefs, p_value = round(p_values, 4)))
+gee_mean_results$variable <- row.names(gee_mean_results)
+row.names(gee_mean_results) <- NULL
 
 
 #===============================#
@@ -262,7 +264,7 @@ results_table <- cbind(coefs, p_value = round(p_values, 4))
 
 random_list <- randomise_grids(data = Hdat_filled, 
                                var = "SES",
-                               iterations = 10)
+                               iterations = 99)
 
 
 #Loop through random_list, performing gee and extracting p value for each one
@@ -277,7 +279,7 @@ for (l in 1:length(random_list)) {
                        scale.fix = T, scale.value = 1, #this is what Pete used in his code 
                        silent = F) 
   
-  coefs <- summary(gee_mean)$coefficients
+  coefs <- summary(one_gee)$coefficients
   p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
   
   if(l == 1) {
@@ -294,5 +296,18 @@ for (l in 1:length(random_list)) {
   
   results_table <- rbind(results_table, results_temp)
   }
-  
 }
+
+
+#Let's look at the p value for rock_cover
+p_rock <- results_table |> 
+  filter(variable == "rock_cover")
+
+library(ggplot2)
+ggplot(p_rock, aes(x = Estimate)) +
+  geom_histogram() +
+  geom_vline(xintercept = 0.004)
+
+#how many times were the estimates of the randomised models different from the observed model?
+mean(abs(p_rock$Estimate) >= abs(gee_mean_results$Estimate[2]))
+#0.45 were as extreme or more extreme than the observed estimate
