@@ -173,12 +173,13 @@ dev.off()
 ####Run GEE####
 Hdat_filled$grid <- as.factor(Hdat_filled$grid)
 Hdat_filled$Cell_ID <- as.factor(Hdat_filled$Cell_ID)
+Hdat_filled$ID_gee <- as.factor("one_cluster") #make the whole dataset one cluster
 
 gee2 <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
             family = gaussian, data = Hdat_filled,
-            id = Cell_ID,
-            corstr = "fixed",
-            R= Rtest, #needs to be the same dimension as one group
+            id = grid,
+            corstr = "unstructured",
+            #R= Rtest, #needs to be the same dimension as one group
             scale.fix = T, scale.value = 1, #this is what Pete used in his code 
             silent = F) #start 09:44
 
@@ -188,3 +189,16 @@ summary(gee2)
 coefs <- summary(gee2)$coefficients
 p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
 cbind(coefs, p_value = round(p_values, 4))
+
+#look at working correlation
+R_estimated <- summary(gee2)$working.correlation
+
+
+gee3 <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
+                 family = gaussian, data = Hdat_filled,
+                 id = ID_gee,
+                 corstr = "fixed",
+                 R= Rtest, #needs to be the same dimension as one group
+                 scale.fix = T, scale.value = 1, #this is what Pete used in his code 
+                 silent = F) #start 09:44
+summary(gee3)
