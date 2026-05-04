@@ -74,3 +74,24 @@ cat("Max value            :", max(R2))
 return(R2)
 
 } #end function
+
+
+
+####example use####
+grid_params <- decay_df
+#For some grids, the negative exponential curve could not be fitted succesfully
+#Give these grids the average decay constant from all the grids
+mean_b   <- mean(grid_params$b,na.rm = TRUE)
+mean_lag <- round(mean(grid_params$first_nonsig_lag, na.rm = TRUE))
+mean_range_dist <- round(mean(grid_params$range_dist, na.rm = TRUE))
+mean_first_nonsig_lag <- round(mean(grid_params$first_nonsig_lag, na.rm = TRUE))
+
+grid_params <- grid_params %>%
+  mutate(b = ifelse(is.na(b),mean_b,b),
+         first_nonsig_lag = ifelse(is.na(first_nonsig_lag), mean_lag, first_nonsig_lag), 
+         range_dist = ifelse(is.na(range_dist), mean_range_dist, range_dist), 
+         first_nonsig_lag = ifelse(is.na(first_nonsig_lag), mean_first_nonsig_lag, first_nonsig_lag))
+
+Rtest <- build_R(data = Hdat_filled, 
+                 grid_params = grid_params, 
+                 cutoff = "first_nonsig_lag")
