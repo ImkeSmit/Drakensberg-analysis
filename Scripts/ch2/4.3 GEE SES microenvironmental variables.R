@@ -265,6 +265,8 @@ row.names(gee_mean_results) <- NULL
 random_list <- randomise_grids(data = Hdat_filled, 
                                var = "SES",
                                iterations = 99)
+##Perhaps we should rather be randomising the env variables
+#Becuase our null hypothesis is that env conditions do not affect the SES
 
 
 #Loop through random_list, performing gee and extracting p value for each one
@@ -308,6 +310,9 @@ ggplot(p_rock, aes(x = Estimate)) +
   geom_histogram() +
   geom_vline(xintercept = 0.004)
 
-#how many times were the estimates of the randomised models different from the observed model?
+#What is the probability that the estimate of the randomised models different from the observed model?
 mean(abs(p_rock$Estimate) >= abs(gee_mean_results$Estimate[2]))
-#0.45 were as extreme or more extreme than the observed estimate
+#0.45/45% were as extreme or more extreme than the observed estimate
+
+#Thus, the probability of obtaining this estimate when the null hypothesis is true is large
+#too large to reject H0
