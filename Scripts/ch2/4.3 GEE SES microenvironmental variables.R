@@ -274,11 +274,10 @@ random_list <- randomise_grids(data = Hdat_filled,
 for (l in 1:length(random_list)) {
   data <- random_list[[l]]
   
-  one_gee <- gee::gee(randomised_SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
+  one_gee <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
                        family = gaussian, data = data,
                        id = grid,
-                       corstr = "fixed",
-                       R = mean_R, #needs to be the same dimension as one group
+                       corstr = "independence", #because spatial autocorrelation was removed during randomisation
                        scale.fix = T, scale.value = 1, #this is what Pete used in his code 
                        silent = F) 
   
@@ -286,10 +285,10 @@ for (l in 1:length(random_list)) {
   p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
   
   if(l == 1) {
-  results_table <- as.data.frame(cbind(coefs, p_value = round(p_values, 4)))
-  results_table$l = l
-  results_table$variable <- row.names(results_table)
-  row.names(results_table) <- NULL
+  results_random <- as.data.frame(cbind(coefs, p_value = round(p_values, 4)))
+  results_random$l = l
+  results_random$variable <- row.names(results_random)
+  row.names(results_random) <- NULL
   } else {
   
   results_temp <- as.data.frame(cbind(coefs, p_value = round(p_values, 4)))
@@ -297,7 +296,7 @@ for (l in 1:length(random_list)) {
   results_temp$variable <- row.names(results_temp)
   row.names(results_temp) <- NULL
   
-  results_table <- rbind(results_table, results_temp)
+  results_random <- rbind(results_random, results_temp)
   }
 }
 
@@ -309,11 +308,12 @@ p_rock <- results_table |>
 library(ggplot2)
 ggplot(p_rock, aes(x = Estimate)) +
   geom_histogram() +
-  geom_vline(xintercept = 0.004)
+  geom_vline(xintercept = gee_mean_results$Estimate[2])
 
 #What is the probability that the estimate of the randomised models different from the observed model?
 mean(abs(p_rock$Estimate) >= abs(gee_mean_results$Estimate[2]))
-#0.45/45% were as extreme or more extreme than the observed estimate
+#mean gets the proportion of values that are greater or equal to the observed model estimate
+#0.12/12% were as extreme or more extreme than the observed estimate
 
 #Thus, the probability of obtaining this estimate when the null hypothesis is true is large
 #too large to reject H0
