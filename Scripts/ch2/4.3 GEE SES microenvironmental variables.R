@@ -263,8 +263,9 @@ row.names(gee_mean_results) <- NULL
 #Run Function_randomise_grids
 
 random_list <- randomise_grids(data = Hdat_filled, 
-                               var = "SES",
-                               iterations = 99)
+                               var = c("rock_cover", "northness", "soil_moisture_adj_campaign2", 
+                                       "mean_soil_depth", "slope_height"),
+                               iterations = 999)
 ##Perhaps we should rather be randomising the env variables
 #Becuase our null hypothesis is that env conditions do not affect the SES
 
