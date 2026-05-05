@@ -310,6 +310,9 @@ for (v in vars) {
   obs <- gee_mean_results[which(gee_mean_results$variable == v), which(colnames(gee_mean_results) == "Estimate")]
   se <- gee_mean_results[which(gee_mean_results$variable == v), which(colnames(gee_mean_results) == "Robust S.E.")]
   
+  #What is the probability that the estimate of the randomised models different from the observed model?
+  #mean gets the proportion of values that are greater or equal to the observed model estimate
+  #0.12/12% were as extreme or more extreme than the observed estimate
   p_val <- mean(abs(one_var$Estimate) >= abs(obs))
   
   if(v == "(Intercept)") {
@@ -334,75 +337,4 @@ perm_test <- ggplot(results_random, aes(x = Estimate)) +
 
 ggsave("Figures//permutation_test.png" ,perm_test)
   
-
-
-
-#Let's look at the p value for rock_cover
-p_rock <- results_table |> 
-  filter(variable == "rock_cover")
-
-library(ggplot2)
-ggplot(p_rock, aes(x = Estimate)) +
-  geom_histogram() +
-  geom_vline(xintercept = gee_mean_results$Estimate[2])
-
-#What is the probability that the estimate of the randomised models different from the observed model?
-mean(abs(p_rock$Estimate) >= abs(gee_mean_results$Estimate[2]))
-#mean gets the proportion of values that are greater or equal to the observed model estimate
-#0.12/12% were as extreme or more extreme than the observed estimate
-
-#Thus, the probability of obtaining this estimate when the null hypothesis is true is large
-#too large to reject H0
-
-
-#northness
-p_north <- results_table |> 
-  filter(variable == "northness")
-
-ggplot(p_north, aes(x = Estimate)) +
-  geom_histogram() +
-  geom_vline(xintercept = gee_mean_results$Estimate[3])
-
-#What is the probability that the estimate of the randomised models different from the observed model?
-mean(abs(p_north$Estimate) >= abs(gee_mean_results$Estimate[3]))
-#0.075
-
-
-#soil moisture
-p_smoist <- results_table |> 
-  filter(variable == "soil_moisture_adj_campaign2")
-
-ggplot(p_smoist, aes(x = Estimate)) +
-  geom_histogram() +
-  geom_vline(xintercept = gee_mean_results$Estimate[4])
-
-#What is the probability that the estimate of the randomised models different from the observed model?
-mean(abs(p_smoist$Estimate) >= abs(gee_mean_results$Estimate[4]))
-#1
-
-
-#soil depth
-p_sdepth <- results_table |> 
-  filter(variable == "mean_soil_depth")
-
-ggplot(p_sdepth, aes(x = Estimate)) +
-  geom_histogram() +
-  geom_vline(xintercept = gee_mean_results$Estimate[5])
-
-#What is the probability that the estimate of the randomised models different from the observed model?
-mean(abs(p_sdepth$Estimate) >= abs(gee_mean_results$Estimate[5]))
-#0.95
-
-
-#slope height
-p_slope <- results_table |> 
-  filter(variable == "slope_height")
-
-ggplot(p_slope, aes(x = Estimate)) +
-  geom_histogram() +
-  geom_vline(xintercept = gee_mean_results$Estimate[6])
-
-#What is the probability that the estimate of the randomised models different from the observed model?
-mean(abs(p_sdepth$Estimate) >= abs(gee_mean_results$Estimate[6]))
-#1
 
