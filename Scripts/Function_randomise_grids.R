@@ -13,25 +13,27 @@ randomise_grids <- function(data, var, iterations) {
     for(g in grids_22) {
       #select grid to randomise
       data <- as.data.frame(data)
-      values <- data[which(data$grid == g),  which(colnames(data) == var)]
-      rnames <- data[which(data$grid == g),  which(colnames(data) == "Cell_ID")]
-      subs <- data.frame(Cell_ID = rnames, SES = values)
+      values <- data[which(data$grid == g),  which(colnames(data) %in% var)]
+      Cell_ID <- data[which(data$grid == g),  which(colnames(data) == "Cell_ID")]
+      subs <- cbind(Cell_ID, values)
       
-      #order of SES values
+      #order of values
       order <- c(1:nrow(subs))
       #new order
       new_order <- sample(order)
       #shuffle subs according to new order
-      shuffled_var <- subs[order(new_order), which(colnames(subs) == var)]
+      shuffled_var <- subs[order(new_order), which(colnames(subs) %in% var)]
       
       if(g == "GG1") {
-        new_var <- data.frame(Cell_ID = rnames, randomised_SES = shuffled_var)
+        new_var <- cbind(Cell_ID, shuffled_var)
       } else{
-      temp <- data.frame(Cell_ID = rnames, randomised_SES = shuffled_var)
+      temp <- cbind(Cell_ID, shuffled_var)
       new_var <- rbind(new_var, temp)
       }
-      
-      randomised_dat <- data |> 
+      #remove unshuffled columns
+      data_min_var <- data[, -which(colnames(data) %in% var)] 
+      #join shuffled columns
+      randomised_dat <- data_min_var|> 
         left_join(new_var, by = "Cell_ID")
     }#end loop through grids
     return(randomised_dat)
