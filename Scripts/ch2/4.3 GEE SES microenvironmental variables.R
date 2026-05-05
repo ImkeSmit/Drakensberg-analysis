@@ -301,6 +301,42 @@ for (l in 1:length(random_list)) {
 }
 
 
+###Compute p values from permutation test
+vars <- c(unique(results_random$variable))
+for (v in vars) {
+  one_var <- results_random |> 
+    filter(variable == v)
+  
+  obs <- gee_mean_results[which(gee_mean_results$variable == v), which(colnames(gee_mean_results) == "Estimate")]
+  se <- gee_mean_results[which(gee_mean_results$variable == v), which(colnames(gee_mean_results) == "Robust S.E.")]
+  
+  p_val <- mean(abs(one_var$Estimate) >= abs(obs))
+  
+  if(v == "(Intercept)") {
+    p_table <- data.frame(variable = v, observed_estimate = obs,
+                          observed_se = se, p_value = p_val)
+  }else {
+    p_temp <- data.frame(variable = v, observed_estimate = obs,
+                         observed_se = se, p_value = p_val)
+    p_table <- rbind(p_table, p_temp)
+  }
+}#end loop through vars
+
+
+###Graph the null distributions and the observed values
+facet_names <- c("Intercept", "Rock cover", "Northness", "Soil moisture", "soil depth", "slope height")
+names(facet_names) <- c(p_table$variable)
+
+perm_test <- ggplot(results_random, aes(x = Estimate)) +
+  geom_histogram() +
+  geom_vline(data = p_table, aes(xintercept = observed_estimate), color = "red")+
+  facet_wrap(~variable, scales = "free", labeller = as_labeller(facet_names))
+
+ggsave("Figures//permutation_test.png" ,perm_test)
+  
+
+
+
 #Let's look at the p value for rock_cover
 p_rock <- results_table |> 
   filter(variable == "rock_cover")
