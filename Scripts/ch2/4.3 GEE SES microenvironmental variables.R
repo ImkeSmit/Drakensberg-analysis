@@ -238,9 +238,10 @@ cbind(coefs, p_value = round(p_values, 4))
 #MEAN DECAY RATE
 ##Try it with a gamma distribution
 #it doesnt really seem to help
-Hdat_filled$SESplus <- Hdat_filled$SES + abs(min(Hdat_filled$SES))+1
+Hdat_filled$SESplus <- Hdat_filled$SES + abs(min(Hdat_filled$SES))+0.01
 gee_mean <- gee::gee(SESplus ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
-                        family = Gamma(link = "log"), data = Hdat_filled,
+                        family = Gamma(link = "log"), 
+                        data = Hdat_filled,
                         id = grid,
                         corstr = "fixed",
                         R = mean_R, #needs to be the same dimension as one group
@@ -255,23 +256,15 @@ ggplot(resid_df, aes(sample = residuals)) +
   stat_qq(
     color = "#2C7BB6",
     alpha = 0.7,
-    size  = 1.8
-  ) +
+    size  = 1.8) +
   stat_qq_line(
     color    = "#D7191C",
     linewidth = 1,
-    linetype = "dashed"
-  ) +
+    linetype = "dashed") +
   labs(
-    title    = paste("QQ Plot of", "Residuals — GEE Model"),
     x        = "Theoretical Quantiles",
     y        = " Residuals")+
-  theme_bw(base_size = 13) +
-  theme(
-    plot.title    = element_text(face = "bold"),
-    plot.subtitle = element_text(color = "grey40"),
-    panel.grid.minor = element_blank()
-  )
+  theme_bw(base_size = 13) 
 
 
 
