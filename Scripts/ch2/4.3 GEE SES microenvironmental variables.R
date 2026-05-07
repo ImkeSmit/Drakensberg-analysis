@@ -26,6 +26,9 @@ cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire
                  elevation = as.numeric(elevation)) |> 
           select(-c(cellref, site, grid, column, row)) 
 
+##Build in some more cleaning:
+#Remove cells with less than 4? species or less than 80% of cover sampled
+
 #import microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
   mutate(mean_soil_depth = as.numeric(mean_soil_depth), 
