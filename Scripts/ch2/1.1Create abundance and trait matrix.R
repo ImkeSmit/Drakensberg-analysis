@@ -29,21 +29,28 @@ mean_traits_all <- FT |>
 
 #Do inner join between trait and cover data to get sp that match between the two
 FT_join <- drak |> 
-  inner_join(mean_traits_all, by = "taxon") |> #inner join to only work with taxa that have trait data
-  mutate(cellref = paste0(site, grid, cell)) |> 
-  select(!c(column, row))
+  inner_join(mean_traits_all, by = "taxon") #inner join to only work with taxa that have trait data
+
+
+#Remove cells that have trait data for less than 80% of the veg cover
+#identify such cells
+#Run Function_cell_trait_coverage.R
+coverage <- cell_trait_coverage() 
+to_remove<- coverage |> 
+  filter(Trait_Coverage < 0.8) #594 cells to remove,17%
+
 
 #create abundance matrix
 abun_matrix <- FT_join |> 
-  select(cellref, taxon, cover) |> 
-  distinct(cellref, taxon, .keep_all = T) |> 
+  select(Cell_ID, taxon, cover) |> 
+  distinct(Cell_ID, taxon, .keep_all = T) |> 
   ungroup() |> 
   arrange(taxon) |> 
   mutate(cover = ceiling(cover)) |> #change cover values to integer to use in null models
   pivot_wider(names_from = taxon, values_from = cover) 
 
 abun_matrix <- as.data.frame(abun_matrix)
-row.names(abun_matrix) <- abun_matrix$cellref
+row.names(abun_matrix) <- abun_matrix$Cell_ID
 abun_matrix <- abun_matrix[, -1]
 
 #replace NA values with 0
