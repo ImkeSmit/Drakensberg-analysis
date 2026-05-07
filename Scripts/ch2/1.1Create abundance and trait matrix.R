@@ -8,11 +8,10 @@ library(vegan)
 ###Matrices for all life forms####
 ####Import community and trait data###
 #occurrence data
-drak <- read.csv("All_data/clean_data/micro_climb_occurrence.csv", row.names = 1) |> 
-  mutate(cell = paste0(column, row))
+drak <- read.csv("All_data/clean_data/micro_climb_occurrence.csv", row.names = 1) 
 
 #trait data
-FT <- read.xlsx("All_data/clean_data/micro-climb_traits.xlsx") |> 
+FT <- read.csv("All_data/clean_data/micro-climb_traits.csv", row.names = 1) |> 
   rename(taxon = Taxon, 
          site = Site, grid = Grid, cell = Cell) |> 
   pivot_longer(cols = c(Wet_mass_mg, Dry_mass_mg, Chlorophyll_mg_per_m2, Ft, Height_cm, 
