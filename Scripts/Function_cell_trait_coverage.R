@@ -31,13 +31,18 @@ cell_trait_coverage <- function() {
     trait_cov<- sum(trait_cov$cover)
     
     trait_coverage <- trait_cov/total_cov
-  }
-  
-  if(c == Cell_IDlist[1]) {
-    result <- cbind(c, trait_coverage)
-  }else {
-    temp<- cbind(c, trait_coverage)
-    result<- rbind(result, temp)
-  }
+    
+    #put results in a table
+    if(c == Cell_IDlist[1]) {
+    result <- data.frame(Cell_ID = c, Trait_Coverage = as.numeric(trait_coverage))
+      }else {
+        temp<- data.frame(Cell_ID = c, Trait_Coverage = as.numeric(trait_coverage))
+        result<- rbind(result, temp)
+      }
+    
+  }#finish loop through cells
   return(result)
 }
+
+#example use
+#test<- cell_trait_coverage()
