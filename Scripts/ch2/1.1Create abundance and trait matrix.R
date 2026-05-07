@@ -36,12 +36,15 @@ FT_join <- drak |>
 #identify such cells
 #Run Function_cell_trait_coverage.R
 coverage <- cell_trait_coverage() 
-to_remove<- coverage |> 
-  filter(Trait_Coverage < 0.8) #594 cells to remove,17%
+to_keep<- coverage |> 
+  filter(Trait_Coverage >= 0.8) #594 cells to remove,17%
 
+#Remove cells with less than 80% trait coverage
+FT_join2 <- FT_join |> 
+  filter(Cell_ID %in% c(to_keep$Cell_ID))
 
 #create abundance matrix
-abun_matrix <- FT_join |> 
+abun_matrix <- FT_join2 |> 
   select(Cell_ID, taxon, cover) |> 
   distinct(Cell_ID, taxon, .keep_all = T) |> 
   ungroup() |> 
@@ -63,9 +66,9 @@ for(r in 1:nrow(abun_matrix)) {
   }
 }
 
-#remove sites that have only one species 
+#remove sites that have less than 3 species 
 no <- specnumber(abun_matrix)
-abun_matrix <- abun_matrix[-which(no < 2), ]
+abun_matrix <- abun_matrix[-which(no < 3), ]
 
 #order species alphabetically
 abun_matrix <- abun_matrix[, order(colnames(abun_matrix))]
