@@ -377,6 +377,8 @@ for (v in vars) {
     p_table <- rbind(p_table, p_temp)
   }
 }#end loop through vars
+#save results
+write.csv(p_table, "All_data//comm_assembly_results//SES_height_env_results.csv")
 
 
 ###Graph the null distributions and the observed values
@@ -409,6 +411,7 @@ check <- SLAdat |> group_by(site, grid) |>
 #===============#
 ###Imputation####
 #===============#
+#Everything ran with the SES NA's, maybe imputation is not necessary?
 #now we need to impute the missing SES or predictor variables because the Gee won't work if there are NA's
 #for now, we fill fill the NA cells with the mean of it's 8 nearest neighbours
 #run Function_impute_cells.R
@@ -436,7 +439,7 @@ for (col in cols) {
 
 ###Check collinearity#### 
 library(corrplot)
-cordf <- SLAdat_filled |> dplyr::select(c(colnames(Hdat)[c(6:13, 15:20, 25)]))
+cordf <- SLAdat_filled |> dplyr::select(c(colnames(SLAdat)[c(6:13, 15:20, 25)]))
 cormat<- cor(cordf)
 high_cor <- which(cormat > 0.7, arr.ind = T) #only diagonals
 low_cor <- which(cormat < -0.7, arr.ind = T) #none
@@ -451,5 +454,178 @@ decay_df <- grid_correlation_structure(grid_vector = c(unique(SLAdat_filled$grid
                                        data = SLAdat_filled, 
                                        formula = "SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height", 
                                        k_specified = 4)
+
+###Build correlation matrix####
+#function for correlation matrices of one grid
+make_grid_corr <- function(b, first_nonsig_lag, coords) {
+  
+  # Euclidean distance matrix in grid-step units
+  dmat <- as.matrix(dist(coords[, c("x_coord", "row")])) #row is in steps of 1-20
+  
+  # Exponential correlation, zeroed beyond first_nonsig_lag steps
+  corr <- exp(-b * dmat)
+  corr[dmat > first_nonsig_lag] <- 0 #replace with range_dist to make it more conservative
+  diag(corr) <- 1
+  corr[corr < 0] <- 0 #replace all negative values with zero, we do not model negative spatial autocorrelation here
+  
+  corr
+}#end make grid corr
+
+#mean distance decay
+mean_b <- decay_df |> 
+  summarise(b = mean(b, na.rm = T), 
+            first_nonsig_lag = ceiling(mean(first_nonsig_lag, na.rm = T)))
+
+coordinates_one_grid <- SLAdat_filled |> #get the coordinates of one grid 
+  filter(grid == "GG1") |> 
+  dplyr::select(x_coord, row)
+
+
+mean_R <- make_grid_corr(b = mean_b$b, 
+                         first_nonsig_lag = mean_b$first_nonsig_lag, 
+                         coords = coordinates_one_grid)
+
+#map R as a sanity check
+df <- melt(mean_R)
+colnames(df) <- c("row", "col", "correlation")
+
+pdf("Figures/R_plot.pdf")
+ggplot(df, aes(x = col, y = row, fill = correlation)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  coord_flip() +
+  theme_minimal() 
+dev.off()
+
+#=============#
+####Run GEE####
+#=============#
+gee_SLA <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
+                       family = gaussian, data = SLAdat_filled,
+                       id = grid,
+                       corstr = "fixed",
+                       R = mean_R, #needs to be the same dimension as one group
+                       scale.fix = T, scale.value = 1, #this is what Pete used in his code 
+                       silent = F) 
+
+#Get p values
+coefs <- summary(gee_SLA)$coefficients
+p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
+gee_SLA_results <- as.data.frame(cbind(coefs, p_value = round(p_values, 4)))
+gee_SLA_results$variable <- row.names(gee_SLA_results)
+row.names(gee_SLA_results) <- NULL
+
+resid_df<- data.frame(residuals = gee_SLA$residuals)
+hist(resid_df$residuals)
+
+ggplot(resid_df, aes(sample = residuals)) +
+  stat_qq(
+    color = "#2C7BB6",
+    alpha = 0.7,
+    size  = 1.8) +
+  stat_qq_line(
+    color    = "#D7191C",
+    linewidth = 1,
+    linetype = "dashed") +
+  labs( title = "SESplus, Gamma(link = log)",
+    x        = "Theoretical Quantiles",
+    y        = " Residuals")+
+  theme_bw(base_size = 13) 
+
+
+#==================================#
+#        Permutation test          #
+#==================================#
+
+#Build 999 randomised grids
+#Run Function_randomise_grids
+
+random_list <- randomise_grids(data = SLAdat_filled, 
+                               var = c("rock_cover", "northness", "soil_moisture_adj_campaign2", 
+                                       "mean_soil_depth", "slope_height"),
+                               iterations = 999)
+#We randomise the env variables becuase our null hypothesis is that env conditions do not affect the SES
+saveRDS(random_list, file = "All_data//comm_assembly_results//randomised_env_grids_SLA.rds")
+
+#Loop through random_list, performing gee and extracting p value for each one
+random_list <- readRDS("All_data//comm_assembly_results//randomised_env_grids_SLA.rds")
+for (l in 1:length(random_list)) {
+  data <- random_list[[l]]
+  
+  one_gee <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
+                      family = gaussian, data = data,
+                      id = grid,
+                      corstr = "independence", #because spatial autocorrelation was removed during randomisation
+                      scale.fix = T, scale.value = 1, #this is what Pete used in his code 
+                      silent = F) 
+  
+  coefs <- summary(one_gee)$coefficients
+  p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
+  
+  if(l == 1) {
+    results_random <- as.data.frame(cbind(coefs, p_value = round(p_values, 4)))
+    results_random$l = l
+    results_random$variable <- row.names(results_random)
+    row.names(results_random) <- NULL
+  } else {
+    
+    results_temp <- as.data.frame(cbind(coefs, p_value = round(p_values, 4)))
+    results_temp$l = l
+    results_temp$variable <- row.names(results_temp)
+    row.names(results_temp) <- NULL
+    
+    results_random <- rbind(results_random, results_temp)
+  }
+}
+
+
+###Compute p values from permutation test
+vars <- c(unique(results_random$variable))
+for (v in vars) {
+  one_var <- results_random |> 
+    filter(variable == v)
+  
+  obs <- gee_mean_results[which(gee_mean_results$variable == v), which(colnames(gee_mean_results) == "Estimate")]
+  se <- gee_mean_results[which(gee_mean_results$variable == v), which(colnames(gee_mean_results) == "Robust S.E.")]
+  
+  #What is the probability that the estimate of the randomised models different from the observed model?
+  #mean gets the proportion of values that are greater or equal to the observed model estimate
+  #0.12/12% were as extreme or more extreme than the observed estimate
+  p_val <- length(which(abs(one_var$Estimate) >= abs(obs)) == T)/(nrow(one_var)+1) #add one so that p value cannot be zero
+  perc_2.5 <- quantile(one_var$Estimate, probs = 0.025)
+  perc_97.5 <- quantile(one_var$Estimate, probs = 0.975)
+  significance <- obs < perc_2.5 | obs > perc_97.5
+  
+  
+  if(v == "(Intercept)") {
+    p_table <- data.frame(variable = v, observed_estimate = obs,
+                          observed_se = se, p_value = p_val, 
+                          perc_2.5 = perc_2.5, perc_97.5 = perc_97.5, 
+                          significant = significance)
+  }else {
+    p_temp <- data.frame(variable = v, observed_estimate = obs,
+                         observed_se = se, p_value = p_val, 
+                         perc_2.5 = perc_2.5, perc_97.5 = perc_97.5, 
+                         significant = significance)
+    p_table <- rbind(p_table, p_temp)
+  }
+}#end loop through vars
+
+#save results
+write.csv(p_table, "All_data//comm_assembly_results//SES_SLA_env_results.csv")
+
+
+###Graph the null distributions and the observed values
+facet_names <- c("Intercept", "Rock cover", "Northness", "Soil moisture", "soil depth", "slope height")
+names(facet_names) <- c(p_table$variable)
+
+perm_test <- ggplot(results_random, aes(x = Estimate)) +
+  geom_histogram() +
+  geom_vline(data = p_table, aes(xintercept = observed_estimate), color = "red")+
+  facet_wrap(~variable, scales = "free", labeller = as_labeller(facet_names))
+
+ggsave("Figures//permutation_test.png" ,perm_test)
+
+
   
 
