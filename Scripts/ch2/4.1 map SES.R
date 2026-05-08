@@ -9,12 +9,11 @@ cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire
   mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
                                grepl("WH", cellref) == T ~ "2500",
                                grepl("GG", cellref) == T ~ "2000",.default = NA)) |> 
-  mutate(site = substr(cellref, 1,2),
-        grid = substr(cellref, 1,3),
-         column = substr(cellref, 4,4), 
-         row = substr(cellref, 5,6),
-         ncolumn = match(column, LETTERS[1:8])) |> 
-  mutate(row = as.numeric(row)) 
+  separate_wider_delim(cellref, delim = "_", names = c("site", "grid", "cell"), cols_remove = F) |> 
+  mutate(grid = paste0(site, grid), 
+        column = substr(cell, 1,1), 
+        row = substr(cell, 2,2),
+        ncolumn = match(column, LETTERS[1:8]))
 cell_ses$elevation <- as.factor(cell_ses$elevation)
 
 
