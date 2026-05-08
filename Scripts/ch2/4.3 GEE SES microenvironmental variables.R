@@ -359,13 +359,18 @@ for (v in vars) {
   #mean gets the proportion of values that are greater or equal to the observed model estimate
   #0.12/12% were as extreme or more extreme than the observed estimate
   p_val <- length(which(abs(one_var$Estimate) >= abs(obs)) == T)/(nrow(one_var)+1) #add one so that p value cannot be zero
+  perc_2.5 <- quantile(one_var$Estimate, probs = 0.025)
+  perc_97.5 <- quantile(one_var$Estimate, probs = 0.975)
+  
   
   if(v == "(Intercept)") {
     p_table <- data.frame(variable = v, observed_estimate = obs,
-                          observed_se = se, p_value = p_val)
+                          observed_se = se, p_value = p_val, 
+                          perc_2.5 = perc_2.5, perc_97.5 = perc_97.5)
   }else {
     p_temp <- data.frame(variable = v, observed_estimate = obs,
-                         observed_se = se, p_value = p_val)
+                         observed_se = se, p_value = p_val, 
+                         perc_2.5 = perc_2.5, perc_97.5 = perc_97.5)
     p_table <- rbind(p_table, p_temp)
   }
 }#end loop through vars
