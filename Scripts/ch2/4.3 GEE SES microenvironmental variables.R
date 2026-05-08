@@ -12,28 +12,13 @@ library(gee)
 
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
-  mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
-                               grepl("WH", cellref) == T ~ "2500",
-                               grepl("GG", cellref) == T ~ "2000",.default = NA), 
-         site = case_when(grepl("BK", cellref) == T ~ "BK", #add elevation variable
-                          grepl("WH", cellref) == T ~ "WH",
-                          grepl("GG", cellref) == T ~ "GG",.default = NA),
-         grid = str_sub(cellref, 1, 3), 
-         column = str_sub(cellref, 4,4), 
-         row = as.numeric(str_sub(cellref, 5,6)), 
-         ncolumn = match(column, LETTERS[1:8])) |> 
-          mutate(Cell_ID = paste0(site, "_G", str_sub(cellref, 3, 3), "_", column, row), 
-                 elevation = as.numeric(elevation)) |> 
-          select(-c(cellref, site, grid, column, row)) 
-
-##Build in some more cleaning:
-#Remove cells with less than 4? species or less than 80% of cover sampled
+  rename(Cell_ID = cellref)
 
 #import microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
   mutate(mean_soil_depth = as.numeric(mean_soil_depth), 
          soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2)) |> 
-  select(!c(soil_temperature_adj_campaign2, soil_moisture_adj_campaign1, soil_temperature_adj_campaign1,
+  dplyr::select(!c(soil_temperature_adj_campaign2, soil_moisture_adj_campaign1, soil_temperature_adj_campaign1,
             aeolian_process, fluvial_process, slope_process,
             geology1, geology2, geology3,
             geology4, geology5, mesotopo, aspect, veg_max_height))
@@ -57,7 +42,8 @@ comb <- env |>
                            grepl("6", grid) ~ y_new+20*5, 
                            grepl("7", grid) ~ y_new+20*6, 
                            grepl("8", grid) ~ y_new+20*7, .default = NA)) |> 
-  mutate(x_coord = ncolumn, 
+  mutate(ncolumn = match(column, LETTERS[1:8]), 
+         x_coord = ncolumn, 
          rock_cover = as.numeric(rock_cover), 
          mean_soil_depth = as.numeric(mean_soil_depth)) |> 
   ungroup() 
@@ -126,9 +112,10 @@ for (col in cols) {
 
 
 ###Check collinearity#### 
-cordf <- Hdat_filled |> select(c(colnames(Hdat)[c(6:13, 15:20, 25)]))
+library(corrplot)
+cordf <- Hdat_filled |> dplyr::select(c(colnames(Hdat)[c(6:13, 15:20, 25)]))
 cormat<- cor(cordf)
-#cormat[cormat >0.7]
+#cormat[cormat > 0.7]
 #cormat[cormat <-0.7]
 #none are highly correlated
 corrplot(cormat, type = "lower", method = "number")
