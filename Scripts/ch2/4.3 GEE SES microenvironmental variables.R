@@ -358,7 +358,7 @@ for (v in vars) {
   #What is the probability that the estimate of the randomised models different from the observed model?
   #mean gets the proportion of values that are greater or equal to the observed model estimate
   #0.12/12% were as extreme or more extreme than the observed estimate
-  p_val <- mean(abs(one_var$Estimate) <= abs(obs))
+  p_val <- length(which(abs(one_var$Estimate) >= abs(obs)) == T)/(nrow(one_var)+1) #add one so that p value cannot be zero
   
   if(v == "(Intercept)") {
     p_table <- data.frame(variable = v, observed_estimate = obs,
