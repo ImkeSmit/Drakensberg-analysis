@@ -112,3 +112,62 @@ map_grid_variation(data = cell_ses, variable = "mean_null", traits = unique(cell
                    grids = unique(cell_ses$grid), sitelist = unique(cell_ses$site))
 
 
+
+####Create maps of one grid####
+
+map_one_grid_variation <- function(data, variable, grid) {
+    
+    # filter data for this grid
+    g_dat <- data %>% filter(grid == grid)
+    
+    # Compute global min and max SES
+    zmin <- min(trait_dat[, which(colnames(data) == variable)], na.rm = TRUE)
+    zmax <- max(trait_dat[, which(colnames(data) == variable)], na.rm = TRUE)
+    
+    # open PDF
+    pdf(paste0("Figures/", variable , "_maps_trait_", tr, ".pdf"), width = 12, height = 10)
+      
+      # define plotting layout
+      n <- length(site_grids)
+      nr <- ceiling(sqrt(n))
+      nc <- ceiling(n / nr)
+      par(mfrow = c(nr, nc))
+      
+        
+        #remove extra columns
+        g_dat <- g_dat[, which(colnames(g_dat) %in% c("row", "ncolumn", variable))]
+        
+        # Create spatial grid object
+        x_range <- 1:20
+        y_range <- 1:8
+        
+        grid_obj <- expand.grid(x = x_range, y = y_range)
+        coordinates(grid_obj) <- ~x + y
+        gridded(grid_obj) <- TRUE
+        r <- raster(grid_obj) 
+        
+        #Check if there are missing cells in data
+        possible_cells <- paste(grid_obj$x, grid_obj$y, sep = "_")
+        observed_cells <- paste(g_dat$row, g_dat$ncolumn, sep = "_")
+        missing <- which(is.na(match(possible_cells, observed_cells)))
+        
+        if(length(missing) > 0) { #create a filler
+          
+          filler <- data.frame(row = grid_obj$x[missing], ncolumn = grid_obj$y[missing])
+          filler[[variable]] <- NA #the variable is set to NA
+          
+          g_dat <- rbind(g_dat, filler) }
+        
+        # need values sorted to match the raster cell order:
+        g_dat <- g_dat[order(g_dat$ncolumn, g_dat$row), ]
+        
+        # add SES values to raster
+        r <- setValues(r, g_dat[, which(colnames(g_dat) == variable)])
+        
+        plot(r, main = paste0(variable, " - ", tr, " - ", g), 
+             zlim = c(zmin, zmax))
+    
+    dev.off()
+  #end function
+}
+
