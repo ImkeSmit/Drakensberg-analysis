@@ -361,16 +361,19 @@ for (v in vars) {
   p_val <- length(which(abs(one_var$Estimate) >= abs(obs)) == T)/(nrow(one_var)+1) #add one so that p value cannot be zero
   perc_2.5 <- quantile(one_var$Estimate, probs = 0.025)
   perc_97.5 <- quantile(one_var$Estimate, probs = 0.975)
+  significance <- obs < perc_2.5 | obs > perc_97.5
   
   
   if(v == "(Intercept)") {
     p_table <- data.frame(variable = v, observed_estimate = obs,
                           observed_se = se, p_value = p_val, 
-                          perc_2.5 = perc_2.5, perc_97.5 = perc_97.5)
+                          perc_2.5 = perc_2.5, perc_97.5 = perc_97.5, 
+                          significant = significance)
   }else {
     p_temp <- data.frame(variable = v, observed_estimate = obs,
                          observed_se = se, p_value = p_val, 
-                         perc_2.5 = perc_2.5, perc_97.5 = perc_97.5)
+                         perc_2.5 = perc_2.5, perc_97.5 = perc_97.5, 
+                         significant = significance)
     p_table <- rbind(p_table, p_temp)
   }
 }#end loop through vars
