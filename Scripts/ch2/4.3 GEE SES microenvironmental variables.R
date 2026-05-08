@@ -431,15 +431,15 @@ for (col in cols) {
     "%-35s  NAs before: %3d  |  NAs after: %3d  |  Filled: %3d\n",
     col, n_before, n_after, n_before - n_after
   ))
-}
+} ###3 NA values remain because all of their neighbours are NA
 
 
 ###Check collinearity#### 
 library(corrplot)
-cordf <- Hdat_filled |> dplyr::select(c(colnames(Hdat)[c(6:13, 15:20, 25)]))
+cordf <- SLAdat_filled |> dplyr::select(c(colnames(Hdat)[c(6:13, 15:20, 25)]))
 cormat<- cor(cordf)
-#cormat[cormat > 0.7]
-#cormat[cormat <-0.7]
+high_cor <- which(cormat > 0.7, arr.ind = T) #only diagonals
+low_cor <- which(cormat < -0.7, arr.ind = T) #none
 #none are highly correlated
 corrplot(cormat, type = "lower", method = "number")
 
