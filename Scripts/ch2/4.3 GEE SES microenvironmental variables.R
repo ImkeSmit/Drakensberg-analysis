@@ -312,9 +312,10 @@ random_list <- randomise_grids(data = Hdat_filled,
                                        "mean_soil_depth", "slope_height"),
                                iterations = 999)
 #We randomise the env variables becuase our null hypothesis is that env conditions do not affect the SES
-
+saveRDS(random_list, file = "All_data//comm_assembly_results//randomised_env_grids.rds")
 
 #Loop through random_list, performing gee and extracting p value for each one
+random_list <- readRDS("All_data//comm_assembly_results//randomised_env_grids.rds")
 for (l in 1:length(random_list)) {
   data <- random_list[[l]]
   
