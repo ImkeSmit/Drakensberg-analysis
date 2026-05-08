@@ -447,8 +447,8 @@ corrplot(cormat, type = "lower", method = "number")
 ####Spatial autocorrelation structure for each grid####
 #=====================================================#
 #Run Function_grid_correlation_structure.R
-decay_df <- grid_correlation_structure(grid_vector = c(unique(Hdat_filled$grid)), 
-                                       data = Hdat_filled, 
+decay_df <- grid_correlation_structure(grid_vector = c(unique(SLAdat_filled$grid)), 
+                                       data = SLAdat_filled, 
                                        formula = "SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height", 
                                        k_specified = 4)
   
