@@ -12,7 +12,7 @@ cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire
   separate_wider_delim(cellref, delim = "_", names = c("site", "grid", "cell"), cols_remove = F) |> 
   mutate(grid = paste0(site, grid), 
         column = substr(cell, 1,1), 
-        row = substr(cell, 2,2),
+        row = substr(cell, 2,3),
         ncolumn = match(column, LETTERS[1:8]))
 cell_ses$elevation <- as.factor(cell_ses$elevation)
 
@@ -115,17 +115,18 @@ map_grid_variation(data = cell_ses, variable = "mean_null", traits = unique(cell
 
 ####Create maps of one grid####
 
-map_one_grid_variation <- function(data, variable, grid) {
+map_one_grid_variation <- function(data, variable, g) {
+  
     
     # filter data for this grid
-    g_dat <- data %>% filter(grid == grid)
+    g_dat <- data %>% filter(grid == g)
     
     # Compute global min and max SES
     zmin <- min(trait_dat[, which(colnames(data) == variable)], na.rm = TRUE)
     zmax <- max(trait_dat[, which(colnames(data) == variable)], na.rm = TRUE)
     
     # open PDF
-    pdf(paste0("Figures/", variable , "_maps_trait_", tr, ".pdf"), width = 12, height = 10)
+    pdf(paste0("Figures/", variable ,"_", grid, ".pdf"), width = 12, height = 10)
       
       # define plotting layout
       n <- length(site_grids)
@@ -160,6 +161,7 @@ map_one_grid_variation <- function(data, variable, grid) {
         
         # need values sorted to match the raster cell order:
         g_dat <- g_dat[order(g_dat$ncolumn, g_dat$row), ]
+        g_dat <- as.data.frame(g_dat)
         
         # add SES values to raster
         r <- setValues(r, g_dat[, which(colnames(g_dat) == variable)])
@@ -171,3 +173,6 @@ map_one_grid_variation <- function(data, variable, grid) {
   #end function
 }
 
+map_data <- cell_ses |> 
+  filter(trait == "Height_cm")
+map_one_grid_variation(data = map_data, variable = "SES", g = "GGG4")
