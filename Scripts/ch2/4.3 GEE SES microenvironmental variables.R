@@ -161,7 +161,7 @@ mean_b <- decay_df |>
 
 coordinates_one_grid <- Hdat_filled |> #get the coordinates of one grid 
   filter(grid == "GG1") |> 
-select(x_coord, row)
+  dplyr::select(x_coord, row)
 
 #lowest distance decay
 lowest_R <- make_grid_corr(b = lowest_b$b, 
@@ -227,10 +227,8 @@ cbind(coefs, p_value = round(p_values, 4))
 
 #MEAN DECAY RATE
 ##Try it with a gamma distribution
-#it doesnt really seem to help
-Hdat_filled$SESplus <- Hdat_filled$SES + abs(min(Hdat_filled$SES))+1
-gee_mean <- gee::gee(SESplus ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
-                        family = Gamma(link = "log"), 
+gee_mean <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
+                        family = gaussian, 
                         data = Hdat_filled,
                         id = grid,
                         corstr = "fixed",
@@ -307,15 +305,13 @@ ggplot(resid_df, aes(sample = residuals)) +
 #===============================#
 
 #Build 999 randomised grids
-#for now, we will randomise only SES
 #Run Function_randomise_grids
 
 random_list <- randomise_grids(data = Hdat_filled, 
                                var = c("rock_cover", "northness", "soil_moisture_adj_campaign2", 
                                        "mean_soil_depth", "slope_height"),
                                iterations = 999)
-##Perhaps we should rather be randomising the env variables
-#Becuase our null hypothesis is that env conditions do not affect the SES
+#We randomise the env variables becuase our null hypothesis is that env conditions do not affect the SES
 
 
 #Loop through random_list, performing gee and extracting p value for each one
