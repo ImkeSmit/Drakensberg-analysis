@@ -126,13 +126,13 @@ map_one_grid_variation <- function(data, variable, g) {
     zmax <- max(trait_dat[, which(colnames(data) == variable)], na.rm = TRUE)
     
     # open PDF
-    pdf(paste0("Figures/", variable ,"_", grid, ".pdf"), width = 12, height = 10)
+    pdf(paste0("Figures/", variable ,"_", g, ".pdf"), width = 12, height = 10)
       
       # define plotting layout
-      n <- length(site_grids)
-      nr <- ceiling(sqrt(n))
-      nc <- ceiling(n / nr)
-      par(mfrow = c(nr, nc))
+      #n <- length(site_grids)
+      #nr <- ceiling(sqrt(n))
+      #nc <- ceiling(n / nr)
+      #par(mfrow = c(nr, nc))
       
         
         #remove extra columns
@@ -175,4 +175,26 @@ map_one_grid_variation <- function(data, variable, g) {
 
 map_data <- cell_ses |> 
   filter(trait == "Height_cm")
-map_one_grid_variation(data = map_data, variable = "SES", g = "GGG4")
+map_one_grid_variation(data = map_data, variable = "SES", g = "WHG7")
+
+
+env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
+  mutate(elevation = case_when(grepl("BK", Cell_ID) == T ~ "3000", #add elevation variable
+                               grepl("WH", Cell_ID) == T ~ "2500",
+                               grepl("GG", Cell_ID) == T ~ "2000",.default = NA)) |> 
+  select(-c("site", "grid")) |> 
+  separate_wider_delim(Cell_ID, delim = "_", names = c("site", "grid", "cell"), cols_remove = F) |> 
+  mutate(grid = paste0(site, grid), 
+         column = substr(cell, 1,1), 
+         row = substr(cell, 2,3),
+         ncolumn = match(column, LETTERS[1:8])) |> 
+  mutate(mean_soil_depth = as.numeric(mean_soil_depth), 
+         soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2)) |> 
+  select(!c(soil_temperature_adj_campaign2, soil_moisture_adj_campaign1, soil_temperature_adj_campaign1,
+                   aeolian_process, fluvial_process, slope_process,
+                   geology1, geology2, geology3,
+                   geology4, geology5, mesotopo, aspect, veg_max_height))
+
+map_one_grid_variation(data = env, variable = "rock_cover", g = "WHG7")
+
+
