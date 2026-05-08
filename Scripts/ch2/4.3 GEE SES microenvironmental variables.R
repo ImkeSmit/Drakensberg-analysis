@@ -389,5 +389,67 @@ perm_test <- ggplot(results_random, aes(x = Estimate)) +
   facet_wrap(~variable, scales = "free", labeller = as_labeller(facet_names))
 
 ggsave("Figures//permutation_test.png" ,perm_test)
+
+
+
+
+#==============================#
+#####GEE FOR SES OF SLA#########
+#==============================#
+SLAdat <- comb2 |> 
+  filter(trait %in% c("SLA", NA)) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
+  arrange(y_coord, x_coord) |> 
+  mutate(trait = "SLA",  #give all records a trait
+         grid = paste0(site, grid))  #grid variable must be unique accross sites for the impute function
+
+#All grids must have 160 cells, check this
+check <- SLAdat |> group_by(site, grid) |> 
+  summarise(n = n()) #all ok
+
+#===============#
+###Imputation####
+#===============#
+#now we need to impute the missing SES or predictor variables because the Gee won't work if there are NA's
+#for now, we fill fill the NA cells with the mean of it's 8 nearest neighbours
+#run Function_impute_cells.R
+SLAdat_filled <- impute_cells(df = SLAdat, 
+                            cols_to_impute = colnames(SLAdat)[c(6:20, 25)])
+SLAdat_filled <- SLAdat_filled |> 
+  arrange(y_coord) |> 
+  mutate(grid = as.factor(grid), #cluster ID must be a factor
+         elevation = as.numeric(elevation))
+
+#Check what was filled
+cols <- c(colnames(SLAdat)[c(6:20, 25)])
+
+cat("=== NA summary before and after imputation ===\n\n")
+for (col in cols) {
+  if (!col %in% names(SLAdat)) next
+  n_before <- sum(is.na(SLAdat[[col]]))
+  n_after  <- sum(is.na(SLAdat_filled[[col]]))
+  cat(sprintf(
+    "%-35s  NAs before: %3d  |  NAs after: %3d  |  Filled: %3d\n",
+    col, n_before, n_after, n_before - n_after
+  ))
+}
+
+
+###Check collinearity#### 
+library(corrplot)
+cordf <- Hdat_filled |> dplyr::select(c(colnames(Hdat)[c(6:13, 15:20, 25)]))
+cormat<- cor(cordf)
+#cormat[cormat > 0.7]
+#cormat[cormat <-0.7]
+#none are highly correlated
+corrplot(cormat, type = "lower", method = "number")
+
+#=====================================================#
+####Spatial autocorrelation structure for each grid####
+#=====================================================#
+#Run Function_grid_correlation_structure.R
+decay_df <- grid_correlation_structure(grid_vector = c(unique(Hdat_filled$grid)), 
+                                       data = Hdat_filled, 
+                                       formula = "SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height", 
+                                       k_specified = 4)
   
 
