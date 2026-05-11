@@ -101,6 +101,16 @@ test2_res <- simulateResiduals(test2)
 plot(test2_res) ##doesn't want to simulate these residuals
 
 
+####t distribution for all grids in GG
+test5<- glmmTMB(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height+
+                exp(pos +0|grid), #only add the spatial random effect since variation between grids are likely due to random spatial factors only
+                family = t_family(link = "identity"), data = Hdat2) #start 14:39
+test5
+summary(test5)
+test5_res <- simulateResiduals(test5)
+plot(test5_res)
+#Is it necessary to add the random effect and the spatial random effect?
+
 ####t distribution
 #only for one grid
 Hdat3 <- Hdat2[Hdat2$grid == "GG1", ]
@@ -114,7 +124,7 @@ plot(test3_res) #looks the best so far
 
 ###tweedie distribution
 test4<- glmmTMB(SESplus ~ rock_cover +
-                  (1|grid) + exp(pos +0|grid), 
+                  (1|grid) + exp(pos+0|grid), 
                 family = tweedie(link = "log"), data = Hdat3) 
 summary(test4) #doesn't converge!
 test4_res <- simulateResiduals(test4)
