@@ -3,7 +3,7 @@ library(tidyverse)
 library(tidylog)
 library(glmmTMB)
 library(MuMIn)
-library(DHArma)
+library(DHARMa)
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
   rename(Cell_ID = cellref)
@@ -79,28 +79,17 @@ Hdat$elevation <- as.factor(Hdat$elevation)
 Hdat2<- Hdat[-which(is.na(Hdat$SES)), ]
 Hdat2<- Hdat2[which(Hdat2$site =="GG"), ]
 
+##Gaussian distribution
 test1<- glmmTMB(SES ~ rock_cover +
                   (1|grid) + exp(pos +0|grid), 
                 family = gaussian, data = Hdat2)
 test1
 summary(test1)
-res<- data.frame(residuals = residuals(test1))
-ggplot(res, aes(sample = residuals)) +
-  stat_qq(
-    color = "#2C7BB6",
-    alpha = 0.7,
-    size  = 1.8) +
-  stat_qq_line(
-    color    = "#D7191C",
-    linewidth = 1,
-    linetype = "dashed") +
-  labs( title = "SESplus, Gamma(link = log)",
-        x        = "Theoretical Quantiles",
-        y        = " Residuals")+
-  theme_bw(base_size = 13) 
+test1_res<- simulateResiduals(test1)
+plot(test1_res)
 
 
-
+##Gamma distribution
 Hdat2$SESplus <- Hdat2$SES+ abs(min(Hdat2$SES, na.rm = T)) + 1
 
 test2<- glmmTMB(SESplus ~ rock_cover +
@@ -108,18 +97,25 @@ test2<- glmmTMB(SESplus ~ rock_cover +
                 family = Gamma(link = "identity"), data = Hdat2) #takes 4 hours
 test2
 summary(test2)
-res2<- data.frame(residuals = residuals(test2))
+test2_res <- simulateResiduals(test2)
+plot(test2_res) ##doesn't want to simulate these residuals
 
-ggplot(res2, aes(sample = residuals)) +
-  stat_qq(
-    color = "#2C7BB6",
-    alpha = 0.7,
-    size  = 1.8) +
-  stat_qq_line(
-    color    = "#D7191C",
-    linewidth = 1,
-    linetype = "dashed") +
-  labs( title = "SESplus, Gamma(link = identity)",
-        x        = "Theoretical Quantiles",
-        y        = " Residuals")+
-  theme_bw(base_size = 13) 
+
+####t distribution
+#only for one grid
+Hdat3 <- Hdat2[Hdat2$grid == "GG1", ]
+test3<- glmmTMB(SES ~ rock_cover +
+                  (1|grid) + exp(pos +0|grid), 
+                family = t_family(link = "identity"), data = Hdat3) 
+summary(test3)
+test3_res <- simulateResiduals(test3)
+plot(test3_res) #looks the best so far
+
+
+###tweedie distribution
+test4<- glmmTMB(SESplus ~ rock_cover +
+                  (1|grid) + exp(pos +0|grid), 
+                family = tweedie(link = "log"), data = Hdat3) 
+summary(test4) #doesn't converge!
+test4_res <- simulateResiduals(test4)
+plot(test4_res)
