@@ -109,6 +109,7 @@ test5 #false conversion
 summary(test5)
 test5_res <- simulateResiduals(test5)
 plot(test5_res)
+diagnose(test5, check_hessian = F)
 #Is it necessary to add the random effect and the spatial random effect?
 
 
