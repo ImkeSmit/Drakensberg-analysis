@@ -104,12 +104,34 @@ plot(test2_res) ##doesn't want to simulate these residuals
 ####t distribution for all grids in GG
 test5<- glmmTMB(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height+
                 exp(pos +0|grid), #only add the spatial random effect since variation between grids are likely due to random spatial factors only
-                family = t_family(link = "identity"), data = Hdat2) #start 14:39
-test5
+                family = t_family(link = "identity"), data = Hdat2) #start 14:39, finish some time before 15:50
+test5 #false conversion
 summary(test5)
 test5_res <- simulateResiduals(test5)
 plot(test5_res)
 #Is it necessary to add the random effect and the spatial random effect?
+
+
+ggplot(Hdat2, aes(x = rock_cover, y = SES)) +
+  geom_point()+
+  theme_classic()
+
+
+ggplot(Hdat2, aes(x = northness, y = SES)) +
+  geom_point()+
+  theme_classic()
+
+ggplot(Hdat2, aes(x = soil_moisture_adj_campaign2, y = SES)) +
+  geom_point()+
+  theme_classic()
+
+ggplot(Hdat2, aes(x = mean_soil_depth, y = SES)) +
+  geom_point()+
+  theme_classic()
+
+ggplot(Hdat2, aes(x = slope_height, y = SES)) +
+  geom_point()+
+  theme_classic()
 
 ####t distribution
 #only for one grid
