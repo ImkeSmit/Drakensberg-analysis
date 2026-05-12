@@ -4,6 +4,7 @@ library(tidylog)
 library(glmmTMB)
 library(MuMIn)
 library(DHARMa)
+library(tictoc)
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
   rename(Cell_ID = cellref)
@@ -24,6 +25,9 @@ comb <- env |>
   full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
   ##Now we need to change the coordinates to reflect the spatial structure of the whole dataset
   #make the grids contiguous, differing by 20m along the y axis
+  mutate(elevation = as.factor(case_when(site == "GG" ~ 2000, 
+                               site == "WH" ~ 2500, 
+                               site == "BK" ~ 3000, .default = NA))) |> 
   mutate(y_new = case_when(site == "GG" ~ row, 
                            site == "WH" ~ row+160, 
                            site == "BK" ~ row+160+140, .default = NA)) |> 
@@ -46,9 +50,9 @@ comb <- env |>
 ###Fill in the x and y coordinates of cells that do not have SES
 comb2 <- comb |> 
   mutate(ncolumn = match(column, LETTERS[1:8]),
-         elevation = case_when(grepl("BK", Cell_ID) == T ~ "3000", #add elevation variable
+         elevation = as.factor(case_when(grepl("BK", Cell_ID) == T ~ "3000", #add elevation variable
                                grepl("WH", Cell_ID) == T ~ "2500",
-                               grepl("GG", Cell_ID) == T ~ "2000", .default = NA),
+                               grepl("GG", Cell_ID) == T ~ "2000", .default = NA)),
          y_new = case_when(site == "GG" ~ row, 
                            site == "WH" ~ row+160, 
                            site == "BK" ~ row+160 +140, .default = NA)) |> 
@@ -103,13 +107,32 @@ plot(test2_res) ##doesn't want to simulate these residuals
 
 ####t distribution for all grids in GG
 test5<- glmmTMB(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height+
-                exp(pos +0|grid), #only add the spatial random effect since variation between grids are likely due to random spatial factors only
+                + exp(pos +0|grid), #only add the spatial random effect since variation between grids are likely due to random spatial factors only
                 family = t_family(link = "identity"), data = Hdat2) #start 14:39, finish some time before 15:50
 test5 #false conversion
 summary(test5)
 test5_res <- simulateResiduals(test5)
 plot(test5_res)
 diagnose(test5, check_hessian = F)
+#Is it necessary to add the random effect and the spatial random effect?
+
+
+####skewnormal for all grids in GG
+
+#get starting parameters from the gaussian model
+pl <- test1$obj$env$parList()
+pl <- pl[lengths(pl) > 0] # Filter out empty components
+
+tic()
+test6<- glmmTMB(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height+
+                  + exp(pos+0|grid), #only add the spatial random effect since variation between grids are likely due to random spatial factors only
+                family = skewnormal(link = "identity"), data = Hdat2, start = pl) 
+toc() #564.14 sec elapsed, 9 min
+test6
+summary(test6)
+test6_res <- simulateResiduals(test6)
+plot(test6_res)
+diagnose(test6, check_hessian = T)#
 #Is it necessary to add the random effect and the spatial random effect?
 
 
