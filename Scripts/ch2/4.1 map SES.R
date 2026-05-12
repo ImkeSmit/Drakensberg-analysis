@@ -173,6 +173,49 @@ map_one_grid_variation <- function(data, variable, g) {
   #end function
 }
 
+
+####Create raster of one grid and one variable####
+
+one_grid_raster <- function(data, variable, g) {
+
+  # filter data for this grid
+  g_dat <- data %>% filter(grid == g)
+  
+  
+  #remove extra columns
+  g_dat <- g_dat[, which(colnames(g_dat) %in% c("row", "ncolumn", variable))]
+  
+  # Create spatial grid object
+  x_range <- 1:20
+  y_range <- 1:8
+  
+  grid_obj <- expand.grid(x = x_range, y = y_range)
+  coordinates(grid_obj) <- ~x + y
+  gridded(grid_obj) <- TRUE
+  r <- raster(grid_obj) 
+  
+  #Check if there are missing cells in data
+  possible_cells <- paste(grid_obj$x, grid_obj$y, sep = "_")
+  observed_cells <- paste(g_dat$row, g_dat$ncolumn, sep = "_")
+  missing <- which(is.na(match(possible_cells, observed_cells)))
+  
+  if(length(missing) > 0) { #create a filler
+    
+    filler <- data.frame(row = grid_obj$x[missing], ncolumn = grid_obj$y[missing])
+    filler[[variable]] <- NA #the variable is set to NA
+    
+    g_dat <- rbind(g_dat, filler) }
+  
+  # need values sorted to match the raster cell order:
+  g_dat <- g_dat[order(g_dat$ncolumn, g_dat$row), ]
+  g_dat <- as.data.frame(g_dat)
+  
+  return(g_dat)
+  #end function
+}
+
+
+
 map_data <- cell_ses |> 
   filter(trait == "Height_cm")
 map_one_grid_variation(data = map_data, variable = "SES", g = "WHG7")
@@ -195,6 +238,21 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
                    geology1, geology2, geology3,
                    geology4, geology5, mesotopo, aspect, veg_max_height))
 
-map_one_grid_variation(data = env, variable = "rock_cover", g = "WHG7")
 
+WHG7_rock_r <- one_grid_raster(data = env, variable = "rock_cover", g = "WHG7")
+
+grid_rock_WHG7 <- ggplot(WHG7_rock_r, aes(row, ncolumn, fill = rock_cover))+
+geom_raster()+
+scale_fill_gradient(low = "white", high = "darkorange2", na.value = "pink")+
+theme_void()+
+labs(x = " ", y = " ", fill = "Rock cover (%)") 
+
+
+WHG7_SES_r <- one_grid_raster(data = cell_ses, variable = "SES", g = "WHG7")
+
+ggplot(WHG7_SES_r, aes(row, ncolumn, fill = SES))+
+  geom_raster()+
+  scale_fill_gradient2(low = "blue3", mid = "white", high = "darkorange2", na.value = "darkgray")+
+  theme_void()+
+  labs(x = " ", y = " ", fill = "SES") 
 
