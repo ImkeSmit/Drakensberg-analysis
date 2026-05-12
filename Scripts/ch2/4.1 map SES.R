@@ -122,11 +122,11 @@ map_one_grid_variation <- function(data, variable, g) {
     g_dat <- data %>% filter(grid == g)
     
     # Compute global min and max SES
-    zmin <- min(trait_dat[, which(colnames(data) == variable)], na.rm = TRUE)
-    zmax <- max(trait_dat[, which(colnames(data) == variable)], na.rm = TRUE)
+    zmin <- min(g_dat[, which(colnames(g_dat) == variable)], na.rm = TRUE)
+    zmax <- max(g_dat[, which(colnames(g_dat) == variable)], na.rm = TRUE)
     
     # open PDF
-    pdf(paste0("Figures/", variable ,"_", g, ".pdf"), width = 12, height = 10)
+    png(paste0("Figures/", variable ,"_", g, ".png"))
       
       # define plotting layout
       #n <- length(site_grids)
@@ -166,7 +166,7 @@ map_one_grid_variation <- function(data, variable, g) {
         # add SES values to raster
         r <- setValues(r, g_dat[, which(colnames(g_dat) == variable)])
         
-        plot(r, main = paste0(variable, " - ", tr, " - ", g), 
+        plot(r, main = paste0(variable, " - ", g), 
              zlim = c(zmin, zmax))
     
     dev.off()
@@ -182,7 +182,7 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
   mutate(elevation = case_when(grepl("BK", Cell_ID) == T ~ "3000", #add elevation variable
                                grepl("WH", Cell_ID) == T ~ "2500",
                                grepl("GG", Cell_ID) == T ~ "2000",.default = NA)) |> 
-  select(-c("site", "grid")) |> 
+  dplyr::select(-c("site", "grid")) |> 
   separate_wider_delim(Cell_ID, delim = "_", names = c("site", "grid", "cell"), cols_remove = F) |> 
   mutate(grid = paste0(site, grid), 
          column = substr(cell, 1,1), 
@@ -190,7 +190,7 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
          ncolumn = match(column, LETTERS[1:8])) |> 
   mutate(mean_soil_depth = as.numeric(mean_soil_depth), 
          soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2)) |> 
-  select(!c(soil_temperature_adj_campaign2, soil_moisture_adj_campaign1, soil_temperature_adj_campaign1,
+  dplyr::select(!c(soil_temperature_adj_campaign2, soil_moisture_adj_campaign1, soil_temperature_adj_campaign1,
                    aeolian_process, fluvial_process, slope_process,
                    geology1, geology2, geology3,
                    geology4, geology5, mesotopo, aspect, veg_max_height))
