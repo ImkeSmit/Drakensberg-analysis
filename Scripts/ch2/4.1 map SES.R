@@ -246,13 +246,15 @@ geom_raster()+
 scale_fill_gradient(low = "white", high = "darkorange2", na.value = "pink")+
 theme_void()+
 labs(x = " ", y = " ", fill = "Rock cover (%)") 
+ggsave("Figures//rock_cover_WHG7.png", grid_rock_WHG7, device = png)
 
 
 WHG7_SES_r <- one_grid_raster(data = cell_ses, variable = "SES", g = "WHG7")
 
-ggplot(WHG7_SES_r, aes(row, ncolumn, fill = SES))+
+grid_SES_WHG7<- ggplot(WHG7_SES_r, aes(row, ncolumn, fill = SES))+
   geom_raster()+
   scale_fill_gradient2(low = "blue3", mid = "white", high = "darkorange2", na.value = "darkgray")+
   theme_void()+
   labs(x = " ", y = " ", fill = "SES") 
+ggsave("Figures//SES_WHG7.png", grid_SES_WHG7, device = png)
 
