@@ -84,8 +84,8 @@ Hdat2<- Hdat[-which(is.na(Hdat$SES)), ]
 Hdat2<- Hdat2[which(Hdat2$site =="GG"), ]
 
 ##Gaussian distribution
-test1<- glmmTMB(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height+
-                + exp(pos +0|grid), 
+test1<- glmmTMB(SES ~ northness + soil_moisture_adj_campaign2 + mean_soil_depth + 
+                 exp(pos +0|grid), 
                 family = gaussian, data = Hdat2)
 test1
 summary(test1)
@@ -124,7 +124,7 @@ pl <- test1$obj$env$parList()
 pl <- pl[lengths(pl) > 0] # Filter out empty components
 
 tic()
-test6<- glmmTMB(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height+
+test6<- glmmTMB(SES ~ northness + soil_moisture_adj_campaign2 + mean_soil_depth 
                   + exp(pos+0|grid), #only add the spatial random effect since variation between grids are likely due to random spatial factors only
                 family = skewnormal(link = "identity"), data = Hdat2, start = pl) 
 toc() #564.14 sec elapsed, 9 min
