@@ -80,8 +80,8 @@ Hdat2<- Hdat[-which(is.na(Hdat$SES)), ]
 Hdat2<- Hdat2[which(Hdat2$site =="GG"), ]
 
 ##Gaussian distribution
-test1<- glmmTMB(SES ~ rock_cover +
-                  (1|grid) + exp(pos +0|grid), 
+test1<- glmmTMB(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height+
+                + exp(pos +0|grid), 
                 family = gaussian, data = Hdat2)
 test1
 summary(test1)
