@@ -78,15 +78,55 @@ Hdat <- comb2 |>
          pos = numFactor(x_coord, y_coord))
 
 
-###FOR REAL, all the data####
+###FOR REAL, with half the data from each grid####
+positions <- Hdat |> 
+  dplyr::select(x_coord, y_coord, grid) |> 
+  mutate(pos = numFactor(x_coord, y_coord))  
+
+  for(g in c(unique(Hdat$grid))) {
+    one_grid <- positions |> filter(grid == g)
+    
+    if(nrow(one_grid)>80) {
+    keep <- sample(one_grid$pos, 80)
+    }else{keep <- one_grid$pos}
+    
+    if(g == unique(Hdat$grid[1])) {
+      keep_vector <- keep
+    }else {
+      temp_vector <- keep
+      keep_vector <- c(keep_vector, temp_vector)
+    }
+  }
+
+Hdat2 <- Hdat |> 
+  filter(pos %in% keep_vector)
+
+
 ##First run Gaussian
 tic()
 gausmod<- glmmTMB(SES ~ elevation + rock_cover+ northness + soil_moisture_adj_campaign2 + mean_soil_depth + 
-                    slope_height+ exp(pos +0|grid), 
-                family = gaussian, data = Hdat)
+                    slope_height+ mat(pos +0 |grid), 
+                family = gaussian, data = Hdat2)
 toc()
+summary(gausmod)
+gausmod_res <- simulateResiduals(gausmod)
+plot(gausmod_res)
+
+#get starting parameters from the gaussian model
+pl <- gausmod$obj$env$parList()
+pl <- pl[lengths(pl) > 0] # Filter out empty components
 
 
+
+###Now run skewnormal
+tic()
+snmod<- glmmTMB(SES ~ elevation + rock_cover+ northness + soil_moisture_adj_campaign2 + mean_soil_depth + 
+                    slope_height+ mat(pos +0 |grid), 
+                  family = skewnormal(link = "identity"), data = Hdat2)
+toc()
+summary(snmod)
+sn_res <- simulateResiduals(snmod)
+plot(sn_res)
 
 
 
