@@ -70,18 +70,25 @@ comb2 <- comb |>
 
 
 Hdat <- comb2 |> 
-  filter(trait %in% c("Height_cm", NA)) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
+  filter(trait %in% c("Height_cm", NA), #also select cells which have no SES measurement. This is necessary to make the grid complete
+         !is.na(SES)) |> 
   arrange(y_coord, x_coord) |> 
   mutate(trait = "Height_cm",  #give all records a trait
-         grid = as.factor(paste0(site, grid))) 
+         grid = as.factor(paste0(site, grid)), 
+         pos = numFactor(x_coord, y_coord))
 
 
-Hdat$pos<- numFactor(Hdat$x_coord, Hdat$y_coord)
-Hdat$grid <- as.factor(Hdat$grid)
-Hdat$elevation <- as.factor(Hdat$elevation)
+###FOR REAL, all the data####
+##First run Gaussian
+tic()
+gausmod<- glmmTMB(SES ~ elevation + rock_cover+ northness + soil_moisture_adj_campaign2 + mean_soil_depth + 
+                    slope_height+ exp(pos +0|grid), 
+                family = gaussian, data = Hdat)
+toc()
 
-Hdat2<- Hdat[-which(is.na(Hdat$SES)), ]
-Hdat2<- Hdat2[which(Hdat2$site =="GG"), ]
+
+
+
 
 ##Gaussian distribution
 test1<- glmmTMB(SES ~ northness + soil_moisture_adj_campaign2 + mean_soil_depth + 
