@@ -71,7 +71,8 @@ comb2 <- comb |>
 
 Hdat <- comb2 |> 
   filter(trait %in% c("Height_cm", NA), #also select cells which have no SES measurement. This is necessary to make the grid complete
-         !is.na(SES)) |> 
+         !is.na(SES), 
+         SES<=2) |> ##remove very large SES
   arrange(y_coord, x_coord) |> 
   mutate(trait = "Height_cm",  #give all records a trait
          grid = as.factor(paste0(site, grid)), 
@@ -105,12 +106,13 @@ Hdat2 <- Hdat |>
 ##First run Gaussian
 tic()
 gausmod<- glmmTMB(SES ~ elevation + rock_cover+ northness + soil_moisture_adj_campaign2 + mean_soil_depth + 
-                    slope_height+ mat(pos +0 |grid), 
-                family = gaussian, data = Hdat2)
+                    slope_height+ exp(pos+0|grid), 
+                family = gaussian, data = Hdat2, REML = T)
 toc()
 summary(gausmod)
 gausmod_res <- simulateResiduals(gausmod)
 plot(gausmod_res)
+#diagnostics of gaussian model with (1|grid looks ok)
 
 #get starting parameters from the gaussian model
 pl <- gausmod$obj$env$parList()
@@ -121,10 +123,10 @@ pl <- pl[lengths(pl) > 0] # Filter out empty components
 ###Now run skewnormal
 tic()
 snmod<- glmmTMB(SES ~ elevation + rock_cover+ northness + soil_moisture_adj_campaign2 + mean_soil_depth + 
-                    slope_height+ mat(pos +0 |grid), 
-                  family = skewnormal(link = "identity"), data = Hdat2)
+                    slope_height+ (1|grid), 
+                  family = skewnormal(link = "identity"), data = Hdat2, start = pl)
 toc()
-summary(snmod)
+summary(snmod) #doesnt converge
 sn_res <- simulateResiduals(snmod)
 plot(sn_res)
 
