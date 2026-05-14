@@ -125,10 +125,10 @@ pl <- pl[lengths(pl) > 0] # Filter out empty components
 
 
 
-##First run Gaussian, WITH spatial decay
+##Run Gaussian, WITH spatial decay
 tic()
 gausmod_spat<- glmmTMB(SES ~ elevation + rock_cover+ northness + soil_moisture_adj_campaign2 + mean_soil_depth + 
-                    slope_height+ exp(pos+0|grid), 
+                    slope_height+ (1|grid) + exp(pos+0|grid), 
                   family = gaussian, data = Hdat2)
 toc()
 summary(gausmod_spat)
@@ -136,10 +136,10 @@ gausmod_spat_res <- simulateResiduals(gausmod_spat)
 plot(gausmod_spat_res)
 #test for spatial autocorrelation in residuals
 used_rows <- as.integer(rownames(model.frame(gausmod_spat))) #get data actually used in model
-dat_used  <- Hdat[used_rows, ]
+dat_used  <- Hdat2[used_rows, ]
 testSpatialAutocorrelation(gausmod_res, x = dat_used$x_coord, y = dat_used$y_coord)
-#normality and HOV assumption looks ok
-#spatial autocorrelation is significant
+#Error in fitTMB(TMBStruc) : 
+#negative log-likelihood is NaN at starting parameter values
 
 
 
