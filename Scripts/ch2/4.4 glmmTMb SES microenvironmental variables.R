@@ -29,17 +29,17 @@ comb <- env |>
                                site == "WH" ~ 2500, 
                                site == "BK" ~ 3000, .default = NA))) |> 
   mutate(y_new = case_when(site == "GG" ~ row, 
-                           site == "WH" ~ row+160, 
-                           site == "BK" ~ row+160+140, .default = NA)) |> 
+                           site == "WH" ~ row+160+1000, 
+                           site == "BK" ~ row+160+140+2000, .default = NA)) |> 
   group_by(site) |> 
   mutate(y_coord = case_when(grepl("1", grid) ~ y_new, 
-                             grepl("2", grid) ~ y_new+20, 
-                             grepl("3", grid) ~ y_new+20*2,
-                             grepl("4", grid) ~ y_new+20*3, 
-                             grepl("5", grid) ~ y_new+20*4, 
-                             grepl("6", grid) ~ y_new+20*5, 
-                             grepl("7", grid) ~ y_new+20*6, 
-                             grepl("8", grid) ~ y_new+20*7, .default = NA)) |> 
+                             grepl("2", grid) ~ y_new+20+100, 
+                             grepl("3", grid) ~ y_new+20*2+200,
+                             grepl("4", grid) ~ y_new+20*3+300, 
+                             grepl("5", grid) ~ y_new+20*4+400, 
+                             grepl("6", grid) ~ y_new+20*5+500, 
+                             grepl("7", grid) ~ y_new+20*6+600, 
+                             grepl("8", grid) ~ y_new+20*7+700, .default = NA)) |> 
   mutate(ncolumn = match(column, LETTERS[1:8]), 
          x_coord = ncolumn, 
          rock_cover = as.numeric(rock_cover), 
@@ -54,17 +54,17 @@ comb2 <- comb |>
                                grepl("WH", Cell_ID) == T ~ "2500",
                                grepl("GG", Cell_ID) == T ~ "2000", .default = NA)),
          y_new = case_when(site == "GG" ~ row, 
-                           site == "WH" ~ row+160, 
-                           site == "BK" ~ row+160 +140, .default = NA)) |> 
+                           site == "WH" ~ row+160+1000, 
+                           site == "BK" ~ row+160 +140+2000, .default = NA)) |> 
   group_by(site) |> 
   mutate(y_coord = case_when(grepl("1", grid) ~ y_new, 
-                             grepl("2", grid) ~ y_new+20, 
-                             grepl("3", grid) ~ y_new+20*2,
-                             grepl("4", grid) ~ y_new+20*3, 
-                             grepl("5", grid) ~ y_new+20*4, 
-                             grepl("6", grid) ~ y_new+20*5, 
-                             grepl("7", grid) ~ y_new+20*6, 
-                             grepl("8", grid) ~ y_new+20*7, .default = NA)) |> 
+                             grepl("2", grid) ~ y_new+20+100, 
+                             grepl("3", grid) ~ y_new+20*2+200,
+                             grepl("4", grid) ~ y_new+20*3+300, 
+                             grepl("5", grid) ~ y_new+20*4+400, 
+                             grepl("6", grid) ~ y_new+20*5+500, 
+                             grepl("7", grid) ~ y_new+20*6+600, 
+                             grepl("8", grid) ~ y_new+20*7+700, .default = NA)) |> 
   mutate(x_coord = ncolumn) |> 
   ungroup()
 
@@ -103,20 +103,43 @@ Hdat2 <- Hdat |>
   filter(pos %in% keep_vector)
 
 
-##First run Gaussian
+##First run Gaussian, without spatial decay
 tic()
 gausmod<- glmmTMB(SES ~ elevation + rock_cover+ northness + soil_moisture_adj_campaign2 + mean_soil_depth + 
-                    slope_height+ exp(pos+0|grid), 
-                family = gaussian, data = Hdat2, REML = T)
+                    slope_height+ (1|grid), 
+                family = gaussian, data = Hdat)
 toc()
 summary(gausmod)
 gausmod_res <- simulateResiduals(gausmod)
 plot(gausmod_res)
-#diagnostics of gaussian model with (1|grid looks ok)
+#test for spatial autocorrelation in residuals
+used_rows <- as.integer(rownames(model.frame(gausmod))) #get data actually used in model
+dat_used  <- Hdat[used_rows, ]
+testSpatialAutocorrelation(gausmod_res, x = dat_used$x_coord, y = dat_used$y_coord)
+#normality and HOV assumption looks ok
+#spatial autocorrelation is significant
 
 #get starting parameters from the gaussian model
 pl <- gausmod$obj$env$parList()
 pl <- pl[lengths(pl) > 0] # Filter out empty components
+
+
+
+##First run Gaussian, WITH spatial decay
+tic()
+gausmod_spat<- glmmTMB(SES ~ elevation + rock_cover+ northness + soil_moisture_adj_campaign2 + mean_soil_depth + 
+                    slope_height+ exp(pos+0|grid), 
+                  family = gaussian, data = Hdat2)
+toc()
+summary(gausmod_spat)
+gausmod_spat_res <- simulateResiduals(gausmod_spat)
+plot(gausmod_spat_res)
+#test for spatial autocorrelation in residuals
+used_rows <- as.integer(rownames(model.frame(gausmod_spat))) #get data actually used in model
+dat_used  <- Hdat[used_rows, ]
+testSpatialAutocorrelation(gausmod_res, x = dat_used$x_coord, y = dat_used$y_coord)
+#normality and HOV assumption looks ok
+#spatial autocorrelation is significant
 
 
 
