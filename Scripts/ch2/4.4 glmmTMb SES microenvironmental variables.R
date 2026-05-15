@@ -5,6 +5,8 @@ library(glmmTMB)
 library(MuMIn)
 library(DHARMa)
 library(tictoc)
+library(ggplot2)
+library(ggridges)
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
   rename(Cell_ID = cellref)
@@ -131,6 +133,14 @@ em_tmod2 <- emmeans(tmod2, specs = "elevation", type = "response")
 cld(em_tmod2, Letters = letters, adjust = "Tukey")
 #2500 elevation has higher SES than other two
 
+
+###Figures###
+ses_ridges <- comb |>
+  filter(trait %in% c("Height_cm", "SLA")) |> 
+  ggplot(aes(x = SES, y = elevation, fill = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait) +
+  theme_classic()
 
 
 
