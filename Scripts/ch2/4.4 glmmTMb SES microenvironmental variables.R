@@ -76,7 +76,12 @@ Hdat <- comb2 |>
   arrange(y_coord, x_coord) |> 
   mutate(trait = "Height_cm",  #give all records a trait
          grid = as.factor(paste0(site, grid)), 
-         pos = numFactor(x_coord, y_coord))
+         pos = numFactor(x_coord, y_coord)) |> 
+  mutate(zrock_cover = scale(rock_cover), 
+         znorthness = scale(northness), 
+         zsoil_moist = scale(soil_moisture_adj_campaign2), 
+         zsoil_depth = scale(mean_soil_depth), 
+         zslope_height = scale(slope_height))
 
 
 ###FOR REAL, with half the data from each grid####
@@ -127,8 +132,8 @@ pl <- pl[lengths(pl) > 0] # Filter out empty components
 
 ##Run Gaussian, WITH spatial decay
 tic()
-gausmod_spat<- glmmTMB(SES ~ elevation + rock_cover+ northness + soil_moisture_adj_campaign2 + mean_soil_depth + 
-                    slope_height+ (1|grid) + exp(pos+0|grid), 
+gausmod_spat<- glmmTMB(SES ~ elevation + zrock_cover+ znorthness + zsoil_moist + zsoil_depth + 
+                    zslope_height+ + exp(pos+0|grid), 
                   family = gaussian, data = Hdat2)
 toc()
 summary(gausmod_spat)
