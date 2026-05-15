@@ -99,8 +99,8 @@ tmod1_res <- simulateResiduals(tmod1)
 plot(tmod1_res) #looks ok...
 
 em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
-cld(em_tmod1)
-
+cld(em_tmod1, Letters = letters, adjust = "Tukey")
+#2500 elevation has lower SES than other two
 
 ####SES SLA####
 #isolate SES of SLA
@@ -122,6 +122,11 @@ toc()
 summary(tmod2)
 tmod2_res <- simulateResiduals(tmod2)
 plot(tmod2_res) #looks good
+
+
+em_tmod2 <- emmeans(tmod2, specs = "elevation", type = "response")
+cld(em_tmod2, Letters = letters, adjust = "Tukey")
+#2500 elevation has higher SES than other two
 
 
 
