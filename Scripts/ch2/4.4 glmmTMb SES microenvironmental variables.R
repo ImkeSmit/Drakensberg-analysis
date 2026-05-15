@@ -100,6 +100,29 @@ plot(tmod1_res) #looks ok...
 
 
 
+####SES SLA####
+#isolate SES of SLA
+#leave heavy tail
+SLAdat <- comb2 |> 
+  filter(trait %in% c("SLA", NA), #also select cells which have no SES measurement. This is necessary to make the grid complete
+         !is.na(SES)) |> 
+  arrange(y_coord, x_coord) |> 
+  mutate(trait = "SLA",  #give all records a trait
+         grid = as.factor(paste0(site, grid)), 
+         pos = numFactor(x_coord, y_coord))
+
+
+tic()
+tmod2<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
+                  zslope_height + (1|grid), 
+                family = t_family(link = "identity"), data = SLAdat)
+toc()
+summary(tmod2)
+tmod2_res <- simulateResiduals(tmod2)
+plot(tmod2_res) #looks good
+
+
+
 #=================================#
 #OLD CODE BELOW- TRYING OUT MODELS#
 Hdat <- comb2 |> 
