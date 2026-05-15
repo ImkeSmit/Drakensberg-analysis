@@ -73,20 +73,20 @@ comb2 <- comb |>
          zslope_height = scale(slope_height)) |> 
   ungroup()
 
-#isolate SES of height
-Hdat <- comb2 |> 
-  filter(trait %in% c("Height_cm", NA), #also select cells which have no SES measurement. This is necessary to make the grid complete
-         !is.na(SES), 
-         SES<=2) |> ##remove very large SES
-  arrange(y_coord, x_coord) |> 
-  mutate(trait = "Height_cm",  #give all records a trait
-         grid = as.factor(paste0(site, grid)), 
-         pos = numFactor(x_coord, y_coord))
-
 
 ####===========================####
 #=======POSTER ANALYSIS===========#
 
+####SES HEIGHT####
+#isolate SES of height
+#leave heavy tail
+Hdat <- comb2 |> 
+  filter(trait %in% c("Height_cm", NA), #also select cells which have no SES measurement. This is necessary to make the grid complete
+         !is.na(SES)) |> 
+  arrange(y_coord, x_coord) |> 
+  mutate(trait = "Height_cm",  #give all records a trait
+         grid = as.factor(paste0(site, grid)), 
+         pos = numFactor(x_coord, y_coord))
 
 
 
