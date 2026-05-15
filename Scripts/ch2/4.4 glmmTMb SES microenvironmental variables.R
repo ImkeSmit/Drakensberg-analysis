@@ -98,6 +98,8 @@ summary(tmod1)
 tmod1_res <- simulateResiduals(tmod1)
 plot(tmod1_res) #looks ok...
 
+write.csv(summary(tmod1)$coefficients$cond, "All_data/comm_assembly_results/SES_height_env_model_results.csv")
+
 em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
 cld(em_tmod1, Letters = letters, adjust = "Tukey")
 #2500 elevation has lower SES than other two
@@ -122,11 +124,14 @@ toc()
 summary(tmod2)
 tmod2_res <- simulateResiduals(tmod2)
 plot(tmod2_res) #looks good
+write.csv(summary(tmod2)$coefficients$cond, "All_data/comm_assembly_results/SES_SLA_env_model_results.csv")
 
 
 em_tmod2 <- emmeans(tmod2, specs = "elevation", type = "response")
 cld(em_tmod2, Letters = letters, adjust = "Tukey")
 #2500 elevation has higher SES than other two
+
+
 
 
 
