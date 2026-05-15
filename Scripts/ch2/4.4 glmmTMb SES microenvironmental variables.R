@@ -135,12 +135,21 @@ cld(em_tmod2, Letters = letters, adjust = "Tukey")
 
 
 ###Figures###
+l1 = c("Height_cm" = "Plant height", "SLA" = "SLA")
+ridges_letters <- data.frame(trait = c(rep("Height_cm", 3), rep("SLA", 3)), 
+                             elevation = as.factor(c(rep(c("2000", "2500", "3000"), 2))),
+                             letters = c("a", "b", "a", "a", "b", "a"))
+
 ses_ridges <- comb |>
   filter(trait %in% c("Height_cm", "SLA")) |> 
-  ggplot(aes(x = SES, y = elevation, fill = elevation)) +
+  ggplot(aes(x = SES, y = elevation)) +
   geom_density_ridges(alpha = 0.5) +
-  facet_wrap(~trait) +
-  theme_classic()
+  facet_wrap(~trait, labeller = as_labeller(l1), scale = "free_x")+
+  labs(x = "SES", y = "Elevation (m a.s.l.)") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_text(data = ridges_letters, x = 4, y = elevation, label = letters)+
+  theme_classic() +
+  theme(legend.position = "none") 
 
 
 
@@ -179,7 +188,8 @@ positions <- Hdat |>
 
 Hdat2 <- Hdat |> 
   filter(pos %in% keep_vector)
-
+SLAdat2 <- SLAdat |> 
+  filter(pos %in% keep_vector)
 
 ##First run Gaussian, without spatial decay
 #WORKS#
@@ -252,7 +262,17 @@ plot(tmod_spat_res)
 #spatial model with T distribution does not work
 
 
-
+##Run t distribution with SLA
+tic()
+tmod_spat<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
+                      zslope_height + exp(pos+0|grid), 
+                    family = t_family(link = "identity"), data = SLAdat2)
+toc()
+summary(tmod_spat)
+tmod_spat_res <- simulateResiduals(tmod_spat)
+plot(tmod_spat_res)
+##THIS MODEL HAS THE BEST DIAGNOSIC PLOTS SO FAR
+#spatial model with T distribution does not work
 
 
 ##Gaussian distribution
