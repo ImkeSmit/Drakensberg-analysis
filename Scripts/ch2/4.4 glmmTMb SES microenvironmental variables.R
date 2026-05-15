@@ -65,10 +65,15 @@ comb2 <- comb |>
                              grepl("6", grid) ~ y_new+20*5+500, 
                              grepl("7", grid) ~ y_new+20*6+600, 
                              grepl("8", grid) ~ y_new+20*7+700, .default = NA)) |> 
-  mutate(x_coord = ncolumn) |> 
+  mutate(x_coord = ncolumn, 
+         zrock_cover = scale(rock_cover), #standardise variables
+         znorthness = scale(northness), 
+         zsoil_moist = scale(soil_moisture_adj_campaign2), 
+         zsoil_depth = scale(mean_soil_depth), 
+         zslope_height = scale(slope_height)) |> 
   ungroup()
 
-
+#isolate SES of height
 Hdat <- comb2 |> 
   filter(trait %in% c("Height_cm", NA), #also select cells which have no SES measurement. This is necessary to make the grid complete
          !is.na(SES), 
@@ -76,15 +81,28 @@ Hdat <- comb2 |>
   arrange(y_coord, x_coord) |> 
   mutate(trait = "Height_cm",  #give all records a trait
          grid = as.factor(paste0(site, grid)), 
-         pos = numFactor(x_coord, y_coord)) |> 
-  mutate(zrock_cover = scale(rock_cover), 
-         znorthness = scale(northness), 
-         zsoil_moist = scale(soil_moisture_adj_campaign2), 
-         zsoil_depth = scale(mean_soil_depth), 
-         zslope_height = scale(slope_height))
+         pos = numFactor(x_coord, y_coord))
 
 
-###FOR REAL, with half the data from each grid####
+####===========================####
+#=======POSTER ANALYSIS===========#
+
+
+
+
+#=================================#
+#OLD CODE BELOW- TRYING OUT MODELS#
+Hdat <- comb2 |> 
+  filter(trait %in% c("Height_cm", NA), #also select cells which have no SES measurement. This is necessary to make the grid complete
+         !is.na(SES), 
+         SES<=2) |> ##remove very large SES
+  arrange(y_coord, x_coord) |> 
+  mutate(trait = "Height_cm",  #give all records a trait
+         grid = as.factor(paste0(site, grid)), 
+         pos = numFactor(x_coord, y_coord))
+
+
+###sample half the data from each grid####
 positions <- Hdat |> 
   dplyr::select(x_coord, y_coord, grid) |> 
   mutate(pos = numFactor(x_coord, y_coord))  
@@ -109,6 +127,7 @@ Hdat2 <- Hdat |>
 
 
 ##First run Gaussian, without spatial decay
+#WORKS#
 tic()
 gausmod<- glmmTMB(SES ~ elevation + rock_cover+ northness + soil_moisture_adj_campaign2 + mean_soil_depth + 
                     slope_height+ (1|grid), 
@@ -131,9 +150,11 @@ pl <- pl[lengths(pl) > 0] # Filter out empty components
 
 
 ##Run Gaussian, WITH spatial decay
+#DOES NOT WORK#
+Hdat2$SESplus = Hdat2$SES+ abs(min(Hdat2$SES))
 tic()
-gausmod_spat<- glmmTMB(SES ~ elevation + zrock_cover+ znorthness + zsoil_moist + zsoil_depth + 
-                    zslope_height+ + exp(pos+0|grid), 
+gausmod_spat<- glmmTMB(SESplus ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
+                    zslope_height + exp(pos+0|grid), 
                   family = gaussian, data = Hdat2)
 toc()
 summary(gausmod_spat)
@@ -149,14 +170,33 @@ testSpatialAutocorrelation(gausmod_res, x = dat_used$x_coord, y = dat_used$y_coo
 
 
 ###Now run skewnormal
+##DOES NOT WORK###
 tic()
-snmod<- glmmTMB(SES ~ elevation + rock_cover+ northness + soil_moisture_adj_campaign2 + mean_soil_depth + 
-                    slope_height+ (1|grid), 
-                  family = skewnormal(link = "identity"), data = Hdat2, start = pl)
+snmod<- glmmTMB(SES ~ elevation + zrock_cover+ znorthness + zsoil_moist + zsoil_depth + 
+                  zslope_height + (1|grid)+ exp(pos+0|grid), 
+                  family = skewnormal(link = "identity"), data = Hdat2)
 toc()
 summary(snmod) #doesnt converge
 sn_res <- simulateResiduals(snmod)
 plot(sn_res)
+#Error in fitTMB(TMBStruc) : 
+#negative log-likelihood is NaN at starting parameter values
+#does not converge with any combo of random effects or link function
+
+
+##Run t distribution
+tic()
+tmod_spat<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
+                         zslope_height + (1|grid), 
+                       family = t_family(link = "identity"), data = Hdat2)
+toc()
+summary(tmod_spat)
+tmod_spat_res <- simulateResiduals(tmod_spat)
+plot(tmod_spat_res)
+##THIS MODEL HAS THE BEST DIAGNOSIC PLOTS SO FAR
+#spatial model with T distribution does not work
+
+
 
 
 
