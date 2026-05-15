@@ -138,7 +138,8 @@ cld(em_tmod2, Letters = letters, adjust = "Tukey")
 l1 = c("Height_cm" = "Plant height", "SLA" = "SLA")
 ridges_letters <- data.frame(trait = c(rep("Height_cm", 3), rep("SLA", 3)), 
                              elevation = as.factor(c(rep(c("2000", "2500", "3000"), 2))),
-                             letters = c("a", "b", "a", "a", "b", "a"))
+                             letters = c("a", "b", "a", "a", "b", "a"), 
+                             x_pos = c(7.5,7.5,7.5,4.5,4.5,4.5))
 
 ses_ridges <- comb |>
   filter(trait %in% c("Height_cm", "SLA")) |> 
@@ -147,9 +148,11 @@ ses_ridges <- comb |>
   facet_wrap(~trait, labeller = as_labeller(l1), scale = "free_x")+
   labs(x = "SES", y = "Elevation (m a.s.l.)") +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  geom_text(data = ridges_letters, x = 4, y = elevation, label = letters)+
+  geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
   theme_classic() +
-  theme(legend.position = "none") 
+  theme(legend.position = "none", axis.title = element_text(size = 20), 
+        axis.text = element_text(size = 16), strip.text = element_text(size = 20)) 
+ggsave(ses_ridges, filename = "SES_elevation_poster.png", path = "Figures")
 
 
 
