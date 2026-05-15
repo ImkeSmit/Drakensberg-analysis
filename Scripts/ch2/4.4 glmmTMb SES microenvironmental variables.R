@@ -98,6 +98,8 @@ summary(tmod1)
 tmod1_res <- simulateResiduals(tmod1)
 plot(tmod1_res) #looks ok...
 
+em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
+cld(em_tmod1)
 
 
 ####SES SLA####
