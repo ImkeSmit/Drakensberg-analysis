@@ -7,6 +7,7 @@ library(DHARMa)
 library(tictoc)
 library(ggplot2)
 library(ggridges)
+library(vip)
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
   rename(Cell_ID = cellref)
@@ -106,6 +107,15 @@ em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
 cld(em_tmod1, Letters = letters, adjust = "Tukey")
 #2500 elevation has lower SES than other two
 
+#variable importance
+# Wrapper needed since vip doesn't natively support glmmTMB
+pfun <- function(object, newdata) predict(object, newdata, type = "response", allow.new.levels = TRUE)
+
+vip_result <- vip(tmod1, method = "permute", 
+                  feature_names = c("elevation", "grid", "zrock_cover", "znorthness","zsoil_moist","zsoil_depth" ,"zslope_height" ), 
+                  train = Hdat, target = "SES",
+    metric = "rmse", pred_wrapper = pfun, nsim = 10)
+
 ####SES SLA####
 #isolate SES of SLA
 #leave heavy tail
@@ -132,6 +142,16 @@ write.csv(summary(tmod2)$coefficients$cond, "All_data/comm_assembly_results/SES_
 em_tmod2 <- emmeans(tmod2, specs = "elevation", type = "response")
 cld(em_tmod2, Letters = letters, adjust = "Tukey")
 #2500 elevation has higher SES than other two
+
+
+#variable importance
+# Wrapper needed since vip doesn't natively support glmmTMB
+pfun <- function(object, newdata) predict(object, newdata, type = "response", allow.new.levels = TRUE)
+
+vip_result <- vip(tmod2, method = "permute", 
+                  feature_names = c("elevation", "grid", "zrock_cover", "znorthness","zsoil_moist","zsoil_depth" ,"zslope_height" ), 
+                  train = SLAdat, target = "SES",
+                  metric = "rmse", pred_wrapper = pfun, nsim = 10)
 
 
 ###Figures###
