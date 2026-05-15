@@ -89,6 +89,16 @@ Hdat <- comb2 |>
          pos = numFactor(x_coord, y_coord))
 
 
+tic()
+tmod1<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
+                      zslope_height + (1|grid), 
+                    family = t_family(link = "identity"), data = Hdat)
+toc()
+summary(tmod1)
+tmod1_res <- simulateResiduals(tmod1)
+plot(tmod1_res) #looks ok...
+
+
 
 #=================================#
 #OLD CODE BELOW- TRYING OUT MODELS#
