@@ -233,7 +233,7 @@ plotdat <- comb2 |>
 
 ggplot(plotdat, aes(x = value, y = SES)) +
   geom_point()+
-facet_grid(trait~var)
+facet_grid(trait~var, scale = "free_x")
 
 
 
