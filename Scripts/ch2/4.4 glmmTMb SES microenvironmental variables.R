@@ -234,10 +234,11 @@ l3 <- c("imp_H" = "SES of plant height", "imp_SLA" = "SES of SLA")
 var_imp <- data.frame(var = c("elevation", "rock cover", "northness","soil moisture","soil depth" ,"slope height" ), 
                       imp_H = importance, imp_SLA = importance_SLA, row.names = NULL) |> 
   arrange(imp_H) |> 
-  pivot_longer(!var, names_to = "trait", values_to = "var_imp") |> 
+  pivot_longer(!var, names_to = "trait", values_to = "var_imp") |>
+  arrange(trait, var_imp) |> 
   ggplot(aes(x = var, y = var_imp)) +
   geom_bar(stat = "identity")+
-  facet_wrap(~trait, strip.position = "top", labeller = as_labeller(l3))+
+  facet_wrap(~trait, strip.position = "top", labeller = as_labeller(l3), scales = "free")+
   labs(x = "", y = "Variable importance")+
   coord_flip() +
   theme_bw() +
@@ -245,7 +246,7 @@ var_imp <- data.frame(var = c("elevation", "rock cover", "northness","soil moist
         axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
         strip.background = element_blank(),
         strip.placement = "outside", panel.grid = element_blank())
-ggsave(var_imp, filename = "variable_importance_poster.png", path = "Figures", width = 2000, height = 1300, units = "px")
+ggsave(var_imp, filename = "variable_importance_poster.png", path = "Figures", width = 1800, units = "px")
 
 
 
