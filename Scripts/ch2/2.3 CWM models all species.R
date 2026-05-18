@@ -49,11 +49,11 @@ trait_ridges <- cwm |>
   ggplot(aes(x = cwm_value, y = elevation)) +
   geom_density_ridges(alpha = 0.5) +
   facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", strip.position = "bottom")+
-  labs(y = "Elevation (m a.s.l.)") +
+  labs(x = "", y = "Elevation (m a.s.l.)") +
   #geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
   theme_classic() +
-  theme(legend.position = "none", axis.title = element_blank(), 
-        axis.text = element_text(size = 16), strip.text = element_text(size = 20), 
+  theme(legend.position = "none", axis.title = element_text(size = 20), 
+        axis.text = element_text(size = 14), strip.text = element_text(size = 20), 
         strip.background = element_blank(),
         strip.placement = "outside") 
 ggsave(trait_ridges, filename = "trait_elevation_poster.png", path = "Figures")
