@@ -16,6 +16,31 @@ abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.nam
 
 mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
 
+###Descriptive statistcis####
+
+#nspecies
+dim(abun_matrix) #161
+
+nspecies_per_site <- abun_matrix |> 
+  rownames_to_column("Cell_ID") |> 
+  pivot_longer(!Cell_ID, names_to = "species", values_to = "cover") |> 
+  filter(cover >0) |> 
+  separate_wider_delim(Cell_ID, delim = "_", names = c("site", "grid", "cell")) |> 
+  group_by(site) |> 
+  summarise(nsp = length(unique(species)))
+
+nspecies_per_cell <- abun_matrix |> 
+  rownames_to_column("Cell_ID") |> 
+  pivot_longer(!Cell_ID, names_to = "species", values_to = "cover") |> 
+  filter(cover >0) |> 
+  group_by(Cell_ID) |> 
+  summarise(nsp = length(unique(species)))
+
+min(nspecies_per_cell$nsp)
+max(nspecies_per_cell$nsp)
+mean(nspecies_per_cell$nsp)
+
+
 
 ####All species - SES at cell scale, C5, pool = entire, weighted RaoQ####
 #observed RaoQ, weighted by abundance
