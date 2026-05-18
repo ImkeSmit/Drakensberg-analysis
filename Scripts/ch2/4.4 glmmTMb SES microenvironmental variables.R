@@ -91,6 +91,12 @@ Hdat <- comb2 |>
          grid = as.factor(paste0(site, grid)), 
          pos = numFactor(x_coord, y_coord))
 
+#descriptive stats
+#how many cells
+nrow(Hdat) #2880
+Hdat |> group_by(site) |> 
+  summarise(n = n())
+
 
 tic()
 tmod1<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
@@ -126,6 +132,12 @@ SLAdat <- comb2 |>
   mutate(trait = "SLA",  #give all records a trait
          grid = as.factor(paste0(site, grid)), 
          pos = numFactor(x_coord, y_coord))
+
+#descriptive stats
+#how many cells
+nrow(SLAdat) #2880
+SLAdat |> group_by(site) |> 
+  summarise(n = n())
 
 
 tic()
