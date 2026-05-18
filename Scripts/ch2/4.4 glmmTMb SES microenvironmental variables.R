@@ -9,6 +9,7 @@ library(ggplot2)
 library(ggridges)
 library(emmeans)
 library(multcomp)
+library(MuMIn)
 library(vip)
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
@@ -109,11 +110,33 @@ summary(tmod1)
 tmod1_res <- simulateResiduals(tmod1)
 plot(tmod1_res) #looks ok...
 
+R2<- r.squaredGLMM(tmod1)
+
 write.csv(summary(tmod1)$coefficients$cond, "All_data/comm_assembly_results/SES_height_env_model_results.csv")
 
 em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
 cld(em_tmod1, Letters = letters, adjust = "Tukey")
 #2500 elevation has lower SES than other two
+
+
+##Variable importance:##
+R2full<- r.squaredGLMM(tmod1)[[1]]
+
+predictors <- c("elevation", "zrock_cover", "znorthness","zsoil_moist","zsoil_depth" ,"zslope_height" )
+
+importance <- sapply(predictors, function(var) {
+  # Refit without this variable
+  f <- as.formula(paste("SES ~", paste(setdiff(predictors, var), collapse = " + "), "+ (1|grid)"))
+  m_drop <- glmmTMB(f, data = Hdat, family = t_family(link = "identity"), REML = FALSE)
+  
+  r2_drop <- r.squaredGLMM(m_drop)[,"R2m"]
+  
+  R2full - r2_drop  # importance = R² lost by removing this variable
+  
+})
+sort(importance, decreasing = T)
+
+
 
 #variable importance
 # Wrapper needed since vip doesn't natively support glmmTMB
