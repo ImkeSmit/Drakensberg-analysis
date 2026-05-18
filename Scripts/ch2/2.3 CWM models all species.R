@@ -38,7 +38,7 @@ ggsave(filename = "cwm_elevation.png", plot = cwm_ridges, path = "Figures",
 
 
 ##SES and SLA- for poster
-l1 = c("Height_cm" = "Plant height", "SLA" = "SLA")
+l1 <- c("Height_cm" = "Plant~height~(cm)", "SLA" = "SLA~(mm^2/mg)")
 ridges_letters <- data.frame(trait = c(rep("Height_cm", 3), rep("SLA", 3)), 
                              elevation = as.factor(c(rep(c("2000", "2500", "3000"), 2))),
                              letters = c("a", "b", "a", "a", "b", "a"), 
@@ -48,12 +48,14 @@ trait_ridges <- cwm |>
   filter(trait %in% c("Height_cm", "SLA")) |> 
   ggplot(aes(x = cwm_value, y = elevation)) +
   geom_density_ridges(alpha = 0.5) +
-  facet_wrap(~trait, labeller = as_labeller(l1), scale = "free_x")+
-  labs(x = "Trait", y = "Elevation (m a.s.l.)") +
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", strip.position = "bottom")+
+  labs(y = "Elevation (m a.s.l.)") +
   #geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
   theme_classic() +
-  theme(legend.position = "none", axis.title = element_text(size = 20), 
-        axis.text = element_text(size = 16), strip.text = element_text(size = 20)) 
+  theme(legend.position = "none", axis.title = element_blank(), 
+        axis.text = element_text(size = 16), strip.text = element_text(size = 20), 
+        strip.background = element_blank(),
+        strip.placement = "outside") 
 ggsave(trait_ridges, filename = "trait_elevation_poster.png", path = "Figures")
 
 
