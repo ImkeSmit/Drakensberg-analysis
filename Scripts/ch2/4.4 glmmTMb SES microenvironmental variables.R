@@ -72,11 +72,11 @@ comb2 <- comb |>
                              grepl("7", grid) ~ y_new+20*6+600, 
                              grepl("8", grid) ~ y_new+20*7+700, .default = NA)) |> 
   mutate(x_coord = ncolumn, 
-         zrock_cover = scale(rock_cover), #standardise variables
-         znorthness = scale(northness), 
-         zsoil_moist = scale(soil_moisture_adj_campaign2), 
-         zsoil_depth = scale(mean_soil_depth), 
-         zslope_height = scale(slope_height)) |> 
+         zrock_cover = c(scale(rock_cover)), #standardise variables
+         znorthness = c(scale(northness)), 
+         zsoil_moist = c(scale(soil_moisture_adj_campaign2)), 
+         zsoil_depth = c(scale(mean_soil_depth)), 
+         zslope_height = c(scale(slope_height))) |> 
   ungroup()
 
 
@@ -213,9 +213,27 @@ ses_ridges <- comb |>
 ggsave(ses_ridges, filename = "SES_elevation_poster.png", path = "Figures")
 
 
-##Trait elevation ridges
+##SES microenvironmental scatterplot
+ggplot(comb2, aes(y = SES, x = zrock_cover)) +
+  geom_point()+
+  theme_classic() +
+  labs(y = "SES of plant height", x = "Rock cover")
+
+ggplot(SLAdat, aes(y = SES, x = zrock_cov)) +
+  geom_point()+
+  theme_classic() +
+  labs(y = "SES of plant height", x = "Rock cover")
 
 
+plotdat <- comb2 |> 
+  dplyr::select(SES, trait, zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height) |> 
+  pivot_longer(cols = c(zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height), 
+               names_to = "var", values_to = "value") |> 
+  filter(!is.na(SES))
+
+ggplot(plotdat, aes(x = value, y = SES)) +
+  geom_point()+
+facet_grid(trait~var)
 
 
 
