@@ -7,6 +7,8 @@ library(DHARMa)
 library(tictoc)
 library(ggplot2)
 library(ggridges)
+library(emmeans)
+library(multcomp)
 library(vip)
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
@@ -117,7 +119,7 @@ cld(em_tmod1, Letters = letters, adjust = "Tukey")
 # Wrapper needed since vip doesn't natively support glmmTMB
 pfun <- function(object, newdata) predict(object, newdata, type = "response", allow.new.levels = TRUE)
 
-vip_result <- vip(tmod1, method = "permute", 
+vip_result <- vi(tmod1, method = "permute", 
                   feature_names = c("elevation", "grid", "zrock_cover", "znorthness","zsoil_moist","zsoil_depth" ,"zslope_height" ), 
                   train = Hdat, target = "SES",
     metric = "rmse", pred_wrapper = pfun, nsim = 10)
