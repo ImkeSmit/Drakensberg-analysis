@@ -138,15 +138,6 @@ sort(importance, decreasing = T)
 
 
 
-#variable importance
-# Wrapper needed since vip doesn't natively support glmmTMB
-pfun <- function(object, newdata) predict(object, newdata, type = "response", allow.new.levels = TRUE)
-
-vip_result <- vi(tmod1, method = "permute", 
-                  feature_names = c("elevation", "grid", "zrock_cover", "znorthness","zsoil_moist","zsoil_depth" ,"zslope_height" ), 
-                  train = Hdat, target = "SES",
-    metric = "rmse", pred_wrapper = pfun, nsim = 10)
-
 ####SES SLA####
 #isolate SES of SLA
 #leave heavy tail
