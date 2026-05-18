@@ -193,7 +193,7 @@ sort(importance_SLA, decreasing = T)
 
 ###Figures####
 #SES ~ elevation ridges
-l1 = c("Height_cm" = "Plant height", "SLA" = "SLA")
+l1 <- c("Height_cm" = "SES~of~plant~Height", "SLA" = "SES~of~SLA")
 ridges_letters <- data.frame(trait = c(rep("Height_cm", 3), rep("SLA", 3)), 
                              elevation = as.factor(c(rep(c("2000", "2500", "3000"), 2))),
                              letters = c("a", "b", "a", "a", "b", "a"), 
@@ -203,28 +203,20 @@ ses_ridges <- comb |>
   filter(trait %in% c("Height_cm", "SLA")) |> 
   ggplot(aes(x = SES, y = elevation)) +
   geom_density_ridges(alpha = 0.5) +
-  facet_wrap(~trait, labeller = as_labeller(l1), scale = "free_x")+
-  labs(x = "SES", y = "Elevation (m a.s.l.)") +
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", 
+             strip.position = "bottom")+
+  labs(x = " ", y = "Elevation (m a.s.l.)") +
   geom_vline(xintercept = 0, linetype = "dashed") +
   geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
-  theme_classic() +
-  theme(legend.position = "none", axis.title = element_text(size = 20), 
-        axis.text = element_text(size = 16), strip.text = element_text(size = 20)) 
+  theme_bw() +
+  theme(legend.position = "none", axis.title = element_text(size = 18), 
+        axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
+        strip.background = element_blank(),
+        strip.placement = "outside", panel.grid = element_blank()) 
 ggsave(ses_ridges, filename = "SES_elevation_poster.png", path = "Figures")
 
 
 ##SES microenvironmental scatterplot
-ggplot(comb2, aes(y = SES, x = zrock_cover)) +
-  geom_point()+
-  theme_classic() +
-  labs(y = "SES of plant height", x = "Rock cover")
-
-ggplot(SLAdat, aes(y = SES, x = zrock_cov)) +
-  geom_point()+
-  theme_classic() +
-  labs(y = "SES of plant height", x = "Rock cover")
-
-
 plotdat <- comb2 |> 
   dplyr::select(SES, trait, zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height) |> 
   pivot_longer(cols = c(zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height), 
