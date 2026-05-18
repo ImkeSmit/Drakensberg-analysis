@@ -25,7 +25,7 @@ cwm <- cwm |>
 cwm$elevation <- as.factor(cwm$elevation)  
 
 ###Figures of cwm####
-
+##All traits
 cwm_ridges <- cwm |> 
   ggplot(aes(x = cwm_value, y = elevation, fill = elevation)) +
   geom_density_ridges(alpha = 0.5, linewidth = 0.3) +
@@ -35,6 +35,26 @@ cwm_ridges <- cwm |>
 
 ggsave(filename = "cwm_elevation.png", plot = cwm_ridges, path = "Figures", 
        width = 1200, height = 1500, units = "px")
+
+
+##SES and SLA- for poster
+l1 = c("Height_cm" = "Plant height", "SLA" = "SLA")
+ridges_letters <- data.frame(trait = c(rep("Height_cm", 3), rep("SLA", 3)), 
+                             elevation = as.factor(c(rep(c("2000", "2500", "3000"), 2))),
+                             letters = c("a", "b", "a", "a", "b", "a"), 
+                             x_pos = c(7.5,7.5,7.5,4.5,4.5,4.5))
+
+trait_ridges <- cwm |>
+  filter(trait %in% c("Height_cm", "SLA")) |> 
+  ggplot(aes(x = cwm_value, y = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait, labeller = as_labeller(l1), scale = "free_x")+
+  labs(x = "Trait", y = "Elevation (m a.s.l.)") +
+  #geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  theme_classic() +
+  theme(legend.position = "none", axis.title = element_text(size = 20), 
+        axis.text = element_text(size = 16), strip.text = element_text(size = 20)) 
+ggsave(trait_ridges, filename = "trait_elevation_poster.png", path = "Figures")
 
 
 ## Same graph but with histograms:
