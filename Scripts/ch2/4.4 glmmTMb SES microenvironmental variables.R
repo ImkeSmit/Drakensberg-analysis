@@ -191,7 +191,8 @@ importance_SLA <- sapply(predictors, function(var) {
 sort(importance_SLA, decreasing = T)
 
 
-###Figures###
+###Figures####
+#SES ~ elevation ridges
 l1 = c("Height_cm" = "Plant height", "SLA" = "SLA")
 ridges_letters <- data.frame(trait = c(rep("Height_cm", 3), rep("SLA", 3)), 
                              elevation = as.factor(c(rep(c("2000", "2500", "3000"), 2))),
@@ -210,6 +211,10 @@ ses_ridges <- comb |>
   theme(legend.position = "none", axis.title = element_text(size = 20), 
         axis.text = element_text(size = 16), strip.text = element_text(size = 20)) 
 ggsave(ses_ridges, filename = "SES_elevation_poster.png", path = "Figures")
+
+
+##Trait elevation ridges
+
 
 
 
