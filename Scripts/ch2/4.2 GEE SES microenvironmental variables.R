@@ -93,14 +93,14 @@ check <- Hdat |> group_by(site, grid) |>
 #for now, we fill fill the NA cells with the mean of it's 8 nearest neighbours
 #run Function_impute_cells.R
 Hdat_filled <- impute_cells(df = Hdat, 
-                            cols_to_impute = colnames(Hdat)[c(6:20, 25)])
+                            cols_to_impute = colnames(Hdat)[c(25, 31:35)])
 Hdat_filled <- Hdat_filled |> 
   arrange(y_coord) |> 
   mutate(grid = as.factor(grid), #cluster ID must be a factor
          elevation = as.numeric(elevation))
 
 #Check what was filled
-cols <- c(colnames(Hdat)[c(6:20, 25)])
+cols <- c(colnames(Hdat)[c(25, 31:35)])
 
 cat("=== NA summary before and after imputation ===\n\n")
 for (col in cols) {
@@ -116,7 +116,8 @@ for (col in cols) {
 
 ###Check collinearity#### 
 library(corrplot)
-cordf <- Hdat_filled |> dplyr::select(c(colnames(Hdat)[c(6:13, 15:20, 25)]))
+cordf <- Hdat_filled |> dplyr::select(c(zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height)) |> 
+  drop_na()
 cormat<- cor(cordf)
 #cormat[cormat > 0.7]
 #cormat[cormat <-0.7]
@@ -129,7 +130,7 @@ corrplot(cormat, type = "lower", method = "number")
 #Run Function_grid_correlation_structure.R
 decay_df <- grid_correlation_structure(grid_vector = c(unique(Hdat_filled$grid)), 
                                    data = Hdat_filled, 
-                                   formula = "SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height", 
+                                   formula = "SES ~ zrock_cover + znorthness + zsoil_moist + zsoil_depth + zslope_height", 
                                    k_specified = 4)
 
 
