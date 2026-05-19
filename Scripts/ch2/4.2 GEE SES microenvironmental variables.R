@@ -65,7 +65,12 @@ comb2 <- comb |>
                              grepl("6", grid) ~ y_new+20*5, 
                              grepl("7", grid) ~ y_new+20*6, 
                              grepl("8", grid) ~ y_new+20*7, .default = NA)) |> 
-  mutate(x_coord = ncolumn) |> 
+  mutate(x_coord = ncolumn, 
+         zrock_cover = c(scale(rock_cover)), #standardise variables
+         znorthness = c(scale(northness)), 
+         zsoil_moist = c(scale(soil_moisture_adj_campaign2)), 
+         zsoil_depth = c(scale(mean_soil_depth)), 
+         zslope_height = c(scale(slope_height))) |> 
   ungroup()
 
 #=====================================
