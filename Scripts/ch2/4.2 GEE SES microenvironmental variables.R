@@ -350,14 +350,14 @@ check <- SLAdat |> group_by(site, grid) |>
 #for now, we fill fill the NA cells with the mean of it's 8 nearest neighbours
 #run Function_impute_cells.R
 SLAdat_filled <- impute_cells(df = SLAdat, 
-                            cols_to_impute = colnames(SLAdat)[c(6:20, 25)])
+                            cols_to_impute = colnames(SLAdat)[c(25, 31:35)])
 SLAdat_filled <- SLAdat_filled |> 
   arrange(y_coord) |> 
   mutate(grid = as.factor(grid), #cluster ID must be a factor
          elevation = as.numeric(elevation))
 
 #Check what was filled
-cols <- c(colnames(SLAdat)[c(6:20, 25)])
+cols <- c(colnames(SLAdat)[c(25, 31:35)])
 
 cat("=== NA summary before and after imputation ===\n\n")
 for (col in cols) {
