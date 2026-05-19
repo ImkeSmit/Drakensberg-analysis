@@ -56,8 +56,10 @@ impute_cells <- function(df, cols_to_impute) {
       ) |>
       pull(all_of(value_col))
     
-    if (all(is.na(neighbour_vals))) {return(NA_real_)
-      message(paste(value_col, ": ","all neighbours NA"))}
+    if (all(is.na(neighbour_vals))) {
+      message(paste(value_col, ": ","all neighbours NA"))
+      return(NA_real_)
+    }
     
     mean(neighbour_vals, na.rm = TRUE)
   }
