@@ -132,7 +132,7 @@ decay_df <- grid_correlation_structure(grid_vector = c(unique(Hdat_filled$grid))
                                    data = Hdat_filled, 
                                    formula = "SES ~ zrock_cover + znorthness + zsoil_moist + zsoil_depth + zslope_height", 
                                    k_specified = 4)
-
+##GG7 doesn't print, possibly because it has too many NA's
 
 
 ###Build 3 correlation matrices####
@@ -195,40 +195,6 @@ dev.off()
 #=============#
 ####Run GEE####
 #=============#
-#LOWEST DECAY RATE
-gee_lowest <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
-            family = gaussian, data = Hdat_filled,
-            id = grid,
-            corstr = "fixed",
-            R = lowest_R, #needs to be the same dimension as one group
-            scale.fix = T, scale.value = 1, #this is what Pete used in his code 
-            silent = F) 
-
-summary(gee_lowest)
-
-#Get p values
-coefs <- summary(gee_lowest)$coefficients
-p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
-cbind(coefs, p_value = round(p_values, 4))
-
-
-#HIGHEST DECAY RATE
-gee_highest <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
-                       family = gaussian, data = Hdat_filled,
-                       id = grid,
-                       corstr = "fixed",
-                       R = highest_R, #needs to be the same dimension as one group
-                       scale.fix = T, scale.value = 1, #this is what Pete used in his code 
-                       silent = F) 
-
-summary(gee_highest)
-
-#Get p values
-coefs <- summary(gee_highest)$coefficients
-p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
-cbind(coefs, p_value = round(p_values, 4))
-
-
 #MEAN DECAY RATE
 ##Try it with a gamma distribution
 gee_mean <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
