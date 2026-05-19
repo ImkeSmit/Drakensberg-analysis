@@ -82,6 +82,7 @@ comb2 <- comb |>
 ###Check collinearity#### 
 library(corrplot)
 cordf <- comb2 |> 
+  filter(trait == "Height_cm") |> #look at just one set of env data, it repeats for every trait
   dplyr::select(c(zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height)) |> 
   drop_na()
 cormat<- cor(cordf)
