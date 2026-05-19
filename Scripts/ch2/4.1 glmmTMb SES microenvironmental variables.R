@@ -10,7 +10,6 @@ library(ggridges)
 library(emmeans)
 library(multcomp)
 library(MuMIn)
-library(vip)
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
   rename(Cell_ID = cellref)
@@ -78,6 +77,18 @@ comb2 <- comb |>
          zsoil_depth = c(scale(mean_soil_depth)), 
          zslope_height = c(scale(slope_height))) |> 
   ungroup()
+
+
+###Check collinearity#### 
+library(corrplot)
+cordf <- comb2 |> 
+  dplyr::select(c(zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height)) |> 
+  drop_na()
+cormat<- cor(cordf)
+#cormat[cormat > 0.7]
+#cormat[cormat <-0.7]
+#none are highly correlated
+corrplot(cormat, type = "lower", method = "number")
 
 
 ####===========================####
