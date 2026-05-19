@@ -355,7 +355,7 @@ SLAdat_filled <- impute_cells(df = SLAdat,
 SLAdat_filled <- SLAdat_filled |> 
   arrange(y_coord) |> 
   mutate(grid = as.factor(grid), #cluster ID must be a factor
-         elevation = as.numeric(elevation))
+         elevation = as.factor(elevation))
 
 #Check what was filled
 cols <- c(colnames(SLAdat)[c(25, 31:35)])
@@ -380,6 +380,7 @@ decay_df <- grid_correlation_structure(grid_vector = c(unique(SLAdat_filled$grid
                                        data = SLAdat_filled, 
                                        formula = "SES ~ zrock_cover + znorthness + zsoil_moist + zsoil_depth + zslope_height", 
                                        k_specified = 4)
+#again GG7 not printed, probably too many Na's
 
 ###Build correlation matrix####
 #function for correlation matrices of one grid
@@ -426,7 +427,7 @@ dev.off()
 #=============#
 ####Run GEE####
 #=============#
-gee_SLA <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
+gee_SLA <- gee::gee(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + zslope_height,
                        family = gaussian, data = SLAdat_filled,
                        id = grid,
                        corstr = "fixed",
