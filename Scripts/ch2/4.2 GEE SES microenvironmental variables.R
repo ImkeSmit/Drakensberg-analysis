@@ -441,6 +441,8 @@ p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
 gee_SLA_results <- as.data.frame(cbind(coefs, p_value = round(p_values, 4)))
 gee_SLA_results$variable <- row.names(gee_SLA_results)
 row.names(gee_SLA_results) <- NULL
+gee_SLA_results <- gee_SLA_results[, c(7,1,2,3,4,5,6)] #reorder columns
+write.csv(gee_SLA_results, "All_data/comm_assembly_results//GEE_SES_SLA_env_model_results.csv")
 
 resid_df<- data.frame(residuals = gee_SLA$residuals)
 hist(resid_df$residuals)
