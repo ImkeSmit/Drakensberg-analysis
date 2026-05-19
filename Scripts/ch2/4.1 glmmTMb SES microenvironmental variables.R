@@ -228,18 +228,6 @@ ses_ridges <- comb |>
 ggsave(ses_ridges, filename = "SES_elevation_poster.png", path = "Figures")
 
 
-##SES microenvironmental scatterplot
-plotdat <- comb2 |> 
-  dplyr::select(SES, trait, zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height) |> 
-  pivot_longer(cols = c(zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height), 
-               names_to = "var", values_to = "value") |> 
-  filter(!is.na(SES))
-
-ggplot(plotdat, aes(x = value, y = SES)) +
-  geom_point()+
-facet_grid(trait~var, scale = "free_x")
-
-
 ###Variable importance bar graph
 l3 <- c("imp_H" = "SES of plant height", "imp_SLA" = "SES of SLA")
 
