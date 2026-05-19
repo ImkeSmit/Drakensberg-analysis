@@ -97,7 +97,7 @@ Hdat_filled <- impute_cells(df = Hdat,
 Hdat_filled <- Hdat_filled |> 
   arrange(y_coord) |> 
   mutate(grid = as.factor(grid), #cluster ID must be a factor
-         elevation = as.numeric(elevation))
+         elevation = as.factor(elevation))
 
 #Check what was filled
 cols <- c(colnames(Hdat)[c(25, 31:35)])
@@ -130,7 +130,7 @@ corrplot(cormat, type = "lower", method = "number")
 #Run Function_grid_correlation_structure.R
 decay_df <- grid_correlation_structure(grid_vector = c(unique(Hdat_filled$grid)), 
                                    data = Hdat_filled, 
-                                   formula = "SES ~ zrock_cover + znorthness + zsoil_moist + zsoil_depth + zslope_height", 
+                                   formula = "SES ~ elevation+ zrock_cover + znorthness + zsoil_moist + zsoil_depth + zslope_height", 
                                    k_specified = 4)
 ##GG7 doesn't print, possibly because it has too many NA's
 
