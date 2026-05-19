@@ -1,7 +1,5 @@
 ###Script to analyse relationship between SES and microenvironmental variables
 library(spdep)
-#library(spatialreg)
-#library(spind)
 library(tidyverse)
 library(tidylog)
 library(reshape2)
