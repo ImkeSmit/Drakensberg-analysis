@@ -128,9 +128,10 @@ corrplot(cormat, type = "lower", method = "number")
 ####Spatial autocorrelation structure for each grid####
 #=====================================================#
 #Run Function_grid_correlation_structure.R
+##Cannot put elevation in this formula, becaus eit looks at correlation per grid
 decay_df <- grid_correlation_structure(grid_vector = c(unique(Hdat_filled$grid)), 
                                    data = Hdat_filled, 
-                                   formula = "SES ~ elevation+ zrock_cover + znorthness + zsoil_moist + zsoil_depth + zslope_height", 
+                                   formula = "SES ~ zrock_cover + znorthness + zsoil_moist + zsoil_depth + zslope_height", 
                                    k_specified = 4)
 ##GG7 doesn't print, possibly because it has too many NA's
 
