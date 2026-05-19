@@ -371,15 +371,6 @@ for (col in cols) {
 } ###3 NA values remain because all of their neighbours are NA
 
 
-###Check collinearity#### 
-library(corrplot)
-cordf <- SLAdat_filled |> dplyr::select(c(colnames(SLAdat)[c(6:13, 15:20, 25)]))
-cormat<- cor(cordf)
-high_cor <- which(cormat > 0.7, arr.ind = T) #only diagonals
-low_cor <- which(cormat < -0.7, arr.ind = T) #none
-#none are highly correlated
-corrplot(cormat, type = "lower", method = "number")
-
 #=====================================================#
 ####Spatial autocorrelation structure for each grid####
 #=====================================================#
