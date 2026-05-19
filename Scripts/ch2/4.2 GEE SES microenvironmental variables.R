@@ -196,8 +196,8 @@ dev.off()
 ####Run GEE####
 #=============#
 #MEAN DECAY RATE
-##Try it with a gamma distribution
-gee_mean <- gee::gee(SES ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
+Hdat_filled$f_elevation<- as.factor(Hdat_filled$elevation)
+gee_mean <- gee::gee(SES ~ f_elevation+ zrock_cover + znorthness + zsoil_moist + zsoil_depth + zslope_height,
                         family = gaussian, 
                         data = Hdat_filled,
                         id = grid,
@@ -226,47 +226,9 @@ ggplot(resid_df, aes(sample = residuals)) +
     color    = "#D7191C",
     linewidth = 1,
     linetype = "dashed") +
-  labs( title = "SESplus, Gamma(link = log)",
+  labs( title = "SES, gaussian",
     x        = "Theoretical Quantiles",
     y        = " Residuals")+
-  theme_bw(base_size = 13) 
-
-
-##Try another transformation
-Hdat_filled$SESplus_log <- log(Hdat_filled$SES + abs(min(Hdat_filled$SES))+10)
-gee_log <- gee::gee(SESplus_log ~ rock_cover + northness + soil_moisture_adj_campaign2 + mean_soil_depth + slope_height,
-                     family = Gamma(link = "identity"), 
-                     data = Hdat_filled,
-                     id = grid,
-                     corstr = "fixed",
-                     R = mean_R, #needs to be the same dimension as one group
-                     scale.fix = T, scale.value = 1, #this is what Pete used in his code 
-                     silent = F) 
-
-summary(gee_log)
-#Get p values
-coefs <- summary(gee_log)$coefficients
-p_values <- 2 * pnorm(abs(coefs[, "Robust z"]), lower.tail = FALSE)
-gee_log_results <- as.data.frame(cbind(coefs, p_value = round(p_values, 4)))
-gee_log_results$variable <- row.names(gee_log_results)
-row.names(gee_log_results) <- NULL
-
-resid_df<- data.frame(residuals = gee_log$residuals)
-hist(resid_df$residuals)
-
-ggplot(resid_df, aes(sample = residuals)) +
-  stat_qq(
-    color = "#2C7BB6",
-    alpha = 0.7,
-    size  = 1.8) +
-  stat_qq_line(
-    
-    color    = "#D7191C",
-    linewidth = 1,
-    linetype = "dashed") +
-  labs( title = "SESplus_log, Gamma(link = identity)",
-        x        = "Theoretical Quantiles",
-        y        = " Residuals")+
   theme_bw(base_size = 13) 
 
 
