@@ -73,7 +73,7 @@ comb2 <- comb |>
 ####SES HEIGHT####
 #isolate SES of height
 Hdat <- comb2 |> 
-  filter(trait %in% c("Height_cm", NA) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
+  filter(trait %in% c("Height_cm", NA)) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
   arrange(y_coord, x_coord) |> 
   mutate(trait = "Height_cm",  #give all records a trait
          grid = as.factor(paste0(site, grid)), 
