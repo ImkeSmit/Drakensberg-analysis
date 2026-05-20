@@ -27,8 +27,29 @@ cat("Grid dimensions:", max(grid_df$x), "x", max(grid_df$y), "\n")
 cat("Total cells:", nrow(grid_df), "\n")
 cat("NA cells:", sum(is.na(grid_df$value)), "\n\n")
 
+Hdat <- comb2 |> 
+  filter(trait %in% c("Height_cm", NA) #also select cells which have no SES measurement. This is necessary to make the grid complete
+ ) |> 
+  arrange(y_coord, x_coord) |> 
+  mutate(trait = "Height_cm",  #give all records a trait
+         grid = as.factor(paste0(site, grid)), 
+         pos = numFactor(x_coord, y_coord))
 
-select_independent_cells <- function()
+check <- Hdat |> group_by(site, grid) |> 
+  summarise(n = n())
+ data = Hdat
+ grid_var = "grid"
+ x = "x_coord"
+ y = "y_coord"
+####Start function
+select_independent_cells <- function(data, grid_var, x, y, lag_threshold, max_search_radius, 
+                                     value_col){
+
+  
+  grid_list<- c(unique(working_dat[, grid_var]))[[1]]
+  
+  for(g in grid_list) {
+    grid_df <- data |> filter(grid == g)
 
 # -----------------------------------------------------------------------------
 # 2. HELPER FUNCTIONS
@@ -43,7 +64,7 @@ cell_distance <- function(x1, y1, x2, y2) {
 #' already-selected cells (distance must be > lag_threshold).
 is_independent <- function(cx, cy, selected_df, lag_threshold = 4) {
   if (nrow(selected_df) == 0) return(TRUE)
-  dists <- cell_distance(cx, cy, selected_df$x, selected_df$y)
+  dists <- cell_distance(cx, cy, selected_df[, x], selected_df[, y])
   all(dists > lag_threshold)
 }
 
@@ -78,8 +99,8 @@ candidate_pool <- grid_df %>%
 #      c) Otherwise → skip.
 # -----------------------------------------------------------------------------
 
-LAG_THRESHOLD <- 4          # cells must be > 4 m apart
-MAX_SEARCH_RADIUS <- 3      # max metres to search for a NA substitute
+LAG_THRESHOLD <- lag_threshold          # cells must be > 4 m apart
+MAX_SEARCH_RADIUS <- max_search_radius  # max metres to search for a NA substitute
 
 selected_cells <- data.frame()   # accumulates the final selection
 
@@ -88,17 +109,17 @@ for (i in seq_len(nrow(candidate_pool))) {
   cell <- candidate_pool[i, ]
   
   # ---- Case A: cell has a value ----
-  if (!is.na(cell$value)) {
-    if (is_independent(cell$x, cell$y, selected_cells, LAG_THRESHOLD)) {
+  if (!is.na(cell[, value_col])) {
+    if (is_independent(cell[, x], cell[, y], selected_cells, LAG_THRESHOLD)) {
       selected_cells <- bind_rows(selected_cells,
                                   mutate(cell, substituted = FALSE,
                                          original_x = NA, original_y = NA))
     }
-    next
+    next #move to next i
   }
   
   # ---- Case B: cell is NA – look for an adjacent substitute ----
-  neighbour <- find_adjacent_non_na(cell$x, cell$y, grid_df, MAX_SEARCH_RADIUS)
+  neighbour <- find_adjacent_non_na(cell[, x], cell[, y], grid_df, MAX_SEARCH_RADIUS)
   
   if (is.null(neighbour)) next   # no non-NA neighbour found within radius
   
@@ -111,8 +132,8 @@ for (i in seq_len(nrow(candidate_pool))) {
     selected_cells <- bind_rows(selected_cells,
                                 mutate(neighbour,
                                        substituted   = TRUE,
-                                       original_x    = cell$x,
-                                       original_y    = cell$y))
+                                       original_x    = cell[, x],
+                                       original_y    = cell[, y]))
   }
 }
 
@@ -145,6 +166,10 @@ if (nrow(selected_cells) > 1) {
       cell_distance(selected_cells$x[idx[1]], selected_cells$y[idx[1]],
                     selected_cells$x[idx[2]], selected_cells$y[idx[2]]))), 3), "m\n")
 }
+
+}#end loop through grids
+  return(result)
+}#end function
 
 # -----------------------------------------------------------------------------
 # 7. VISUALISE THE GRID AND SELECTED CELLS
