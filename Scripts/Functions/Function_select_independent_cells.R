@@ -133,7 +133,13 @@ select_independent_cells <- function(data,
   
   # COMBINE AND RETURN
   result <- bind_rows(all_results)
-  return(result)
+  #Check how many cells in each grid
+  check<- result |> 
+    group_by(grid) |> 
+    summarise(n = n())
+  print(check, n = 22)
+
+    return(result)
 } # end select_independent_cells()
 
 Hdat <- comb2 |> 
@@ -144,64 +150,8 @@ Hdat <- comb2 |>
          grid = as.factor(paste0(site, grid)), 
          pos = numFactor(x_coord, y_coord))
 
-test<- select_independent_cells2(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
+test<- select_independent_cells(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
                           max_search_radius = 3, lag_threshold = 4)
 
 
-
-# -----------------------------------------------------------------------------
-# 7. VISUALISE THE GRID AND SELECTED CELLS
-# -----------------------------------------------------------------------------
-
-# Build a plot-ready version of the full grid
-plot_df <- grid_df %>%
-  mutate(status = case_when(
-    is.na(value) ~ "NA cell",
-    TRUE         ~ "Available"
-  ))
-
-# Mark selected and substituted cells
-selected_plot <- selected_cells %>%
-  mutate(status = if_else(substituted, "Substituted (was NA)", "Selected"))
-
-# Replace matching rows in plot_df
-plot_df <- plot_df %>%
-  rows_update(selected_plot %>% select(x, y, status), by = c("x", "y"))
-
-ggplot() +
-  # Full grid as background tiles
-  geom_tile(data = plot_df,
-            aes(x = x, y = y, fill = status),
-            colour = "white", linewidth = 0.4) +
-  # Arrows showing NA → substitute substitutions
-  geom_segment(data = selected_cells %>% filter(substituted),
-               aes(x = original_x, y = original_y,
-                   xend = x, yend = y),
-               arrow = arrow(length = unit(0.2, "cm"), type = "closed"),
-               colour = "black", linewidth = 0.5) +
-  scale_fill_manual(values = c(
-    "Available"             = "#d0e8d0",
-    "NA cell"               = "#f0b8b8",
-    "Selected"              = "#2a7d4f",
-    "Substituted (was NA)"  = "#e8a000"
-  )) +
-  scale_x_continuous(breaks = 1:20) +
-  scale_y_continuous(breaks = 1:8) +
-  coord_equal() +
-  labs(
-    title    = "Spatially Independent Cell Selection",
-    subtitle = paste0("Lag threshold: >4 m | Selected: ", nrow(selected_cells),
-                      " cells (", sum(selected_cells$substituted), " substituted)"),
-    x        = "x (m)",
-    y        = "y (m)",
-    fill     = "Cell status"
-  ) +
-  theme_minimal(base_size = 12) +
-  theme(
-    panel.grid.minor = element_blank(),
-    legend.position  = "bottom"
-  )
-
-ggsave("spatial_sampling_plot.png", width = 12, height = 5, dpi = 150)
-cat("\nPlot saved to: spatial_sampling_plot.png\n")
 
