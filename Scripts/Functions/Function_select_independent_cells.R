@@ -142,16 +142,6 @@ select_independent_cells <- function(data,
     return(result)
 } # end select_independent_cells()
 
-Hdat <- comb2 |> 
-  filter(trait %in% c("Height_cm", NA) #also select cells which have no SES measurement. This is necessary to make the grid complete
-         ) |> 
-  arrange(y_coord, x_coord) |> 
-  mutate(trait = "Height_cm",  #give all records a trait
-         grid = as.factor(paste0(site, grid)), 
-         pos = numFactor(x_coord, y_coord))
-
-test<- select_independent_cells(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
-                          max_search_radius = 3, lag_threshold = 4)
 
 
 
