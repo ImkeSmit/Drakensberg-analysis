@@ -95,7 +95,7 @@ Hdat <- comb2 |>
 ###===Sample uncorrelated cells===####  
 #Run Function_select_independent_cells.R
 Hdat_subs<- select_independent_cells(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
-                                max_search_radius = 3, lag_threshold = 4)
+                                max_search_radius = 3, lag_threshold = 5)
 #between 10 and 5 cells per grid
 #lets look at the ones with few cells
 
@@ -155,6 +155,11 @@ write.csv(summary(tmod1)$coefficients$cond, "All_data/comm_assembly_results/glmm
 em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
 cld(em_tmod1, Letters = letters, adjust = "Tukey")
 
+#test for spatial autocorrelation
+used_rows <- as.integer(rownames(model.frame(tmod1)))
+dat_used  <- Hdat_subs[used_rows, ]
+testSpatialAutocorrelation(tmod1_res, x = dat_used$x_coord, y = dat_used$y_coord)
+##P value still very small even at lag = 5
 
 ##Variable importance:##
 R2full<- r.squaredGLMM(tmod1)[[1]]
@@ -194,7 +199,7 @@ SLAdat <- comb2 |>
 #=====sample uncorrelated cells===####
 #Run Function_select_independent_cells.R
 SLAdat_subs<- select_independent_cells(SLAdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
-                                     max_search_radius = 3, lag_threshold = 4)
+                                     max_search_radius = 3, lag_threshold = 5)
 #between 10 and 5 cells per grid
 #lets look at the ones with few cells
 
@@ -222,7 +227,7 @@ ggplot() +
 #====Model====#
 tmod2<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
                   zslope_height + (1|grid), 
-                family = t_family(link = "identity"), data = SLAdat_subs)
+                family = gaussian(link = "identity"), data = SLAdat_subs)
 summary(tmod2)
 tmod2_res <- simulateResiduals(tmod2)
 plot(tmod2_res) #looks very good!
@@ -230,7 +235,9 @@ plot(tmod2_res) #looks very good!
 #test for spatial autocorrelation
 used_rows <- as.integer(rownames(model.frame(tmod2)))
 dat_used  <- SLAdat_subs[used_rows, ]
-testSpatialAutocorrelation(tmod2_res, x = dat_used$x_coord, y = dat_used$y_coord)#still significant autocorrelation
+testSpatialAutocorrelation(tmod2_res, x = dat_used$x_coord, y = dat_used$y_coord)
+#autocorrelation disappears after after lag = 5. When lag = 5 is used th t family does not converge.
+#T family does give better diagnostic plots but the gaussian is also ok
 
 em_tmod2 <- emmeans(tmod2, specs = "elevation", type = "response")
 cld(em_tmod2, Letters = letters, adjust = "Tukey")
