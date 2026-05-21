@@ -5,7 +5,7 @@ library(lubridate)
 library(ggplot2)
 
 ###Witsieshoek weather station, behind WH mountain lodge####
-witsies <- read.delim("All_data\\weather station data\\Witsieshoek_lodge_daily.txt", sep = ",", header = T, row.names = NULL) 
+witsies <- read.delim("All_data\\weather station data\\Witsieshoek_lodge_daily_21May.txt", sep = ",", header = F, row.names = NULL) 
 
 colnames(witsies) <- c("Timestamp","StationID","WSpd_Min","WSpd_TMn",          
                         "WSpd_Max","WSpd_TMx","WSpd_Avg","WSpd_Std","WDir_Avg",          
@@ -18,30 +18,34 @@ colnames(witsies) <- c("Timestamp","StationID","WSpd_Min","WSpd_TMn",
                         "LoggerBattery_Max","LoggerBattery_TMx","LoggerBattery_Avg","LoggerTemp_Min","LoggerTemp_TMn",    
                         "LoggerTemp_Max","LoggerTemp_TMx","LoggerTemp_Avg","LoggerLithiumBatt","PingTime_Avg",      
                         "ScanCount","ETos","Rso","SunHrs_Tot","WC_C_Min",          
-                        "WC_C_TMn", "extra")
+                        "WC_C_TMn")
 
-witsies2 <- witsies |> #the scancount column was separated into two because there is a comma in the value.
-  mutate(ScanCount = paste(ScanCount, ETos)) |> 
-  select(!ETos) 
-colnames(witsies2)[51:55] <- c("ETos","Rso","SunHrs_Tot","WC_C_Min",          
-                              "WC_C_TMn")
+witsies <- witsies[-c(1:4),]
+
+#witsies2 <- witsies |> #the scancount column was separated into two because there is a comma in the value.
+#  mutate(ScanCount = paste(ScanCount, ETos)) |> 
+#  select(!ETos) 
+#colnames(witsies2)[51:55] <- c("ETos","Rso","SunHrs_Tot","WC_C_Min",          
+#                              "WC_C_TMn")
 #fix the date format
-witsies2 <- witsies2 |> 
+witsies2 <- witsies |> 
   mutate(Timestamp = gsub('"', '', Timestamp)) |> 
-  mutate(Timestamp = mdy_hms(Timestamp))
+  mutate(Timestamp = ymd_hms(Timestamp))
 
 #date range
-range(witsies2$Timestamp) #"2024-07-09 UTC" "2025-06-25 UTC"
+range(witsies2$Timestamp) #"2025-05-22 UTC" "2026-05-21 UTC"
 
 #mean daily temperature
 mat_witsies <- witsies2 |> 
+  mutate(AirTemp_Avg = as.numeric(AirTemp_Avg)) |> 
   filter(!is.na(AirTemp_Avg)) |> 
-  summarise(mat = mean(AirTemp_Avg)) #12.2989
+  summarise(mat = mean(AirTemp_Avg)) #11.67479
 
 #annual rainfall
 Rai_witsies <- witsies2 |> 
+  mutate(Rain_Tot = as.numeric(Rain_Tot)) |> 
   filter(!is.na(Rain_Tot)) |> 
-  summarise(rai = sum(Rain_Tot)) #3780.1
+  summarise(rai = sum(Rain_Tot)) #1309.8
 
 
 
