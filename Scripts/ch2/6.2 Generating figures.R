@@ -1,4 +1,6 @@
 ####Script to generate figures for posters and publications####
+library(ggplot)
+library(ggridges)
 
 #####SES ~ elevation ridges####
 #import SES data
@@ -69,7 +71,7 @@ comb2 <- comb |>
          zslope_height = c(scale(slope_height))) |> 
   ungroup()
 
-l1 <- c("Height_cm" = "SES~of~plant~Height", "SLA" = "SES~of~SLA")
+l1 <- c("Height_cm" = "SES~of~plant~height", "SLA" = "SES~of~SLA")
 ridges_letters <- data.frame(trait = c(rep("Height_cm", 3), rep("SLA", 3)), 
                              elevation = as.factor(c(rep(c("2000", "2500", "3000"), 2))),
                              letters = c("a", "b", "a", "a", "b", "a"), 
