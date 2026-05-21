@@ -1,5 +1,17 @@
 ###Modelling with glmmTMB on subsampled data####
 ###Data is subsampled to eliminate spatial autocorrelation####
+library(tidyverse)
+library(tidylog)
+library(glmmTMB)
+library(MuMIn)
+library(DHARMa)
+library(tictoc)
+library(ggplot2)
+library(ggridges)
+library(emmeans)
+library(multcomp)
+library(MuMIn)
+
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
   rename(Cell_ID = cellref)
@@ -70,7 +82,7 @@ comb2 <- comb |>
 
 
 
-####SES HEIGHT####
+####===SES HEIGHT====####
 #isolate SES of height
 Hdat <- comb2 |> 
   filter(trait %in% c("Height_cm", NA)) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
@@ -84,3 +96,47 @@ Hdat <- comb2 |>
 #Run Function_select_independent_cells.R
 Hdat_subs<- select_independent_cells(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
                                 max_search_radius = 3, lag_threshold = 4)
+#between 10 and 5 cells per grid
+#lets look at the ones with few cells
+
+##GG6
+GG6_subs <- Hdat_subs |> 
+  filter(grid == "GG6") |> 
+  dplyr::select(Cell_ID)
+
+GG6_full <- Hdat |> 
+  filter(grid == "GG6") |> 
+  mutate(chosen = case_when(Cell_ID %in% c(GG6_subs$Cell_ID) ~ "yes",
+                            is.na(SES) ~ "NA",
+                            .default = "no"))
+
+ggplot() +
+  geom_tile(data = GG6_full, aes(row, ncolumn, fill = chosen), 
+            colour = "white", linewidth = 0.4) +
+  scale_fill_manual(values = c(
+    "no"             = "orange",
+    "NA"               = "grey",
+    "yes"              = "green"))
+
+
+##BK4
+BK4_subs <- Hdat_subs |> 
+  filter(grid == "BK4") |> 
+  dplyr::select(Cell_ID)
+
+BK4_full <- Hdat |> 
+  filter(grid == "BK4") |> 
+  mutate(chosen = case_when(Cell_ID %in% c(BK4_subs$Cell_ID) ~ "yes",
+                            is.na(SES) ~ "NA",
+                            .default = "no"))
+
+ggplot() +
+  geom_tile(data = BK4_full, aes(row, ncolumn, fill = chosen), 
+            colour = "white", linewidth = 0.4) +
+  scale_fill_manual(values = c(
+    "no"             = "orange",
+    "NA"               = "grey",
+    "yes"              = "green"))
+  
+
+
