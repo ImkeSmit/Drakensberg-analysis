@@ -92,7 +92,7 @@ Hdat <- comb2 |>
          pos = numFactor(x_coord, y_coord))
   
   
-###Sample uncorrelated cells  
+###===Sample uncorrelated cells===####  
 #Run Function_select_independent_cells.R
 Hdat_subs<- select_independent_cells(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
                                 max_search_radius = 3, lag_threshold = 4)
@@ -137,6 +137,43 @@ ggplot() +
     "no"             = "orange",
     "NA"               = "grey",
     "yes"              = "green"))
+
+
+###===Model===####
+tmod1<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
+                  zslope_height + (1|grid), 
+                family = t_family(link = "identity"), data = Hdat_subs)
+toc()
+summary(tmod1)
+tmod1_res <- simulateResiduals(tmod1)
+plot(tmod1_res) #looks ok...
+
+r.squaredGLMM(tmod1)
+
+write.csv(summary(tmod1)$coefficients$cond, "All_data/comm_assembly_results/SES_height_env_model_results.csv")
+
+em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
+cld(em_tmod1, Letters = letters, adjust = "Tukey")
+#2500 elevation has lower SES than other two
+
+
+##Variable importance:##
+R2full<- r.squaredGLMM(tmod1)[[1]]
+
+predictors <- c("elevation", "zrock_cover", "znorthness","zsoil_moist","zsoil_depth" ,"zslope_height" )
+
+importance <- sapply(predictors, function(var) {
+  # Refit without this variable
+  f <- as.formula(paste("SES ~", paste(setdiff(predictors, var), collapse = " + "), "+ (1|grid)"))
+  m_drop <- glmmTMB(f, data = Hdat, family = t_family(link = "identity"), REML = FALSE)
   
+  r2_drop <- r.squaredGLMM(m_drop)[,"R2m"]
+  
+  R2full - r2_drop  # importance = R² lost by removing this variable
+  
+})
+sort(importance, decreasing = T)
+
+
 
 
