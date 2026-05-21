@@ -95,8 +95,7 @@ Rai_scarpark <- scarpark2 |>
 
 
 ####Alpine base weather station####
-alpbase <- read.delim("All_data\\weather station data\\Alpine_base_daily.txt", sep = ",", header = F, row.names = NULL)
-alpbase <- alpbase[-1,]
+alpbase <- read.delim("All_data\\weather station data\\Alpine_base_daily_21May.txt", sep = ",", header = F, row.names = NULL)
 colnames(alpbase) <- c("Timestamp","StationID","WSpd_Min","WSpd_TMn",          
                         "WSpd_Max","WSpd_TMx","WSpd_Avg","WSpd_Std","WDir_Avg",          
                         "WDir_Std","AirTemp_Min","AirTemp_TMn","AirTemp_Max","AirTemp_TMx",       
@@ -108,32 +107,35 @@ colnames(alpbase) <- c("Timestamp","StationID","WSpd_Min","WSpd_TMn",
                         "LoggerBattery_Max","LoggerBattery_TMx","LoggerBattery_Avg","LoggerTemp_Min","LoggerTemp_TMn",    
                         "LoggerTemp_Max","LoggerTemp_TMx","LoggerTemp_Avg","LoggerLithiumBatt","PingTime_Avg",      
                         "ScanCount","ETos","Rso","SunHrs_Tot","WC_C_Min",          
-                        "WC_C_TMn" , "extra")
+                        "WC_C_TMn")
+
+alpbase <- alpbase[-c(1:4),-c(56:80)]
 
 
-alpbase2 <- alpbase |> #the scancount column was separated into two because there is a comma in the value.
-  mutate(ScanCount = paste(ScanCount, ETos)) |> 
-  select(!ETos) 
-colnames(alpbase2)[51:55] <- c("ETos","Rso","SunHrs_Tot","WC_C_Min",          
-                                "WC_C_TMn")
+
+#alpbase2 <- alpbase |> #the scancount column was separated into two because there is a comma in the value.
+#  mutate(ScanCount = paste(ScanCount, ETos)) |> 
+#  select(!ETos) 
+#colnames(alpbase2)[51:55] <- c("ETos","Rso","SunHrs_Tot","WC_C_Min",          
+#                                "WC_C_TMn")
 #fix the date format
-alpbase2 <- alpbase2 |> 
-  mutate(Timestamp = gsub('"', '', Timestamp)) |> 
-  mutate(Timestamp = mdy_hms(Timestamp))
+alpbase2 <- alpbase |> 
+  #mutate(Timestamp = gsub('"', '', Timestamp)) |> 
+  mutate(Timestamp = ymd_hms(Timestamp))
 
 #date range
-range(alpbase2$Timestamp) #"2024-07-09 UTC" "2024-12-11 UTC"
+range(alpbase2$Timestamp) #"2025-07-10 UTC" "2026-05-20 UTC"
 
 #mean daily temperature
 mat_alpbase <- alpbase2 |> 
   filter(!is.na(AirTemp_Avg)) |>
   mutate(AirTemp_Avg = as.numeric(AirTemp_Avg)) |> 
-  summarise(mat = mean(AirTemp_Avg)) #5.101923
+  summarise(mat = mean(AirTemp_Avg)) #7.368254
 
 #annual rainfall
 Rai_alpbase <- alpbase2 |> 
   filter(!is.na(Rain_Tot)) |> 
   mutate(Rain_Tot = as.numeric(Rain_Tot)) |> 
-  summarise(rai = sum(Rain_Tot)) #3792.6
+  summarise(rai = sum(Rain_Tot)) #913.6
 
 
