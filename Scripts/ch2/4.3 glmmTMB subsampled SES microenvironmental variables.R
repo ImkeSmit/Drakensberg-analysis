@@ -180,6 +180,80 @@ write.csv(tmod1_results, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_
 
 
 
+####===SES of SLA====####
+#isolate SES of SLA
+#leave heavy tail
+SLAdat <- comb2 |> 
+  filter(trait %in% c("SLA", NA)) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
+  arrange(y_coord, x_coord) |> 
+  mutate(trait = "SLA",  #give all records a trait
+         grid = as.factor(paste0(site, grid)), 
+         pos = numFactor(x_coord, y_coord))
+
+
+#=====sample uncorrelated cells===####
+#Run Function_select_independent_cells.R
+SLAdat_subs<- select_independent_cells(SLAdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
+                                     max_search_radius = 3, lag_threshold = 4)
+#between 10 and 5 cells per grid
+#lets look at the ones with few cells
+
+##GG7
+GG7_subs <- SLAdat_subs |> 
+  filter(grid == "GG7") |> 
+  dplyr::select(Cell_ID)
+
+GG7_full <- SLAdat |> 
+  filter(grid == "GG7") |> 
+  mutate(chosen = case_when(Cell_ID %in% c(GG7_subs$Cell_ID) ~ "yes",
+                            is.na(SES) ~ "NA",
+                            .default = "no"))
+
+ggplot() +
+  geom_tile(data = GG7_full, aes(row, ncolumn, fill = chosen), 
+            colour = "white", linewidth = 0.4) +
+  scale_fill_manual(values = c(
+    "no"             = "orange",
+    "NA"               = "grey",
+    "yes"              = "green"))
+
+
+
+#====Model====#
+tmod2<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
+                  zslope_height + (1|grid), 
+                family = t_family(link = "identity"), data = SLAdat_subs)
+summary(tmod2)
+tmod2_res <- simulateResiduals(tmod2)
+plot(tmod2_res) #looks very good!
+
+em_tmod2 <- emmeans(tmod2, specs = "elevation", type = "response")
+cld(em_tmod2, Letters = letters, adjust = "Tukey")
+#2500 elevation has higher SES than other two
+
+r.squaredGLMM(tmod2)
+
+##Variable importance:##
+R2full<- r.squaredGLMM(tmod2)[[1]]
+
+predictors <- c("elevation", "zrock_cover", "znorthness","zsoil_moist","zsoil_depth" ,"zslope_height" )
+
+importance_SLA <- sapply(predictors, function(var) {
+  # Refit without this variable
+  f <- as.formula(paste("SES ~", paste(setdiff(predictors, var), collapse = " + "), "+ (1|grid)"))
+  m_drop <- glmmTMB(f, data = SLAdat_subs, family = t_family(link = "identity"), REML = FALSE)
+  
+  r2_drop <- r.squaredGLMM(m_drop)[,"R2m"]
+  
+  R2full - r2_drop  # importance = R² lost by removing this variable
+  
+})
+sort(importance_SLA, decreasing = T)
+#save results
+tmod2_results <-as.data.frame(summary(tmod2)$coefficients$cond)
+tmod2_results$variable_importance <- c(0,0,importance_SLA)
+write.csv(tmod2_results, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_SLA_env_model_results.csv")
+
 
 
 
