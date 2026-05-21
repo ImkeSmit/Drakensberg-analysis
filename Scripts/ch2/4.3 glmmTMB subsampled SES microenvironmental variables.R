@@ -142,19 +142,18 @@ ggplot() +
 ###===Model===####
 tmod1<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
                   zslope_height + (1|grid), 
-                family = t_family(link = "identity"), data = Hdat_subs)
-toc()
+                family = gaussian(link = "identity"), 
+                data = Hdat_subs) ##convergence problem with t family
 summary(tmod1)
 tmod1_res <- simulateResiduals(tmod1)
-plot(tmod1_res) #looks ok...
+plot(tmod1_res) #not looking good
 
-r.squaredGLMM(tmod1)
+r.squaredGLMM(tmod1) #0.1760862 0.2584234
 
-write.csv(summary(tmod1)$coefficients$cond, "All_data/comm_assembly_results/SES_height_env_model_results.csv")
+write.csv(summary(tmod1)$coefficients$cond, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_height_env_model_results.csv")
 
 em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
 cld(em_tmod1, Letters = letters, adjust = "Tukey")
-#2500 elevation has lower SES than other two
 
 
 ##Variable importance:##
@@ -165,7 +164,7 @@ predictors <- c("elevation", "zrock_cover", "znorthness","zsoil_moist","zsoil_de
 importance <- sapply(predictors, function(var) {
   # Refit without this variable
   f <- as.formula(paste("SES ~", paste(setdiff(predictors, var), collapse = " + "), "+ (1|grid)"))
-  m_drop <- glmmTMB(f, data = Hdat, family = t_family(link = "identity"), REML = FALSE)
+  m_drop <- glmmTMB(f, data = Hdat_subs, family = gaussian(link = "identity"), REML = FALSE)
   
   r2_drop <- r.squaredGLMM(m_drop)[,"R2m"]
   
@@ -173,6 +172,13 @@ importance <- sapply(predictors, function(var) {
   
 })
 sort(importance, decreasing = T)
+
+#save results
+tmod1_results <-as.data.frame(summary(tmod1)$coefficients$cond)
+tmod1_results$variable_importance <- c(0,0,importance)
+write.csv(tmod1_results, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_height_env_model_results.csv")
+
+
 
 
 
