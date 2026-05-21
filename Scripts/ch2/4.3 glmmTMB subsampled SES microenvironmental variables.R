@@ -227,6 +227,11 @@ summary(tmod2)
 tmod2_res <- simulateResiduals(tmod2)
 plot(tmod2_res) #looks very good!
 
+#test for spatial autocorrelation
+used_rows <- as.integer(rownames(model.frame(tmod2)))
+dat_used  <- SLAdat_subs[used_rows, ]
+testSpatialAutocorrelation(tmod2_res, x = dat_used$x_coord, y = dat_used$y_coord)#still significant autocorrelation
+
 em_tmod2 <- emmeans(tmod2, specs = "elevation", type = "response")
 cld(em_tmod2, Letters = letters, adjust = "Tukey")
 #2500 elevation has higher SES than other two
