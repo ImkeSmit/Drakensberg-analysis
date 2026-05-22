@@ -95,8 +95,8 @@ Hdat <- comb2 |>
 ###===Sample uncorrelated cells===####  
 #Run Function_select_independent_cells.R
 Hdat_subs<- select_independent_cells(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
-                                max_search_radius = 2, lag_threshold = 4)
-#between 10 and 5 cells per grid
+                                max_search_radius = 2)
+#There are grids with only 2 cells included, perhaps having a max lag threshold of 6 is too much.
 #lets look at the ones with few cells
 
 ##GG6
@@ -119,19 +119,19 @@ ggplot() +
     "yes"              = "green"))
 
 
-##BK4
-BK4_subs <- Hdat_subs |> 
-  filter(grid == "BK4") |> 
+##BK7
+BK7_subs <- Hdat_subs |> 
+  filter(grid == "BK7") |> 
   dplyr::select(Cell_ID)
 
-BK4_full <- Hdat |> 
-  filter(grid == "BK4") |> 
-  mutate(chosen = case_when(Cell_ID %in% c(BK4_subs$Cell_ID) ~ "yes",
+BK7_full <- Hdat |> 
+  filter(grid == "BK7") |> 
+  mutate(chosen = case_when(Cell_ID %in% c(BK7_subs$Cell_ID) ~ "yes",
                             is.na(SES) ~ "NA",
                             .default = "no"))
 
 ggplot() +
-  geom_tile(data = BK4_full, aes(row, ncolumn, fill = chosen), 
+  geom_tile(data = BK7_full, aes(row, ncolumn, fill = chosen), 
             colour = "white", linewidth = 0.4) +
   scale_fill_manual(values = c(
     "no"             = "orange",
@@ -154,19 +154,19 @@ tmod1<- glmmTMB(SES ~ elevation + zrock_cover +  znorthness + zsoil_moist + zsoi
                   zslope_height + (1|grid), 
                 family = t_family(link = "identity"), 
                 data = Hdat_subs) 
-performance::check_singularity(tmod1) #singular fit uh oh
+#performance::check_singularity(tmod1) #singular fit uh oh
 
 #update the modle with gamme priors to see if that helps
-prior <- data.frame(
-  prior = "gamma(100, 2.5)",  # mean can be 1, but even 1e8
-  class = "ranef"           # for random effects
-)
-tmod1_update <- update(tmod1, priors = prior) 
-check_singularity(tmod1_update) #not singular anymore
+#prior <- data.frame(
+#  prior = "gamma(100, 2.5)",  # mean can be 1, but even 1e8
+#  class = "ranef" )          # for random effects
+
+#tmod1_update <- update(tmod1, priors = prior) 
+#check_singularity(tmod1_update) #not singular anymore
 
 
-summary(tmod1_update)
-tmod1_res <- simulateResiduals(tmod1_update)
+summary(tmod1)
+tmod1_res <- simulateResiduals(tmod1)
 plot(tmod1_res) #looks ok...
 #sample size large enough with t family if lag threshold = 4 and search radius = 2
 
@@ -177,20 +177,20 @@ em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
 cld(em_tmod1, Letters = letters, adjust = "Tukey")
 
 #test for spatial autocorrelation
-used_rows <- as.integer(rownames(model.frame(tmod1_update)))
+used_rows <- as.integer(rownames(model.frame(tmod1)))
 dat_used  <- Hdat_subs[used_rows, ]
 testSpatialAutocorrelation(tmod1_res, x = dat_used$x_coord, y = dat_used$y_coord)
-#No autocorrelation in updated model!
+#Still have autocorrelation... Check if we are simulating residuals correctly
 
 ##Variable importance:##
-R2full<- r.squaredGLMM(tmod1_update)[[1]]
+R2full<- r.squaredGLMM(tmod1)[[1]]
 
 predictors <- c("elevation", "zrock_cover", "znorthness","zsoil_moist","zsoil_depth" ,"zslope_height" )
 
 importance <- sapply(predictors, function(var) {
   # Refit without this variable
   f <- as.formula(paste("SES ~", paste(setdiff(predictors, var), collapse = " + "), "+ (1|grid)"))
-  m_drop <- glmmTMB(f, data = Hdat_subs, family = t_family(link = "identity"), REML = FALSE, priors = prior)
+  m_drop <- glmmTMB(f, data = Hdat_subs, family = t_family(link = "identity"), REML = FALSE)
   
   r2_drop <- r.squaredGLMM(m_drop)[,"R2m"]
   
