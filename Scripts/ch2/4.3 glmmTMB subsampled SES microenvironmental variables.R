@@ -139,6 +139,16 @@ ggplot() +
     "yes"              = "green"))
 
 
+####Graph SES~env variables
+Hdat_subs |> 
+  dplyr::select(c(SES, rock_cover , northness , soil_moisture_adj_campaign2 , mean_soil_depth , slope_height)) |> 
+  pivot_longer(cols = !SES, names_to = "variable", values_to = "value") |> 
+  ggplot(aes(y = SES, x = value)) +
+  geom_point()+
+  facet_wrap(~variable, scales = "free_x")+
+  theme_bw()
+
+
 ###===Model===####
 tmod1<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
                   zslope_height + (1|grid), 
