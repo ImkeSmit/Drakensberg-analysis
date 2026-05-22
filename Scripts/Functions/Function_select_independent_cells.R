@@ -56,12 +56,28 @@ select_independent_cells <- function(data,
     candidates[1, ]
   }
   
-  # MAIN LOOP — iterate over every unique grid
+  ####Get lag distances for each grid
+  ##First we have to impute cells otherwise correlation doesn't work
+  data_filled <- impute_cells(df = data, 
+                              cols_to_impute = c("zrock_cover"," znorthness","zsoil_moist" ,"zsoil_depth" ,"zslope_height"))
+  
+  #get autocorrelation structure of each grid
+  decay_df <- grid_correlation_structure(grid_vector = c(unique(data_filled$grid)), 
+                                         data = data_filled, 
+                                         formula = "SES ~ zrock_cover + znorthness + zsoil_moist + zsoil_depth + zslope_height", 
+                                         k_specified = 4)
+  
+  
+  
+  #### MAIN LOOP — iterate over every unique grid
 
   grid_list <- unique(data[[grid_var]])
   all_results <- vector("list", length(grid_list))   # pre-allocate for speed
   
   for (g_idx in seq_along(grid_list)) {
+    
+    #lag threshold per grid
+    lag_threshold <- decay_df[which(decay_df$grid == grid_list[g_idx]), which(colnames(decay_df) == "first_nonsig_lag")]
     
     g      <- grid_list[g_idx]
     grid_df <- data |> filter(.data[[grid_var]] == g)
