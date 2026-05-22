@@ -93,7 +93,8 @@ check <- Hdat |> group_by(site, grid) |>
 #for now, we fill fill the NA cells with the mean of it's 8 nearest neighbours
 #run Function_impute_cells.R
 Hdat_filled <- impute_cells(df = Hdat, 
-                            cols_to_impute = colnames(Hdat)[c(25, 31:35)])
+                            cols_to_impute = colnames(Hdat)[c(25, 31:35)], 
+                            neighbours = 4)
 Hdat_filled <- Hdat_filled |> 
   arrange(y_coord) |> 
   mutate(grid = as.factor(grid), #cluster ID must be a factor
