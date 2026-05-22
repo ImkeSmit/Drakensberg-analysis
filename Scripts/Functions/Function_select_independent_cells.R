@@ -6,15 +6,13 @@
 # NA cells cannot be selected; adjacent cells are substituted instead.
 # =============================================================================
 
-library(tidyverse)
-
 
 select_independent_cells <- function(data,
                                      grid_var,        # character: grouping column (e.g. "grid_id")
                                      x,               # character: x-coordinate column (e.g. "x")
                                      y,               # character: y-coordinate column (e.g. "y")
                                      value_col,       # character: measurement column (e.g. "ndvi")
-                                     lag_threshold    = 4,   # min distance between selected cells
+#                                     lag_threshold    = 4,   # min distance between selected cells
                                      max_search_radius = 3   # max search radius for NA substitutes
 ) {
   
@@ -59,7 +57,7 @@ select_independent_cells <- function(data,
   ####Get lag distances for each grid
   ##First we have to impute cells otherwise correlation doesn't work
   data_filled <- impute_cells(df = data, 
-                              cols_to_impute = c("zrock_cover"," znorthness","zsoil_moist" ,"zsoil_depth" ,"zslope_height"))
+                              cols_to_impute = colnames(data)[c(25, 31:35)])
   
   #get autocorrelation structure of each grid
   decay_df <- grid_correlation_structure(grid_vector = c(unique(data_filled$grid)), 
@@ -67,6 +65,7 @@ select_independent_cells <- function(data,
                                          formula = "SES ~ zrock_cover + znorthness + zsoil_moist + zsoil_depth + zslope_height", 
                                          k_specified = 4)
   
+  mean_lag_distance = round(mean(decay_df$first_nonsig_lag, na.rm = T))
   
   
   #### MAIN LOOP — iterate over every unique grid
@@ -78,6 +77,7 @@ select_independent_cells <- function(data,
     
     #lag threshold per grid
     lag_threshold <- decay_df[which(decay_df$grid == grid_list[g_idx]), which(colnames(decay_df) == "first_nonsig_lag")]
+    if(is.na(lag_threshold)) {lag_threshold <- mean_lag_distance}
     
     g      <- grid_list[g_idx]
     grid_df <- data |> filter(.data[[grid_var]] == g)
