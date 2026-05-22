@@ -177,20 +177,20 @@ em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
 cld(em_tmod1, Letters = letters, adjust = "Tukey")
 
 #test for spatial autocorrelation
-used_rows <- as.integer(rownames(model.frame(tmod1)))
+used_rows <- as.integer(rownames(model.frame(tmod1_update)))
 dat_used  <- Hdat_subs[used_rows, ]
 testSpatialAutocorrelation(tmod1_res, x = dat_used$x_coord, y = dat_used$y_coord)
-##Aw man still significant autocorrlation, however I may have to fine tune the simulation of the residuals here.
+#No autocorrelation in updated model!
 
 ##Variable importance:##
-R2full<- r.squaredGLMM(tmod1)[[1]]
+R2full<- r.squaredGLMM(tmod1_update)[[1]]
 
 predictors <- c("elevation", "zrock_cover", "znorthness","zsoil_moist","zsoil_depth" ,"zslope_height" )
 
 importance <- sapply(predictors, function(var) {
   # Refit without this variable
   f <- as.formula(paste("SES ~", paste(setdiff(predictors, var), collapse = " + "), "+ (1|grid)"))
-  m_drop <- glmmTMB(f, data = Hdat_subs, family = t_family(link = "identity"), REML = FALSE)
+  m_drop <- glmmTMB(f, data = Hdat_subs, family = t_family(link = "identity"), REML = FALSE, priors = prior)
   
   r2_drop <- r.squaredGLMM(m_drop)[,"R2m"]
   
@@ -200,8 +200,8 @@ importance <- sapply(predictors, function(var) {
 sort(importance, decreasing = T)
 
 #save results
-tmod1_results <-as.data.frame(summary(tmod1)$coefficients$cond)
-tmod1_results$variable_importance <- c(importance)
+tmod1_results <-as.data.frame(summary(tmod1_update)$coefficients$cond)
+tmod1_results$variable_importance <- c(0,0,importance)
 write.csv(tmod1_results, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_height_env_model_results.csv")
 
 
@@ -220,7 +220,7 @@ SLAdat <- comb2 |>
 #=====sample uncorrelated cells===####
 #Run Function_select_independent_cells.R
 SLAdat_subs<- select_independent_cells(SLAdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
-                                     max_search_radius = 3, lag_threshold = 5)
+                                     max_search_radius = 2, lag_threshold = 4)
 #between 10 and 5 cells per grid
 #lets look at the ones with few cells
 
@@ -248,7 +248,7 @@ ggplot() +
 #====Model====#
 tmod2<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
                   zslope_height + (1|grid), 
-                family = gaussian(link = "identity"), data = SLAdat_subs)
+                family = t_family(link = "identity"), data = SLAdat_subs)
 summary(tmod2)
 tmod2_res <- simulateResiduals(tmod2)
 plot(tmod2_res) #looks very good!
@@ -257,8 +257,7 @@ plot(tmod2_res) #looks very good!
 used_rows <- as.integer(rownames(model.frame(tmod2)))
 dat_used  <- SLAdat_subs[used_rows, ]
 testSpatialAutocorrelation(tmod2_res, x = dat_used$x_coord, y = dat_used$y_coord)
-#autocorrelation disappears after after lag = 5. When lag = 5 is used th t family does not converge.
-#T family does give better diagnostic plots but the gaussian is also ok
+#still has significant spatial autocorrelation, but may need to simulate residuals differently??
 
 em_tmod2 <- emmeans(tmod2, specs = "elevation", type = "response")
 cld(em_tmod2, Letters = letters, adjust = "Tukey")
