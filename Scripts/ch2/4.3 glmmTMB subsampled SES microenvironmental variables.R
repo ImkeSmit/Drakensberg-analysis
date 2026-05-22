@@ -158,7 +158,7 @@ performance::check_singularity(tmod1) #singular fit uh oh
 
 #update the modle with gamme priors to see if that helps
 prior <- data.frame(
-  prior = "gamma(1, 2.5)",  # mean can be 1, but even 1e8
+  prior = "gamma(100, 2.5)",  # mean can be 1, but even 1e8
   class = "ranef"           # for random effects
 )
 tmod1_update <- update(tmod1, priors = prior) 
@@ -170,15 +170,14 @@ tmod1_res <- simulateResiduals(tmod1_update)
 plot(tmod1_res) #looks ok...
 #sample size large enough with t family if lag threshold = 4 and search radius = 2
 
-r.squaredGLMM(tmod1_update) #0.05550544 0.06488596
+r.squaredGLMM(tmod1_update) #0.1158696 0.1234497
 
-write.csv(summary(tmod1_update)$coefficients$cond, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_height_env_model_results.csv")
 
-em_tmod1 <- emmeans(tmod1_update, specs = "elevation", type = "response")
+em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
 cld(em_tmod1, Letters = letters, adjust = "Tukey")
 
 #test for spatial autocorrelation
-used_rows <- as.integer(rownames(model.frame(tmod1_update)))
+used_rows <- as.integer(rownames(model.frame(tmod1)))
 dat_used  <- Hdat_subs[used_rows, ]
 testSpatialAutocorrelation(tmod1_res, x = dat_used$x_coord, y = dat_used$y_coord)
 ##Aw man still significant autocorrlation, however I may have to fine tune the simulation of the residuals here.
@@ -191,7 +190,7 @@ predictors <- c("elevation", "zrock_cover", "znorthness","zsoil_moist","zsoil_de
 importance <- sapply(predictors, function(var) {
   # Refit without this variable
   f <- as.formula(paste("SES ~", paste(setdiff(predictors, var), collapse = " + "), "+ (1|grid)"))
-  m_drop <- glmmTMB(f, data = Hdat_subs, family = gaussian(link = "identity"), REML = FALSE)
+  m_drop <- glmmTMB(f, data = Hdat_subs, family = t_family(link = "identity"), REML = FALSE)
   
   r2_drop <- r.squaredGLMM(m_drop)[,"R2m"]
   
@@ -202,7 +201,7 @@ sort(importance, decreasing = T)
 
 #save results
 tmod1_results <-as.data.frame(summary(tmod1)$coefficients$cond)
-tmod1_results$variable_importance <- c(0,0,importance)
+tmod1_results$variable_importance <- c(importance)
 write.csv(tmod1_results, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_height_env_model_results.csv")
 
 
