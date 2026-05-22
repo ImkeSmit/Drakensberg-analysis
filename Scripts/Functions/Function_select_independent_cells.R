@@ -75,7 +75,7 @@ select_independent_cells <- function(data,
   
   #Replace lag distances >6 with 6 because that is as big as we can go
   decay_df<- decay_df |> 
-    mutate(first_nonsig_lag = case_when(first_nonsig_lag > 5 ~ 6, 
+    mutate(first_nonsig_lag = case_when(first_nonsig_lag > 4 ~ 5, 
                                         is.na(first_nonsig_lag) ~ mean_lag_distance, #replace NA's with the mean
                                         .default = first_nonsig_lag))
   
