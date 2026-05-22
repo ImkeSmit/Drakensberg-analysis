@@ -1,9 +1,10 @@
 # =============================================================================
-# Ecological Grid: Fill Missing Values Using 8 Nearest Neighbours
+# Ecological Grid: Fill Missing Values Using 4 or 8 Nearest Neighbours
 # =============================================================================
-# For each NA value in a numeric column, the function finds the cell's eight
-# neighbouring cells (Moore neighbourhood) using x_coord and y_coord, then
-# replaces the NA with the mean of all available (non-NA) neighbour values.
+# For each NA value in a numeric column, the function finds the cell's four
+# or eight neighbouring cells (Von Neumann or Moore neighbourhood) using
+# x_coord and y_coord, then replaces the NA with the mean of all available
+# (non-NA) neighbour values.
 #
 # Neighbours are identified within the same grid group only (e.g. GG_G1),
 # so cells from different grids are never used as neighbours.
@@ -12,16 +13,23 @@
 #   - Grid position is given by columns `x_coord` and `y_coord`
 #   - The grid identifier is stored in a column called `grid`
 #     (character, of the form GG1, GG2 ... GG7)
-#   - Edge/corner cells are filled using however many real neighbours exist
-#     (5 for edges, 3 for corners); cells where ALL neighbours are also NA
-#     are left unfilled
+#   - Edge/corner cells are filled using however many real neighbours exist;
+#     cells where ALL neighbours are also NA are left unfilled
+#
+# neighbours argument:
+#   - 8 (default): Moore neighbourhood — cardinal + diagonal adjacents
+#   - 4:           Von Neumann neighbourhood — cardinal adjacents only
+#                  (up, down, left, right)
 # =============================================================================
-
 library(dplyr)
 
-impute_cells <- function(df, cols_to_impute) {
+impute_cells <- function(df, cols_to_impute, neighbours = 8) {
   
   # --- Input checks -----------------------------------------------------------
+  if (!neighbours %in% c(4, 8)) {
+    stop("`neighbours` must be either 4 or 8.")
+  }
+  
   missing_cols <- setdiff(cols_to_impute, names(df))
   if (length(missing_cols) > 0) {
     stop("The following columns are not in the data frame: ",
@@ -41,11 +49,19 @@ impute_cells <- function(df, cols_to_impute) {
          paste(missing_required, collapse = ", "))
   }
   
-  # --- Helper: mean of 8-neighbour values for one cell -----------------------
+  # --- Build offset table once, based on neighbourhood type ------------------
+  # Moore (8):       all 8 surrounding cells, including diagonals
+  # Von Neumann (4): only the 4 cardinal cells (no diagonals)
+  offsets <- if (neighbours == 8) {
+    expand.grid(dx = -1:1, dy = -1:1) |>
+      filter(!(dx == 0 & dy == 0))                      # drop self
+  } else {
+    data.frame(dx = c(-1, 1,  0, 0),
+               dy = c( 0, 0, -1, 1))                    # N/S/W/E only
+  }
+  
+  # --- Helper: mean of neighbour values for one cell -------------------------
   neighbour_mean <- function(target_x, target_y, grid_df, value_col) {
-    
-    offsets <- expand.grid(dx = -1:1, dy = -1:1) |>
-      filter(!(dx == 0 & dy == 0))
     
     neighbour_vals <- grid_df |>
       inner_join(
@@ -57,7 +73,7 @@ impute_cells <- function(df, cols_to_impute) {
       pull(all_of(value_col))
     
     if (all(is.na(neighbour_vals))) {
-      message(paste(value_col, ": ","all neighbours NA"))
+      message(paste(value_col, ": ", "all neighbours NA"))
       return(NA_real_)
     }
     
@@ -70,7 +86,7 @@ impute_cells <- function(df, cols_to_impute) {
     group_modify(function(grid_df, grid_key) {
       
       for (col in cols_to_impute) {
-        if (!any(is.na(grid_df[[col]]))) next   # skip if no NAs in this col
+        if (!any(is.na(grid_df[[col]]))) next
         
         missing_rows <- which(is.na(grid_df[[col]]))
         
