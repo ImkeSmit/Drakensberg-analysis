@@ -7,6 +7,11 @@
 # =============================================================================
 
 
+##ALSO LOAD:
+#Function_impute_cells
+#Function_grid_correlation structure
+
+
 select_independent_cells <- function(data,
                                      grid_var,        # character: grouping column (e.g. "grid_id")
                                      x,               # character: x-coordinate column (e.g. "x")
@@ -57,7 +62,8 @@ select_independent_cells <- function(data,
   ####Get lag distances for each grid
   ##First we have to impute cells otherwise correlation doesn't work
   data_filled <- impute_cells(df = data, 
-                              cols_to_impute = colnames(data)[c(25, 31:35)])
+                              cols_to_impute = colnames(data)[c(25, 31:35)], 
+                              neighbours = 4)
   
   #get autocorrelation structure of each grid
   decay_df <- grid_correlation_structure(grid_vector = c(unique(data_filled$grid)), 
