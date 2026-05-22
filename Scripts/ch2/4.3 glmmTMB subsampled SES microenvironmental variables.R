@@ -95,7 +95,7 @@ Hdat <- comb2 |>
 ###===Sample uncorrelated cells===####  
 #Run Function_select_independent_cells.R
 Hdat_subs<- select_independent_cells(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
-                                max_search_radius = 3, lag_threshold = 5)
+                                max_search_radius = 2, lag_threshold = 4)
 #between 10 and 5 cells per grid
 #lets look at the ones with few cells
 
@@ -150,26 +150,38 @@ Hdat_subs |>
 
 
 ###===Model===####
-tmod1<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
+tmod1<- glmmTMB(SES ~ elevation + zrock_cover +  znorthness + zsoil_moist + zsoil_depth + 
                   zslope_height + (1|grid), 
-                family = gaussian(link = "identity"), 
-                data = Hdat_subs) ##convergence problem with t family
-summary(tmod1)
-tmod1_res <- simulateResiduals(tmod1)
-plot(tmod1_res) #not looking good
+                family = t_family(link = "identity"), 
+                data = Hdat_subs) 
+performance::check_singularity(tmod1) #singular fit uh oh
 
-r.squaredGLMM(tmod1) #0.1760862 0.2584234
+#update the modle with gamme priors to see if that helps
+prior <- data.frame(
+  prior = "gamma(1, 2.5)",  # mean can be 1, but even 1e8
+  class = "ranef"           # for random effects
+)
+tmod1_update <- update(tmod1, priors = prior) 
+check_singularity(tmod1_update) #not singular anymore
 
-write.csv(summary(tmod1)$coefficients$cond, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_height_env_model_results.csv")
 
-em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
+summary(tmod1_update)
+tmod1_res <- simulateResiduals(tmod1_update)
+plot(tmod1_res) #looks ok...
+#sample size large enough with t family if lag threshold = 4 and search radius = 2
+
+r.squaredGLMM(tmod1_update) #0.05550544 0.06488596
+
+write.csv(summary(tmod1_update)$coefficients$cond, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_height_env_model_results.csv")
+
+em_tmod1 <- emmeans(tmod1_update, specs = "elevation", type = "response")
 cld(em_tmod1, Letters = letters, adjust = "Tukey")
 
 #test for spatial autocorrelation
-used_rows <- as.integer(rownames(model.frame(tmod1)))
+used_rows <- as.integer(rownames(model.frame(tmod1_update)))
 dat_used  <- Hdat_subs[used_rows, ]
 testSpatialAutocorrelation(tmod1_res, x = dat_used$x_coord, y = dat_used$y_coord)
-##P value still very small even at lag = 5
+##Aw man still significant autocorrlation, however I may have to fine tune the simulation of the residuals here.
 
 ##Variable importance:##
 R2full<- r.squaredGLMM(tmod1)[[1]]
