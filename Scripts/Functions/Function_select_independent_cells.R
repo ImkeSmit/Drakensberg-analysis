@@ -82,9 +82,9 @@ select_independent_cells <- function(data,
   for (g_idx in seq_along(grid_list)) {
     
     #lag threshold per grid
-    lag_threshold <- decay_df[which(decay_df$grid == grid_list[g_idx]), which(colnames(decay_df) == "first_nonsig_lag")]
-
     g      <- grid_list[g_idx]
+    lag_threshold <- decay_df[which(decay_df$grid == g), which(colnames(decay_df) == "first_nonsig_lag")]
+
     grid_df <- data |> filter(.data[[grid_var]] == g)
     
     # 1. Shuffle candidate cells 
