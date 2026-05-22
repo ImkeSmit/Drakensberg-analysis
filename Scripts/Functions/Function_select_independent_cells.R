@@ -67,6 +67,12 @@ select_independent_cells <- function(data,
   
   mean_lag_distance = round(mean(decay_df$first_nonsig_lag, na.rm = T))
   
+  #Replace lag distances >6 with 6 because that is as big as we can go
+  decay_df<- decay_df |> 
+    mutate(first_nonsig_lag = case_when(first_nonsig_lag > 5 ~ 6, 
+                                        is.na(first_nonsig_lag) ~ mean_lag_distance, #replace NA's with the mean
+                                        .default = first_nonsig_lag))
+  
   
   #### MAIN LOOP — iterate over every unique grid
 
@@ -77,8 +83,7 @@ select_independent_cells <- function(data,
     
     #lag threshold per grid
     lag_threshold <- decay_df[which(decay_df$grid == grid_list[g_idx]), which(colnames(decay_df) == "first_nonsig_lag")]
-    if(is.na(lag_threshold)) {lag_threshold <- mean_lag_distance}
-    
+
     g      <- grid_list[g_idx]
     grid_df <- data |> filter(.data[[grid_var]] == g)
     
