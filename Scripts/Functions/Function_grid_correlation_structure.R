@@ -30,8 +30,8 @@ for(g in grid_vector) {
   one_grid_dat <- data |>  filter(grid == g)
   
   #linear model
-  lm <- lm(as.formula(formula), 
-           data = one_grid_dat)
+  lm <- glmmTMB(as.formula(formula), 
+           data = one_grid_dat, family= t_family(link = "identity"))
   one_grid_resid <- c(resid(lm))
   
   
