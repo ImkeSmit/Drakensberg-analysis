@@ -132,6 +132,34 @@ ggsave("Figures//SES_WHG7.png", grid_SES_WHG7, device = png, height = 900, units
 
 
 ####Variable importance####
+#import results from subsampled glmmTMB models
+height_mod <- read.csv("All_data/comm_assembly_results/glmmTMB_subsampled_SES_height_env_model_results.csv")
+colnames(height_mod) = c("variable", "estimate", "std_eror","z_value", "p_value", "var_imp")
+SLA_mod <- read.csv("All_data/comm_assembly_results/glmmTMB_subsampled_SES_SLA_env_model_results.csv")
+colnames(SLA_mod) = c("variable", "estimate", "std_eror","z_value", "p_value", "var_imp")
+
+imp_H <- height_mod$var_imp[3:8]
+imp_SLA <- SLA_mod$var_imp[3:8]
+
+l3 <- c("imp_H" = "SES of plant height", "imp_SLA" = "SES of SLA")
+
+var_imp <- data.frame(var = c("elevation", "rock cover", "northness","soil moisture","soil depth" ,"slope height" ), 
+                      imp_H = importance, imp_SLA = importance_SLA, row.names = NULL) |> 
+  arrange(imp_H) |> 
+  pivot_longer(!var, names_to = "trait", values_to = "var_imp") |>
+  arrange(trait, var_imp) |> 
+  ggplot(aes(x = var, y = var_imp)) +
+  geom_bar(stat = "identity")+
+  facet_wrap(~trait, strip.position = "top", labeller = as_labeller(l3), scales = "free")+
+  labs(x = "", y = "Variable importance")+
+  coord_flip() +
+  theme_bw() +
+  theme(axis.title = element_text(size = 18), 
+        axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
+        strip.background = element_blank(),
+        strip.placement = "outside", panel.grid = element_blank())
+ggsave(var_imp, filename = "variable_importance_poster.png", path = "Figures", width = 1800, units = "px")
+
 
 
 
