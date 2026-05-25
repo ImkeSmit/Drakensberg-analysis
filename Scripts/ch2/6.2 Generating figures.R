@@ -283,6 +283,13 @@ SLAdat_subs<- select_independent_cells(SLAdat, grid_var = "grid", x = "x_coord",
 ##Bind together
 all_subs <- bind_rows(Hdat_subs, SLAdat_subs)
 
+#labels
+l1 <- c("Height_cm" = "SES~of~plant~height", "SLA" = "SES~of~SLA")
+ridges_letters <- data.frame(trait = c(rep("Height_cm", 3), rep("SLA", 3)), 
+                             elevation = as.factor(c(rep(c("2000", "2500", "3000"), 2))),
+                             letters = c("a", "b", "a", "a", "b", "a"), 
+                             x_pos = c(6.5,6.5,6.5,4,4,4))
+
 
 ses_ridges_subsampled <- all_subs |>
   filter(trait %in% c("Height_cm", "SLA")) |> 
@@ -292,10 +299,10 @@ ses_ridges_subsampled <- all_subs |>
              strip.position = "bottom")+
   labs(x = " ", y = "Elevation (m a.s.l.)") +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 18))+
   theme_bw() +
-  theme(legend.position = "none", axis.title = element_text(size = 18), 
-        axis.text = element_text(size = 16), strip.text = element_text(size = 18), 
+  theme(legend.position = "none", axis.title = element_text(size = 20), 
+        axis.text = element_text(size = 18), strip.text = element_text(size = 20), 
         strip.background = element_blank(),
         strip.placement = "outside", panel.grid = element_blank()) 
 ggsave(ses_ridges_subsampled, filename = "SES_elevation_subsampled.png", path = "Figures", 
