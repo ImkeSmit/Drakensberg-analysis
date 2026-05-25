@@ -1,5 +1,5 @@
 ####Script to generate figures for posters and publications####
-library(ggplot)
+library(ggplot2)
 library(ggridges)
 library(tidyverse)
 library(ggh4x)
@@ -165,9 +165,6 @@ ggsave(var_imp_panes, filename = "variable_importance_poster.png", path = "Figur
 
 
 
-
-
-
 #####SES ~ elevation ridges####
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
@@ -259,6 +256,50 @@ ses_ridges <- comb2 |>
         strip.placement = "outside", panel.grid = element_blank()) 
 ggsave(ses_ridges, filename = "SES_elevation_poster.png", path = "Figures")
 
+
+####SES ridges on subsampled data####
+##subsample cells
+Hdat <- comb2 |> 
+  filter(trait %in% c("Height_cm", NA)) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
+  arrange(y_coord, x_coord) |> 
+  mutate(trait = "Height_cm",  #give all records a trait
+         grid = as.factor(paste0(site, grid)), 
+         pos = numFactor(x_coord, y_coord))
+
+Hdat_subs<- select_independent_cells(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
+                                     max_search_radius = 2)
+
+#also for SLA
+SLAdat <- comb2 |> 
+  filter(trait %in% c("SLA", NA)) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
+  arrange(y_coord, x_coord) |> 
+  mutate(trait = "SLA",  #give all records a trait
+         grid = as.factor(paste0(site, grid)), 
+         pos = numFactor(x_coord, y_coord))
+
+SLAdat_subs<- select_independent_cells(SLAdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
+                                       max_search_radius = 2)
+
+##Bind together
+all_subs <- bind_rows(Hdat_subs, SLAdat_subs)
+
+
+ses_ridges_subsampled <- all_subs |>
+  filter(trait %in% c("Height_cm", "SLA")) |> 
+  ggplot(aes(x = SES, y = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", 
+             strip.position = "bottom")+
+  labs(x = " ", y = "Elevation (m a.s.l.)") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  theme_bw() +
+  theme(legend.position = "none", axis.title = element_text(size = 18), 
+        axis.text = element_text(size = 16), strip.text = element_text(size = 18), 
+        strip.background = element_blank(),
+        strip.placement = "outside", panel.grid = element_blank()) 
+ggsave(ses_ridges_subsampled, filename = "SES_elevation_subsampled.png", path = "Figures", 
+       width = 2300, height = 1400, units = "px")
 
 
 
