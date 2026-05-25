@@ -144,41 +144,7 @@ colnames(SLA_mod) = c("variable", "estimate", "std_eror","z_value", "p_value", "
 imp_H <- height_mod$var_imp[3:8]
 imp_SLA <- SLA_mod$var_imp[3:8]
 
-l3 <- c("imp_H" = "SES of plant height", "imp_SLA" = "SES of SLA")
-
-var_imp <- data.frame(var = c("elevation", "rock cover", "northness","soil moisture","soil depth" ,"slope height" ), 
-                      imp_H = imp_H, imp_SLA = imp_SLA, row.names = NULL) |> 
-  arrange(imp_H) |> 
-  pivot_longer(!var, names_to = "trait", values_to = "var_imp") |>
-  arrange(trait, var_imp) |> 
-  mutate(varlabel = if_else(trait == "imp_SLA", "", var)) |> 
-  ggplot(aes(x = var, y = var_imp)) +
-  geom_bar(stat = "identity")+
-  facet_wrap2(~trait, strip.position = "top", labeller = as_labeller(l3),
-             scales = "free", axes = "all", remove_labels = "y")+
-  labs(x = "", y = "Variable importance")+
-  coord_flip() +
-  theme_bw() +
-  theme(axis.title = element_text(size = 18), 
-        axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
-        strip.background = element_blank(),
-        strip.placement = "outside", panel.grid = element_blank())
-ggsave(var_imp, filename = "variable_importance_poster.png", path = "Figures", width = 1800, units = "px")
-
-
-imp_H_only <- data.frame(var = c("elevation", "rock cover", "northness","soil moisture","soil depth" ,"slope height" ), 
-                         imp_H = imp_H, row.names = NULL) |> 
-  ggplot(aes(x = var, y = imp_H)) +
-  geom_bar(stat = "identity")+
-  labs(x = "", y = "Variable importance", title = "SES of plant Height")+
-  scale_y_continuous(labels = label_number(accuracy = 0.01))+
-  coord_flip() +
-  theme_bw() +
-  theme(axis.title = element_text(size = 18), 
-        axis.text = element_text(size = 16), title = element_text(size = 20), 
-        panel.grid = element_blank())
-
-
+#make the figure by combining two figures:
 imp_SLA_only <- data.frame(var = c("elevation", "rock cover", "northness","soil moisture","soil depth" ,"slope height" ), 
                          imp_SLA = imp_SLA, row.names = NULL) |> 
   ggplot(aes(x = var, y = imp_SLA)) +
