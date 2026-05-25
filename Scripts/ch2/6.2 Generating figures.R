@@ -2,6 +2,9 @@
 library(ggplot)
 library(ggridges)
 library(tidyverse)
+library(ggh4x)
+library(ggpubr)
+library(scales)
 
 ####Hypothesis figure SES~elevation####
 #generate fake data
@@ -144,13 +147,15 @@ imp_SLA <- SLA_mod$var_imp[3:8]
 l3 <- c("imp_H" = "SES of plant height", "imp_SLA" = "SES of SLA")
 
 var_imp <- data.frame(var = c("elevation", "rock cover", "northness","soil moisture","soil depth" ,"slope height" ), 
-                      imp_H = importance, imp_SLA = importance_SLA, row.names = NULL) |> 
+                      imp_H = imp_H, imp_SLA = imp_SLA, row.names = NULL) |> 
   arrange(imp_H) |> 
   pivot_longer(!var, names_to = "trait", values_to = "var_imp") |>
   arrange(trait, var_imp) |> 
+  mutate(varlabel = if_else(trait == "imp_SLA", "", var)) |> 
   ggplot(aes(x = var, y = var_imp)) +
   geom_bar(stat = "identity")+
-  facet_wrap(~trait, strip.position = "top", labeller = as_labeller(l3), scales = "free")+
+  facet_wrap2(~trait, strip.position = "top", labeller = as_labeller(l3),
+             scales = "free", axes = "all", remove_labels = "y")+
   labs(x = "", y = "Variable importance")+
   coord_flip() +
   theme_bw() +
@@ -161,6 +166,35 @@ var_imp <- data.frame(var = c("elevation", "rock cover", "northness","soil moist
 ggsave(var_imp, filename = "variable_importance_poster.png", path = "Figures", width = 1800, units = "px")
 
 
+imp_H_only <- data.frame(var = c("elevation", "rock cover", "northness","soil moisture","soil depth" ,"slope height" ), 
+                         imp_H = imp_H, row.names = NULL) |> 
+  ggplot(aes(x = var, y = imp_H)) +
+  geom_bar(stat = "identity")+
+  labs(x = "", y = "Variable importance", title = "SES of plant Height")+
+  scale_y_continuous(labels = label_number(accuracy = 0.01))+
+  coord_flip() +
+  theme_bw() +
+  theme(axis.title = element_text(size = 18), 
+        axis.text = element_text(size = 16), title = element_text(size = 20), 
+        panel.grid = element_blank())
+
+
+imp_SLA_only <- data.frame(var = c("elevation", "rock cover", "northness","soil moisture","soil depth" ,"slope height" ), 
+                         imp_SLA = imp_SLA, row.names = NULL) |> 
+  ggplot(aes(x = var, y = imp_SLA)) +
+  geom_bar(stat = "identity")+
+  labs(x = "", y = "Variable importance", title = "SES of SLA")+
+  scale_y_continuous(labels = label_number(accuracy = 0.01))+
+  coord_flip() +
+  theme_bw() +
+  theme(axis.title = element_text(size = 18), 
+        axis.text.y = element_blank(), axis.text.x = element_text(size = 16),
+        title = element_text(size = 20), 
+        panel.grid = element_blank())
+
+var_imp_panes <- ggarrange(imp_H_only, imp_SLA_only, ncol = 2, nrow = 1, widths = c(1.5,1))
+ggsave(var_imp_panes, filename = "variable_importance_poster.png", path = "Figures", 
+       width = 2300, height = 1400, units = "px")
 
 
 
