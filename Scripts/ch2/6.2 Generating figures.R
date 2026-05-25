@@ -70,6 +70,8 @@ one_grid_raster <- function(data, variable, g) {
   #end function
 }
 
+
+###Environmental grid####
 ##import environmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
   mutate(elevation = case_when(grepl("BK", Cell_ID) == T ~ "3000", #add elevation variable
@@ -91,13 +93,50 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
 
 WHG7_rock_r <- one_grid_raster(data = env, variable = "rock_cover", g = "WHG7")
 
-grid_rock_WHG7 <- ggplot(WHG7_rock_r, aes(row, ncolumn, fill = rock_cover))+
-  geom_raster()+
+grid_rock_WHG7 <- ggplot(WHG7_rock_r, aes(y = row, x = ncolumn, fill = rock_cover))+
+  geom_tile(color = "black", linewidth = 0.5)+
   scale_fill_gradient(low = "white", high = "darkorange2", na.value = "pink")+
+  coord_fixed(ratio = 1)+
   theme_void()+
-  labs(x = " ", y = " ", fill = "Rock cover (%)")  +
-  theme(legend.text = element_text(size = 16), legend.title = element_text(size = 20))
-ggsave("Figures//rock_cover_WHG7.png", grid_rock_WHG7, device = png, width = 2000, units = "px")
+  labs(x = " ", y = " ", fill = " ", title = "Rock cover (%)")  +
+  theme(legend.text = element_text(size = 17), legend.title = element_text(size = 20), 
+        title = element_text(size = 18))
+ggsave("Figures//rock_cover_WHG7.png", grid_rock_WHG7, device = png, height = 900, units = "px")
+
+
+####SES grid####
+cell_ses_height <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
+  mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
+                               grepl("WH", cellref) == T ~ "2500",
+                               grepl("GG", cellref) == T ~ "2000",.default = NA)) |> 
+  separate_wider_delim(cellref, delim = "_", names = c("site", "grid", "cell"), cols_remove = F) |> 
+  mutate(grid = paste0(site, grid), 
+         column = substr(cell, 1,1), 
+         row = substr(cell, 2,3),
+         ncolumn = match(column, LETTERS[1:8])) |> 
+  filter(trait == "Height_cm") #map SES of height
+
+
+WHG7_SES_r <- one_grid_raster(data = cell_ses_height, variable = "SES", g = "WHG7")
+
+grid_SES_WHG7 <- ggplot(WHG7_SES_r, aes(y = row, x = ncolumn, fill = SES))+
+  geom_tile(color = "black", linewidth = 0.5)+
+  scale_fill_gradient2(low = "blue3", mid = "white", high = "darkorange2", na.value = "black")+
+  coord_fixed(ratio = 1)+
+  theme_void()+
+  labs(x = " ", y = " ",fill = " ", title = "SES")  +
+  theme(legend.text = element_text(size = 16), legend.title = element_text(size = 20), 
+        title = element_text(size = 18))
+ggsave("Figures//SES_WHG7.png", grid_SES_WHG7, device = png, height = 900, units = "px")
+
+
+
+####Variable importance####
+
+
+
+
+
 
 
 
