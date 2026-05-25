@@ -329,3 +329,69 @@ var_imp <- data.frame(var = c("elevation", "rock cover", "northness","soil moist
         strip.background = element_blank(),
         strip.placement = "outside", panel.grid = element_blank())
 ggsave(var_imp, filename = "variable_importance_poster.png", path = "Figures", width = 1800, units = "px")
+
+
+
+####CWm ridges####
+#import trait and abundance data
+abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
+
+mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
+
+
+#compute CWM of each trait for each cell
+library(FD)
+cwm <- functcomp(x = mean_traits, a = as.matrix(abun_matrix))
+cwm <- cwm |>
+  rownames_to_column(var = "cellref") |> 
+  mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
+                               grepl("WH", cellref) == T ~ "2500",
+                               grepl("GG", cellref) == T ~ "2000",.default = NA)) |> 
+  pivot_longer(cols = c("Height_cm", "LDMC", "Leaf_area_mm2", "SLA", "Thickness_mm"), names_to = "trait", values_to = "cwm_value")
+cwm$elevation <- as.factor(cwm$elevation) 
+
+##Graph
+l1 <- c("Height_cm" = "Plant~height~(cm)", "SLA" = "SLA~(mm^2/mg)")
+
+trait_ridges <- cwm |>
+  filter(trait %in% c("Height_cm", "SLA")) |> 
+  ggplot(aes(x = cwm_value, y = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", strip.position = "bottom")+
+  labs(x = "", y = "Elevation (m a.s.l.)") +
+  #geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  theme_bw() +
+  theme(legend.position = "none", axis.title = element_text(size = 18), 
+        axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
+        strip.background = element_blank(),
+        strip.placement = "outside", panel.grid = element_blank()) 
+ggsave(trait_ridges, filename = "trait_elevation_poster.png", path = "Figures")
+
+
+###Subset for the cells used in analysis
+included <- all_subs |> 
+  group_by(trait) |> 
+  distinct(Cell_ID) |> 
+  rename(cellref = Cell_ID)
+
+cwm_subs <- cwm |> 
+  inner_join(included, by = c("trait", "cellref"))
+
+
+##Graph
+l1 <- c("Height_cm" = "Plant~height~(cm)", "SLA" = "SLA~(mm^2/mg)")
+
+trait_ridges_subsampled <- cwm_subs |>
+  filter(trait %in% c("Height_cm", "SLA")) |> 
+  ggplot(aes(x = cwm_value, y = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", strip.position = "bottom")+
+  labs(x = "", y = "Elevation (m a.s.l.)") +
+  #geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  theme_bw() +
+  theme(legend.position = "none", axis.title = element_text(size = 20), 
+        axis.text = element_text(size = 18), strip.text = element_text(size = 20), 
+        strip.background = element_blank(),
+        strip.placement = "outside", panel.grid = element_blank()) 
+ggsave(trait_ridges_subsampled, filename = "trait_elevation_poster_subsampled.png", path = "Figures", 
+       width = 2300, height = 1400, units = "px")
