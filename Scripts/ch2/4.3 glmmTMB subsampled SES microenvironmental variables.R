@@ -96,8 +96,7 @@ Hdat <- comb2 |>
 #Run Function_select_independent_cells.R
 Hdat_subs<- select_independent_cells(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
                                 max_search_radius = 2)
-#There are grids with only 2 cells included, perhaps having a max lag threshold of 6 is too much.
-#lets look at the ones with few cells
+
 
 ##GG6
 GG6_subs <- Hdat_subs |> 
@@ -170,7 +169,7 @@ tmod1_res <- simulateResiduals(tmod1)
 plot(tmod1_res) #looks ok...
 #sample size large enough with t family if lag threshold = 4 and search radius = 2
 
-r.squaredGLMM(tmod1_update) #0.1158696 0.1234497
+r.squaredGLMM(tmod1) #0.09365263 0.1094613
 
 
 em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
@@ -198,10 +197,12 @@ importance <- sapply(predictors, function(var) {
   
 })
 sort(importance, decreasing = T)
+##Some models not converging, how to fix???
 
 #save results
-tmod1_results <-as.data.frame(summary(tmod1_update)$coefficients$cond)
+tmod1_results <-as.data.frame(summary(tmod1)$coefficients$cond)
 tmod1_results$variable_importance <- c(0,0,importance)
+tmod1_results$letters <- 
 write.csv(tmod1_results, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_height_env_model_results.csv")
 
 
@@ -220,23 +221,31 @@ SLAdat <- comb2 |>
 #=====sample uncorrelated cells===####
 #Run Function_select_independent_cells.R
 SLAdat_subs<- select_independent_cells(SLAdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
-                                     max_search_radius = 2, lag_threshold = 4)
-#between 10 and 5 cells per grid
-#lets look at the ones with few cells
+                                     max_search_radius = 2)
 
-##GG7
-GG7_subs <- SLAdat_subs |> 
-  filter(grid == "GG7") |> 
+data_filled <- impute_cells(df = SLAdat, 
+                            cols_to_impute = colnames(SLAdat)[c(25, 31:35)], 
+                            neighbours = 4)
+
+#WH5 has 64 cells, lets look at the correlation structure
+grid_correlation_structure(grid_vector = c(unique(data_filled$grid)), data_filled, 
+                           formula = "SES ~ zrock_cover + znorthness + zsoil_moist + zsoil_depth + zslope_height", 
+                          k_specified = 4)
+#Jup, WH5 already has nonsigificant lag at 1
+
+##WH5
+WH5_subs <- SLAdat_subs |> 
+  filter(grid == "WH5") |> 
   dplyr::select(Cell_ID)
 
-GG7_full <- SLAdat |> 
-  filter(grid == "GG7") |> 
-  mutate(chosen = case_when(Cell_ID %in% c(GG7_subs$Cell_ID) ~ "yes",
+WH5_full <- SLAdat |> 
+  filter(grid == "WH5") |> 
+  mutate(chosen = case_when(Cell_ID %in% c(WH5_subs$Cell_ID) ~ "yes",
                             is.na(SES) ~ "NA",
                             .default = "no"))
 
 ggplot() +
-  geom_tile(data = GG7_full, aes(row, ncolumn, fill = chosen), 
+  geom_tile(data = WH5_full, aes(row, ncolumn, fill = chosen), 
             colour = "white", linewidth = 0.4) +
   scale_fill_manual(values = c(
     "no"             = "orange",
@@ -251,7 +260,7 @@ tmod2<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil
                 family = t_family(link = "identity"), data = SLAdat_subs)
 summary(tmod2)
 tmod2_res <- simulateResiduals(tmod2)
-plot(tmod2_res) #looks very good!
+plot(tmod2_res) #looks ok!
 
 #test for spatial autocorrelation
 used_rows <- as.integer(rownames(model.frame(tmod2)))
@@ -263,7 +272,7 @@ em_tmod2 <- emmeans(tmod2, specs = "elevation", type = "response")
 cld(em_tmod2, Letters = letters, adjust = "Tukey")
 #2500 elevation has higher SES than other two
 
-r.squaredGLMM(tmod2)
+r.squaredGLMM(tmod2) #[1,] 0.221175 0.2699643
 
 ##Variable importance:##
 R2full<- r.squaredGLMM(tmod2)[[1]]
