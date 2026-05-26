@@ -185,17 +185,20 @@ testSpatialAutocorrelation(tmod1_res, x = dat_used$x_coord, y = dat_used$y_coord
 R2full<- r.squaredGLMM(tmod1)[[1]]
 
 predictors <- c("elevation", "zrock_cover", "znorthness","zsoil_moist","zsoil_depth" ,"zslope_height" )
+importance <- c(rep(NA, length(predictors)))
+names(importance) <- predictors
 
-importance <- sapply(predictors, function(var) {
-  # Refit without this variable
+for(var in predictors) {
   f <- as.formula(paste("SES ~", paste(setdiff(predictors, var), collapse = " + "), "+ (1|grid)"))
+  
   m_drop <- glmmTMB(f, data = Hdat_subs, family = t_family(link = "identity"), REML = FALSE)
   
   r2_drop <- r.squaredGLMM(m_drop)[,"R2m"]
   
-  R2full - r2_drop  # importance = R² lost by removing this variable
+  imp <- R2full - r2_drop  # importance = R² lost by removing this variable
   
-})
+  importance[which(names(importance) == var)] <- imp
+}
 sort(importance, decreasing = T)
 ##Some models not converging, how to fix???
 
