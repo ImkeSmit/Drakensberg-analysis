@@ -145,8 +145,24 @@ imp_H <- height_mod$var_imp[3:8]
 imp_SLA <- SLA_mod$var_imp[3:8]
 
 #make the figure by combining two figures:
+imp_H_only <- data.frame(var = c("elevation", "rock cover", "northness","soil moisture","soil depth" ,"slope height" ), 
+                           imp_H = imp_H, row.names = NULL) |> 
+                          mutate(imp_H = case_when(imp_H<0 ~ 0, .default = imp_H)) |> 
+  ggplot(aes(x = var, y = imp_H)) +
+  geom_bar(stat = "identity")+
+  labs(x = "", y = "Variable importance", title = "SES of plant height")+
+  scale_y_continuous(labels = label_number(accuracy = 0.01))+
+  coord_flip() +
+  theme_bw() +
+  theme(axis.title = element_text(size = 18), 
+        axis.text = element_text(size = 16),
+        title = element_text(size = 20), 
+        panel.grid = element_blank())
+
+
 imp_SLA_only <- data.frame(var = c("elevation", "rock cover", "northness","soil moisture","soil depth" ,"slope height" ), 
                          imp_SLA = imp_SLA, row.names = NULL) |> 
+                          mutate(imp_SLA = case_when(imp_SLA<0 ~ 0, .default = imp_SLA)) |>
   ggplot(aes(x = var, y = imp_SLA)) +
   geom_bar(stat = "identity")+
   labs(x = "", y = "Variable importance", title = "SES of SLA")+
@@ -158,7 +174,7 @@ imp_SLA_only <- data.frame(var = c("elevation", "rock cover", "northness","soil 
         title = element_text(size = 20), 
         panel.grid = element_blank())
 
-var_imp_panes <- ggarrange(imp_H_only, imp_SLA_only, ncol = 2, nrow = 1, widths = c(1.5,1))
+var_imp_panes <- ggarrange(imp_H_only, imp_SLA_only, ncol = 2, nrow = 1, widths = c(1,0.75))
 ggsave(var_imp_panes, filename = "variable_importance_poster.png", path = "Figures", 
        width = 2300, height = 1400, units = "px")
 
