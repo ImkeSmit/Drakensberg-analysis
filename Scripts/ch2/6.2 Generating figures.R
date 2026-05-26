@@ -151,7 +151,7 @@ imp_H_only <- data.frame(var = c("elevation", "rock cover", "northness","soil mo
   ggplot(aes(x = var, y = imp_H)) +
   geom_bar(stat = "identity")+
   labs(x = "", y = "Variable importance", title = "SES of plant height")+
-  scale_y_continuous(labels = label_number(accuracy = 0.01))+
+  scale_y_continuous(labels = label_number(accuracy = 0.01), n.breaks = 3)+
   coord_flip() +
   theme_bw() +
   theme(axis.title = element_text(size = 18), 
