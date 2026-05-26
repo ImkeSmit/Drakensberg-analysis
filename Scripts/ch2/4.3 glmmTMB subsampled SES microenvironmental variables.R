@@ -205,7 +205,6 @@ sort(importance, decreasing = T)
 #save results
 tmod1_results <-as.data.frame(summary(tmod1)$coefficients$cond)
 tmod1_results$variable_importance <- c(0,0,importance)
-tmod1_results$letters <- 
 write.csv(tmod1_results, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_height_env_model_results.csv")
 
 
@@ -278,21 +277,24 @@ cld(em_tmod2, Letters = letters, adjust = "Tukey")
 r.squaredGLMM(tmod2) #[1,] 0.221175 0.2699643
 
 ##Variable importance:##
-R2full<- r.squaredGLMM(tmod2)[[1]]
+R2full<- r.squaredGLMM(tmod1)[[1]]
 
 predictors <- c("elevation", "zrock_cover", "znorthness","zsoil_moist","zsoil_depth" ,"zslope_height" )
+importance <- c(rep(NA, length(predictors)))
+names(importance) <- predictors
 
-importance_SLA <- sapply(predictors, function(var) {
-  # Refit without this variable
+for(var in predictors) {
   f <- as.formula(paste("SES ~", paste(setdiff(predictors, var), collapse = " + "), "+ (1|grid)"))
-  m_drop <- glmmTMB(f, data = SLAdat_subs, family = t_family(link = "identity"), REML = FALSE)
+  
+  m_drop <- glmmTMB(f, data = Hdat_subs, family = t_family(link = "identity"), REML = FALSE)
   
   r2_drop <- r.squaredGLMM(m_drop)[,"R2m"]
   
-  R2full - r2_drop  # importance = R² lost by removing this variable
+  imp <- R2full - r2_drop  # importance = R² lost by removing this variable
   
-})
-sort(importance_SLA, decreasing = T)
+  importance[which(names(importance) == var)] <- imp
+}
+sort(importance, decreasing = T)
 #save results
 tmod2_results <-as.data.frame(summary(tmod2)$coefficients$cond)
 tmod2_results$variable_importance <- c(0,0,importance_SLA)
