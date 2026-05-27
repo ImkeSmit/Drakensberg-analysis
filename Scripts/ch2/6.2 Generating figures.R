@@ -156,7 +156,7 @@ imp_H_only <- data.frame(var = c("elevation", "rock cover", "northness","soil mo
   theme_bw() +
   theme(axis.title = element_text(size = 18), 
         axis.text = element_text(size = 16),
-        title = element_text(size = 20), 
+        title = element_text(size = 16), 
         panel.grid = element_blank())
 
 
@@ -171,7 +171,7 @@ imp_SLA_only <- data.frame(var = c("elevation", "rock cover", "northness","soil 
   theme_bw() +
   theme(axis.title = element_text(size = 18), 
         axis.text.y = element_blank(), axis.text.x = element_text(size = 16),
-        title = element_text(size = 20), 
+        title = element_text(size = 16), 
         panel.grid = element_blank())
 
 var_imp_panes <- ggarrange(imp_H_only, imp_SLA_only, ncol = 2, nrow = 1, widths = c(1,0.75))
