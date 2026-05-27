@@ -5,6 +5,7 @@ library(tidyverse)
 library(ggh4x)
 library(ggpubr)
 library(scales)
+library(glmmTMB)
 
 ####Hypothesis figure SES~elevation####
 #generate fake data
@@ -375,7 +376,7 @@ trait_ridges <- cwm |>
   geom_density_ridges(alpha = 0.5) +
   facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", strip.position = "bottom")+
   labs(x = "", y = "Elevation (m a.s.l.)") +
-  #geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  scale_x_continuous(breaks = c(0,25,50))+
   theme_bw() +
   theme(legend.position = "none", axis.title = element_text(size = 18), 
         axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
@@ -403,7 +404,7 @@ trait_ridges_subsampled <- cwm_subs |>
   geom_density_ridges(alpha = 0.5) +
   facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", strip.position = "bottom")+
   labs(x = "", y = "Elevation (m a.s.l.)") +
-  #geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  scale_x_continuous(breaks = c(0,25,50))+
   theme_bw() +
   theme(legend.position = "none", axis.title = element_text(size = 20), 
         axis.text = element_text(size = 18), strip.text = element_text(size = 20), 
