@@ -314,6 +314,7 @@ tmod2<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil
                   zslope_height + (1|grid), 
                 family = t_family(link = "identity"), data = SLAdat_subs)
 summary(tmod2)
+Anova(tmod2)
 tmod2_res <- simulateResiduals(tmod2)
 plot(tmod2_res) #looks ok!
 
@@ -353,6 +354,59 @@ tmod2_results <-as.data.frame(summary(tmod2)$coefficients$cond)
 tmod2_results$variable_importance <- c(0,0,importance_SLA)
 write.csv(tmod2_results, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_SLA_env_model_results.csv")
 
+# --- Get all results ---
+output_file <- "All_data/comm_assembly_results/glmmTMB_subsampled_SES_SLA_model_results.txt"
+sink(output_file)
+
+# ── 1. Model Formula ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  MODEL FORMULA\n")
+cat("===========================================\n")
+print(formula(tmod2))
+cat("\n\n")
+
+# ── 2. Summary Table ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  MODEL SUMMARY\n")
+cat("===========================================\n")
+print(summary(tmod2))
+cat("\n\n")
+
+
+# ── 2. R squared ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  R SQUARED\n")
+cat("===========================================\n")
+print(r.squaredGLMM(tmod2))
+cat("\n\n")
+
+
+# ── 3. ANOVA Table ────────────────────────────────────────────
+cat("===========================================\n")
+cat("  ANOVA TABLE\n")
+cat("===========================================\n")
+print(Anova(tmod2))
+cat("\n\n")
+
+# ── 4. EMmeans Table ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  ESTIMATED MARGINAL MEANS (emmeans)\n")
+cat("===========================================\n")
+em_tmod2 <- emmeans(tmod2, specs = "elevation", type = "response")
+cld(em_tmod2, Letters = letters, adjust = "Tukey")
+print(em_tmod2)
+cat("\n")
+
+
+# ── 4. Variable importance ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  VARIABLE IMPORTANCE \n")
+cat("===========================================\n")
+print(sort(importance_SLA, decreasing = T))
+cat("\n")
+
+# --- Close the sink ---
+sink()
 
 
 
