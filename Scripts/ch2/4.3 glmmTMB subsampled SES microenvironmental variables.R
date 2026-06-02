@@ -148,6 +148,26 @@ Hdat_subs |>
   theme_bw()
 
 
+###===Descriptive stats SES Height===###
+#ncells
+length(unique(Hdat_subs$Cell_ID)) #196
+
+#nspecies
+included_cells <- (unique(Hdat_subs$Cell_ID))
+
+abun_matrix <- read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
+mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
+
+subs_abun_matrix<- abun_matrix[rownames(abun_matrix) %in% c(included_cells), ]
+subs_abun_matrix2 <- subs_abun_matrix[, colSums(subs_abun_matrix) > 0, drop = F]
+
+nsp <- ncol(subs_abun_matrix2) #138
+
+#how many sp from each site? 
+incl_sp <- c(colnames(subs_abun_matrix2))
+
+
+
 ###===Model===####
 tmod1<- glmmTMB(SES ~ elevation + zrock_cover +  znorthness + zsoil_moist + zsoil_depth + 
                   zslope_height + (1|grid), 
