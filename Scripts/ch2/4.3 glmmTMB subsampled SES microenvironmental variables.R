@@ -97,6 +97,10 @@ Hdat <- comb2 |>
 Hdat_subs<- select_independent_cells(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
                                 max_search_radius = 2)
 
+#Save the cells that we use
+Height_incl_cells <- data.frame(trait = "Height_cm", included_cells = c(unique(Hdat_subs$Cell_ID)))
+write.csv(Height_incl_cells, "All_data/comm_assembly_results/included_cells_Height.csv")
+
 
 ##GG6
 GG6_subs <- Hdat_subs |> 
