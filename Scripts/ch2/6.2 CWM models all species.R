@@ -17,12 +17,25 @@ mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.na
 #compute CWM of each trait for each cell
 cwm <- functcomp(x = mean_traits, a = as.matrix(abun_matrix))
 cwm <- cwm |>
-  rownames_to_column(var = "cellref") |> 
-  mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
-                               grepl("WH", cellref) == T ~ "2500",
-                               grepl("GG", cellref) == T ~ "2000",.default = NA)) |> 
+  rownames_to_column(var = "Cell_ID") |> 
+  mutate(elevation = case_when(grepl("BK", Cell_ID) == T ~ "3000", #add elevation variable
+                               grepl("WH", Cell_ID) == T ~ "2500",
+                               grepl("GG", Cell_ID) == T ~ "2000",.default = NA)) |> 
   pivot_longer(cols = c("Height_cm", "LDMC", "Leaf_area_mm2", "SLA", "Thickness_mm"), names_to = "trait", values_to = "cwm_value")
 cwm$elevation <- as.factor(cwm$elevation)  
+
+###Subset CWM to include cells that we have SES for
+Height_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_Height.csv", row.names = 1) |> 
+  rename(Cell_ID = included_cells)
+
+cwm_H <- cwm |> 
+  inner_join (Height_incl_cells, by = c("trait", "Cell_ID"))
+
+
+###===Model CWM Height ~ elevation===###
+
+
+
 
 ###Figures of cwm####
 ##All traits
