@@ -152,7 +152,7 @@ Hdat_subs |>
   theme_bw()
 
 
-###===Descriptive stats SES Height===###
+###===Descriptive stats SES Height===####
 #ncells
 length(unique(Hdat_subs$Cell_ID)) #196
 
@@ -189,6 +189,7 @@ tmod1<- glmmTMB(SES ~ elevation + zrock_cover +  znorthness + zsoil_moist + zsoi
 
 
 summary(tmod1)
+Anova(tmod1)
 tmod1_res <- simulateResiduals(tmod1)
 plot(tmod1_res) #looks ok...
 #sample size large enough with t family if lag threshold = 4 and search radius = 2
@@ -229,10 +230,12 @@ sort(importance, decreasing = T)
 #save results
 tmod1_results <-as.data.frame(summary(tmod1)$coefficients$cond)
 tmod1_results$variable_importance <- c(0,0,importance)
+tmod1_results$emmean <- c(-0.238,-0.437, -0.301, 0,0,0,0,0)
+tmod1_results$em_std_er <- c(0.0527,0.0290,0.0279,0,0,0,0,0)
 model <- paste(as.character(formula(tmod1))[[2]], as.character(formula(tmod1))[[1]],as.character(formula(tmod1))[[3]],
-             "; ", "family = " , 
-             as.character(family(tmod1)[[1]]), "link = ", 
-             as.character(family(tmod1)[[3]]))
+               "; ", "family = " , 
+               as.character(family(tmod1)[[1]]), "link = ", 
+               as.character(family(tmod1)[[3]]))
 tmod1_results$model <- model
 write.csv(tmod1_results, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_height_env_model_results.csv")
 
@@ -254,6 +257,11 @@ SLAdat <- comb2 |>
 SLAdat_subs<- select_independent_cells(SLAdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
                                      max_search_radius = 2)
 
+#Save the cells that we use
+SLA_incl_cells <- data.frame(trait = "SLA", included_cells = c(unique(SLAdat_subs$Cell_ID)))
+write.csv(SLA_incl_cells, "All_data/comm_assembly_results/included_cells_SLA.csv")
+
+#check sampling:
 data_filled <- impute_cells(df = SLAdat, 
                             cols_to_impute = colnames(SLAdat)[c(25, 31:35)], 
                             neighbours = 4)
@@ -284,8 +292,24 @@ ggplot() +
     "yes"              = "green"))
 
 
+###===Descriptive stats SES SLA===####
+#ncells
+length(unique(SLAdat_subs$Cell_ID)) #345
 
-#====Model====#
+#nspecies
+included_cells <- (unique(SLAdat_subs$Cell_ID))
+
+abun_matrix <- read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
+mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
+
+subs_abun_matrix<- abun_matrix[rownames(abun_matrix) %in% c(included_cells), ]
+subs_abun_matrix2 <- subs_abun_matrix[, colSums(subs_abun_matrix) > 0, drop = F]
+
+nsp <- ncol(subs_abun_matrix2) #144
+
+
+
+#====Model====#####
 tmod2<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
                   zslope_height + (1|grid), 
                 family = t_family(link = "identity"), data = SLAdat_subs)
