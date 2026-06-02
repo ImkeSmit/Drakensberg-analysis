@@ -276,26 +276,30 @@ ggsave(ses_ridges, filename = "SES_elevation_poster.png", path = "Figures")
 
 ####SES ridges on subsampled data####
 ##subsample cells
+Height_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_Height.csv", row.names = 1) |> 
+  rename(Cell_ID = included_cells)
+
 Hdat <- comb2 |> 
   filter(trait %in% c("Height_cm", NA)) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
   arrange(y_coord, x_coord) |> 
   mutate(trait = "Height_cm",  #give all records a trait
          grid = as.factor(paste0(site, grid)), 
-         pos = numFactor(x_coord, y_coord))
+         pos = numFactor(x_coord, y_coord)) |> 
+  inner_join(Height_incl_cells, by = c("trait", "Cell_ID"))
 
-Hdat_subs<- select_independent_cells(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
-                                     max_search_radius = 2)
 
 #also for SLA
+SLA_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_SLA.csv", row.names = 1) |> 
+  rename(Cell_ID = included_cells)
+
 SLAdat <- comb2 |> 
   filter(trait %in% c("SLA", NA)) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
   arrange(y_coord, x_coord) |> 
   mutate(trait = "SLA",  #give all records a trait
          grid = as.factor(paste0(site, grid)), 
-         pos = numFactor(x_coord, y_coord))
+         pos = numFactor(x_coord, y_coord)) |> 
+  inner_join(SLA_incl_cells, by = c("trait", "Cell_ID"))
 
-SLAdat_subs<- select_independent_cells(SLAdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
-                                       max_search_radius = 2)
 
 ##Bind together
 all_subs <- bind_rows(Hdat_subs, SLAdat_subs)
@@ -305,17 +309,66 @@ l1 <- c("Height_cm" = "SES~of~plant~height", "SLA" = "SES~of~SLA")
 ridges_letters <- data.frame(trait = c(rep("Height_cm", 3), rep("SLA", 3)), 
                              elevation = as.factor(c(rep(c("2000", "2500", "3000"), 2))),
                              letters = c("a", "b", "a", "a", "b", "a"), 
-                             x_pos = c(6.5,6.5,6.5,4,4,4))
+                             x_pos = c(6.5,6.5,6.5,4,4,4), 
+                             emmean = c(-0.238, -0.437, -0.301, -0.8908, -0.0923, -0.7040), #type over from results table
+                             emmean_SE = c(0.0527, 0.0290, 0.0279, 0.114, 0.125, 0.106))
+
+# Interpolate density height at each group's mean
+segments_df <- all_subs %>%
+  filter(trait %in% c("Height_cm", "SLA")) %>%
+  group_by(trait, elevation) %>%
+  summarise(
+    mean_val = mean(SES),
+    dens_x = list(density(SES)$x),
+    dens_y = list(density(SES)$y),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    # Interpolate height at the mean
+    mean_y_raw = mapply(function(dx, dy, mx) approx(dx, dy, xout = mx)$y,
+                        dens_x, dens_y, mean_val),
+    # Get the max density per ridge — same normalisation ggridges uses
+    max_y_raw  = sapply(dens_y, max),
+    # Scale so that max density = scale parameter (set scale = 1 in geom_density_ridges)
+    mean_y_scaled = (mean_y_raw / max_y_raw) * 1,  # 0.9 gives a small safety margin
+    emmean = c(-0.238, -0.437, -0.301, -0.8908, -0.0923, -0.7040),
+    emmean_SE = c(0.0527, 0.0290, 0.0279, 0.114, 0.125, 0.106)
+  )
 
 
 ses_ridges_subsampled <- all_subs |>
   filter(trait %in% c("Height_cm", "SLA")) |> 
   ggplot(aes(x = SES, y = elevation)) +
-  geom_density_ridges(alpha = 0.5) +
+  geom_density_ridges(alpha = 0.5, scale = 1) +
+  geom_segment(
+    data = segments_df,
+    aes(
+      x    = emmean,
+      xend = emmean,
+      y    = as.numeric(elevation),
+      yend = as.numeric(elevation) + mean_y_scaled),
+    linewidth = 0.8)+
+  geom_segment(
+    data = segments_df,
+    aes(
+      x    = emmean+emmean_SE,
+      xend = emmean+emmean_SE,
+      y    = as.numeric(elevation),
+      yend = as.numeric(elevation) + mean_y_scaled),
+    linewidth = 0.5, linetype = "dashed")+
+  geom_segment(
+    data = segments_df,
+    aes(
+      x    = emmean-emmean_SE,
+      xend = emmean-emmean_SE,
+      y    = as.numeric(elevation),
+      yend = as.numeric(elevation) + mean_y_scaled),
+    linewidth = 0.5, linetype = "dashed")+
+  
   facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", 
              strip.position = "bottom")+
   labs(x = " ", y = "Elevation (m a.s.l.)") +
-  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = 0, colour = "red") +
   geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 18))+
   theme_bw() +
   theme(legend.position = "none", axis.title = element_text(size = 20), 
