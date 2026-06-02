@@ -229,6 +229,11 @@ sort(importance, decreasing = T)
 #save results
 tmod1_results <-as.data.frame(summary(tmod1)$coefficients$cond)
 tmod1_results$variable_importance <- c(0,0,importance)
+model <- paste(as.character(formula(tmod1))[[2]], as.character(formula(tmod1))[[1]],as.character(formula(tmod1))[[3]],
+             "; ", "family = " , 
+             as.character(family(tmod1)[[1]]), "link = ", 
+             as.character(family(tmod1)[[3]]))
+tmod1_results$model <- model
 write.csv(tmod1_results, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_height_env_model_results.csv")
 
 
