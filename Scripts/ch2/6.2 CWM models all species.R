@@ -24,16 +24,42 @@ cwm <- cwm |>
   pivot_longer(cols = c("Height_cm", "LDMC", "Leaf_area_mm2", "SLA", "Thickness_mm"), names_to = "trait", values_to = "cwm_value")
 cwm$elevation <- as.factor(cwm$elevation)  
 
+#import env data
+env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
+  mutate(mean_soil_depth = as.numeric(mean_soil_depth), 
+         soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2)) |> 
+  dplyr::select(!c(soil_temperature_adj_campaign2, soil_moisture_adj_campaign1, soil_temperature_adj_campaign1,
+                   aeolian_process, fluvial_process, slope_process,
+                   geology1, geology2, geology3,
+                   geology4, geology5, mesotopo, aspect, veg_max_height)) |> 
+  mutate(zrock_cover = c(scale(rock_cover)), #standardise variables
+         znorthness = c(scale(northness)), 
+         zsoil_moist = c(scale(soil_moisture_adj_campaign2)), 
+         zsoil_depth = c(scale(mean_soil_depth)), 
+         zslope_height = c(scale(slope_height)))
+
+
+#Join cwm and env data
+cwm_env <- cwm |> 
+  left_join(env, by = "Cell_ID", relationship = "many-to-one")
+
+
+
+
+###===Model CWM Height ~ elevation===###
 ###Subset CWM to include cells that we have SES for
 Height_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_Height.csv", row.names = 1) |> 
   rename(Cell_ID = included_cells)
 
-cwm_H <- cwm |> 
-  inner_join (Height_incl_cells, by = c("trait", "Cell_ID"))
+cwm_H <- cwm_env |> 
+  inner_join (Height_incl_cells, by = c("trait", "Cell_ID")) #subset
 
+Hmod <- glmmTMB(cwm_value ~ elevation + zrock_cover +  znorthness + zsoil_moist + zsoil_depth + 
+                  zslope_height + (1|grid), data = cwm_H, family = t_family(link = "identity"))
 
-###===Model CWM Height ~ elevation===###
-
+#check diagnostics
+Hmod_res <- simulateResiduals(Hmod)
+plot(Hmod_res) #t_family is best for diagnostics
 
 
 
