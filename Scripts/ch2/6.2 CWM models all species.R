@@ -62,6 +62,61 @@ Hmod_res <- simulateResiduals(Hmod)
 plot(Hmod_res) #t_family is best for diagnostics
 
 
+####=== Get all results ===####
+output_file <- "All_data/comm_assembly_results/glmmTMB_subsampled_CWM_Height_model_results.txt"
+sink(output_file)
+
+# ── 1. Model Formula ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  MODEL FORMULA\n")
+cat("===========================================\n")
+print(formula(Hmod))
+cat("\n\n")
+
+# ── 2. Summary Table ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  MODEL SUMMARY\n")
+cat("===========================================\n")
+print(summary(Hmod))
+cat("\n\n")
+
+
+# ── 2. R squared ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  R SQUARED\n")
+cat("===========================================\n")
+print(r.squaredGLMM(Hmod))
+cat("\n\n")
+
+
+# ── 3. ANOVA Table ────────────────────────────────────────────
+cat("===========================================\n")
+cat("  ANOVA TABLE\n")
+cat("===========================================\n")
+print(Anova(Hmod))
+cat("\n\n")
+
+# ── 4. EMmeans Table ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  ESTIMATED MARGINAL MEANS (emmeans)\n")
+cat("===========================================\n")
+em_Hmod <- emmeans(Hmod, specs = "elevation", type = "response")
+cld(em_Hmod, Letters = letters, adjust = "Tukey")
+print(em_Hmod)
+cat("\n")
+
+
+# ── 4. Variable importance ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  VARIABLE IMPORTANCE \n")
+cat("===========================================\n")
+print(sort(importance, decreasing = T))
+cat("\n")
+
+# --- Close the sink ---
+sink()
+
+
 
 ###Figures of cwm####
 ##All traits
