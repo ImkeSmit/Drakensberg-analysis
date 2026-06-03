@@ -11,6 +11,7 @@ library(ggridges)
 library(emmeans)
 library(multcomp)
 library(MuMIn)
+library(car)
 
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
@@ -94,12 +95,19 @@ Hdat <- comb2 |>
   
 ###===Sample uncorrelated cells===####  
 #Run Function_select_independent_cells.R
-Hdat_subs<- select_independent_cells(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
-                                max_search_radius = 2)
+#Hdat_subs<- select_independent_cells(Hdat, grid_var = "grid", x = "x_coord", y = "y_coord", value_col = "SES",
+#                                max_search_radius = 2)
 
 #Save the cells that we use
-Height_incl_cells <- data.frame(trait = "Height_cm", included_cells = c(unique(Hdat_subs$Cell_ID)))
-write.csv(Height_incl_cells, "All_data/comm_assembly_results/included_cells_Height.csv")
+#Height_incl_cells <- data.frame(trait = "Height_cm", included_cells = c(unique(Hdat_subs$Cell_ID)))
+#write.csv(Height_incl_cells, "All_data/comm_assembly_results/included_cells_Height.csv")
+
+#import cells that the sampling algorithm selected
+Height_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_Height.csv", row.names = 1) |> 
+  rename(Cell_ID = included_cells)
+
+Hdat_subs <- Hdat |> 
+  inner_join(Height_incl_cells, by = c("trait", "Cell_ID"))
 
 
 ##GG6
@@ -177,28 +185,12 @@ tmod1<- glmmTMB(SES ~ elevation + zrock_cover +  znorthness + zsoil_moist + zsoi
                   zslope_height + (1|grid), 
                 family = t_family(link = "identity"), 
                 data = Hdat_subs) 
-#performance::check_singularity(tmod1) #singular fit uh oh
-
-#update the modle with gamme priors to see if that helps
-#prior <- data.frame(
-#  prior = "gamma(100, 2.5)",  # mean can be 1, but even 1e8
-#  class = "ranef" )          # for random effects
-
-#tmod1_update <- update(tmod1, priors = prior) 
-#check_singularity(tmod1_update) #not singular anymore
 
 
-summary(tmod1)
-Anova(tmod1)
+#Check diagnostics
 tmod1_res <- simulateResiduals(tmod1)
 plot(tmod1_res) #looks ok...
 #sample size large enough with t family if lag threshold = 4 and search radius = 2
-
-r.squaredGLMM(tmod1) #0.09365263 0.1094613
-
-
-em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
-cld(em_tmod1, Letters = letters, adjust = "Tukey")
 
 #test for spatial autocorrelation
 used_rows <- as.integer(rownames(model.frame(tmod1)))
@@ -227,18 +219,59 @@ for(var in predictors) {
 sort(importance, decreasing = T)
 ##Some models not converging, how to fix???
 
-#save results
-tmod1_results <-as.data.frame(summary(tmod1)$coefficients$cond)
-tmod1_results$variable_importance <- c(0,0,importance)
-tmod1_results$emmean <- c(-0.238,-0.437, -0.301, 0,0,0,0,0)
-tmod1_results$em_std_er <- c(0.0527,0.0290,0.0279,0,0,0,0,0)
-model <- paste(as.character(formula(tmod1))[[2]], as.character(formula(tmod1))[[1]],as.character(formula(tmod1))[[3]],
-               "; ", "family = " , 
-               as.character(family(tmod1)[[1]]), "link = ", 
-               as.character(family(tmod1)[[3]]))
-tmod1_results$model <- model
-write.csv(tmod1_results, "All_data/comm_assembly_results/glmmTMB_subsampled_SES_height_env_model_results.csv")
+# --- Get all results ---
+output_file <- "All_data/comm_assembly_results/glmmTMB_subsampled_SES_Height_model_results.txt"
+sink(output_file)
 
+# ── 1. Model Formula ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  MODEL FORMULA\n")
+cat("===========================================\n")
+print(formula(tmod1))
+cat("\n\n")
+
+# ── 2. Summary Table ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  MODEL SUMMARY\n")
+cat("===========================================\n")
+print(summary(tmod1))
+cat("\n\n")
+
+
+# ── 2. R squared ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  R SQUARED\n")
+cat("===========================================\n")
+print(r.squaredGLMM(tmod1))
+cat("\n\n")
+
+
+# ── 3. ANOVA Table ────────────────────────────────────────────
+cat("===========================================\n")
+cat("  ANOVA TABLE\n")
+cat("===========================================\n")
+print(Anova(tmod1))
+cat("\n\n")
+
+# ── 4. EMmeans Table ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  ESTIMATED MARGINAL MEANS (emmeans)\n")
+cat("===========================================\n")
+em_tmod1 <- emmeans(tmod1, specs = "elevation", type = "response")
+cld(em_tmod1, Letters = letters, adjust = "Tukey")
+print(em_tmod1)
+cat("\n")
+
+
+# ── 4. Variable importance ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  VARIABLE IMPORTANCE \n")
+cat("===========================================\n")
+print(sort(importance, decreasing = T))
+cat("\n")
+
+# --- Close the sink ---
+sink()
 
 
 ####===SES of SLA====####
