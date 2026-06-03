@@ -439,13 +439,16 @@ ggsave(trait_ridges, filename = "trait_elevation_poster.png", path = "Figures")
 
 
 ###Subset for the cells used in analysis
-included <- all_subs |> 
-  group_by(trait) |> 
-  distinct(Cell_ID) |> 
-  rename(cellref = Cell_ID)
+SLA_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_SLA.csv", row.names = 1) |> 
+  rename(Cell_ID = included_cells)
+H_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_Height.csv", row.names = 1) |> 
+  rename(Cell_ID = included_cells)
+
+incl_cells <- bind_rows(SLA_incl_cells, H_incl_cells)
 
 cwm_subs <- cwm |> 
-  inner_join(included, by = c("trait", "cellref"))
+  rename(Cell_ID = cellref) |> 
+  inner_join (incl_cells, by = c("trait", "Cell_ID")) #subset
 
 
 ##Graph
