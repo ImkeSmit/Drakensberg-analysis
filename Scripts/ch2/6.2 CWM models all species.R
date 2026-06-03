@@ -105,14 +105,6 @@ cld(em_Hmod, Letters = letters, adjust = "Tukey")
 print(em_Hmod)
 cat("\n")
 
-
-# ── 4. Variable importance ──────────────────────────────────────────
-cat("===========================================\n")
-cat("  VARIABLE IMPORTANCE \n")
-cat("===========================================\n")
-print(sort(importance, decreasing = T))
-cat("\n")
-
 # --- Close the sink ---
 sink()
 
