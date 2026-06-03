@@ -46,7 +46,7 @@ cwm_env <- cwm |>
 
 
 
-###===Model CWM Height ~ elevation===###
+###===Model CWM Height ~ elevation===####
 ###Subset CWM to include cells that we have SES for
 Height_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_Height.csv", row.names = 1) |> 
   rename(Cell_ID = included_cells)
@@ -54,8 +54,7 @@ Height_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_Hei
 cwm_H <- cwm_env |> 
   inner_join (Height_incl_cells, by = c("trait", "Cell_ID")) #subset
 
-Hmod <- glmmTMB(cwm_value ~ elevation + zrock_cover +  znorthness + zsoil_moist + zsoil_depth + 
-                  zslope_height + (1|grid), data = cwm_H, family = t_family(link = "identity"))
+Hmod <- glmmTMB(cwm_value ~ elevation + (1|grid), data = cwm_H, family = t_family(link = "identity"))
 
 #check diagnostics
 Hmod_res <- simulateResiduals(Hmod)
@@ -107,6 +106,71 @@ cat("\n")
 
 # --- Close the sink ---
 sink()
+
+
+
+###===Model CWM SLA ~ elevation===####
+###Subset CWM to include cells that we have SES for
+SLA_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_SLA.csv", row.names = 1) |> 
+  rename(Cell_ID = included_cells)
+
+cwm_SLA <- cwm_env |> 
+  inner_join (SLA_incl_cells, by = c("trait", "Cell_ID")) |> #subset
+  mutate(sqrt_cwm_value = sqrt(cwm_value))
+  
+SLAmod <- glmmTMB(cwm_value ~ elevation + (1|grid), data = cwm_SLA, family = t_family(link = "identity"))
+
+#check diagnostics
+SLAmod_res <- simulateResiduals(SLAmod)
+plot(SLAmod_res) #t_family is best for diagnostics
+
+
+####=== Get all results ===####
+output_file <- "All_data/comm_assembly_results/glmmTMB_subsampled_CWM_SLA_model_results.txt"
+sink(output_file)
+
+# ── 1. Model Formula ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  MODEL FORMULA\n")
+cat("===========================================\n")
+print(formula(SLAmod))
+cat("\n\n")
+
+# ── 2. Summary Table ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  MODEL SUMMARY\n")
+cat("===========================================\n")
+print(summary(SLAmod))
+cat("\n\n")
+
+
+# ── 2. R squared ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  R SQUARED\n")
+cat("===========================================\n")
+print(r.squaredGLMM(SLAmod))
+cat("\n\n")
+
+
+# ── 3. ANOVA Table ────────────────────────────────────────────
+cat("===========================================\n")
+cat("  ANOVA TABLE\n")
+cat("===========================================\n")
+print(Anova(SLAmod))
+cat("\n\n")
+
+# ── 4. EMmeans Table ──────────────────────────────────────────
+cat("===========================================\n")
+cat("  ESTIMATED MARGINAL MEANS (emmeans)\n")
+cat("===========================================\n")
+em_SLAmod <- emmeans(SLAmod, specs = "elevation", type = "response")
+cld(em_SLAmod, Letters = letters, adjust = "Tukey")
+print(em_SLAmod)
+cat("\n")
+
+# --- Close the sink ---
+sink()
+
 
 
 
