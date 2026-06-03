@@ -219,7 +219,8 @@ for(var in predictors) {
 sort(importance, decreasing = T)
 ##Some models not converging, how to fix???
 
-# --- Get all results ---
+
+####=== Get all results ===####
 output_file <- "All_data/comm_assembly_results/glmmTMB_subsampled_SES_Height_model_results.txt"
 sink(output_file)
 
