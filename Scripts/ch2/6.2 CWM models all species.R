@@ -129,7 +129,8 @@ cwm_SLA <- cwm_env |>
   inner_join (SLA_incl_cells, by = c("trait", "Cell_ID")) |> #subset
   mutate(sqrt_cwm_value = sqrt(cwm_value))
   
-SLAmod <- glmmTMB(cwm_value ~ elevation + (1|grid), data = cwm_SLA, family = t_family(link = "identity"))
+SLAmod <- glmmTMB(cwm_value ~ elevation + zrock_cover +  znorthness + zsoil_moist + zsoil_depth + 
+                    zslope_height + (1|grid), data = cwm_SLA, family = t_family(link = "identity"))
 
 #check diagnostics
 SLAmod_res <- simulateResiduals(SLAmod)
