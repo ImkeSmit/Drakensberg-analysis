@@ -25,3 +25,18 @@ all_FT_pca$center #means
 #make biplot
 biplot(all_FT_pca, choices = c("Comp.1", "Comp.2"))
 plot(all_FT_pca$scores[, 1], all_FT_pca$scores[, 2])
+
+
+
+###GGplot biplot
+trait_pca <- ggbiplot(all_FT_pca, choices = c(1,2), 
+                      varname.size = 4, varname.color = "black") +
+  geom_point(colour = "azure3", alpha = 0.8)+
+  theme_classic() 
+trait_pca$layers <- c(trait_pca$layers, trait_pca$layers[[2]], trait_pca$layers[[3]]) #move the arrows to plot in the foreground
+ggsave(plot = trait_pca, filename = "trait.pca.png", path = "Figures")
+
+
+###correlation
+cormat <- cor(mean_traits)
+corrplot(cormat, method = "number", type = "lower")
