@@ -7,8 +7,15 @@ library(vegan)
 library(traitstrap)
 library(FD)
 library(ggridges)
+library(glmmTMB)
+library(DHARMa)
+library(MuMIn)
+library(car)
+library(emmeans)
+library(multcomp)
+library(multcompView)
 
-####Import community and trait data####
+####ImpomultcompView####Import community and trait data####
 abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
 
 mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
@@ -46,7 +53,7 @@ cwm_env <- cwm |>
 
 
 
-###===Model CWM Height ~ elevation===####
+###===Model CWM Height ~ elevation + microenv===####
 ###Subset CWM to include cells that we have SES for
 Height_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_Height.csv", row.names = 1) |> 
   rename(Cell_ID = included_cells)
@@ -54,7 +61,8 @@ Height_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_Hei
 cwm_H <- cwm_env |> 
   inner_join (Height_incl_cells, by = c("trait", "Cell_ID")) #subset
 
-Hmod <- glmmTMB(cwm_value ~ elevation + (1|grid), data = cwm_H, family = t_family(link = "identity"))
+Hmod <- glmmTMB(cwm_value ~ elevation + zrock_cover +  znorthness + zsoil_moist + zsoil_depth + 
+                  zslope_height + (1|grid), data = cwm_H, family = t_family(link = "identity"))
 
 #check diagnostics
 Hmod_res <- simulateResiduals(Hmod)
