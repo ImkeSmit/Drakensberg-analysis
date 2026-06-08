@@ -15,7 +15,7 @@ library(emmeans)
 library(multcomp)
 library(multcompView)
 
-####ImpomultcompView####Import community and trait data####
+####Import community and trait data####
 abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
 
 mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
