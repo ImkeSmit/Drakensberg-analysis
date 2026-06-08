@@ -116,66 +116,6 @@ cat("\n")
 sink()
 
 
-###===Model CWM Height ~ soil moisture===####
-###Subset CWM to include cells that we have SES for
-Height_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_Height.csv", row.names = 1) |> 
-  rename(Cell_ID = included_cells)
-
-cwm_H <- cwm_env |> 
-  inner_join (Height_incl_cells, by = c("trait", "Cell_ID")) #subset
-
-Hmod_smoist <- glmmTMB(cwm_value ~ elevation+ zsoil_moist + (1|grid), data = cwm_H, family = t_family(link = "identity"))
-
-#check diagnostics
-Hmod_smoist_res <- simulateResiduals(Hmod_smoist)
-plot(Hmod_smoist_res) #t_family is best for diagnostics
-
-
-####=== Get all results ===####
-output_file <- "All_data/comm_assembly_results/glmmTMB_subsampled_CWM_Height_smoist_model_results.txt"
-sink(output_file)
-
-# ── 1. Model Formula ──────────────────────────────────────────
-cat("===========================================\n")
-cat("  MODEL FORMULA\n")
-cat("===========================================\n")
-print(formula(Hmod_smoist))
-cat("\n\n")
-
-# ── 2. Summary Table ──────────────────────────────────────────
-cat("===========================================\n")
-cat("  MODEL SUMMARY\n")
-cat("===========================================\n")
-print(summary(Hmod_smoist))
-cat("\n\n")
-
-
-# ── 2. R squared ──────────────────────────────────────────
-cat("===========================================\n")
-cat("  R SQUARED\n")
-cat("===========================================\n")
-print(r.squaredGLMM(Hmod_smoist))
-cat("\n\n")
-
-
-# ── 3. ANOVA Table ────────────────────────────────────────────
-cat("===========================================\n")
-cat("  ANOVA TABLE\n")
-cat("===========================================\n")
-print(Anova(Hmod_smoist))
-cat("\n\n")
-
-# ── 4. EMmeans Table ──────────────────────────────────────────
-cat("===========================================\n")
-cat("  ESTIMATED MARGINAL MEANS (emmeans)\n")
-cat("===========================================\n")
-em_Hmod_smoist <- emmeans(Hmod_smoist, specs = "elevation", type = "response")
-cld(em_Hmod_smoist, Letters = letters, adjust = "Tukey")
-print(em_Hmod_smoist)
-cat("\n")
-
-# --- Close the sink ---
-sink()
 
 
 
