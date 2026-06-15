@@ -55,11 +55,35 @@ rms <- rms |>
 all_env <- env |> 
   full_join(ind, by = "Cell_ID") |> 
   full_join(rms, by = "Cell_ID")  |> 
-  select(c(Cell_ID, rock_cover:slope_height, T1_avg_annual:moist_avg_summer, STD)) |> 
+  select(c(Cell_ID, site.x, elevation, rock_cover:slope_height, T1_avg_annual:moist_avg_summer, STD)) |> 
   column_to_rownames(var = "Cell_ID") |> 
   mutate(across(c(rock_cover: STD), ~ as.numeric(scale(.x))))
   
-  
+####Do the principal component analysis####
+all_env_subs <- all_env |> 
+  drop_na()
+
+
+all_env_pca <- princomp(all_env_subs[, c(3:ncol(all_env_subs))], scores = T) #not including elevation
+summary(all_env_pca) #proportion of variance is the variance explained by the PC
+all_env_pca$scores #
+all_env_pca$loadings #How much each var contributed to building the PC
+all_env_pca$scale #scaling applied to each variable
+all_env_pca$center #means
+
+#make biplot
+biplot(all_env_pca, choices = c("Comp.1", "Comp.2"))
+
+
+###GGplot biplot
+env_pca <- ggbiplot(all_env_pca, choices = c(1,2), 
+                      varname.size = 4, varname.color = "black", 
+                      groups = c(all_env_subs$site.x)) +
+  geom_point(aes(color = all_env_subs$site.x), alpha = 0.8)+
+  scale_color_manual(values = c("blue", "red", "green"))+
+  theme_classic() 
+env_pca$layers <- c(env_pca$layers, env_pca$layers[[2]], env_pca$layers[[3]]) #move the arrows to plot in the foreground
+ggsave(plot = trait_pca, filename = "trait.pca.png", path = "Figures")  
 
 
 
