@@ -83,7 +83,15 @@ env_pca <- ggbiplot(all_env_pca, choices = c(1,2),
   scale_color_manual(values = c("blue", "red", "green"))+
   theme_classic() 
 env_pca$layers <- c(env_pca$layers, env_pca$layers[[2]], env_pca$layers[[3]]) #move the arrows to plot in the foreground
-ggsave(plot = trait_pca, filename = "trait.pca.png", path = "Figures")  
+ggsave(plot = trait_pca, filename = "trait.pca.png", path = "Figures") 
+
+
+###correlation
+cormat <- cor(all_env_subs[, c(3:ncol(all_env_subs))])
+corrplot(cormat, method = "number", type = "lower", 
+         tl.cex = 0.8,    # shrink variable name text
+         tl.srt = 45)
+
 
 
 
