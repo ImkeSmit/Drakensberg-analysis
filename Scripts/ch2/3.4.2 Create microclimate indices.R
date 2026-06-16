@@ -2,6 +2,7 @@
 ###And calculate mean temperature for the growing season####
 library(tidyverse)
 library(tidylog)
+library(lubridate)
 
 #T1 = soil temp
 #T3 = air temp
@@ -21,4 +22,8 @@ tms <- read.csv("C:\\Users\\imke6\\Documents\\PhD 2025\\Ch2 niche modelling\\All
   
   
 mean_daily_temp <- tms |> 
-  group_by(Cell_ID, )
+  mutate(date = as_date(datetime)) %>%
+  group_by(site, Cell_ID, date) %>%
+  summarise(mean_daily_T1 = mean(T1, na.rm = TRUE), )
+
+
