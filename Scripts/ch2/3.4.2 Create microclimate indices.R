@@ -108,4 +108,52 @@ growing_season_min_temps <- start_grw |>
   left_join(end_grw, by = "site") #do not consider the years, only the days!
 
 
+###====Calculate indices for growing season===####
+##GG#
+GG_start <- c(growing_season_min_temps[which(growing_season_min_temps$site == "GG"), "start_grw_date"])[[1]]
+GG_end <- c(growing_season_min_temps[which(growing_season_min_temps$site == "GG"), "end_grw_date"])[[1]]
+
+GG_ind <- tms |> 
+  mutate(date = as_date(datetime)) |>
+  filter(site == "GG", 
+         !between(date, ymd(GG_end), ymd(GG_start)), #exclude non-growing season
+          between(date, ymd("2023-01-01"), ymd("2023-12-31"))) |>  #only use from 2023 growing season
+  group_by(site, Cell_ID) |> 
+  summarise(mean_T1_growing_season = mean(T1, na.rm = T)) |> 
+  mutate(start_growing_season = ymd(GG_start), 
+         end_growing_season = ymd(GG_end))
+  
+
+##WH#
+WH_start <- c(growing_season_min_temps[which(growing_season_min_temps$site == "WH"), "start_grw_date"])[[1]]
+WH_end <- c(growing_season_min_temps[which(growing_season_min_temps$site == "WH"), "end_grw_date"])[[1]]
+
+WH_ind <- tms |> 
+  mutate(date = as_date(datetime)) |>
+  filter(site == "WH", 
+         !between(date, ymd(WH_end), ymd(WH_start)), #exclude non-growing season
+         between(date, ymd("2023-01-01"), ymd("2023-12-31"))) |>  #only use from 2023 growing season
+  group_by(site, Cell_ID) |> 
+  summarise(mean_T1_growing_season = mean(T1, na.rm = T)) |> 
+  mutate(start_growing_season = ymd(WH_start), 
+         end_growing_season = ymd(WH_end))
+
+
+##BK#
+BK_start <- c(growing_season_min_temps[which(growing_season_min_temps$site == "BK"), "start_grw_date"])[[1]]
+BK_end <- c(growing_season_min_temps[which(growing_season_min_temps$site == "BK"), "end_grw_date"])[[1]]
+
+BK_ind <- tms |> 
+  mutate(date = as_date(datetime)) |>
+  filter(site == "BK", 
+         !between(date, ymd(BK_end), ymd(BK_start)), #exclude non-growing season
+         between(date, ymd("2023-01-01"), ymd("2023-12-31"))) |>  #only use from 2023 growing season
+  group_by(site, Cell_ID) |> 
+  summarise(mean_T1_growing_season = mean(T1, na.rm = T)) |> 
+  mutate(start_growing_season = ymd(BK_start), 
+         end_growing_season = ymd(BK_end))
+
+
+mean_T1_growing_season <- bind_rows(GG_ind, WH_ind, BK_ind)
+write.csv(mean_T1_growing_season, "all_data/clean_data/Environmental data/Imke_microclimate_indices.csv")
 
