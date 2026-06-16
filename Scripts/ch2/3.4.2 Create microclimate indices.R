@@ -154,6 +154,8 @@ BK_ind <- tms |>
          end_growing_season = ymd(BK_end))
 
 
-mean_T1_growing_season <- bind_rows(GG_ind, WH_ind, BK_ind)
-write.csv(mean_T1_growing_season, "all_data/clean_data/Environmental data/Imke_microclimate_indices.csv")
+ind_mean_T1 <- bind_rows(GG_ind, WH_ind, BK_ind)
+write.csv(ind_mean_T1, "all_data/clean_data/Environmental data/Imke_microclimate_indices.csv")
 
+ggplot(ind_mean_T1, aes(x = site, y = mean_T1_growing_season)) +
+  geom_boxplot() 
