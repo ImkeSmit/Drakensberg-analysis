@@ -46,7 +46,7 @@ ggplot(min_daily_temp, aes( x = date, y = min_daily_T1)) +
   geom_line()+
   facet_wrap(~site, nrow = 3, ncol = 1)
 
-
+####===DEFINE GROWING SEASON===####
 ###USING MEAN TEMP####
 ###Period where mean annual temp is consistently above 5 degrees
 #first date after June 21 where all logers at a site had a mean  temp above 5
@@ -106,4 +106,6 @@ end_grw <- min_daily_temp |>
 
 growing_season_min_temps <- start_grw |> 
   left_join(end_grw, by = "site") #do not consider the years, only the days!
+
+
 
