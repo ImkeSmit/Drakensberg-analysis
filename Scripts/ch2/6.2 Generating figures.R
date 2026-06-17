@@ -190,11 +190,15 @@ cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire
 #import microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
   mutate(mean_soil_depth = as.numeric(mean_soil_depth), 
-         soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2)) |> 
-  dplyr::select(!c(soil_temperature_adj_campaign2, soil_moisture_adj_campaign1, soil_temperature_adj_campaign1,
-                   aeolian_process, fluvial_process, slope_process,
-                   geology1, geology2, geology3,
-                   geology4, geology5, mesotopo, aspect, veg_max_height))
+         soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2), 
+         soil_depth_CV = as.numeric(soil_depth_CV)) |> 
+  #variables we are interested in
+  select(c(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
+           soil_depth_CV, mean_soil_depth, slope_height)) |> 
+  #add elevation variables
+  mutate(elevation = case_when(site == "GG" ~ 2000, 
+                               site == "WH" ~ 2500, 
+                               site == "BK" ~ 3000, .default = NA))
 
 
 ##Combine SES and environmental data
