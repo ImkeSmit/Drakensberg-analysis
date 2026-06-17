@@ -534,6 +534,7 @@ moist_pred_dat <- data.frame(microenv_var = "zsoil_moist", predictions = moist_p
 
 prediction_lines <- rbind(rock_pred_dat, moist_pred_dat)
 
+l1 <- c("zrock_cover" = "Rock~~cover~(standardised)", "zsoil_moist" = "Soil~moisture~(standardised)")
 
 Hplots <- plotdat |> 
   filter(trait == "Height_cm") |> 
@@ -542,5 +543,16 @@ Hplots <- plotdat |>
   ggplot(aes(x = value, y = SES)) +
   geom_point()+
   geom_line(data = prediction_lines, aes(x = value, y = predictions), color = "red", linewidth = 1) +
-  facet_wrap(~ microenv_var, scale = "free_x") +
-  theme_classic()
+  facet_wrap(~ microenv_var, scale = "free_x", labeller = as_labeller(l1, default = label_parsed), 
+             strip.position = "bottom") +
+  labs(x = " ", y = "SES of Height") +
+  theme_bw() +
+  theme( 
+        axis.title = element_text(size = 16), 
+        axis.text = element_text(size = 14), 
+        strip.text = element_text(size = 16), 
+        strip.background = element_blank(),
+        strip.placement = "outside", 
+        panel.grid = element_blank())
+ggsave(Hplots, filename = "SES_Height_microenv_subsampled.png", path = "Figures", 
+       width = 2300, height = 1400, units = "px")
