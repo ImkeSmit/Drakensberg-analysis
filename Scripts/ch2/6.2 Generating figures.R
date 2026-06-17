@@ -344,51 +344,6 @@ ses_ridges_subsampled <- all_subs |>
   filter(trait %in% c("Height_cm", "SLA")) |> 
   ggplot(aes(x = SES, y = elevation)) +
   geom_density_ridges(alpha = 0.5, scale = 1) +
-  geom_segment(
-    data = segments_df,
-    aes(
-      x    = emmean,
-      xend = emmean,
-      y    = as.numeric(elevation),
-      yend = as.numeric(elevation) + mean_y_scaled),
-    linewidth = 0.8)+
-  geom_segment(
-    data = segments_df,
-    aes(
-      x    = emmean+emmean_SE,
-      xend = emmean+emmean_SE,
-      y    = as.numeric(elevation),
-      yend = as.numeric(elevation) + mean_y_scaled),
-    linewidth = 0.5, linetype = "dashed")+
-  geom_segment(
-    data = segments_df,
-    aes(
-      x    = emmean-emmean_SE,
-      xend = emmean-emmean_SE,
-      y    = as.numeric(elevation),
-      yend = as.numeric(elevation) + mean_y_scaled),
-    linewidth = 0.5, linetype = "dashed")+
-  
-  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", 
-             strip.position = "bottom")+
-  labs(x = " ", y = "Elevation (m a.s.l.)") +
-  geom_vline(xintercept = 0, colour = "red") +
-  geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 18))+
-  theme_bw() +
-  theme(legend.position = "none", axis.title = element_text(size = 20), 
-        axis.text = element_text(size = 18), strip.text = element_text(size = 20), 
-        strip.background = element_blank(),
-        strip.placement = "outside", panel.grid = element_blank()) 
-ggsave(ses_ridges_subsampled, filename = "SES_elevation_subsampled.png", path = "Figures", 
-       width = 2300, height = 1400, units = "px")
-
-
-
-
-ses_ridges_subsampled2 <- all_subs |>
-  filter(trait %in% c("Height_cm", "SLA")) |> 
-  ggplot(aes(x = SES, y = elevation)) +
-  geom_density_ridges(alpha = 0.5, scale = 1) +
   geom_point(
     data = segments_df,
     aes(x = emmean, y = as.numeric(elevation)),
@@ -418,6 +373,13 @@ ses_ridges_subsampled2 <- all_subs |>
         strip.background = element_blank(),
         strip.placement = "outside", 
         panel.grid = element_blank())
+ggsave(ses_ridges_subsampled, filename = "SES_elevation_subsampled.png", path = "Figures", 
+       width = 2300, height = 1400, units = "px")
+
+
+
+
+
 
 
 
