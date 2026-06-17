@@ -503,11 +503,44 @@ plotdat <- comb2 |>
   inner_join(incl_cells, by = c("trait", "Cell_ID"))
 
 
+###Generate predictions for lines of best fit####
+Hdat_subs <- plotdat |> filter(trait == "Height_cm")
+tmod1<- glmmTMB(SES ~ elevation + zrock_cover +  znorthness + zsoil_moist + zsoil_depth + 
+                  zslope_height, 
+                family = t_family(link = "identity"), 
+                data = Hdat_subs) 
+
+rock_dat <- Hdat_subs |> 
+  dplyr::select(elevation , zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height) |> 
+  mutate(elevation = "2000", 
+         znorthness = mean(znorthness), 
+         zsoil_moist = mean(zsoil_moist, na.rm = T), 
+         zsoil_depth = mean(zsoil_depth), 
+         zslope_height = mean(zslope_height))
+rock_predictions <- predict(tmod1, rock_dat, type = "response")
+rock_pred_dat <- data.frame(microenv_var = "zrock_cover", predictions = rock_predictions, value = rock_dat$zrock_cover)
+
+
+moist_dat <- Hdat_subs |> 
+  dplyr::select(elevation , zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height) |> 
+  drop_na() |> 
+  mutate(elevation = "2000", 
+         znorthness = mean(znorthness), 
+         zrock_cover = mean(zrock_cover), 
+         zsoil_depth = mean(zsoil_depth), 
+         zslope_height = mean(zslope_height))
+moist_predictions <- predict(tmod1, moist_dat, type = "response")
+moist_pred_dat <- data.frame(microenv_var = "zsoil_moist", predictions = moist_predictions, value = moist_dat$zsoil_moist)
+
+prediction_lines <- rbind(rock_pred_dat, moist_pred_dat)
+
+
 Hplots <- plotdat |> 
   filter(trait == "Height_cm") |> 
   dplyr::select(Cell_ID, SES, zrock_cover, zsoil_moist) |> 
   pivot_longer(cols = c(zrock_cover, zsoil_moist), names_to = "microenv_var", values_to = "value") |> 
   ggplot(aes(x = value, y = SES)) +
   geom_point()+
+  geom_line(data = prediction_lines, aes(x = value, y = predictions), color = "red", linewidth = 1) +
   facet_wrap(~ microenv_var, scale = "free_x") +
   theme_classic()
