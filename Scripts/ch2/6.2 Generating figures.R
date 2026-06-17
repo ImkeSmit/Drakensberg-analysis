@@ -347,18 +347,15 @@ ses_ridges_subsampled <- all_subs |>
   geom_point(
     data = segments_df,
     aes(x = emmean, y = as.numeric(elevation)),
-    size = 1, inherit.aes = FALSE
-  ) +
+    size = 1, inherit.aes = FALSE) +
   geom_errorbarh(
     data = segments_df,
     aes(
       xmin = emmean - emmean_SE,
       xmax = emmean + emmean_SE,
-      y = as.numeric(elevation)
-    ),
+      y = as.numeric(elevation)),
     height = 0.08,
-    linewidth = 0.8, inherit.aes = FALSE
-  ) +
+    linewidth = 0.8, inherit.aes = FALSE) +
   facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), 
              scale = "free_x", strip.position = "bottom") +
   labs(x = " ", y = "Elevation (m a.s.l.)") +
