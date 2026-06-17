@@ -34,21 +34,23 @@ cwm$elevation <- as.factor(cwm$elevation)
 #import env data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
   mutate(mean_soil_depth = as.numeric(mean_soil_depth), 
-         soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2)) |> 
-  dplyr::select(!c(soil_temperature_adj_campaign2, soil_moisture_adj_campaign1, soil_temperature_adj_campaign1,
-                   aeolian_process, fluvial_process, slope_process,
-                   geology1, geology2, geology3,
-                   geology4, geology5, mesotopo, aspect, veg_max_height)) |> 
+         soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2), 
+         soil_depth_CV = as.numeric(soil_depth_CV)) |> 
+  #variables we are interested in
+  dplyr::select(c(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
+           soil_depth_CV, mean_soil_depth, slope_height)) |> 
   mutate(zrock_cover = c(scale(rock_cover)), #standardise variables
          znorthness = c(scale(northness)), 
          zsoil_moist = c(scale(soil_moisture_adj_campaign2)), 
          zsoil_depth = c(scale(mean_soil_depth)), 
          zslope_height = c(scale(slope_height)))
+  
 
 
 #Join cwm and env data
 cwm_env <- cwm |> 
-  left_join(env, by = "Cell_ID", relationship = "many-to-one")
+  left_join(env, by = "Cell_ID", relationship = "many-to-one") |> 
+  mutate(elevation = as.factor(elevation))
 
 
 
