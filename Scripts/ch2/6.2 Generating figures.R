@@ -283,7 +283,7 @@ ggsave(ses_ridges, filename = "SES_elevation_poster.png", path = "Figures")
 Height_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_Height.csv", row.names = 1) |> 
   rename(Cell_ID = included_cells)
 
-Hdat <- comb2 |> 
+Hdat_subs <- comb2 |> 
   filter(trait %in% c("Height_cm", NA)) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
   arrange(y_coord, x_coord) |> 
   mutate(trait = "Height_cm",  #give all records a trait
@@ -296,7 +296,7 @@ Hdat <- comb2 |>
 SLA_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_SLA.csv", row.names = 1) |> 
   rename(Cell_ID = included_cells)
 
-SLAdat <- comb2 |> 
+SLAdat_subs <- comb2 |> 
   filter(trait %in% c("SLA", NA)) |>  #also select cells which have no SES measurement. This is necessary to make the grid complete
   arrange(y_coord, x_coord) |> 
   mutate(trait = "SLA",  #give all records a trait
@@ -381,6 +381,45 @@ ses_ridges_subsampled <- all_subs |>
         strip.placement = "outside", panel.grid = element_blank()) 
 ggsave(ses_ridges_subsampled, filename = "SES_elevation_subsampled.png", path = "Figures", 
        width = 2300, height = 1400, units = "px")
+
+
+
+
+ses_ridges_subsampled2 <- all_subs |>
+  filter(trait %in% c("Height_cm", "SLA")) |> 
+  ggplot(aes(x = SES, y = elevation)) +
+  geom_density_ridges(alpha = 0.5, scale = 1) +
+  geom_point(
+    data = segments_df,
+    aes(x = emmean, y = as.numeric(elevation)),
+    size = 1, inherit.aes = FALSE
+  ) +
+  geom_errorbarh(
+    data = segments_df,
+    aes(
+      xmin = emmean - emmean_SE,
+      xmax = emmean + emmean_SE,
+      y = as.numeric(elevation)
+    ),
+    height = 0.08,
+    linewidth = 0.8, inherit.aes = FALSE
+  ) +
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), 
+             scale = "free_x", strip.position = "bottom") +
+  labs(x = " ", y = "Elevation (m a.s.l.)") +
+  geom_vline(xintercept = 0, colour = "red") +
+  geom_text(data = ridges_letters, 
+            aes(x = x_pos, y = elevation, label = letters, size = 18)) +
+  theme_bw() +
+  theme(legend.position = "none", 
+        axis.title = element_text(size = 20), 
+        axis.text = element_text(size = 18), 
+        strip.text = element_text(size = 20), 
+        strip.background = element_blank(),
+        strip.placement = "outside", 
+        panel.grid = element_blank())
+
+
 
 
 
