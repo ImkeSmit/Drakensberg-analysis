@@ -491,7 +491,7 @@ ggsave(trait_ridges_subsampled, filename = "trait_elevation_poster_subsampled.pn
 
 
 
-####Scatterplots of SES ~microenvironmental variables####
+####Scatterplots of SES Height ~microenvironmental variables####
 SLA_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_SLA.csv", row.names = 1) |> 
   rename(Cell_ID = included_cells)
 H_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_Height.csv", row.names = 1) |> 
@@ -503,7 +503,7 @@ plotdat <- comb2 |>
   inner_join(incl_cells, by = c("trait", "Cell_ID"))
 
 
-###Generate predictions for lines of best fit####
+###Generate predictions for lines of best fit###
 Hdat_subs <- plotdat |> filter(trait == "Height_cm")
 tmod1<- glmmTMB(SES ~ elevation + zrock_cover +  znorthness + zsoil_moist + zsoil_depth + 
                   zslope_height, 
@@ -555,4 +555,64 @@ Hplots <- plotdat |>
         strip.placement = "outside", 
         panel.grid = element_blank())
 ggsave(Hplots, filename = "SES_Height_microenv_subsampled.png", path = "Figures", 
+       width = 2300, height = 1400, units = "px")
+
+
+
+
+####Scatterplots of SES SLA ~microenvironmental variables####
+
+###Generate predictions for lines of best fit###
+SLAdat_subs <- plotdat |> filter(trait == "SLA")
+tmod2<- glmmTMB(SES ~ elevation + zrock_cover +  znorthness + zsoil_moist + zsoil_depth + 
+                  zslope_height, 
+                family = t_family(link = "identity"), 
+                data = SLAdat_subs) 
+
+north_dat <- SLAdat_subs |> 
+  dplyr::select(elevation , zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height) |> 
+  drop_na() |> 
+  mutate(elevation = "2000", 
+         zrock_cover = mean(zrock_cover), 
+         zsoil_moist = mean(zsoil_moist), 
+         zsoil_depth = mean(zsoil_depth), 
+         zslope_height = mean(zslope_height))
+north_predictions <- predict(tmod2, north_dat, type = "response")
+north_pred_dat <- data.frame(microenv_var = "znorthness", predictions = north_predictions, value = north_dat$znorthness)
+
+
+moist_dat <- SLAdat_subs |> 
+  dplyr::select(elevation , zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height) |> 
+  drop_na() |> 
+  mutate(elevation = "2000", 
+         znorthness = mean(znorthness), 
+         zrock_cover = mean(zrock_cover), 
+         zsoil_depth = mean(zsoil_depth), 
+         zslope_height = mean(zslope_height))
+moist_predictions <- predict(tmod2, moist_dat, type = "response")
+moist_pred_dat <- data.frame(microenv_var = "zsoil_moist", predictions = moist_predictions, value = moist_dat$zsoil_moist)
+
+prediction_lines <- rbind(north_pred_dat, moist_pred_dat)
+
+l1 <- c("znorthness" = "Northness~(standardised)", "zsoil_moist" = "Soil~moisture~(standardised)")
+
+SLAplots <- plotdat |> 
+  filter(trait == "SLA") |> 
+  dplyr::select(Cell_ID, SES, znorthness, zsoil_moist) |> 
+  pivot_longer(cols = c(znorthness, zsoil_moist), names_to = "microenv_var", values_to = "value") |> 
+  ggplot(aes(x = value, y = SES)) +
+  geom_point()+
+  geom_line(data = prediction_lines, aes(x = value, y = predictions), color = "red", linewidth = 1) +
+  facet_wrap(~ microenv_var, scale = "free_x", labeller = as_labeller(l1, default = label_parsed), 
+             strip.position = "bottom") +
+  labs(x = " ", y = "SES of SLA") +
+  theme_bw() +
+  theme( 
+    axis.title = element_text(size = 16), 
+    axis.text = element_text(size = 14), 
+    strip.text = element_text(size = 16), 
+    strip.background = element_blank(),
+    strip.placement = "outside", 
+    panel.grid = element_blank())
+ggsave(SLAplots, filename = "SES_SLA_microenv_subsampled.png", path = "Figures", 
        width = 2300, height = 1400, units = "px")
