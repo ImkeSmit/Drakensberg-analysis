@@ -457,13 +457,26 @@ l1 <- c("Height_cm" = "Plant~height~(cm)", "SLA" = "SLA~(mm^2/mg)")
 ridges_letters <- data.frame(trait = c(rep("Height_cm", 3), rep("SLA", 3)), 
                              elevation = as.factor(c(rep(c("2000", "2500", "3000"), 2))),
                              letters = c("a", "b", "c", "a", "b", "c"), 
-                             x_pos = c(60,60,60,60,60,60))
+                             x_pos = c(60,60,60,60,60,60), 
+                             emmean = c(19.9, 11.1, 14.4, 18.2, 38.4, 15.5), #type over from results table
+                             emmean_SE = c(0.567, 0.619, 0.602, 0.849, 1.060, 0.908))
                             
 
 trait_ridges_subsampled <- cwm_subs |>
   filter(trait %in% c("Height_cm", "SLA")) |> 
   ggplot(aes(x = cwm_value, y = elevation)) +
   geom_density_ridges(alpha = 0.5) +
+  geom_point(
+    data = ridges_letters,
+    aes(x = emmean, y = as.numeric(elevation)),
+    size = 2, inherit.aes = FALSE) +
+  geom_errorbarh(
+    data = ridges_letters,
+    aes(xmin = emmean - emmean_SE,
+        xmax = emmean + emmean_SE,
+        y = as.numeric(elevation)),
+    height = 0.08,
+    linewidth = 1, inherit.aes = FALSE) +
   facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", strip.position = "bottom")+
   geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 18))+
   labs(x = "", y = "Elevation (m a.s.l.)") +
