@@ -488,3 +488,26 @@ trait_ridges_subsampled <- cwm_subs |>
         strip.placement = "outside", panel.grid = element_blank()) 
 ggsave(trait_ridges_subsampled, filename = "trait_elevation_poster_subsampled.png", path = "Figures", 
        width = 2300, height = 1400, units = "px")
+
+
+
+####Scatterplots of SES ~microenvironmental variables####
+SLA_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_SLA.csv", row.names = 1) |> 
+  rename(Cell_ID = included_cells)
+H_incl_cells <- read.csv("All_data/comm_assembly_results/included_cells_Height.csv", row.names = 1) |> 
+  rename(Cell_ID = included_cells)
+
+incl_cells <- bind_rows(SLA_incl_cells, H_incl_cells)
+
+plotdat <- comb2 |> 
+  inner_join(incl_cells, by = c("trait", "Cell_ID"))
+
+
+Hplots <- plotdat |> 
+  filter(trait == "Height_cm") |> 
+  dplyr::select(Cell_ID, SES, zrock_cover, zsoil_moist) |> 
+  pivot_longer(cols = c(zrock_cover, zsoil_moist), names_to = "microenv_var", values_to = "value") |> 
+  ggplot(aes(x = value, y = SES)) +
+  geom_point()+
+  facet_wrap(~ microenv_var, scale = "free_x") +
+  theme_classic()
