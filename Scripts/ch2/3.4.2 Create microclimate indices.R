@@ -90,7 +90,7 @@ start_grw <- min_daily_temp |>
   group_by(site) |> 
   slice_min(date, n = 1) |>   #earliest date per site
   rename(start_grw_date = date) |> 
-  select(!all_above_5)
+  dplyr::select(!all_above_5)
 
 ##latest date before 21 June where all loggers at a site had a mean temp above 5
 end_grw <- min_daily_temp |>
@@ -102,7 +102,7 @@ end_grw <- min_daily_temp |>
   group_by(site) |> 
   slice_max(date, n = 1) |>   #latest date per site
   rename(end_grw_date = date) |> 
-  select(!all_above_5)
+  dplyr::select(!all_above_5)
 
 growing_season_min_temps <- start_grw |> 
   left_join(end_grw, by = "site") #do not consider the years, only the days!
@@ -119,7 +119,8 @@ GG_ind <- tms |>
          !between(date, ymd(GG_end), ymd(GG_start)), #exclude non-growing season
           between(date, ymd("2023-01-01"), ymd("2023-12-31"))) |>  #only use from 2023 growing season
   group_by(site, Cell_ID) |> 
-  summarise(mean_T1_growing_season = mean(T1, na.rm = T)) |> 
+  summarise(mean_T1_growing_season = mean(T1, na.rm = T), 
+            mean_moist_growing_season = mean(moist, na.rm = T)) |> 
   mutate(start_growing_season = ymd(GG_start), 
          end_growing_season = ymd(GG_end))
   
@@ -134,7 +135,8 @@ WH_ind <- tms |>
          !between(date, ymd(WH_end), ymd(WH_start)), #exclude non-growing season
          between(date, ymd("2023-01-01"), ymd("2023-12-31"))) |>  #only use from 2023 growing season
   group_by(site, Cell_ID) |> 
-  summarise(mean_T1_growing_season = mean(T1, na.rm = T)) |> 
+  summarise(mean_T1_growing_season = mean(T1, na.rm = T), 
+            mean_moist_growing_season = mean(moist, na.rm = T)) |>  
   mutate(start_growing_season = ymd(WH_start), 
          end_growing_season = ymd(WH_end))
 
@@ -149,7 +151,8 @@ BK_ind <- tms |>
          !between(date, ymd(BK_end), ymd(BK_start)), #exclude non-growing season
          between(date, ymd("2023-01-01"), ymd("2023-12-31"))) |>  #only use from 2023 growing season
   group_by(site, Cell_ID) |> 
-  summarise(mean_T1_growing_season = mean(T1, na.rm = T)) |> 
+  summarise(mean_T1_growing_season = mean(T1, na.rm = T), 
+            mean_moist_growing_season = mean(moist, na.rm = T)) |>  
   mutate(start_growing_season = ymd(BK_start), 
          end_growing_season = ymd(BK_end))
 
