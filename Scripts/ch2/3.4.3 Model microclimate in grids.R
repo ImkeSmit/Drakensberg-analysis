@@ -2,6 +2,7 @@
 ###USING ALL ENVIRONMENTAL VARIABLES####
 library(tidyverse)
 library(tidylog)
+library(corrplot)
 
 ###Import microclimate indices
 ind <- read.csv("all_data/clean_data/Environmental data/Imke_microclimate_indices.csv", row.names = 1) |> 
@@ -19,8 +20,16 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
          mesotopo = as.factor(mesotopo)) |> 
   #variables we are interested in
   dplyr::select(c(Cell_ID:row, vascular_cover, rock_cover, soil_cover, northness, eastness, 
-                  mesotopo, veg_max_height, mean_soil_depth, slope_height)) |> 
-  mutate(zrock_cover = c(scale(rock_cover)), #standardise variables
-         znorthness = c(scale(northness)), 
-         zsoil_depth = c(scale(mean_soil_depth)), 
-         zslope_height = c(scale(slope_height)))
+                  mesotopo, veg_max_height, mean_soil_depth, slope_height)) 
+
+
+###Correlation of env variables
+cordf <- env |> 
+  select(!mesotopo) |> 
+  drop_na()
+cormat <- cor(cordf[, c(6:13)])
+corrplot(cormat, method = "number", type = "lower", 
+         tl.cex = 0.8,    # shrink variable name text
+         tl.srt = 45)
+##Only vascular cover and rock cover are highly correlated
+
