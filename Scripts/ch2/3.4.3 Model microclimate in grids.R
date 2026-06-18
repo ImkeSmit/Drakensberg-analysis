@@ -128,7 +128,10 @@ for(g in 1:length(gridlist)) {
   }
 }
 
-
+###Save results
+predicted_microclim_indices <- result |> 
+  dplyr::select(c(Cell_ID, mean_T1_growing_season:moist_bestmod_rsq))
+write.csv(predicted_microclim_indices, "All_data/clean_data/Environmental data/predicted_microclimate_indices.csv")
 
 
 
