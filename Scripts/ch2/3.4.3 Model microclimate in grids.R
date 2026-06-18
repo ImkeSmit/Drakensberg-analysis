@@ -48,17 +48,24 @@ WH_micro_env <- micro_env |>  filter(site.x == "WH")
 BK_micro_env <- micro_env |>  filter(site.x == "BK")
 
 
-gridlist <- c(unique(micro_env$grid))
+###PREDICT MICROCLIMATE INDICES FROM ENVIRONMENTAL VARIABLES###
+#Do this per site. 
+#Too few datapoints to do it per grid
 
+#list of sites
+gridlist <- c(unique(micro_env$site))
+
+#start loop
 for(g in 1:length(gridlist)) {
-  one_grid <- micro_env |>  filter(grid == gridlist[g])
+  one_grid <- micro_env |>  filter(site == gridlist[g])
   
   #full models
   grid_fullmod_T1 <- lm(mean_T1_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
-                       mesotopo+ veg_max_height+ mean_soil_depth+ slope_height, data = one_grid)
+                      veg_max_height+ mean_soil_depth+ slope_height, data = one_grid)
+  #does not contain mesotopo because the model tries to predict to novel mesotopo codes
   
   grid_fullmod_moist <- lm(mean_moist_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
-                          mesotopo+ veg_max_height+ mean_soil_depth+ slope_height, data = one_grid)
+                         veg_max_height+ mean_soil_depth+ slope_height, data = one_grid)
   
   #backward selection
   T1_bestmod <- stepAIC(grid_fullmod_T1, direction = "backward")
@@ -69,7 +76,7 @@ for(g in 1:length(gridlist)) {
   #predictions
   #data for prediction
   pred_dat <- env |> 
-    filter(grid == gridlist[g]) |> 
+    filter(site == gridlist[g]) |> 
     left_join(ind, by = "Cell_ID") |>  #add measured microclimate indices
     dplyr::select(!c(site.y, start_growing_season, end_growing_season)) |> 
     rename(site = site.x)
@@ -83,8 +90,8 @@ for(g in 1:length(gridlist)) {
   pred_dat_save <- pred_dat |> 
     mutate(predicted_mean_T1_growing_season = predicted_mean_T1_growing_season, 
            predicted_mean_moist_growing_season = predicted_mean_moist_growing_season,
-           T1_bestmod_formula = formula(T1_bestmod), 
-           moist_bestmod_formula = formula (moist_bestmod)) 
+           T1_bestmod_formula = paste0(as.character(formula(T1_bestmod))), 
+           moist_bestmod_formula = as.character(formula (moist_bestmod))) 
   
   if(g == 1) {
     result <- pred_dat_save
