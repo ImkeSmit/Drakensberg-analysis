@@ -47,7 +47,7 @@ BK_micro_env <- micro_env |>  filter(site.x == "BK")
 
 
 
-###Build model for predicting microclimate per site
+###===MODEL SELECTION===####
 ###GOLDEN GATE####
 fullmod_GG <- lm(mean_T1_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
               mesotopo+ veg_max_height+ mean_soil_depth+ slope_height, data = GG_micro_env)
@@ -93,3 +93,34 @@ plot(fullmod_BK)
 BK_bestmod <- stepAIC(fullmod_BK, direction = "backward")
 par(mfrow = c(2,2))
 plot(BK_bestmod)
+
+
+####===PREDICTION===####
+###GOLDEN GATE####
+
+formula(GG_bestmod)
+
+#get data to predict over
+GG_pred_dat <- env |> 
+  filter(site == "GG") |> 
+  left_join(ind, by = "Cell_ID") |>  #add measured microclimate indices
+  dplyr::select(!c(site.y, start_growing_season, end_growing_season)) |> 
+  rename(site = site.x)
+
+#check that grids are complete
+GG_pred_dat |>  group_by(grid) |> 
+summarise(ncells = n())
+
+predicted_mean_T1_growing_season <- predict(GG_bestmod, GG_pred_dat, type = "response")
+GG_pred_dat <- GG_pred_dat |> 
+  mutate(predicted_mean_T1_growing_season = predicted_mean_T1_growing_season)
+
+###Validation
+#How to do??
+
+
+  
+
+
+
+
