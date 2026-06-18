@@ -453,7 +453,7 @@ cwm_subs <- cwm |>
 
 
 ##Graph
-l1 <- c("Height_cm" = "Plant~height~(cm)", "SLA" = "SLA~(mm^2/mg)")
+l1 <- c("Height_cm" = "CWM~Plant~height~(cm)", "SLA" = "CWM~SLA~(mm^2/mg)")
 ridges_letters <- data.frame(trait = c(rep("Height_cm", 3), rep("SLA", 3)), 
                              elevation = as.factor(c(rep(c("2000", "2500", "3000"), 2))),
                              letters = c("a", "b", "c", "a", "b", "c"), 
