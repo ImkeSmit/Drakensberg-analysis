@@ -67,8 +67,8 @@ plot(WH_bestmod)
 
 
 ##BOKONG####
-fullmod_BK <- glm(mean_T1_growing_season ~ rock_cover+soil_cover+northness+eastness+
-                 mesotopo+veg_max_height+mean_soil_depth+slope_height, data = BK_micro_env, family = "Gamma")
+fullmod_BK <- lm(mean_T1_growing_season ~ rock_cover+soil_cover+northness+eastness+
+                 mesotopo+veg_max_height+mean_soil_depth+slope_height, data = BK_micro_env)
 plot(fullmod_BK)
 
 
