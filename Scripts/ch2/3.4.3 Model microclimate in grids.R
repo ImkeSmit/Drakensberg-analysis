@@ -37,12 +37,66 @@ corrplot(cormat, method = "number", type = "lower",
 
 ###Join microclimate and env variables
 micro_env <- ind |> 
-  left_join(env, by = "Cell_ID")
+  left_join(env, by = "Cell_ID") |>
+  rename(site = site.x) |> 
+  dplyr::select(!site.y) |> 
+  mutate(grid = paste0(site, grid))
 
 ###Golden gate data
 GG_micro_env <- micro_env |>  filter(site.x == "GG") 
 WH_micro_env <- micro_env |>  filter(site.x == "WH")
 BK_micro_env <- micro_env |>  filter(site.x == "BK")
+
+
+gridlist <- c(unique(micro_env$grid))
+
+for(g in 1:length(gridlist)) {
+  one_grid <- micro_env |>  filter(grid == gridlist[g])
+  
+  #full models
+  grid_fullmod_T1 <- lm(mean_T1_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
+                       mesotopo+ veg_max_height+ mean_soil_depth+ slope_height, data = one_grid)
+  
+  grid_fullmod_moist <- lm(mean_moist_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
+                          mesotopo+ veg_max_height+ mean_soil_depth+ slope_height, data = one_grid)
+  
+  #backward selection
+  T1_bestmod <- stepAIC(grid_fullmod_T1, direction = "backward")
+  
+  moist_bestmod <- stepAIC(grid_fullmod_moist, direction = "backward")
+  
+  
+  #predictions
+  #data for prediction
+  pred_dat <- env |> 
+    filter(grid == gridlist[g]) |> 
+    left_join(ind, by = "Cell_ID") |>  #add measured microclimate indices
+    dplyr::select(!c(site.y, start_growing_season, end_growing_season)) |> 
+    rename(site = site.x)
+  
+  #Mean T1
+  predicted_mean_T1_growing_season <- predict(T1_bestmod, pred_dat, type = "response")
+  
+  #mean moist
+  predicted_mean_moist_growing_season <- predict(moist_bestmod, pred_dat, type = "response")
+  
+  pred_dat_save <- pred_dat |> 
+    mutate(predicted_mean_T1_growing_season = predicted_mean_T1_growing_season, 
+           predicted_mean_moist_growing_season = predicted_mean_moist_growing_season,
+           T1_bestmod_formula = formula(T1_bestmod), 
+           moist_bestmod_formula = formula (moist_bestmod)) 
+  
+  if(g == 1) {
+    result <- pred_dat_save
+  } else {
+    temp_result <- pred_dat_save
+    result <- bind_rows(result, temp_result)
+  }
+    
+}
+
+
+
 
 
 
