@@ -26,7 +26,7 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
 
 ###Correlation of env variables
 cordf <- env |> 
-  select(!mesotopo) |> 
+  dplyr::select(!mesotopo) |> 
   drop_na()
 cormat <- cor(cordf[, c(6:13)])
 corrplot(cormat, method = "number", type = "lower", 
@@ -51,17 +51,34 @@ BK_micro_env <- micro_env |>  filter(site.x == "BK")
 ###GOLDEN GATE####
 fullmod_GG <- lm(mean_T1_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
               mesotopo+ veg_max_height+ mean_soil_depth+ slope_height, data = GG_micro_env)
+par(mfrow = c(2,2))
 plot(fullmod_GG) ##Looks ok
 
 GG_bestmod <- stepAIC(fullmod_GG, direction = "backward")
 
 
 ###WITSIESHOEK####
-fullmod_WH <- glm(mean_T1_growing_season ~ rock_cover+soil_cover+northness+eastness+ 
-                 mesotopo+veg_max_height+mean_soil_depth+slope_height, data = WH_micro_env, family = "Gamma")
+fullmod_WH <- lm(mean_T1_growing_season ~ rock_cover+soil_cover+northness+eastness+ 
+                 mesotopo+veg_max_height+mean_soil_depth+slope_height, data = WH_micro_env)
+
+par(mfrow = c(2,2))
 plot(fullmod_WH)##A little heavy tailed
 
+bc <- boxcox(fullmod_WH, plotit = T)
+# Extract the best lambda
+best_lambda <- bc$x[which.max(bc$y)]
+#apply boxcox transformation
+WH_micro_env$y_transformed <- (WH_micro_env$mean_T1_growing_season^best_lambda - 1) / best_lambda
+
+fullmod_WH2 <- lm(y_transformed ~ rock_cover+soil_cover+northness+eastness+ 
+                   mesotopo+veg_max_height+mean_soil_depth+slope_height, data = WH_micro_env)
+
+par(mfrow = c(2,2))
+plot(fullmod_WH2)##Not really better
+
+#backward selection
 WH_bestmod <- stepAIC(fullmod_WH, direction = "backward")
+par(mfrow = c(2,2))
 plot(WH_bestmod)
 
 
@@ -69,8 +86,10 @@ plot(WH_bestmod)
 ##BOKONG####
 fullmod_BK <- lm(mean_T1_growing_season ~ rock_cover+soil_cover+northness+eastness+
                  mesotopo+veg_max_height+mean_soil_depth+slope_height, data = BK_micro_env)
+par(mfrow = c(2,2))
 plot(fullmod_BK)
 
 
 BK_bestmod <- stepAIC(fullmod_BK, direction = "backward")
-plot(WH_bestmod)
+par(mfrow = c(2,2))
+plot(BK_bestmod)
