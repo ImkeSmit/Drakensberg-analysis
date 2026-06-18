@@ -125,7 +125,7 @@ plot(fullmod_BK_moist)
 BK_bestmod_moist <- stepAIC(fullmod_BK_moist, direction = "backward")
 
 
-####===PREDICTION, mean T1===####
+####===PREDICTION===####
 ###GOLDEN GATE####
 
 formula(GG_bestmod)
@@ -141,9 +141,72 @@ GG_pred_dat <- env |>
 GG_pred_dat |>  group_by(grid) |> 
 summarise(ncells = n())
 
+#Mean T1
 predicted_mean_T1_growing_season <- predict(GG_bestmod, GG_pred_dat, type = "response")
+
+#mean moist
+predicted_mean_moist_growing_season <- predict(GG_bestmod_moist, GG_pred_dat, type = "response")
+
 GG_pred_dat <- GG_pred_dat |> 
-  mutate(predicted_mean_T1_growing_season = predicted_mean_T1_growing_season)
+  mutate(predicted_mean_T1_growing_season = predicted_mean_T1_growing_season, 
+         predicted_mean_moist_growing_season = predicted_mean_moist_growing_season)
+
+###Validation
+#How to do??
+
+
+
+###WITSIESHOEK####
+#get data to predict over
+WH_pred_dat <- env |> 
+  filter(site == "WH") |> 
+  left_join(ind, by = "Cell_ID") |>  #add measured microclimate indices
+  dplyr::select(!c(site.y, start_growing_season, end_growing_season)) |> 
+  rename(site = site.x)
+
+#check that grids are complete
+WH_pred_dat |>  group_by(grid) |> 
+  summarise(ncells = n())
+
+#Mean T1
+WH_predicted_mean_T1_growing_season <- predict(WH_bestmod, WH_pred_dat, type = "response")
+
+#mean moist
+WH_predicted_mean_moist_growing_season <- predict(lm(mean_moist_growing_season ~ slope_height, data = WH_micro_env),
+                                                  #put next best model in here because the best model is ~1
+                                                  WH_pred_dat, type = "response")
+
+WH_pred_dat <- WH_pred_dat |> 
+  mutate(predicted_mean_T1_growing_season = WH_predicted_mean_T1_growing_season, 
+         predicted_mean_moist_growing_season = WH_predicted_mean_moist_growing_season)
+
+###Validation
+#How to do??
+
+
+
+###BOKONG####
+#get data to predict over
+BK_pred_dat <- env |> 
+  filter(site == "BK") |> 
+  left_join(ind, by = "Cell_ID") |>  #add measured microclimate indices
+  dplyr::select(!c(site.y, start_growing_season, end_growing_season)) |> 
+  rename(site = site.x)
+
+#check that grids are complete
+BK_pred_dat |>  group_by(grid) |> 
+  summarise(ncells = n())
+
+#Mean T1
+BK_predicted_mean_T1_growing_season <- predict(BK_bestmod, BK_pred_dat, type = "response")
+
+#mean moist
+BK_predicted_mean_moist_growing_season <- predict(BK_bestmod_moist,
+                                                  BK_pred_dat, type = "response")
+
+WH_pred_dat <- WH_pred_dat |> 
+  mutate(predicted_mean_T1_growing_season = WH_predicted_mean_T1_growing_season, 
+         predicted_mean_moist_growing_season = WH_predicted_mean_moist_growing_season)
 
 ###Validation
 #How to do??
