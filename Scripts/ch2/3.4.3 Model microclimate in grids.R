@@ -47,8 +47,9 @@ BK_micro_env <- micro_env |>  filter(site.x == "BK")
 
 
 
-###===MODEL SELECTION===####
+###===MODEL SELECTION####
 ###GOLDEN GATE####
+##mean T1
 fullmod_GG <- lm(mean_T1_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
               mesotopo+ veg_max_height+ mean_soil_depth+ slope_height, data = GG_micro_env)
 par(mfrow = c(2,2))
@@ -56,8 +57,17 @@ plot(fullmod_GG) ##Looks ok
 
 GG_bestmod <- stepAIC(fullmod_GG, direction = "backward")
 
+##mean moist
+fullmod_GG_moist <- lm(mean_moist_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
+                   mesotopo+ veg_max_height+ mean_soil_depth+ slope_height, data = GG_micro_env)
+par(mfrow = c(2,2))
+plot(fullmod_GG_moist) ##Looks ok
+
+GG_bestmod_moist <- stepAIC(fullmod_GG_moist, direction = "backward")
+
 
 ###WITSIESHOEK####
+#mean T1
 fullmod_WH <- lm(mean_T1_growing_season ~ rock_cover+soil_cover+northness+eastness+ 
                  mesotopo+veg_max_height+mean_soil_depth+slope_height, data = WH_micro_env)
 
@@ -83,7 +93,18 @@ plot(WH_bestmod)
 
 
 
+##mean moist
+fullmod_WH_moist <- lm(mean_moist_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
+                         mesotopo+ veg_max_height+ mean_soil_depth+ slope_height, data = WH_micro_env)
+par(mfrow = c(2,2))
+plot(fullmod_WH_moist) ##Looks ok
+
+WH_bestmod_moist <- stepAIC(fullmod_WH_moist, direction = "backward")
+#null model is best??
+
+
 ##BOKONG####
+#mean T1
 fullmod_BK <- lm(mean_T1_growing_season ~ rock_cover+soil_cover+northness+eastness+
                  mesotopo+veg_max_height+mean_soil_depth+slope_height, data = BK_micro_env)
 par(mfrow = c(2,2))
@@ -95,7 +116,16 @@ par(mfrow = c(2,2))
 plot(BK_bestmod)
 
 
-####===PREDICTION===####
+#mean moist
+fullmod_BK_moist <- lm(mean_moist_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
+                         mesotopo+ veg_max_height+ mean_soil_depth+ slope_height, data = BK_micro_env)
+par(mfrow = c(2,2))
+plot(fullmod_BK_moist) 
+
+BK_bestmod_moist <- stepAIC(fullmod_BK_moist, direction = "backward")
+
+
+####===PREDICTION, mean T1===####
 ###GOLDEN GATE####
 
 formula(GG_bestmod)
