@@ -143,12 +143,17 @@ anova(tmod1_nonspat, tmod1)
 #spatial model has lower AIC and is a significantly better fit than the nonspatial model
 
 
+# Residual diagnostics
+plot(tmod1)
+qqnorm(tmod1, ~ resid(., type = "normalized"))
+
+# Optional: variogram of normalized residuals to visually check
+# whether spatial autocorrelation has been adequately captured
+plot(Variogram(tmod1, resType = "normalized"))
+plot(Variogram(tmod1_nonspat, resType = "normalized"))
 
 
-tmod1_res <- simulateResiduals(tmod1)
-plot(tmod1_res) #looks ok...
 
-r.squaredGLMM(tmod1)
 
 write.csv(summary(tmod1)$coefficients$cond, "All_data/comm_assembly_results/SES_height_env_model_results.csv")
 
