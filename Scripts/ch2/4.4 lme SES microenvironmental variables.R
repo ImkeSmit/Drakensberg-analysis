@@ -129,7 +129,6 @@ anova(tmod1)
 
 # Check the estimated range and nugget effect
 tmod1$modelStruct$corStruct
-intervals(tmod1, which = "var-cov")
 
 
 #Compare against a model without spatial structure to see if it improves fit
