@@ -105,7 +105,8 @@ Hdat <- comb2 |>
          !is.na(SES)) |> 
   arrange(y_coord, x_coord) |> 
   mutate(trait = "Height_cm",  #give all records a trait
-         grid = as.factor(paste0(site, grid)))
+         grid = as.factor(paste0(site, grid))) |> 
+  drop_na()
 
 #descriptive stats
 #how many cells
@@ -118,11 +119,32 @@ tic()
 tmod1<- lme(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
                   zslope_height,
             random = ~1|grid, 
-            correlation = corExp(form = ~ x + y | grid, nugget = TRUE), #exponential correlation structure
-            data = Hdat,
-            family = t_family(link = "identity"))
+            correlation = corExp(form = ~ x_coord + y_coord | grid, nugget = TRUE), #exponential correlation structure
+            data = Hdat) #only gaussian family possible
 toc()
 summary(tmod1)
+anova(tmod1)
+
+
+# Check the estimated range and nugget effect
+tmod1$modelStruct$corStruct
+intervals(tmod1, which = "var-cov")
+
+
+#Compare against a model without spatial structure to see if it improves fit
+tic()
+tmod1_nonspat<- lme(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
+              zslope_height,
+            random = ~1|grid, 
+            data = Hdat) #only gaussian family possible
+toc()
+
+anova(tmod1_nonspat, tmod1)
+#spatial model has lower AIC and is a significantly better fit than the nonspatial model
+
+
+
+
 tmod1_res <- simulateResiduals(tmod1)
 plot(tmod1_res) #looks ok...
 
