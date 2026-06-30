@@ -8,7 +8,7 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
          soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2), 
          soil_depth_CV = as.numeric(soil_depth_CV)) |> 
   #variables we are interested in
-  select(c(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
+  dplyr::select(c(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
            soil_depth_CV, mean_soil_depth, slope_height)) |> 
   #add elevation variables
   mutate(elevation = case_when(site == "GG" ~ 2000, 
@@ -23,12 +23,12 @@ ind <- read.csv("C:\\Users\\imke6\\Documents\\PhD 2025\\Ch2 niche modelling\\All
          grid = str_split_i(grid, "_", 2), 
          cell = toupper(str_split_i(site, "_", 3)), 
          Cell_ID = paste0(area, "_G", grid, "_", cell)) |> 
-  select(!c(site, impprop)) |> 
+  dplyr::select(!c(site, impprop)) |> 
   rename(site = "area") |> 
   #pick variables we are interested in
   filter(stat %in% c("avg", "fdh", "gdh5"), sensor %in% c("T1", "moist"), period %in% c("annual", "summer")) |>  #T1 is the soil temperature, this is the most relaible temperature as it isn't excesively heated by solar radiation
   mutate(variable = paste(sensor, stat, period, sep = "_")) |> 
-  select(!c(sensor, stat, period)) |> 
+  dplyr::select(!c(sensor, stat, period)) |> 
   pivot_wider(names_from = variable, values_from = value) |> 
   arrange(site, grid)
 
@@ -55,7 +55,7 @@ rms <- rms |>
 all_env <- env |> 
   full_join(ind, by = "Cell_ID") |> 
   full_join(rms, by = "Cell_ID")  |> 
-  select(c(Cell_ID, site.x, elevation, rock_cover:slope_height, T1_avg_annual:moist_avg_summer, STD)) |> 
+  dplyr::select(c(Cell_ID, site.x, elevation, rock_cover:slope_height, T1_avg_annual:moist_avg_summer, STD)) |> 
   column_to_rownames(var = "Cell_ID") |> 
   mutate(across(c(rock_cover: STD), ~ as.numeric(scale(.x))))
   
