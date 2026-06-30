@@ -20,7 +20,7 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
          soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2), 
          soil_depth_CV = as.numeric(soil_depth_CV)) |> 
   #variables we are interested in
-  select(c(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
+  dplyr::select(c(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
            soil_depth_CV, mean_soil_depth, slope_height)) |> 
   #add elevation variables
   mutate(elevation = case_when(site == "GG" ~ 2000, 
@@ -96,8 +96,6 @@ cormat<- cor(cordf)
 corrplot(cormat, type = "lower", method = "number")
 
 
-####===========================####
-#=======POSTER ANALYSIS===========#
 
 ####SES HEIGHT####
 #isolate SES of height
@@ -107,8 +105,7 @@ Hdat <- comb2 |>
          !is.na(SES)) |> 
   arrange(y_coord, x_coord) |> 
   mutate(trait = "Height_cm",  #give all records a trait
-         grid = as.factor(paste0(site, grid)), 
-         pos = numFactor(x_coord, y_coord))
+         grid = as.factor(paste0(site, grid)))
 
 #descriptive stats
 #how many cells
