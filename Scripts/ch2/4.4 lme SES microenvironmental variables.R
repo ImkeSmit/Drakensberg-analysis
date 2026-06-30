@@ -115,9 +115,12 @@ Hdat |> group_by(site) |>
 
 
 tic()
-tmod1<- glmmTMB(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
-                  zslope_height + (1|grid), 
-                family = t_family(link = "identity"), data = Hdat)
+tmod1<- lme(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
+                  zslope_height,
+            random = ~1|grid, 
+            correlation = corExp(form = ~ x + y | grid, nugget = TRUE), #exponential correlation structure
+            data = Hdat,
+            family = t_family(link = "identity"))
 toc()
 summary(tmod1)
 tmod1_res <- simulateResiduals(tmod1)
