@@ -1,6 +1,7 @@
 ####PCA of all microenvironmental variables####
 library(tidyverse)
 library(tidylog)
+library(ggbiplot)
 
 ###Microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
@@ -83,7 +84,7 @@ env_pca <- ggbiplot(all_env_pca, choices = c(1,2),
   scale_color_manual(values = c("blue", "red", "green"))+
   theme_classic() 
 env_pca$layers <- c(env_pca$layers, env_pca$layers[[2]], env_pca$layers[[3]]) #move the arrows to plot in the foreground
-ggsave(plot = trait_pca, filename = "trait.pca.png", path = "Figures") 
+#ggsave(plot = trait_pca, filename = "trait.pca.png", path = "Figures") 
 
 
 ###correlation
