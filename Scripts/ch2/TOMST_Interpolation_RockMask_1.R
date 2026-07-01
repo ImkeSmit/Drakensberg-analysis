@@ -40,7 +40,7 @@ NMAX           <- Inf    # use all loggers per grid
 # SECTION 1 Load data 
 # =============================================================================
 
-tomst_raw  <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices.csv", stringsAsFactors=FALSE)
+tomst_raw  <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices.csv")
 #centroids  <- read.csv("All_Sites_Cell_Centroids.csv", stringsAsFactors=FALSE)
 env_data   <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv")
 centroids <- env_data |> 
@@ -126,8 +126,8 @@ print(head(tomst_wide %>% select(site_code, Grid, Column, Row, Cell_ID), 5))
 # SECTION 3 Join logger positions to coordinates
 # =============================================================================
 
-tomst_spatial <- tomst_wide %>%
-  left_join(centroids %>% select(Cell_ID, lat, lon), by="Cell_ID") %>%
+tomst_spatial <- tomst_raw %>%
+  left_join(centroids %>% select(Cell_ID, x_coord, y_coord), by="Cell_ID") %>%
   # Flag loggers sitting on high-rock cells
   left_join(rock_lookup %>% select(Cell_ID, high_rock), by="Cell_ID")
 
