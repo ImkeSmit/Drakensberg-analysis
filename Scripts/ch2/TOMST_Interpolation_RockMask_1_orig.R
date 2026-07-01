@@ -108,8 +108,8 @@ tomst_extracted <- TOMST_VARS %>%
 tomst_wide <- tomst_extracted %>%
   pivot_wider(names_from = output_name, values_from = value) %>%
   mutate(
-    site_code = SITE_MAP[Site],
-    Grid      = as.integer(Grid),
+    site_code = SITE_MAP[site],
+    Grid      = as.integer(grid),
     Column    = toupper(trimws(Column)),
     Row       = as.integer(Row),
     Cell_ID   = paste0(site_code, "_G", Grid, "_", Column, Row)
