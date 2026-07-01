@@ -61,18 +61,13 @@ for(g in 1:length(sitelist)) {
   sub <- micro_env |>  filter(site == sitelist[g])
   
   #full models
-  grid_fullmod_T1 <- lme(mean_T1_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
+  grid_fullmod_T1 <- lm(mean_T1_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
                       veg_max_height+ mean_soil_depth+ slope_height +MAX,
-                      random = ~1|grid, 
-                      correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE),
-                      data = sub, 
-                      method = "ML") #must use maximum likelihood to do stepwise selection
+                      data = sub)
   #does not contain mesotopo because the model tries to predict to novel mesotopo codes
   
   grid_fullmod_moist <- lme(mean_moist_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
                             veg_max_height+ mean_soil_depth+ slope_height +MAX,
-                           random = ~1|grid, 
-                           correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE),
                            data = sub)
   
   #backward selection
