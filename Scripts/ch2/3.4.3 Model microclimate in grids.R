@@ -4,6 +4,9 @@ library(tidyverse)
 library(tidylog)
 library(corrplot)
 library(MASS)
+library(nlme)
+library(conflicted)
+conflict_prefer_all("tidylog", quiet = TRUE)
 
 ###Import microclimate indices
 ind <- read.csv("all_data/clean_data/Environmental data/Imke_microclimate_indices.csv", row.names = 1)# |> 
