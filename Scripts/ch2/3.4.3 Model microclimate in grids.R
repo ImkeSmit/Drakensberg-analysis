@@ -43,7 +43,10 @@ micro_env <- ind |>
   left_join(env, by = "Cell_ID") |>
   rename(site = site.x) |> 
   select(!site.y) |> 
-  mutate(grid = paste0(site, grid))
+  mutate(grid = paste0(site, grid)) |> 
+  mutate(ncolumn = match(column, LETTERS[1:8])) |> #make x and y coordinates
+  rename(x_coord = ncolumn, 
+         y_coord = row)
 
 
 ###PREDICT MICROCLIMATE INDICES FROM ENVIRONMENTAL VARIABLES###
@@ -60,7 +63,6 @@ for(g in 1:length(gridlist)) {
   #full models
   grid_fullmod_T1 <- lme(mean_T1_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
                       veg_max_height+ mean_soil_depth+ slope_height +MAX,
-                      random = ~1|grid, 
                       correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE),
                       data = sub)
   #does not contain mesotopo because the model tries to predict to novel mesotopo codes
