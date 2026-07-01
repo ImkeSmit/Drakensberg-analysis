@@ -56,15 +56,20 @@ RQ_obs_cells <- calc_RaoQ_weighted(mean_traits, abun_matrix)
 toc()}
 
 #Create null models
+{tic()
 set.seed(123)
 nullcomm_cells <- generate_C5_null_imp(abun_matrix, 999, pool = "entire")
+toc()}
 
 saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/nullmodel_C5_cells.rds")
 nullcomm_cells <- readRDS("All_data/comm_assembly_results/nullmodel_C5_cells.rds")
-#Calculate SES, with unscaled RaoQ#
+
+#===Calculate SES, with unscaled RaoQ===#
 #we need to calculate RaoQ for each of the observed null communities
 
+
 # Set up parallel backend
+tic()
 plan(multisession, workers = parallel::detectCores() - 2)  
 
 chunks <- split(nullcomm_cells, ceiling(seq_along(nullcomm_cells) / 50))
@@ -92,7 +97,7 @@ for (i in seq_along(chunks)) { #run chunks sequentially
 null_RQ <- bind_rows(RaoQ_results)
 
 plan(sequential)
-
+toc()
 
 #SES of each cell
 RQ_cells_summary <- null_RQ |> 
