@@ -10,7 +10,7 @@
 #
 #   This is the same logic used for the campaign moisture NAs bare rock
 #   cells are biologically uninformative for soil variables and their
-#   inclusion was dragging down cross-validation R² for moisture.
+#   inclusion was dragging down cross-validation R? for moisture.
 #
 # =============================================================================
 
@@ -21,7 +21,7 @@ library(gstat)
 library(sf)
 library(ggplot2)
 
-setwd("C:/Users/User/Documents/Academics 5/Env data merge")  
+#setwd("C:/Users/User/Documents/Academics 5/Env data merge")  
 # =============================================================================
 # SETTINGS
 # =============================================================================
