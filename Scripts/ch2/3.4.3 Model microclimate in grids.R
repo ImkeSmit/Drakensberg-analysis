@@ -65,7 +65,8 @@ for(g in 1:length(sitelist)) {
                       veg_max_height+ mean_soil_depth+ slope_height +MAX,
                       random = ~1|grid, 
                       correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE),
-                      data = sub)
+                      data = sub, 
+                      method = "ML") #must use maximum likelihood to do stepwise selection
   #does not contain mesotopo because the model tries to predict to novel mesotopo codes
   
   grid_fullmod_moist <- lme(mean_moist_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
@@ -108,9 +109,9 @@ for(g in 1:length(sitelist)) {
   #predictions
   #data for prediction
   pred_dat <- env |> 
-    filter(site == gridlist[g]) |> 
+    filter(site == sitelist[g]) |> 
     left_join(ind, by = "Cell_ID") |>  #add measured microclimate indices
-    dplyr::select(!c(site.y, start_growing_season, end_growing_season)) |> 
+    select(!c(site.y, start_growing_season, end_growing_season)) |> 
     rename(site = site.x)
   
   #Mean T1
