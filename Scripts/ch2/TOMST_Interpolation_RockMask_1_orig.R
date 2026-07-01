@@ -101,7 +101,7 @@ tomst_extracted <- TOMST_VARS %>%
         output_name = output_name,
         value_clean = ifelse(impprop > IMP_THRESHOLD, NA_real_, value)
       ) %>%
-      select(Site, Grid, Column, Row, output_name, value = value_clean)
+      select(site, grid, output_name, value = value_clean)
   })
 
 # Pivot to wide format and build Cell_ID
