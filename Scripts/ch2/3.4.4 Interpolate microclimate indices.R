@@ -138,3 +138,49 @@ interpolate_grid_idw <- function(site_code, grid_num, tomst_sp,
   
   return(result)
 }
+
+
+
+# =============================================================================
+# SECTION 5 Run interpolation
+# =============================================================================
+
+cat("=== Running IDW interpolation with rock masking ===\n")
+
+site_grids <- indices_spatial %>%
+  distinct(site, grid_number) %>%
+  arrange(site, grid_number)
+
+CELL_LEVEL_VARS = as.vector(colnames(indices_spatial)[c(3,4)])
+
+all_interpolated <- map_dfr(CELL_LEVEL_VARS, function(var) {
+  cat("Interpolating:", var, "\n")
+  map2_dfr(site_grids$site, site_grids$grid_number, function(sc, gn) {
+    interpolate_grid_idw(sc, gn, indices_spatial, meter_centroids,
+                         rock_lookup, var)
+  })
+})
+
+tomst_interpolated <- all_interpolated %>%
+  group_by(Cell_ID) %>%
+  summarise(across(all_of(CELL_LEVEL_VARS),
+                   ~first(.[!is.na(.)])),
+            .groups="drop")
+
+cat("\nInterpolated surface:", nrow(tomst_interpolated), "cells\n")
+
+# High-rock cells will be absent from tomst_interpolated — add them back as NA
+# so the output has all cells and rock cells simply have NA for TOMST variables
+all_cell_ids <- centroids %>%
+  filter(site %in% unique(tomst_spatial$site_code)) %>%
+  select(Cell_ID)
+
+tomst_interpolated <- all_cell_ids %>%
+  left_join(tomst_interpolated, by="Cell_ID")
+
+cat("After adding back rock cells as NA:", nrow(tomst_interpolated), "cells\n")
+cat("\nNA counts per variable:\n")
+tomst_interpolated %>%
+  summarise(across(all_of(CELL_LEVEL_VARS), ~sum(is.na(.)))) %>%
+  pivot_longer(everything(), names_to="variable", values_to="n_NA") %>%
+  print()
