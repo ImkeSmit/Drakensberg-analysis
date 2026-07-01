@@ -151,7 +151,7 @@ site_grids <- indices_spatial %>%
   distinct(site, grid_number) %>%
   arrange(site, grid_number)
 
-CELL_LEVEL_VARS = as.vector(colnames(indices_spatial)[c(3)])
+CELL_LEVEL_VARS = colnames(indices_spatial)[3:4]
 
 all_interpolated <- map_dfr(CELL_LEVEL_VARS, function(var) {
   cat("Interpolating:", var, "\n")
@@ -159,13 +159,13 @@ all_interpolated <- map_dfr(CELL_LEVEL_VARS, function(var) {
     interpolate_grid_idw(sc, gn, indices_spatial, meter_centroids,
                          rock_lookup, var)
   })
-})
+}) #this has two rows for each cell, one row with the T1 interpolated and one with the moist interpolated
 
-#tomst_interpolated <- all_interpolated %>%
-#  group_by(Cell_ID) %>%
-#  summarise(across(all_of(CELL_LEVEL_VARS),
-#                   ~first(.[!is.na(.)])),
-#            .groups="drop")
+tomst_interpolated <- all_interpolated %>%
+  group_by(Cell_ID) %>%
+  summarise(across(all_of(CELL_LEVEL_VARS),
+                   ~first(.[!is.na(.)])),
+            .groups="drop")
 
 cat("\nInterpolated surface:", nrow(all_interpolated), "cells\n")
 
@@ -175,7 +175,7 @@ all_cell_ids <- meter_centroids %>%
   distinct(Cell_ID)
 
 tomst_interpolated <- all_cell_ids %>%
-  left_join(all_interpolated, by="Cell_ID")
+  left_join(tomst_interpolated, by="Cell_ID")
 
 cat("After adding back rock cells as NA:", nrow(tomst_interpolated), "cells\n")
 cat("\nNA counts per variable:\n")
