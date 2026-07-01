@@ -42,13 +42,8 @@ corrplot(cormat, method = "number", type = "lower",
 micro_env <- ind |> 
   left_join(env, by = "Cell_ID") |>
   rename(site = site.x) |> 
-  dplyr::select(!site.y) |> 
+  select(!site.y) |> 
   mutate(grid = paste0(site, grid))
-
-###Golden gate data
-GG_micro_env <- micro_env |>  filter(site.x == "GG") 
-WH_micro_env <- micro_env |>  filter(site.x == "WH")
-BK_micro_env <- micro_env |>  filter(site.x == "BK")
 
 
 ###PREDICT MICROCLIMATE INDICES FROM ENVIRONMENTAL VARIABLES###
@@ -56,15 +51,18 @@ BK_micro_env <- micro_env |>  filter(site.x == "BK")
 #Too few datapoints to do it per grid
 
 #list of sites
-gridlist <- c(unique(micro_env$site))
+sitelist <- c(unique(micro_env$site))
 
 #start loop
 for(g in 1:length(gridlist)) {
-  one_grid <- micro_env |>  filter(site == gridlist[g])
+  sub <- micro_env |>  filter(site == sitelist[g])
   
   #full models
-  grid_fullmod_T1 <- lm(mean_T1_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
-                      veg_max_height+ mean_soil_depth+ slope_height +MAX, data = one_grid)
+  grid_fullmod_T1 <- lme(mean_T1_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
+                      veg_max_height+ mean_soil_depth+ slope_height +MAX,
+                      random = ~1|grid, 
+                      correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE),
+                      data = sub)
   #does not contain mesotopo because the model tries to predict to novel mesotopo codes
   
   grid_fullmod_moist <- lm(mean_moist_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
