@@ -8,6 +8,7 @@ library(vegan)
 library(traitstrap)
 library(FD)
 library(future.apply)
+library(tictoc)
 
 #load required functions first
 
@@ -15,7 +16,12 @@ library(future.apply)
 abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
 
 mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1) |> 
-  mutate(log_Height = log(Height_cm)) #Also calculate SES with log heihgt to see if that improves skew
+  mutate(log_Height = log(Height_cm), 
+         log_LDMC = log(LDMC), 
+         log_LA = log(Leaf_area_mm2), 
+         log_SLA = log(SLA), 
+         log_Thickness = log(Thickness_mm)) #Also calculate SES with log of traits to see if that improves skew
+#logging improves long positive tail in RaoQ
 
 ###Descriptive statistcis####
 
@@ -45,7 +51,9 @@ mean(nspecies_per_cell$nsp)
 
 ####All species - SES at cell scale, C5, pool = entire, weighted RaoQ####
 #observed RaoQ, weighted by abundance
+{tic()
 RQ_obs_cells <- calc_RaoQ_weighted(mean_traits, abun_matrix)
+toc()}
 
 #Create null models
 set.seed(123)
