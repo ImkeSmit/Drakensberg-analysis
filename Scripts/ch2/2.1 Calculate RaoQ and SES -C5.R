@@ -14,7 +14,8 @@ library(future.apply)
 ####Import community and trait data####
 abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
 
-mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
+mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1) |> 
+  mutate(log_Height = log(Height_cm)) #Also calculate SES with log heihgt to see if that improves skew
 
 ###Descriptive statistcis####
 
