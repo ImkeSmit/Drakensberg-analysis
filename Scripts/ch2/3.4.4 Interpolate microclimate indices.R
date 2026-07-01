@@ -50,7 +50,7 @@ rock_lookup %>%
 
 ####Join loggers to cell centroids
 indices_spatial <- imke_indices %>%
-  left_join(centroids %>% select(Cell_ID, CellX, CellY), by="Cell_ID") %>%
+  left_join(meter_centroids %>% select(Cell_ID, x_coord, y_coord), by="Cell_ID") %>%
   # Flag loggers sitting on high-rock cells
   left_join(rock_lookup %>% select(Cell_ID, high_rock), by="Cell_ID") |> 
   mutate(grid_unique = str_split_i(Cell_ID, "_", 2), 
@@ -65,6 +65,14 @@ cat("Loggers on high-rock cells (excluded from interpolation):",
 # =============================================================================
 # SECTION 4 IDW interpolation function WITH rock masking
 # =============================================================================
+IMP_THRESHOLD  <- 0.20
+ROCK_THRESHOLD <- 40    # cells with rock_cover >= this are masked out
+# consistent with the campaign moisture NA logic
+R2_THRESHOLD   <- 0.10  # poor grid fallback
+IDP            <- 2      # IDW power parameter: p=2 is standard 
+# higher p = more local influence, lower p = smoother surface
+NMAX           <- Inf    # use all loggers per grid 
+
 
 interpolate_grid_idw <- function(site_code, grid_num, tomst_sp,
                                  all_centroids, rock_lkp, var_name, idp=IDP) {
@@ -74,8 +82,8 @@ interpolate_grid_idw <- function(site_code, grid_num, tomst_sp,
     filter(site == !!site_code,
            grid_number      == grid_num,
            (is.na(high_rock) | !high_rock)) %>%  # exclude confirmed rock cells; NA rock_cover treated as non-rock
-    select(Cell_ID, CellX, CellY, value=all_of(var_name)) %>%
-    filter(!is.na(value), !is.na(CellX), !is.na(CellX))
+    select(Cell_ID, x_coord, y_coord, value=all_of(var_name)) %>%
+    filter(!is.na(value), !is.na(x_coord), !is.na(y_coord))
   
   # Minimum 2 loggers to fit IDW (gstat requires at least 2 source points).
   # Validation uses min 3 so one can be held out while 2 remain for fitting.
@@ -105,9 +113,17 @@ interpolate_grid_idw <- function(site_code, grid_num, tomst_sp,
   #target_coords <- st_coordinates(target_sf)
   
   # st_transform preserves row order, so source_coords rows align with source_pts rows
-  source_df <- data.frame(X=source_coords[,1], Y=source_coords[,2],
-                          value=source_pts$value)
-  target_df <- data.frame(X=target_coords[,1], Y=target_coords[,2])
+  #source_df <- data.frame(X=source_coords[,1], Y=source_coords[,2],
+                          #value=source_pts$value)
+  #target_df <- data.frame(X=target_coords[,1], Y=target_coords[,2])
+  
+  source_df <- source_pts |> 
+    rename(X = x_coord, Y = y_coord) |> 
+    select(!Cell_ID)
+  
+  target_df = target_pts |> 
+    rename(X = x_coord, Y = y_coord) |> 
+    select(!Cell_ID)
   
   # Cap predictions to observed logger range (prevent extrapolation)
   obs_min <- min(source_df$value)
