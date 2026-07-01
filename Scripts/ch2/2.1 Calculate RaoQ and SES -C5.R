@@ -61,8 +61,8 @@ set.seed(123)
 nullcomm_cells <- generate_C5_null_imp(abun_matrix, 999, pool = "entire")
 toc()}
 
-saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/nullmodel_C5_cells.rds")
-nullcomm_cells <- readRDS("All_data/comm_assembly_results/nullmodel_C5_cells.rds")
+saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/nullmodel_C5_cells_poolentire.rds")
+nullcomm_cells <- readRDS("All_data/comm_assembly_results/nullmodel_C5_cells_poolentire.rds")
 
 #===Calculate SES, with unscaled RaoQ===#
 #we need to calculate RaoQ for each of the observed null communities
