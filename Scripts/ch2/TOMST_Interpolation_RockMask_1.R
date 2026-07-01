@@ -14,12 +14,14 @@
 #
 # =============================================================================
 
-library(dplyr)
-library(tidyr)
+library(tidyverse)
 library(purrr)
 library(gstat)
 library(sf)
 library(ggplot2)
+library(openxlsx)
+library(conflicted)
+conflict_prefer_all("tidyverse", quiet = TRUE)
 
 # =============================================================================
 # SETTINGS
@@ -43,11 +45,11 @@ NMAX           <- Inf    # use all loggers per grid
 tomst_raw  <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices.csv")
 #centroids  <- read.csv("All_Sites_Cell_Centroids.csv", stringsAsFactors=FALSE)
 env_data   <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv")
-centroids <- env_data |> 
-  select(Cell_ID, site, grid, column, row) |> 
-  mutate(ncolumn = match(column, LETTERS[1:8])) |> 
-  rename(x_coord = ncolumn, 
-         y_coord = row)
+centroids <- read.xlsx("All_data/clean_data/Environmental data/all_cell_coords.xlsx") |> 
+  mutate(Cell_ID = paste0(Site, "_G", GRID, "_", COLUMN, ROW)) |> 
+  rename(lat = CellX, 
+         lon = CellY)
+  
 
 # Rock cover lookup used for masking throughout
 rock_lookup <- env_data %>%
