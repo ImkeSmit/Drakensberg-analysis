@@ -69,7 +69,7 @@ for(g in 1:length(sitelist)) {
   #does not contain mesotopo because the model tries to predict to novel mesotopo codes
   
   grid_fullmod_moist <- lme(mean_moist_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
-                             veg_max_height+ mean_soil_depth+ slope_height +MAX,
+                            veg_max_height+ mean_soil_depth+ slope_height +MAX,
                            random = ~1|grid, 
                            correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE),
                            data = sub)
