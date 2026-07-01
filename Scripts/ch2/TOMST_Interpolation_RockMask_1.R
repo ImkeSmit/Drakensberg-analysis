@@ -42,7 +42,22 @@ NMAX           <- Inf    # use all loggers per grid
 # SECTION 1 Load data 
 # =============================================================================
 
-tomst_raw  <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices.csv")
+pekka_indices <- read.csv("C:\\Users\\imke6\\Documents\\PhD 2025\\Ch2 niche modelling\\All_data\\Clean_data\\microclimate\\Pekka_cleaned_data\\TOMST data\\transfer_402058_files_56a24364\\tomst_data_imputed.csv") |> 
+  rename(cellref = site) |> 
+  filter(!is.na(cellref)) |> 
+  mutate(site = str_split_i(cellref, "_", 1),
+         site = case_when(site == "BOK" ~ "BK", 
+                          site == "GOL" ~ "GG", 
+                          site == "WIT" ~ "WH"),
+         grid = str_split_i(cellref, "_", 2),
+         cell = toupper(str_split_i(cellref, "_", 3)), 
+         Cell_ID = paste0(site, "_G", grid, "_", cell))
+
+imke_indices <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices.csv", row.names = 1) 
+
+tomst_raw  <- pekka_indices |> 
+  full_join(imke_indices, by = "Cell_ID")
+  
 #centroids  <- read.csv("All_Sites_Cell_Centroids.csv", stringsAsFactors=FALSE)
 env_data   <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv")
 centroids <- read.xlsx("All_data/clean_data/Environmental data/all_cell_coords.xlsx") |> 
@@ -118,7 +133,7 @@ tomst_wide <- tomst_extracted %>%
   )
 
 # All variables attempted at cell level 
-CELL_LEVEL_VARS <- TOMST_VARS$output_name
+CELL_LEVEL_VARS <- colnames(tomst_raw)[c(4,5)]
 
 cat("\nLoggers after extraction:", nrow(tomst_wide), "\n")
 cat("Sample Cell_IDs:\n")
@@ -129,9 +144,11 @@ print(head(tomst_wide %>% select(site_code, Grid, Column, Row, Cell_ID), 5))
 # =============================================================================
 
 tomst_spatial <- tomst_raw %>%
-  left_join(centroids %>% select(Cell_ID, x_coord, y_coord), by="Cell_ID") %>%
+  left_join(centroids %>% select(Cell_ID, lat, lon), by="Cell_ID") %>%
   # Flag loggers sitting on high-rock cells
-  left_join(rock_lookup %>% select(Cell_ID, high_rock), by="Cell_ID")
+  left_join(rock_lookup %>% select(Cell_ID, high_rock), by="Cell_ID") |> 
+  mutate(site_code = str_split_i(Cell_ID, "_", 1), 
+         Grid = paste0(site_code, grid))
 
 n_rock_loggers <- sum(tomst_spatial$high_rock, na.rm=TRUE)
 cat("Loggers on high-rock cells (excluded from interpolation):",
