@@ -151,7 +151,7 @@ site_grids <- indices_spatial %>%
   distinct(site, grid_number) %>%
   arrange(site, grid_number)
 
-CELL_LEVEL_VARS = as.vector(colnames(indices_spatial)[c(3,4)])
+CELL_LEVEL_VARS = as.vector(colnames(indices_spatial)[c(3)])
 
 all_interpolated <- map_dfr(CELL_LEVEL_VARS, function(var) {
   cat("Interpolating:", var, "\n")
@@ -161,22 +161,21 @@ all_interpolated <- map_dfr(CELL_LEVEL_VARS, function(var) {
   })
 })
 
-tomst_interpolated <- all_interpolated %>%
-  group_by(Cell_ID) %>%
-  summarise(across(all_of(CELL_LEVEL_VARS),
-                   ~first(.[!is.na(.)])),
-            .groups="drop")
+#tomst_interpolated <- all_interpolated %>%
+#  group_by(Cell_ID) %>%
+#  summarise(across(all_of(CELL_LEVEL_VARS),
+#                   ~first(.[!is.na(.)])),
+#            .groups="drop")
 
-cat("\nInterpolated surface:", nrow(tomst_interpolated), "cells\n")
+cat("\nInterpolated surface:", nrow(all_interpolated), "cells\n")
 
 # High-rock cells will be absent from tomst_interpolated — add them back as NA
 # so the output has all cells and rock cells simply have NA for TOMST variables
-all_cell_ids <- centroids %>%
-  filter(site %in% unique(tomst_spatial$site_code)) %>%
-  select(Cell_ID)
+all_cell_ids <- meter_centroids %>%
+  distinct(Cell_ID)
 
 tomst_interpolated <- all_cell_ids %>%
-  left_join(tomst_interpolated, by="Cell_ID")
+  left_join(all_interpolated, by="Cell_ID")
 
 cat("After adding back rock cells as NA:", nrow(tomst_interpolated), "cells\n")
 cat("\nNA counts per variable:\n")
@@ -184,3 +183,101 @@ tomst_interpolated %>%
   summarise(across(all_of(CELL_LEVEL_VARS), ~sum(is.na(.)))) %>%
   pivot_longer(everything(), names_to="variable", values_to="n_NA") %>%
   print()
+
+
+
+# =============================================================================
+# SECTION 6 Leave-one-logger-out validation (rock masking applied)
+# =============================================================================
+
+cat("\n=== Leave-one-logger-out validation (non-rock loggers only) ===\n")
+
+run_loloo_validation <- function(site_code, grid_num, tomst_sp,
+                                 var_name, idp=IDP) {
+  
+  # Only use non-rock loggers in validation
+  grid_loggers <- tomst_sp %>%
+    filter(site == !!site_code,
+           grid_number      == grid_num,
+           (is.na(high_rock) | !high_rock)) %>%
+    select(Cell_ID, x_coord, y_coord, value=all_of(var_name)) %>%
+    filter(!is.na(value), !is.na(x_coord), !is.na(y_coord))
+  
+  if (nrow(grid_loggers) < 3) return(NULL)
+  
+  map_dfr(seq_len(nrow(grid_loggers)), function(i) {
+    held_out <- grid_loggers[i, ]
+    training <- grid_loggers[-i, ]
+    
+    #train_sf <- st_as_sf(training, coords=c("lon","lat"), crs=4326) %>%
+    #  st_transform(32736)
+    #held_sf  <- st_as_sf(held_out, coords=c("lon","lat"), crs=4326) %>%
+    #  st_transform(32736)
+    
+    # st_transform preserves row order — coordinates align with original data rows
+    #train_df <- data.frame(X=st_coordinates(train_sf)[,1],
+    #                       Y=st_coordinates(train_sf)[,2],
+    #                       value=training$value)
+    #held_df  <- data.frame(X=st_coordinates(held_sf)[,1],
+    #                       Y=st_coordinates(held_sf)[,2])
+    
+    train_df <- training |> 
+      rename(X = x_coord, Y = y_coord)
+    held_df <- held_out |> 
+      rename(X = x_coord, Y = y_coord)
+    
+    obs_min <- min(training$value)
+    obs_max <- max(training$value)
+    
+    idw_mod <- gstat(formula=value~1, locations=~X+Y,
+                     data=train_df, nmax=nrow(train_df), set=list(idp=IDP))
+    pred    <- predict(idw_mod, newdata=held_df)
+    pred_val <- pmax(pmin(pred$var1.pred, obs_max), obs_min)
+    
+    tibble(site=site_code, grid_number=grid_num, variable=var_name,
+           Cell_ID=held_out$Cell_ID, observed=held_out$value,
+           predicted=pred_val, error=pred_val - held_out$value)
+  })
+}
+
+validation_results <- map_dfr(CELL_LEVEL_VARS, function(var) {
+  cat("Validating:", var, "\n")
+  map2_dfr(site_grids$site, site_grids$grid, function(sc, gn) {
+    run_loloo_validation(sc, gn, indices_spatial, var)
+  })
+})
+
+# =============================================================================
+# SECTION 7 Validation summary
+# =============================================================================
+
+validation_grid <- validation_results %>%
+  group_by(site, grid_number, variable) %>%
+  summarise(
+    n        = n(),
+    R2       = ifelse(var(observed) > 0, 
+                      cor(observed, predicted)^2, NA_real_),
+    RMSE     = sqrt(mean(error^2)),
+    bias     = mean(error),
+    .groups  = "drop"
+  )
+
+cat("\n=== Validation R² by variable (non-rock loggers only) ===\n")
+validation_grid %>%
+  group_by(variable) %>%
+  summarise(
+    mean_R2  = round(mean(R2, na.rm=TRUE), 3),
+    n_poor   = sum(R2 < R2_THRESHOLD, na.rm=TRUE),
+    n_grids  = n(),
+    .groups  = "drop"
+  ) %>%
+  arrange(desc(mean_R2)) %>%
+  print()
+
+# Compare moisture R² with vs without masking for reporting
+cat("\nMoisture grid-level R² (all grids):\n")
+validation_grid %>%
+  filter(grepl("moist", variable)) %>%
+  select(site_code, Grid, variable, R2) %>%
+  arrange(variable, site_code, Grid) %>%
+  print(n=Inf)
