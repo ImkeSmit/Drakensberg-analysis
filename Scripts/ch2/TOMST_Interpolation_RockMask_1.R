@@ -21,7 +21,6 @@ library(gstat)
 library(sf)
 library(ggplot2)
 
-#setwd("C:/Users/User/Documents/Academics 5/Env data merge")  
 # =============================================================================
 # SETTINGS
 # =============================================================================
@@ -41,9 +40,14 @@ NMAX           <- Inf    # use all loggers per grid
 # SECTION 1 Load data 
 # =============================================================================
 
-tomst_raw  <- read.csv("microclimate_indices.csv", stringsAsFactors=FALSE)
-centroids  <- read.csv("All_Sites_Cell_Centroids.csv", stringsAsFactors=FALSE)
-env_data   <- read.csv("All_Sites_Environmental_Data.csv", stringsAsFactors=FALSE)
+tomst_raw  <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices.csv", stringsAsFactors=FALSE)
+#centroids  <- read.csv("All_Sites_Cell_Centroids.csv", stringsAsFactors=FALSE)
+env_data   <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv")
+centroids <- env_data |> 
+  select(Cell_ID, site, grid, column, row) |> 
+  mutate(ncolumn = match(column, LETTERS[1:8])) |> 
+  rename(x_coord = ncolumn, 
+         y_coord = row)
 
 # Rock cover lookup used for masking throughout
 rock_lookup <- env_data %>%
