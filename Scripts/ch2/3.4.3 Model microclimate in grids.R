@@ -66,7 +66,7 @@ for(g in 1:length(sitelist)) {
                       data = sub)
   #does not contain mesotopo because the model tries to predict to novel mesotopo codes
   
-  grid_fullmod_moist <- lme(mean_moist_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
+  grid_fullmod_moist <- lm(mean_moist_growing_season ~ rock_cover+ soil_cover+ northness+ eastness+ 
                             veg_max_height+ mean_soil_depth+ slope_height +MAX,
                            data = sub)
   
