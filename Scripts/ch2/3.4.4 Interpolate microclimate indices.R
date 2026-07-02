@@ -265,6 +265,7 @@ validation_grid <- validation_results %>%
     .groups  = "drop"
   )
 
+##Visualise validation per site
 ggplot(validation_grid, aes(x = site ,y = R2)) +
   geom_boxplot()+
   facet_wrap(~variable)
