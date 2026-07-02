@@ -110,6 +110,8 @@ for (t in 1:length(traitlist)) {
                   correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
                   data = modeldat) #only gaussian family possible
   
+  check_model(model)
+  
   output_file <- paste0("All_data/comm_assembly_results/lme_SES_" ,traitlist[t], "_elevation_results.txt")
   sink(output_file)
   
