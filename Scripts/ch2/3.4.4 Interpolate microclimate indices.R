@@ -32,8 +32,7 @@ meter_centroids <- env_data |> #centroids I made myself instead of the geographi
 
 
 ###Identify cells which have too high rock cover####
-
-ROCK_THRESHOLD <- 40
+ROCK_THRESHOLD <- 50
 
 rock_lookup <- env_data %>%
   select(Cell_ID, rock_cover) %>%
@@ -67,9 +66,8 @@ cat("Loggers on high-rock cells (excluded from interpolation):",
 
 
 # =============================================================================
-# SECTION 4 IDW interpolation function WITH rock masking
+# Ceate IDW interpolation function WITH rock masking
 # =============================================================================
-IMP_THRESHOLD  <- 0.20
 ROCK_THRESHOLD <- 40    # cells with rock_cover >= this are masked out
 # consistent with the campaign moisture NA logic
 R2_THRESHOLD   <- 0.10  # poor grid fallback
@@ -146,7 +144,7 @@ interpolate_grid_idw <- function(site_code, grid_num, tomst_sp,
 
 
 # =============================================================================
-# SECTION 5 Run interpolation
+# Run interpolation
 # =============================================================================
 
 cat("=== Running IDW interpolation with rock masking ===\n")
@@ -155,7 +153,7 @@ site_grids <- indices_spatial %>%
   distinct(site, grid_number) %>%
   arrange(site, grid_number)
 
-CELL_LEVEL_VARS = colnames(indices_spatial)[3:4]
+CELL_LEVEL_VARS = c("mean_T1_growing_season"  ,  "mean_moist_growing_season")
 
 all_interpolated <- map_dfr(CELL_LEVEL_VARS, function(var) {
   cat("Interpolating:", var, "\n")
