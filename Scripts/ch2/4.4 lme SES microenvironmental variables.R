@@ -70,8 +70,18 @@ corrplot(cormat, type = "lower", method = "number")
 ###============C5 NULL MODEL===============####
 ###=========================================###
 traitlist <- c("log_Height", "log_SLA", "log_LDMC", "log_LA", "Height_cm", "SLA", "LDMC", "Leaf_area_mm2")
-model_result_list <- vector(mode = "list", length=length(traitlist))
-names(model_result_list) = traitlist
+#lists to store results in
+SES_ele_summary <- vector(mode= "list", length = length(traitlist))
+names(SES_ele_summary) = traitlist
+
+SES_ele_Rsq<- vector(mode= "list", length = length(traitlist))
+names(SES_ele_Rsq) = traitlist
+
+SES_ele_anova<- vector(mode= "list", length = length(traitlist))
+names(SES_ele_anova) = traitlist
+
+SES_ele_cld<- vector(mode= "list", length = length(traitlist))
+names(SES_ele_cld) = traitlist
 
 for (t in 1:length(traitlist)) {
   modeldat <-  comb |> 
@@ -147,10 +157,10 @@ for (t in 1:length(traitlist)) {
   sink()
   
   #Also save results in a list object so we can call it with quarto
-  model_summary[[t]] <- summary(model)
-  model_Rsq[[t]] <- r.squaredGLMM(model)
-  model_anova[[t]] <- anova(model)
-  model_cld[[t]] <- comp_letters
+  SES_ele_summary[[t]] <- summary(model)
+  SES_ele_Rsq[[t]] <- r.squaredGLMM(model)
+  SES_ele_anova[[t]] <- anova(model)
+  SES_ele_cld[[t]] <- comp_letters
   
 }
 
