@@ -110,8 +110,13 @@ for (t in 1:length(traitlist)) {
                   correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
                   data = modeldat) #only gaussian family possible
   
-  check_model(model)
+  ###Save check_model plot
+  plot_file <- paste0("All_data/comm_assembly_results/checkmodel_lme_SES_", traitlist[t], "_elevation.png")
+  png(plot_file, width = 1600, height = 1200, res = 150)
+  print(check_model(model))   # print() forces the plot to actually draw to the device
+  dev.off()
   
+  ###Save model results
   output_file <- paste0("All_data/comm_assembly_results/lme_SES_" ,traitlist[t], "_elevation_results.txt")
   sink(output_file)
   
