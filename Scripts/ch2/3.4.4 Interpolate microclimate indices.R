@@ -154,6 +154,7 @@ site_grids <- indices_spatial %>%
   arrange(site, grid_number)
 
 CELL_LEVEL_VARS = c("mean_T1_growing_season"  ,  "mean_moist_growing_season")
+IDP = 2
 
 all_interpolated <- map_dfr(CELL_LEVEL_VARS, function(var) {
   cat("Interpolating:", var, "\n")
@@ -189,7 +190,7 @@ tomst_interpolated %>%
 
 
 # =============================================================================
-# SECTION 6 Leave-one-logger-out validation (rock masking applied)
+# Leave-one-logger-out validation (rock masking applied)
 # =============================================================================
 
 cat("\n=== Leave-one-logger-out validation (non-rock loggers only) ===\n")
