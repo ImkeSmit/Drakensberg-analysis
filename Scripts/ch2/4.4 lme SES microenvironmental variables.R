@@ -149,7 +149,7 @@ for (t in 1:length(traitlist)) {
   cat("  ESTIMATED MARGINAL MEANS (emmeans)\n")
   cat("===========================================\n")
   em_model <- emmeans(model, specs = "elevation", type = "response")
-  comp_letters <-cld(em_model, Letters = letters, adjust = "Tukey")
+  comp_letters <-cld(em_model, Letters = letters, adjust = "Tukey", sort = FALSE)
   print(comp_letters)
   cat("\n")
   
