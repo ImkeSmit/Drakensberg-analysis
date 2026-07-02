@@ -187,6 +187,9 @@ tomst_interpolated %>%
   pivot_longer(everything(), names_to="variable", values_to="n_NA") %>%
   print()
 
+##SAVE
+write.csv(tomst_interpolated, "All_data/clean_data/Imke_microclimate_indices_idw_interpolated.csv")
+
 
 
 # =============================================================================
