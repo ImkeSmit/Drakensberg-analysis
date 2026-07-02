@@ -15,7 +15,7 @@ conflict_prefer_all("tidylog", quiet = TRUE)
 
 
 #import SES data
-cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
+cell_ses <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
   rename(Cell_ID = cellref)
 
 #import microenvironmental data
@@ -40,12 +40,12 @@ micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_
 
 ##Combine SES and environmental data
 comb <- env |> 
-  #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
-  full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
   #join to microclimate indices |> 
   full_join(micro_idw, by = "Cell_ID") |> 
   #join to remote sensing data |> 
   full_join(rms, by = "Cell_ID") |> 
+  #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
+  full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
   mutate(ncolumn = match(column, LETTERS[1:8])) |> 
   rename(x_coord = ncolumn, 
          y_coord = row)
