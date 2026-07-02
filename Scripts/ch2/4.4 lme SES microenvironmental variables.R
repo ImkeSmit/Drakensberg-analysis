@@ -46,7 +46,8 @@ comb <- env |>
   full_join(rms, by = "Cell_ID") |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
   full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
-  mutate(ncolumn = match(column, LETTERS[1:8])) |> 
+  mutate(ncolumn = match(column, LETTERS[1:8]), 
+         grid = paste0(site, grid)) |> #each grid must have a unique id 
   rename(x_coord = ncolumn, 
          y_coord = row)
 
@@ -64,64 +65,31 @@ cormat<- cor(cordf)
 corrplot(cormat, type = "lower", method = "number")
 
 
+###############################
+#####SES ~ ELEVATION MODELS####
+##C5 NULLMODEL, POOL = ENTIRE##
+
 
 ####SES HEIGHT####
-#isolate SES of height
-#leave heavy tail
-Hdat <- comb2 |> 
-  filter(trait == "Height_cm") |> 
+Hdat <- comb |> 
+  filter(trait == "log_Height") |> 
+  mutate(elevation = as.factor(elevation), 
+         grid = as.factor(grid)) |> 
   drop_na()
 
 
-
-#descriptive stats
-#how many cells
-nrow(Hdat) #2880
-Hdat |> group_by(site) |> 
-  summarise(n = n())
-
-
 tic()
-tmod1<- lme(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
-                  zslope_height,
+H_ele_mod<- lme(SES ~ elevation ,
             random = ~1|grid, 
-            correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #exponential correlation structure
+            correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
             data = Hdat) #only gaussian family possible
 toc()
-summary(tmod1)
-anova(tmod1)
+summary(H_ele_mod)
+anova(H_ele_mod)
+emmeans(H_ele_mod, specs = "elevation")
 
-
-
-# Check the estimated range and nugget effect
-tmod1$modelStruct$corStruct
-
-
-#Compare against a model without spatial structure to see if it improves fit
-tic()
-tmod1_nonspat<- lme(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
-              zslope_height,
-            random = ~1|grid, 
-            data = Hdat) #only gaussian family possible
-toc()
-
-anova(tmod1_nonspat, tmod1)
-#spatial model has lower AIC and is a significantly better fit than the nonspatial model
-
-
-# Residual diagnostics
-plot(tmod1)
-qqnorm(tmod1, ~ resid(., type = "normalized"))
-
-# Optional: variogram of normalized residuals to visually check
-# whether spatial autocorrelation has been adequately captured
-plot(Variogram(tmod1, resType = "normalized"))
-plot(Variogram(tmod1_nonspat, resType = "normalized"))
-
-tmod1_res <- simulateResiduals(tmod1)
-plot(tmod1_res)
-
-check_model(tmod1)
+#diagnostics
+check_model(H_ele_mod)
 
 
 
