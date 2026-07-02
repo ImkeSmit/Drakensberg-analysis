@@ -5,6 +5,7 @@ library(ggbiplot)
 
 #import microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
+  tibble() |> 
   #variables we are interested in
   select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
          soil_depth_CV, mean_soil_depth, slope_height) |> 
@@ -12,7 +13,8 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
   mutate(elevation = case_when(site == "GG" ~ 2000, 
                                site == "WH" ~ 2500, 
                                site == "BK" ~ 3000,
-                               .default = NA))
+                               .default = NA), 
+         soil_depth_CV = as.numeric(soil_depth_CV))
 
 #import remote sensing derived variables
 rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
@@ -24,7 +26,7 @@ micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_
 
 
 ##Combine SES and environmental data
-comb <- env |> 
+all_env <- env |> 
   #join to microclimate indices |> 
   full_join(micro_idw, by = "Cell_ID") |> 
   #join to remote sensing data |> 
@@ -35,7 +37,7 @@ comb <- env |>
 
 
 #check for duplicates
-dups <- comb %>% 
+dups <- all_env %>% 
   group_by(Cell_ID) %>% 
   filter(n() > 1) %>% 
   ungroup() #no duplicates
@@ -47,7 +49,7 @@ all_env_subs <- all_env |>
   drop_na()
 
 
-all_env_pca <- princomp(all_env_subs[, c(3:ncol(all_env_subs))], scores = T) #not including elevation
+all_env_pca <- princomp(all_env_subs[, c(6:11, 13:ncol(all_env_subs))], scores = T) #not including elevation
 summary(all_env_pca) #proportion of variance is the variance explained by the PC
 all_env_pca$scores #
 all_env_pca$loadings #How much each var contributed to building the PC
