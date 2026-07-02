@@ -12,11 +12,6 @@ conflict_prefer_all("tidylog", quiet = TRUE)
 imke_indices <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices.csv", row.names = 1)
 #environmental data, containing rock cover
 env_data   <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv")
-#coordinate centroids from Anika
-centroids  <-read.xlsx("All_data/clean_data/Environmental data/all_cell_coords.xlsx") |> 
-  mutate(Cell_ID = paste0(Site, "_G", GRID, "_", COLUMN, ROW)) |> 
-         rename(site = Site, 
-                grid = GRID)
 #centroids created by Imke, just in meters
 meter_centroids <- env_data |> #centroids I made myself instead of the geographic coordinates
   select(Cell_ID, site, grid, row, column) |> 
