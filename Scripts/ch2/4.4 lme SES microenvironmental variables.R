@@ -93,8 +93,9 @@ check_model(H_ele_mod)
 #looks better!
 
 
-
-###Write a loop for all models
+###=========================================###
+###Loop to run SES elevation for all traits####
+###=========================================###
 traitlist <- c("log_Height", "log_SLA", "log_LDMC", "log_Thickness")
 
 for (t in 1:length(traitlist)) {
