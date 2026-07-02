@@ -113,6 +113,14 @@ for (t in 1:length(traitlist)) {
   output_file <- paste0("All_data/comm_assembly_results/lme_SES_" ,traitlist[t], "_elevation_results.txt")
   sink(output_file)
   
+  # ── 1.Trait ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  TRAIT\n")
+  cat("===========================================\n")
+  print(traitlist[t])
+  cat("\n\n")
+  
+  
   # ── 1. Model Formula ──────────────────────────────────────────
   cat("===========================================\n")
   cat("  MODEL FORMULA\n")
@@ -148,7 +156,8 @@ for (t in 1:length(traitlist)) {
   cat("  ESTIMATED MARGINAL MEANS (emmeans)\n")
   cat("===========================================\n")
   em_model <- emmeans(model, specs = "elevation", type = "response")
-  print(em_model)
+  comp_letters <-cld(em_model, Letters = letters, adjust = "Tukey")
+  print(comp_letters)
   cat("\n")
   
   # --- Close the sink ---
