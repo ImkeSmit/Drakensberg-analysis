@@ -65,13 +65,9 @@ cormat<- cor(cordf)
 corrplot(cormat, type = "lower", method = "number")
 
 
-###############################
-#####SES ~ ELEVATION MODELS####
-##C5 NULLMODEL, POOL = ENTIRE##
-
-
 ###=========================================###
-###Loop to run SES elevation for all traits####
+###Loop to run SES~elevation for all traits####
+###============C5 NULL MODEL===============####
 ###=========================================###
 traitlist <- c("log_Height", "log_SLA", "log_LDMC", "log_LA", "Height_cm", "SLA", "LDMC", "Leaf_area_mm2")
 
@@ -149,6 +145,8 @@ for (t in 1:length(traitlist)) {
   sink()
 }
 
+###Using the logged traits are generally better for model diagnostics than the raw traits
+##BUT the leaf area diagnostics are still very bad
 
 
 ####SES SLA####
