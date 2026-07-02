@@ -121,11 +121,11 @@ write.csv(RQ_cells_summary, "All_data/comm_assembly_results/SES_RQ_weighted_cell
 #Create null models
 {tic()
   set.seed(123)
-  nullcomm_cells <- generate_C5_null_imp(abun_matrix, 999, pool = "site")
+  nullcomm_cells_poolsite <- generate_C5_null_imp(abun_matrix, 999, pool = "site")
   toc()}
 
-saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/nullmodel_C5_cells_poolsite.rds")
-nullcomm_cells <- readRDS("All_data/comm_assembly_results/nullmodel_C5_cells_poolsite.rds")
+saveRDS(nullcomm_cells_poolsite, file = "All_data/comm_assembly_results/nullmodel_C5_cells_poolsite.rds")
+nullcomm_cells_poolsite <- readRDS("All_data/comm_assembly_results/nullmodel_C5_cells_poolsite.rds")
 
 #===Calculate SES, with unscaled RaoQ===#
 #we need to calculate RaoQ for each of the observed null communities
