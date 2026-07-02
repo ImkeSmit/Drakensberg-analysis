@@ -189,80 +189,60 @@ cell_ses <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_en
 
 #import microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
-  mutate(mean_soil_depth = as.numeric(mean_soil_depth), 
-         soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2), 
-         soil_depth_CV = as.numeric(soil_depth_CV)) |> 
   #variables we are interested in
-  select(c(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
-           soil_depth_CV, mean_soil_depth, slope_height)) |> 
+  select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
+         soil_depth_CV, mean_soil_depth, slope_height) |> 
   #add elevation variables
   mutate(elevation = case_when(site == "GG" ~ 2000, 
                                site == "WH" ~ 2500, 
-                               site == "BK" ~ 3000, .default = NA))
+                               site == "BK" ~ 3000,
+                               .default = NA))
+
+#import remote sensing derived variables
+rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
+  select(CELL_ID, STD) |> 
+  rename(Cell_ID = CELL_ID)
+
+#import interpolated microclimate indices
+micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
 
 
 ##Combine SES and environmental data
 comb <- env |> 
+  #join to microclimate indices |> 
+  full_join(micro_idw, by = "Cell_ID") |> 
+  #join to remote sensing data |> 
+  full_join(rms, by = "Cell_ID") |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
   full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
-  ##Now we need to change the coordinates to reflect the spatial structure of the whole dataset
-  #make the grids contiguous, differing by 20m along the y axis
-  mutate(elevation = as.factor(case_when(site == "GG" ~ 2000, 
-                                         site == "WH" ~ 2500, 
-                                         site == "BK" ~ 3000, .default = NA))) |> 
-  mutate(y_new = case_when(site == "GG" ~ row, 
-                           site == "WH" ~ row+160+1000, 
-                           site == "BK" ~ row+160+140+2000, .default = NA)) |> 
-  group_by(site) |> 
-  mutate(y_coord = case_when(grepl("1", grid) ~ y_new, 
-                             grepl("2", grid) ~ y_new+20+100, 
-                             grepl("3", grid) ~ y_new+20*2+200,
-                             grepl("4", grid) ~ y_new+20*3+300, 
-                             grepl("5", grid) ~ y_new+20*4+400, 
-                             grepl("6", grid) ~ y_new+20*5+500, 
-                             grepl("7", grid) ~ y_new+20*6+600, 
-                             grepl("8", grid) ~ y_new+20*7+700, .default = NA)) |> 
   mutate(ncolumn = match(column, LETTERS[1:8]), 
-         x_coord = ncolumn, 
-         rock_cover = as.numeric(rock_cover), 
-         mean_soil_depth = as.numeric(mean_soil_depth)) |> 
-  ungroup() 
+         grid = paste0(site, grid), 
+         elevation = as.factor(elevation)) |> #each grid must have a unique id 
+  rename(x_coord = ncolumn, 
+         y_coord = row)
 
+l1 <- c("log_Height" = "SES~of~plant~height", "log_SLA" = "SES~of~SLA", "log_LDMC" = "SES~of~LDMC", "log_LA" = "SES~of~LA")
+ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("log_SLA", 3), rep("log_LDMC", 3),rep("log_LA", 3)), 
+                             elevation = as.factor(c(rep(c("2000", "2500", "3000"), 4))),
+                             letters = c(SES_ele_cld$log_Height$.group, 
+                                         SES_ele_cld$log_SLA$.group, 
+                                         SES_ele_cld$log_LDMC$.group, 
+                                         SES_ele_cld$log_LA$.group), 
+                             x_pos = c(4.5, 4.5, 4.5,
+                                       6,6,6, 
+                                       9,9,9,
+                                       8.1,8.1,8.1), 
+                             emmean = c(SES_ele_cld$log_Height$emmean,
+                                        SES_ele_cld$log_SLA$emmean,
+                                        SES_ele_cld$log_LDMC$emmean,
+                                        SES_ele_cld$log_LA$emmean), 
+                             emmean_SE = c(SES_ele_cld$log_Height$SE,
+                                           SES_ele_cld$log_SLA$SE,
+                                           SES_ele_cld$log_LDMC$SE,
+                                           SES_ele_cld$log_LA$SE))
 
-###Fill in the x and y coordinates of cells that do not have SES
-comb2 <- comb |> 
-  mutate(ncolumn = match(column, LETTERS[1:8]),
-         elevation = as.factor(case_when(grepl("BK", Cell_ID) == T ~ "3000", #add elevation variable
-                                         grepl("WH", Cell_ID) == T ~ "2500",
-                                         grepl("GG", Cell_ID) == T ~ "2000", .default = NA)),
-         y_new = case_when(site == "GG" ~ row, 
-                           site == "WH" ~ row+160+1000, 
-                           site == "BK" ~ row+160 +140+2000, .default = NA)) |> 
-  group_by(site) |> 
-  mutate(y_coord = case_when(grepl("1", grid) ~ y_new, 
-                             grepl("2", grid) ~ y_new+20+100, 
-                             grepl("3", grid) ~ y_new+20*2+200,
-                             grepl("4", grid) ~ y_new+20*3+300, 
-                             grepl("5", grid) ~ y_new+20*4+400, 
-                             grepl("6", grid) ~ y_new+20*5+500, 
-                             grepl("7", grid) ~ y_new+20*6+600, 
-                             grepl("8", grid) ~ y_new+20*7+700, .default = NA)) |> 
-  mutate(x_coord = ncolumn, 
-         zrock_cover = c(scale(rock_cover)), #standardise variables
-         znorthness = c(scale(northness)), 
-         zsoil_moist = c(scale(soil_moisture_adj_campaign2)), 
-         zsoil_depth = c(scale(mean_soil_depth)), 
-         zslope_height = c(scale(slope_height))) |> 
-  ungroup()
-
-l1 <- c("Height_cm" = "SES~of~plant~height", "SLA" = "SES~of~SLA")
-ridges_letters <- data.frame(trait = c(rep("Height_cm", 3), rep("SLA", 3)), 
-                             elevation = as.factor(c(rep(c("2000", "2500", "3000"), 2))),
-                             letters = c("a", "b", "a", "a", "b", "a"), 
-                             x_pos = c(7.5,7.5,7.5,4.5,4.5,4.5))
-
-ses_ridges <- comb2 |>
-  filter(trait %in% c("Height_cm", "SLA")) |> 
+ses_ridges <- comb |>
+  filter(trait %in% c("log_Height", "log_SLA", "log_LDMC", "log_LA")) |> 
   ggplot(aes(x = SES, y = elevation)) +
   geom_density_ridges(alpha = 0.5) +
   facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", 
@@ -270,6 +250,17 @@ ses_ridges <- comb2 |>
   labs(x = " ", y = "Elevation (m a.s.l.)") +
   geom_vline(xintercept = 0, linetype = "dashed") +
   geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  geom_point(
+    data = ridges_letters,
+    aes(x = emmean, y = as.numeric(elevation)),
+    size = 2, inherit.aes = FALSE) +
+  geom_errorbarh(
+    data = ridges_letters,
+    aes(xmin = emmean - emmean_SE,
+        xmax = emmean + emmean_SE,
+        y = as.numeric(elevation)),
+    height = 0.08,
+    linewidth = 1, inherit.aes = FALSE)+
   theme_bw() +
   theme(legend.position = "none", axis.title = element_text(size = 18), 
         axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
