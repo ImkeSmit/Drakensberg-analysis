@@ -184,7 +184,7 @@ ggsave(var_imp_panes, filename = "variable_importance_poster.png", path = "Figur
 
 #####SES ~ elevation ridges####
 #import SES data
-cell_ses <- read.csv("All_data/comm_assembly_results/RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
+cell_ses <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
   rename(Cell_ID = cellref)
 
 #import microenvironmental data
