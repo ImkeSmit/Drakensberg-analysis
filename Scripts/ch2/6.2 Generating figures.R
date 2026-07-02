@@ -266,7 +266,7 @@ ses_ridges <- comb |>
         axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
         strip.background = element_blank(),
         strip.placement = "outside", panel.grid = element_blank()) 
-ggsave(ses_ridges, filename = "SES_elevation_poster.png", path = "Figures")
+ggsave(ses_ridges, filename = "lme_SES_elevation_ridges.png", path = "Figures")
 
 
 
