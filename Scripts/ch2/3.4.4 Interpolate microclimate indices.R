@@ -265,6 +265,11 @@ validation_grid <- validation_results %>%
     .groups  = "drop"
   )
 
+#R2 =  how well the pattern (rank and relative spacing) of predicted values tracks the pattern of observed values.
+  #It ranges 0–1. A value near 1 means loggers that were relatively warm/cold are being predicted as relatively warm   /cold in the right order and proportion
+
+#RMSE = on average, predictions are off by about X°C
+
 ##Visualise validation per site
 ggplot(validation_grid, aes(x = site ,y = R2)) +
   geom_boxplot()+
@@ -274,7 +279,7 @@ ggplot(validation_grid, aes(x = site ,y = R2)) +
 
 cat("\n=== Validation R² by variable (non-rock loggers only) ===\n")
 validation_grid %>%
-  group_by(variable) %>%
+  group_by(site, variable) %>%
   summarise(
     mean_R2  = round(mean(R2, na.rm=TRUE), 3),
     n_poor   = sum(R2 < R2_THRESHOLD, na.rm=TRUE),#grids that do not have good interpolation
@@ -284,10 +289,3 @@ validation_grid %>%
   arrange(desc(mean_R2)) %>%
   print()
 
-# Compare moisture R² with vs without masking for reporting
-cat("\nMoisture grid-level R² (all grids):\n")
-validation_grid %>%
-  filter(grepl("moist", variable)) %>%
-  select(site_code, Grid, variable, R2) %>%
-  arrange(variable, site_code, Grid) %>%
-  print(n=Inf)
