@@ -14,7 +14,7 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
                                site == "WH" ~ 2500, 
                                site == "BK" ~ 3000,
                                .default = NA), 
-         soil_depth_CV = as.numeric(soil_depth_CV))
+         soil_depth_CV = as.numeric(soil_depth_CV)) #NA are ones with 100% rock
 
 #import remote sensing derived variables
 rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
@@ -46,10 +46,12 @@ dups <- all_env %>%
   
 ####Do the principal component analysis####
 all_env_subs <- all_env |> 
-  drop_na()
+  drop_na() |> 
+  select(site, rock_cover:slope_height, mean_T1_growing_season:STD) |> 
+  mutate(across(where(is.numeric), ~as.vector(scale(.))))
 
 
-all_env_pca <- princomp(all_env_subs[, c(6:11, 13:ncol(all_env_subs))], scores = T) #not including elevation
+all_env_pca <- princomp(all_env_subs[2:ncol(all_env_subs)], scores = T) #not including elevation
 summary(all_env_pca) #proportion of variance is the variance explained by the PC
 all_env_pca$scores #
 all_env_pca$loadings #How much each var contributed to building the PC
@@ -63,8 +65,8 @@ biplot(all_env_pca, choices = c("Comp.1", "Comp.2"))
 ###GGplot biplot
 env_pca <- ggbiplot(all_env_pca, choices = c(1,2), 
                       varname.size = 4, varname.color = "black", 
-                      groups = c(all_env_subs$site.x)) +
-  geom_point(aes(color = all_env_subs$site.x), alpha = 0.8)+
+                      groups = c(all_env_subs$site)) +
+  geom_point(aes(color = all_env_subs$site), alpha = 0.8)+
   scale_color_manual(values = c("blue", "red", "green"))+
   theme_classic() 
 env_pca$layers <- c(env_pca$layers, env_pca$layers[[2]], env_pca$layers[[3]]) #move the arrows to plot in the foreground
