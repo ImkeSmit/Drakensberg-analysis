@@ -134,7 +134,7 @@ nullcomm_cells_poolsite <- readRDS("All_data/comm_assembly_results/nullmodel_C5_
 tic()
 plan(multisession, workers = parallel::detectCores() - 2)  
 
-chunks <- split(nullcomm_cells, ceiling(seq_along(nullcomm_cells) / 50))
+chunks <- split(nullcomm_cells_poolsite, ceiling(seq_along(nullcomm_cells_poolsite) / 50))
 #each chunk has 50 null matrices
 RaoQ_results <- list()
 
@@ -170,7 +170,7 @@ RQ_cells_summary_poolsite <- null_RQ |>
   inner_join(RQ_obs_cells, by = c("trait", "cellref")) |> 
   mutate(SES = (RaoQ - mean_null)/sd_null)
 
-write.csv(RQ_cells_summary_poolsite, "All_data/comm_assembly_results/RQ_weighted_cells_C5_poolsite.csv")
+write.csv(RQ_cells_summary_poolsite, "All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_poolsite.csv")
 
 
 
