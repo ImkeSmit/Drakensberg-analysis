@@ -29,6 +29,9 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
                                site == "BK" ~ 3000,
                                .default = NA))
 
+#import interpolated microclimate indices
+micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
+
 
 ##Combine SES and environmental data
 comb <- env |> 
