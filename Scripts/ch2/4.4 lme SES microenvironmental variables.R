@@ -70,6 +70,8 @@ corrplot(cormat, type = "lower", method = "number")
 ###============C5 NULL MODEL===============####
 ###=========================================###
 traitlist <- c("log_Height", "log_SLA", "log_LDMC", "log_LA", "Height_cm", "SLA", "LDMC", "Leaf_area_mm2")
+model_result_list <- vector(mode = "list", length=length(traitlist))
+names(model_result_list) = traitlist
 
 for (t in 1:length(traitlist)) {
   modeldat <-  comb |> 
@@ -143,6 +145,13 @@ for (t in 1:length(traitlist)) {
   
   # --- Close the sink ---
   sink()
+  
+  #Also save results in a list object so we can call it with quarto
+  model_summary[[t]] <- summary(model)
+  model_Rsq[[t]] <- r.squaredGLMM(model)
+  model_anova[[t]] <- anova(model)
+  model_cld[[t]] <- comp_letters
+  
 }
 
 ###Using the logged traits are generally better for model diagnostics than the raw traits
