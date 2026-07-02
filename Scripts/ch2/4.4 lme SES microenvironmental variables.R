@@ -90,6 +90,7 @@ emmeans(H_ele_mod, specs = "elevation")
 
 #diagnostics
 check_model(H_ele_mod)
+#looks better!
 
 
 
