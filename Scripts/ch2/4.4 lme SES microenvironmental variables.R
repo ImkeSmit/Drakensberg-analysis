@@ -29,6 +29,11 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
                                site == "BK" ~ 3000,
                                .default = NA))
 
+#import remote sensing derived variables
+rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
+  select(CELL_ID, STD) |> 
+  rename(Cell_ID = CELL_ID)
+
 #import interpolated microclimate indices
 micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
 
@@ -39,17 +44,18 @@ comb <- env |>
   full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
   #join to microclimate indices |> 
   full_join(micro_idw, by = "Cell_ID") |> 
+  #join to remote sensing data |> 
+  full_join(rms, by = "Cell_ID") |> 
   mutate(ncolumn = match(column, LETTERS[1:8])) |> 
   rename(x_coord = ncolumn, 
          y_coord = row)
 
 
-
 ###Check collinearity#### 
 library(corrplot)
-cordf <- comb2 |> 
+cordf <- comb |> 
   filter(trait == "Height_cm") |> #look at just one set of env data, it repeats for every trait
-  select(zrock_cover, znorthness, zsoil_moist, zsoil_depth, zslope_height) |> 
+  select(mean_T1_growing_season, mean_moist_growing_season, STD, rock_cover, northness, mean_soil_depth, slope_height) |> 
   drop_na()
 cormat<- cor(cordf)
 #cormat[cormat > 0.7]
