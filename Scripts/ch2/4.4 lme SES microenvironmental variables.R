@@ -70,29 +70,6 @@ corrplot(cormat, type = "lower", method = "number")
 ##C5 NULLMODEL, POOL = ENTIRE##
 
 
-####SES HEIGHT####
-Hdat <- comb |> 
-  filter(trait == "log_Height") |> 
-  mutate(elevation = as.factor(elevation), 
-         grid = as.factor(grid)) |> 
-  drop_na()
-
-
-tic()
-H_ele_mod<- lme(SES ~ elevation ,
-            random = ~1|grid, 
-            correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
-            data = Hdat) #only gaussian family possible
-toc()
-summary(H_ele_mod)
-anova(H_ele_mod)
-emmeans(H_ele_mod, specs = "elevation")
-
-#diagnostics
-check_model(H_ele_mod)
-#looks better!
-
-
 ###=========================================###
 ###Loop to run SES elevation for all traits####
 ###=========================================###
