@@ -37,20 +37,11 @@ micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_
 comb <- env |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
   full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
+  #join to microclimate indices |> 
+  full_join(micro_idw, by = "Cell_ID") |> 
   mutate(ncolumn = match(column, LETTERS[1:8])) |> 
   rename(x_coord = ncolumn, 
          y_coord = row)
-
-
-###Fill in the x and y coordinates of cells that do not have SES
-comb2 <- comb |> 
-  mutate(
-         zrock_cover = c(scale(rock_cover)), #standardise variables
-         znorthness = c(scale(northness)), 
-         zsoil_moist = c(scale(soil_moisture_adj_campaign2)), 
-         zsoil_depth = c(scale(mean_soil_depth)), 
-         zslope_height = c(scale(slope_height))) |> 
-  mutate(grid = paste0(site, grid))
 
 
 
