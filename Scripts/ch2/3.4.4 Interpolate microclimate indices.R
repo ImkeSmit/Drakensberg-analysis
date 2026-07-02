@@ -251,7 +251,7 @@ validation_results <- map_dfr(CELL_LEVEL_VARS, function(var) {
 })
 
 # =============================================================================
-# SECTION 7 Validation summary
+# Validation summary
 # =============================================================================
 
 validation_grid <- validation_results %>%
@@ -265,12 +265,18 @@ validation_grid <- validation_results %>%
     .groups  = "drop"
   )
 
+ggplot(validation_grid, aes(x = site ,y = R2)) +
+  geom_boxplot()+
+  facet_wrap(~variable)
+  
+
+
 cat("\n=== Validation R² by variable (non-rock loggers only) ===\n")
 validation_grid %>%
   group_by(variable) %>%
   summarise(
     mean_R2  = round(mean(R2, na.rm=TRUE), 3),
-    n_poor   = sum(R2 < R2_THRESHOLD, na.rm=TRUE),
+    n_poor   = sum(R2 < R2_THRESHOLD, na.rm=TRUE),#grids that do not have good interpolation
     n_grids  = n(),
     .groups  = "drop"
   ) %>%
