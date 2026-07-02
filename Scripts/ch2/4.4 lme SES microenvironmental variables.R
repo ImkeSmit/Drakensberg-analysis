@@ -94,6 +94,70 @@ check_model(H_ele_mod)
 
 
 
+###Write a loop for all models
+traitlist <- c("log_Height, log_SLA, log_LDMC, log_Thickness")
+
+for (t in 1:length(traitlist)) {
+  modeldat <-  comb |> 
+    filter(trait == traitlist[t]) |> 
+    mutate(elevation = as.factor(elevation), 
+           grid = as.factor(grid)) |> 
+    drop_na()
+  
+  
+  model<- lme(SES ~ elevation ,
+                  random = ~1|grid, 
+                  correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
+                  data = modeldat) #only gaussian family possible
+  
+  output_file <- paste0("All_data/comm_assembly_results/lme_SES" ,traitlist[t], "elevation_results.txt")
+  sink(output_file)
+  
+  # ── 1. Model Formula ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  MODEL FORMULA\n")
+  cat("===========================================\n")
+  print(formula(model))
+  cat("\n\n")
+  
+  # ── 2. Summary Table ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  MODEL SUMMARY\n")
+  cat("===========================================\n")
+  print(summary(model))
+  cat("\n\n")
+  
+  
+  # ── 2. R squared ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  R SQUARED\n")
+  cat("===========================================\n")
+  print(r.squaredGLMM(model))
+  cat("\n\n")
+  
+  
+  # ── 3. ANOVA Table ────────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  ANOVA TABLE\n")
+  cat("===========================================\n")
+  print(anova(model))
+  cat("\n\n")
+  
+  # ── 4. EMmeans Table ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  ESTIMATED MARGINAL MEANS (emmeans)\n")
+  cat("===========================================\n")
+  em_model <- emmeans(model, specs = "elevation", type = "response")
+  print(em_tmod1)
+  cat("\n")
+  
+  # --- Close the sink ---
+  sink()
+  
+}
+
+
+
 ####SES SLA####
 #isolate SES of SLA
 #leave heavy tail
