@@ -25,8 +25,6 @@ micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_
 
 ##Combine SES and environmental data
 comb <- env |> 
-  #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
-  full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
   #join to microclimate indices |> 
   full_join(micro_idw, by = "Cell_ID") |> 
   #join to remote sensing data |> 
@@ -36,26 +34,13 @@ comb <- env |>
          y_coord = row)
 
 
-####Remote sensing derived variables
-rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
-  rename(Cell_ID = CELL_ID)
-
-dups <- rms %>% 
+#check for duplicates
+dups <- comb %>% 
   group_by(Cell_ID) %>% 
   filter(n() > 1) %>% 
-  ungroup() #There are some duplicates. For now we will just remove them
-
-rms <- rms |> 
-  filter(!(Cell_ID %in% c(dups$Cell_ID)))
+  ungroup() #no duplicates
 
 
-###Now we merge them all together
-all_env <- env |> 
-  full_join(ind, by = "Cell_ID") |> 
-  full_join(rms, by = "Cell_ID")  |> 
-  dplyr::select(c(Cell_ID, site.x, elevation, rock_cover:slope_height, T1_avg_annual:moist_avg_summer, STD)) |> 
-  column_to_rownames(var = "Cell_ID") |> 
-  mutate(across(c(rock_cover: STD), ~ as.numeric(scale(.x))))
   
 ####Do the principal component analysis####
 all_env_subs <- all_env |> 
