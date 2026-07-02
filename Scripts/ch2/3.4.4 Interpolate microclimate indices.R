@@ -188,7 +188,7 @@ tomst_interpolated %>%
   print()
 
 ##SAVE
-write.csv(tomst_interpolated, "All_data/clean_data/Imke_microclimate_indices_idw_interpolated.csv")
+write.csv(tomst_interpolated, "All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv")
 
 
 
