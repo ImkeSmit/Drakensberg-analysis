@@ -96,7 +96,7 @@ check_model(H_ele_mod)
 ###=========================================###
 ###Loop to run SES elevation for all traits####
 ###=========================================###
-traitlist <- c("log_Height", "log_SLA", "log_LDMC", "log_Thickness")
+traitlist <- c("log_Height", "log_SLA", "log_LDMC", "log_LA", "Height_cm", "SLA", "LDMC", "Leaf_area_mm2")
 
 for (t in 1:length(traitlist)) {
   modeldat <-  comb |> 
@@ -170,7 +170,6 @@ for (t in 1:length(traitlist)) {
   
   # --- Close the sink ---
   sink()
-  
 }
 
 
