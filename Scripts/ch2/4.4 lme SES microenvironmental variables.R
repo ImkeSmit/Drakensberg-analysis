@@ -152,7 +152,7 @@ cell_ses_poolsite <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_ce
   rename(Cell_ID = cellref) 
 
 #import microenvironmental data
-env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
+env2 <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
   #variables we are interested in
   select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
          soil_depth_CV, mean_soil_depth, slope_height) |> 
@@ -172,7 +172,7 @@ micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_
 
 
 ##Combine SES and environmental data
-comb <- env |> 
+comb2 <- env2 |> 
   #join to microclimate indices |> 
   full_join(micro_idw, by = "Cell_ID") |> 
   #join to remote sensing data |> 
@@ -187,7 +187,7 @@ comb <- env |>
 
 ###Check collinearity#### 
 library(corrplot)
-cordf <- comb |> 
+cordf <- comb2 |> 
   filter(trait == "Height_cm") |> #look at just one set of env data, it repeats for every trait
   select(mean_T1_growing_season, mean_moist_growing_season, STD, rock_cover, northness, mean_soil_depth, slope_height) |> 
   drop_na()
@@ -209,7 +209,7 @@ SES_microenv_anova<- vector(mode= "list", length = length(traitlist))
 names(SES_microenv_anova) = traitlist
 
 for (t in 1:length(traitlist)) {
-  modeldat <-  comb |> 
+  modeldat <-  comb2 |> 
     filter(trait == traitlist[t]) |> 
     mutate(elevation = as.factor(elevation), 
            grid = as.factor(grid)) |> 
