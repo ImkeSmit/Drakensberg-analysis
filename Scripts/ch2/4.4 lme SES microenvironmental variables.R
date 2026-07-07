@@ -34,7 +34,7 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
 ##Combine SES and environmental data
 comb <- env |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
-  full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
+  inner_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
   mutate(ncolumn = match(column, LETTERS[1:8]), 
          grid = paste0(site, grid)) |> #each grid must have a unique id 
   rename(x_coord = ncolumn, 
