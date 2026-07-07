@@ -13,54 +13,6 @@ library(performance)
 library(see)
 conflict_prefer_all("tidylog", quiet = TRUE)
 
-
-#import microenvironmental data
-env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
-  #variables we are interested in
-  select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
-           soil_depth_CV, mean_soil_depth, slope_height) |> 
-  #add elevation variables
-  mutate(elevation = case_when(site == "GG" ~ 2000, 
-                               site == "WH" ~ 2500, 
-                               site == "BK" ~ 3000,
-                               .default = NA))
-
-#import remote sensing derived variables
-rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
-  select(CELL_ID, STD) |> 
-  rename(Cell_ID = CELL_ID)
-
-#import interpolated microclimate indices
-micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
-
-
-##Combine SES and environmental data
-comb <- env |> 
-  #join to microclimate indices |> 
-  full_join(micro_idw, by = "Cell_ID") |> 
-  #join to remote sensing data |> 
-  full_join(rms, by = "Cell_ID") |> 
-  #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
-  full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
-  mutate(ncolumn = match(column, LETTERS[1:8]), 
-         grid = paste0(site, grid)) |> #each grid must have a unique id 
-  rename(x_coord = ncolumn, 
-         y_coord = row)
-
-
-###Check collinearity#### 
-library(corrplot)
-cordf <- comb |> 
-  filter(trait == "Height_cm") |> #look at just one set of env data, it repeats for every trait
-  select(mean_T1_growing_season, mean_moist_growing_season, STD, rock_cover, northness, mean_soil_depth, slope_height) |> 
-  drop_na()
-cormat<- cor(cordf)
-#cormat[cormat > 0.7]
-#cormat[cormat <-0.7]
-#none are highly correlated
-corrplot(cormat, type = "lower", method = "number")
-
-
 ###=========================================###
 ###Loop to run SES~elevation for all traits####
 ###=====C5 NULL MODEL, pool = entire========####
@@ -168,4 +120,56 @@ for (t in 1:length(traitlist)) {
 ###Using the logged traits are generally better for model diagnostics than the raw traits
 ##BUT the leaf area diagnostics are still very bad
 
+
+
+
+###===========================================================###
+###Loop to run SES~microenvironmental variables for all traits####
+###=============C5 NULL MODEL, pool = site====================####
+###===========================================================###
+#import microenvironmental data
+env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
+  #variables we are interested in
+  select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
+         soil_depth_CV, mean_soil_depth, slope_height) |> 
+  #add elevation variables
+  mutate(elevation = case_when(site == "GG" ~ 2000, 
+                               site == "WH" ~ 2500, 
+                               site == "BK" ~ 3000,
+                               .default = NA))
+
+#import remote sensing derived variables
+rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
+  select(CELL_ID, STD) |> 
+  rename(Cell_ID = CELL_ID)
+
+#import interpolated microclimate indices
+micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
+
+
+##Combine SES and environmental data
+comb <- env |> 
+  #join to microclimate indices |> 
+  full_join(micro_idw, by = "Cell_ID") |> 
+  #join to remote sensing data |> 
+  full_join(rms, by = "Cell_ID") |> 
+  #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
+  full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
+  mutate(ncolumn = match(column, LETTERS[1:8]), 
+         grid = paste0(site, grid)) |> #each grid must have a unique id 
+  rename(x_coord = ncolumn, 
+         y_coord = row)
+
+
+###Check collinearity#### 
+library(corrplot)
+cordf <- comb |> 
+  filter(trait == "Height_cm") |> #look at just one set of env data, it repeats for every trait
+  select(mean_T1_growing_season, mean_moist_growing_season, STD, rock_cover, northness, mean_soil_depth, slope_height) |> 
+  drop_na()
+cormat<- cor(cordf)
+#cormat[cormat > 0.7]
+#cormat[cormat <-0.7]
+#none are highly correlated
+corrplot(cormat, type = "lower", method = "number")
 
