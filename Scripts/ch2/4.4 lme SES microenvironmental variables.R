@@ -276,3 +276,5 @@ for (t in 1:length(traitlist)) {
   SES_microenv_anova[[t]] <- anova(model)
 
 }
+#plot(checkmodel()) returns the following error: Check it out when you have internet
+#Converting missing values (`NA`) into regular values currently not possible for variables of class `NULL`.
