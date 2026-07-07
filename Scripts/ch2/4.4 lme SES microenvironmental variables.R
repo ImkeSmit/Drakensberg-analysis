@@ -69,6 +69,11 @@ corrplot(cormat, type = "lower", method = "number")
 ###Loop to run SES~elevation for all traits####
 ###============C5 NULL MODEL===============####
 ###=========================================###
+#import SES data
+cell_ses <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
+  rename(Cell_ID = cellref)
+
+
 traitlist <- c("log_Height", "log_SLA", "log_LDMC", "log_LA", "Height_cm", "SLA", "LDMC", "Leaf_area_mm2")
 #lists to store results in
 SES_ele_summary <- vector(mode= "list", length = length(traitlist))
@@ -166,60 +171,5 @@ for (t in 1:length(traitlist)) {
 
 ###Using the logged traits are generally better for model diagnostics than the raw traits
 ##BUT the leaf area diagnostics are still very bad
-
-
-####SES SLA####
-#isolate SES of SLA
-#leave heavy tail
-SLAdat <- comb2 |> 
-  filter(trait %in% c("SLA", NA), #also select cells which have no SES measurement. This is necessary to make the grid complete
-         !is.na(SES)) |> 
-  arrange(y_coord, x_coord) |> 
-  mutate(trait = "SLA",  #give all records a trait
-         grid = as.factor(paste0(site, grid))) |> 
-  drop_na()
-
-#descriptive stats
-#how many cells
-nrow(SLAdat) #2880
-SLAdat |> group_by(site) |> 
-  summarise(n = n())
-
-
-tic()
-tmod2<- lme(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
-                  zslope_height,
-            random = ~1|grid, 
-            correlation = corExp(form = ~ x_coord + y_coord | grid, nugget = TRUE),
-            data = SLAdat)
-toc()
-summary(tmod2)
-anova(tmod2)
-
-check_model(tmod2)
-
-
-#Compare against a model without spatial structure to see if it improves fit
-tic()
-tmod2_nonspat<- lme(SES ~ elevation + zrock_cover + znorthness + zsoil_moist + zsoil_depth + 
-                      zslope_height,
-                    random = ~1|grid, 
-                    data = SLAdat) #only gaussian family possible
-toc()
-
-anova(tmod2_nonspat, tmod2)
-#spatial model has lower AIC and is a significantly better fit than the nonspatial model
-
-
-# Residual diagnostics
-plot(tmod2) #looks pretty good
-qqnorm(tmod2, ~ resid(., type = "normalized")) #pretty ok
-
-# Optional: variogram of normalized residuals to visually check
-# whether spatial autocorrelation has been adequately captured
-plot(Variogram(tmod2, resType = "normalized"))
-plot(Variogram(tmod2_nonspat, resType = "normalized"))
-
-
 
 
