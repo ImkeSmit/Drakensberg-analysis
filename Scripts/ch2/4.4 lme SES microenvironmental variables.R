@@ -146,6 +146,11 @@ for (t in 1:length(traitlist)) {
 ###Loop to run SES~microenvironmental variables for all traits####
 ###=============C5 NULL MODEL, pool = site====================####
 ###===========================================================###
+cell_ses_poolsite <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_poolsite.csv", row.names = 1) |> 
+  rename(Cell_ID = cellref) 
+
+
+
 #import microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
   #variables we are interested in
@@ -173,7 +178,7 @@ comb <- env |>
   #join to remote sensing data |> 
   full_join(rms, by = "Cell_ID") |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
-  full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
+  full_join(cell_ses_poolsite, by = "Cell_ID", relationship = "one-to-many") |>
   mutate(ncolumn = match(column, LETTERS[1:8]), 
          grid = paste0(site, grid)) |> #each grid must have a unique id 
   rename(x_coord = ncolumn, 
@@ -192,3 +197,99 @@ cormat<- cor(cordf)
 #none are highly correlated
 corrplot(cormat, type = "lower", method = "number")
 
+
+###Loop starts here
+traitlist <- c("log_Height", "log_SLA", "log_LDMC", "log_LA", "Height_cm", "SLA", "LDMC", "Leaf_area_mm2")
+#lists to store results in
+SES_microenv_summary <- vector(mode= "list", length = length(traitlist))
+names(SES_microenv_summary) = traitlist
+
+SES_microenv_Rsq<- vector(mode= "list", length = length(traitlist))
+names(SES_microenv_Rsq) = traitlist
+
+SES_microenv_anova<- vector(mode= "list", length = length(traitlist))
+names(SES_microenv_anova) = traitlist
+
+SES_microenv_cld<- vector(mode= "list", length = length(traitlist))
+names(SES_microenv_cld) = traitlist
+
+for (t in 1:length(traitlist)) {
+  modeldat <-  comb |> 
+    filter(trait == traitlist[t]) |> 
+    mutate(elevation = as.factor(elevation), 
+           grid = as.factor(grid)) |> 
+    drop_na()
+  
+  
+  model<- lme(SES ~ mean_T1_growing_season + mean_moist_growing_season + mean_soil_depth + sdepth + STD,
+              random = ~1|grid, 
+              correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
+              data = modeldat) #only gaussian family possible
+  
+  ###Save check_model plot
+  plot_file <- paste0("All_data/comm_assembly_results/checkmodel_lme_SES_", traitlist[t], "_microenv.png")
+  png(plot_file, width = 1600, height = 1200, res = 150)
+  print(check_model(model))   # print() forces the plot to actually draw to the device
+  dev.off()
+  
+  ###Save model results
+  output_file <- paste0("All_data/comm_assembly_results/lme_SES_" ,traitlist[t], "_microenv_results.txt")
+  sink(output_file)
+  
+  # ── 1.Trait ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  TRAIT\n")
+  cat("===========================================\n")
+  print(traitlist[t])
+  cat("\n\n")
+  
+  
+  # ── 1. Model Formula ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  MODEL FORMULA\n")
+  cat("===========================================\n")
+  print(formula(model))
+  cat("\n\n")
+  
+  # ── 2. Summary Table ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  MODEL SUMMARY\n")
+  cat("===========================================\n")
+  print(summary(model))
+  cat("\n\n")
+  
+  
+  # ── 2. R squared ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  R SQUARED\n")
+  cat("===========================================\n")
+  print(r.squaredGLMM(model))
+  cat("\n\n")
+  
+  
+  # ── 3. ANOVA Table ────────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  ANOVA TABLE\n")
+  cat("===========================================\n")
+  print(anova(model))
+  cat("\n\n")
+  
+  # ── 4. EMmeans Table ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  ESTIMATED MARGINAL MEANS (emmeans)\n")
+  cat("===========================================\n")
+  em_model <- emmeans(model, specs = "elevation", type = "response")
+  comp_letters <-cld(em_model, Letters = letters, adjust = "Tukey", sort = FALSE)
+  print(comp_letters)
+  cat("\n")
+  
+  # --- Close the sink ---
+  sink()
+  
+  #Also save results in a list object so we can call it with quarto
+  SES_ele_summary[[t]] <- summary(model)
+  SES_ele_Rsq[[t]] <- r.squaredGLMM(model)
+  SES_ele_anova[[t]] <- anova(model)
+  SES_ele_cld[[t]] <- comp_letters
+  
+}
