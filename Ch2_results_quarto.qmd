@@ -1,0 +1,163 @@
+---
+title: "Ch2_results"
+format: html
+editor: visual
+---
+
+```{r setup chunk}
+#| message: false
+#| echo: false
+#| warning: false
+library(tidyverse)
+library(ggplot2)
+library(ggridges)
+library(nlme)
+library(emmeans)
+library(multcomp)
+library(MuMIn)
+library(conflicted)
+conflict_prefer_all("dplyr", quiet = TRUE)
+
+#import SES data
+cell_ses <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
+  rename(Cell_ID = cellref)
+
+#import microenvironmental data
+env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
+  #variables we are interested in
+  select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
+           soil_depth_CV, mean_soil_depth, slope_height) |> 
+  #add elevation variables
+  mutate(elevation = case_when(site == "GG" ~ 2000, 
+                               site == "WH" ~ 2500, 
+                               site == "BK" ~ 3000,
+                               .default = NA))
+
+#import remote sensing derived variables
+rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
+  select(CELL_ID, STD) |> 
+  rename(Cell_ID = CELL_ID)
+
+#import interpolated microclimate indices
+micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
+
+
+##Combine SES and environmental data
+comb <- env |> 
+  #join to microclimate indices |> 
+  full_join(micro_idw, by = "Cell_ID") |> 
+  #join to remote sensing data |> 
+  full_join(rms, by = "Cell_ID") |> 
+  #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
+  full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
+  mutate(ncolumn = match(column, LETTERS[1:8]), 
+         grid = paste0(site, grid)) |> #each grid must have a unique id 
+  rename(x_coord = ncolumn, 
+         y_coord = row)
+
+
+###=========================================###
+###Loop to run SES~elevation for all traits####
+###============C5 NULL MODEL===============####
+###=========================================###
+traitlist <- c("log_Height", "log_SLA", "log_LDMC", "log_LA", "Height_cm", "SLA", "LDMC", "Leaf_area_mm2")
+#lists to store results in
+SES_ele_summary <- vector(mode= "list", length = length(traitlist))
+names(SES_ele_summary) = traitlist
+
+SES_ele_Rsq<- vector(mode= "list", length = length(traitlist))
+names(SES_ele_Rsq) = traitlist
+
+SES_ele_anova<- vector(mode= "list", length = length(traitlist))
+names(SES_ele_anova) = traitlist
+
+SES_ele_cld<- vector(mode= "list", length = length(traitlist))
+names(SES_ele_cld) = traitlist
+
+for (t in 1:length(traitlist)) {
+  modeldat <-  comb |> 
+    filter(trait == traitlist[t]) |> 
+    mutate(elevation = as.factor(elevation), 
+           grid = as.factor(grid)) |> 
+    drop_na()
+  
+  
+  model<- lme(SES ~ elevation ,
+                  random = ~1|grid, 
+                  correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
+                  data = modeldat) #only gaussian family possible
+  
+  em_model <- emmeans(model, specs = "elevation", type = "response")
+  comp_letters <-cld(em_model, Letters = letters, adjust = "Tukey", sort = FALSE)
+  
+  #Also save results in a list object so we can call it with quarto
+  SES_ele_summary[[t]] <- summary(model)
+  SES_ele_Rsq[[t]] <- r.squaredGLMM(model)
+  SES_ele_anova[[t]] <- anova(model)
+  SES_ele_cld[[t]] <- comp_letters
+  
+}
+
+```
+
+# Results
+
+`r comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` Cells were included in the analysis, with a total species richness of xx. Elevation did not have a consistent effect on the community assembly of different plant traits (Figure 1). Elevation shifted the assembly of plant height and LDMC from environmental filtering at the low elevation, to limiting similarity at the high elevation. Environmental filtering was the dominant assembly mechanism at all elevations for leaf area and SLA, although the filtering effect of LSA was strongest at the mid elevation.
+
+```{r}
+#| message: false
+#| echo: false
+#| label: fig-SES-elevation-ridges
+#| fig-cap: "The deviation of trait diversity calculated with Height, SLA, LDMC and leaf area from random assembly (SES)"
+#| warning: false
+
+
+l1 <- c("log_Height" = "SES~of~plant~height", "log_SLA" = "SES~of~SLA", "log_LDMC" = "SES~of~LDMC", "log_LA" = "SES~of~LA")
+ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("log_SLA", 3), rep("log_LDMC", 3),rep("log_LA", 3)), 
+                             elevation = as.factor(c(rep(c("2000", "2500", "3000"), 4))),
+                             letters = c(SES_ele_cld$log_Height$.group, 
+                                         SES_ele_cld$log_SLA$.group, 
+                                         SES_ele_cld$log_LDMC$.group, 
+                                         SES_ele_cld$log_LA$.group), 
+                             x_pos = c(4.5, 4.5, 4.5,
+                                       6,6,6, 
+                                       9,9,9,
+                                       8.1,8.1,8.1), 
+                             emmean = c(SES_ele_cld$log_Height$emmean,
+                                        SES_ele_cld$log_SLA$emmean,
+                                        SES_ele_cld$log_LDMC$emmean,
+                                        SES_ele_cld$log_LA$emmean), 
+                             emmean_SE = c(SES_ele_cld$log_Height$SE,
+                                           SES_ele_cld$log_SLA$SE,
+                                           SES_ele_cld$log_LDMC$SE,
+                                           SES_ele_cld$log_LA$SE))
+
+ses_ridges <- comb |>
+  filter(trait %in% c("log_Height", "log_SLA", "log_LDMC", "log_LA")) |> 
+  mutate(elevation = as.factor(elevation)) |> 
+  ggplot(aes(x = SES, y = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", 
+             strip.position = "bottom")+
+  labs(x = " ", y = "Elevation (m a.s.l.)") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  geom_point(
+    data = ridges_letters,
+    aes(x = emmean, y = as.numeric(elevation)),
+    size = 2, inherit.aes = FALSE) +
+  geom_errorbarh(
+    data = ridges_letters,
+    aes(xmin = emmean - emmean_SE,
+        xmax = emmean + emmean_SE,
+        y = as.numeric(elevation)),
+    height = 0.08,
+    linewidth = 1, inherit.aes = FALSE)+
+  theme_bw() +
+  theme(legend.position = "none", axis.title = element_text(size = 18), 
+        axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
+        strip.background = element_blank(),
+        strip.placement = "outside", panel.grid = element_blank()) 
+
+ses_ridges
+```
