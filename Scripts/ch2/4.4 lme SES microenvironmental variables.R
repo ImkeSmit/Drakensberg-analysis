@@ -14,10 +14,6 @@ library(see)
 conflict_prefer_all("tidylog", quiet = TRUE)
 
 
-#import SES data
-cell_ses <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
-  rename(Cell_ID = cellref)
-
 #import microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
   #variables we are interested in
@@ -67,7 +63,7 @@ corrplot(cormat, type = "lower", method = "number")
 
 ###=========================================###
 ###Loop to run SES~elevation for all traits####
-###============C5 NULL MODEL===============####
+###=====C5 NULL MODEL, pool = entire========####
 ###=========================================###
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
