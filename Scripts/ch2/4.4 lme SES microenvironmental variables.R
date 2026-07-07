@@ -146,10 +146,9 @@ for (t in 1:length(traitlist)) {
 ###Loop to run SES~microenvironmental variables for all traits####
 ###=============C5 NULL MODEL, pool = site====================####
 ###===========================================================###
+#import ses
 cell_ses_poolsite <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_poolsite.csv", row.names = 1) |> 
   rename(Cell_ID = cellref) 
-
-
 
 #import microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
@@ -192,9 +191,6 @@ cordf <- comb |>
   select(mean_T1_growing_season, mean_moist_growing_season, STD, rock_cover, northness, mean_soil_depth, slope_height) |> 
   drop_na()
 cormat<- cor(cordf)
-#cormat[cormat > 0.7]
-#cormat[cormat <-0.7]
-#none are highly correlated
 corrplot(cormat, type = "lower", method = "number")
 
 
