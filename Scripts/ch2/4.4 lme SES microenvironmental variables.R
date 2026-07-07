@@ -287,9 +287,9 @@ for (t in 1:length(traitlist)) {
   sink()
   
   #Also save results in a list object so we can call it with quarto
-  SES_ele_summary[[t]] <- summary(model)
-  SES_ele_Rsq[[t]] <- r.squaredGLMM(model)
-  SES_ele_anova[[t]] <- anova(model)
-  SES_ele_cld[[t]] <- comp_letters
+  SES_microenv_summary[[t]] <- summary(model)
+  SES_microenv_Rsq[[t]] <- r.squaredGLMM(model)
+  SES_microenv_anova[[t]] <- anova(model)
+  SES_microenv_cld[[t]] <- comp_letters
   
 }
