@@ -19,7 +19,12 @@ conflict_prefer_all("tidylog", quiet = TRUE)
 ###=========================================###
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
-  rename(Cell_ID = cellref)
+  rename(Cell_ID = cellref) |> 
+  mutate(elevation = case_when(grepl("GG", Cell_ID) ~ "2000", 
+                               grepl("WH", Cell_ID) ~ "2500", 
+                               grepl("BK", Cell_ID) ~ "3000"), 
+         grid = paste0(str_split_i(Cell_ID, "_", 1), str_split_i(Cell_ID, "_", 2)))
+  
 
 
 traitlist <- c("log_Height", "log_SLA", "log_LDMC", "log_LA", "Height_cm", "SLA", "LDMC", "Leaf_area_mm2")
@@ -37,7 +42,7 @@ SES_ele_cld<- vector(mode= "list", length = length(traitlist))
 names(SES_ele_cld) = traitlist
 
 for (t in 1:length(traitlist)) {
-  modeldat <-  comb |> 
+  modeldat <-  cell_ses |> 
     filter(trait == traitlist[t]) |> 
     mutate(elevation = as.factor(elevation), 
            grid = as.factor(grid)) |> 
