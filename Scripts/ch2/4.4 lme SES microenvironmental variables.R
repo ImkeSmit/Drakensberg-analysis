@@ -206,9 +206,6 @@ names(SES_microenv_Rsq) = traitlist
 SES_microenv_anova<- vector(mode= "list", length = length(traitlist))
 names(SES_microenv_anova) = traitlist
 
-SES_microenv_cld<- vector(mode= "list", length = length(traitlist))
-names(SES_microenv_cld) = traitlist
-
 for (t in 1:length(traitlist)) {
   modeldat <-  comb |> 
     filter(trait == traitlist[t]) |> 
@@ -270,15 +267,6 @@ for (t in 1:length(traitlist)) {
   print(anova(model))
   cat("\n\n")
   
-  # ── 4. EMmeans Table ──────────────────────────────────────────
-  cat("===========================================\n")
-  cat("  ESTIMATED MARGINAL MEANS (emmeans)\n")
-  cat("===========================================\n")
-  em_model <- emmeans(model, specs = "elevation", type = "response")
-  comp_letters <-cld(em_model, Letters = letters, adjust = "Tukey", sort = FALSE)
-  print(comp_letters)
-  cat("\n")
-  
   # --- Close the sink ---
   sink()
   
@@ -286,6 +274,5 @@ for (t in 1:length(traitlist)) {
   SES_microenv_summary[[t]] <- summary(model)
   SES_microenv_Rsq[[t]] <- r.squaredGLMM(model)
   SES_microenv_anova[[t]] <- anova(model)
-  SES_microenv_cld[[t]] <- comp_letters
-  
+
 }
