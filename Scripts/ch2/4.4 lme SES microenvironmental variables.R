@@ -195,7 +195,8 @@ corrplot(cormat, type = "lower", method = "number")
 
 
 ###Loop starts here
-traitlist <- c("log_Height", "log_SLA", "log_LDMC", "log_LA", "Height_cm", "SLA", "LDMC", "Leaf_area_mm2")
+#These variables have the best diagnostics after comparing diagnostoc plots of log and raw variables
+traitlist <- c("log_LDMC", "Height_cm", "SLA", "Leaf_area_mm2")
 #lists to store results in
 SES_microenv_summary <- vector(mode= "list", length = length(traitlist))
 names(SES_microenv_summary) = traitlist
