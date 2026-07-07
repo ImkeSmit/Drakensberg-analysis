@@ -19,13 +19,27 @@ conflict_prefer_all("tidylog", quiet = TRUE)
 ###=========================================###
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
-  rename(Cell_ID = cellref) |> 
-  mutate(elevation = case_when(grepl("GG", Cell_ID) ~ "2000", 
-                               grepl("WH", Cell_ID) ~ "2500", 
-                               grepl("BK", Cell_ID) ~ "3000"), 
-         grid = paste0(str_split_i(Cell_ID, "_", 1), str_split_i(Cell_ID, "_", 2)))
-  
+  rename(Cell_ID = cellref) 
 
+#import microenvironmental data containing x and y coordinates
+env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
+  #variables we are interested in
+  select(Cell_ID:row) |> 
+  #add elevation variables
+  mutate(elevation = case_when(site == "GG" ~ 2000, 
+                               site == "WH" ~ 2500, 
+                               site == "BK" ~ 3000,
+                               .default = NA))
+
+##Combine SES and environmental data
+comb <- env |> 
+  #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
+  full_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
+  mutate(ncolumn = match(column, LETTERS[1:8]), 
+         grid = paste0(site, grid)) |> #each grid must have a unique id 
+  rename(x_coord = ncolumn, 
+         y_coord = row)
+  
 
 traitlist <- c("log_Height", "log_SLA", "log_LDMC", "log_LA", "Height_cm", "SLA", "LDMC", "Leaf_area_mm2")
 #lists to store results in
@@ -42,7 +56,7 @@ SES_ele_cld<- vector(mode= "list", length = length(traitlist))
 names(SES_ele_cld) = traitlist
 
 for (t in 1:length(traitlist)) {
-  modeldat <-  cell_ses |> 
+  modeldat <-  comb |> 
     filter(trait == traitlist[t]) |> 
     mutate(elevation = as.factor(elevation), 
            grid = as.factor(grid)) |> 
