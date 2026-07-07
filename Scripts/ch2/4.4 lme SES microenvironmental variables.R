@@ -40,8 +40,9 @@ comb <- env |>
   rename(x_coord = ncolumn, 
          y_coord = row)
   
-
-traitlist <- c("log_Height", "log_SLA", "log_LDMC", "log_LA", "Height_cm", "SLA", "LDMC", "Leaf_area_mm2")
+#These variables have the best diagnostics
+#LA and SLA still have TERRIBLE DIAGNOSTICS
+traitlist <- c("log_Height", "log_LDMC", "log_LA", "SLA")
 #lists to store results in
 SES_ele_summary <- vector(mode= "list", length = length(traitlist))
 names(SES_ele_summary) = traitlist
