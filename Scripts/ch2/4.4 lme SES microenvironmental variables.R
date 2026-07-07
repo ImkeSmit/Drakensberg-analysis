@@ -214,7 +214,7 @@ for (t in 1:length(traitlist)) {
     drop_na()
   
   
-  model<- lme(SES ~ mean_T1_growing_season + mean_moist_growing_season + mean_soil_depth + STD,
+  model<- lme(SES ~ mean_T1_growing_season + mean_moist_growing_season + rock_cover+ mean_soil_depth + STD,
               random = ~1|grid, 
               correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
               data = modeldat) #only gaussian family possible
