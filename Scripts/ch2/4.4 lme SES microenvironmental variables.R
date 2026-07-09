@@ -196,21 +196,25 @@ corrplot(cormat, type = "lower", method = "number")
 
 
 ###Loop starts here
-#These variables have the best diagnostics after comparing diagnostoc plots of log and raw variables
+#These variables have the best diagnostics after comparing diagnostic plots of log and raw variables
 traitlist <- c("log_LDMC", "Height_cm", "SLA", "Leaf_area_mm2")
+sitelist <- c("GG", "WH", "BK")
 #lists to store results in
-SES_microenv_summary <- vector(mode= "list", length = length(traitlist))
+SES_microenv_summary <- vector(mode= "list", length = length(traitlist) + length(sitelist))
 names(SES_microenv_summary) = traitlist
 
-SES_microenv_Rsq<- vector(mode= "list", length = length(traitlist))
+SES_microenv_Rsq<- vector(mode= "list", length = length(traitlist) + length(sitelist))
 names(SES_microenv_Rsq) = traitlist
 
-SES_microenv_anova<- vector(mode= "list", length = length(traitlist))
+SES_microenv_anova<- vector(mode= "list", length = length(traitlist) + length(sitelist))
 names(SES_microenv_anova) = traitlist
 
+l = 1
 for (t in 1:length(traitlist)) {
+  for(s in 1:length(sitelist)) {
   modeldat <-  comb2 |> 
-    filter(trait == traitlist[t]) |> 
+    filter(trait == traitlist[t], 
+           site == sitelist[s]) |> 
     mutate(elevation = as.factor(elevation), 
            grid = as.factor(grid)) |> 
     drop_na()
@@ -222,13 +226,13 @@ for (t in 1:length(traitlist)) {
               data = modeldat) #only gaussian family possible
   
   ###Save check_model plot
-  plot_file <- paste0("All_data/comm_assembly_results/checkmodel_SES_microenv/checkmodel_lme_SES_", traitlist[t], "_microenv.png")
+  plot_file <- paste0("All_data/comm_assembly_results/checkmodel_SES_microenv/checkmodel_lme_SES_", traitlist[t], "_microenv_", sitelist[s], ".png")
   png(plot_file, width = 1600, height = 1200, res = 150)
   print(check_model(model))   # print() forces the plot to actually draw to the device
   dev.off()
   
   ###Save model results
-  output_file <- paste0("All_data/comm_assembly_results/lme_results_SES_microenv/lme_SES_" ,traitlist[t], "_microenv_results.txt")
+  output_file <- paste0("All_data/comm_assembly_results/lme_results_SES_microenv/lme_SES_" ,traitlist[t], "_microenv_", sitelist[s], ".txt")
   sink(output_file)
   
   # ── 1.Trait ──────────────────────────────────────────
@@ -273,10 +277,12 @@ for (t in 1:length(traitlist)) {
   sink()
   
   #Also save results in a list object so we can call it with quarto
-  SES_microenv_summary[[t]] <- summary(model)
-  SES_microenv_Rsq[[t]] <- r.squaredGLMM(model)
-  SES_microenv_anova[[t]] <- anova(model)
+  SES_microenv_summary[[l]] <- summary(model)
+  SES_microenv_Rsq[[l]] <- r.squaredGLMM(model)
+  SES_microenv_anova[[l]] <- anova(model)
+  
+  l = l+1
 
-}
+}}
 #plot(checkmodel()) returns the following error: Check it out when you have internet
 #Converting missing values (`NA`) into regular values currently not possible for variables of class `NULL`.
