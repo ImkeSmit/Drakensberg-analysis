@@ -95,7 +95,6 @@ for (t in 1:length(traitlist)) {
 
 
 
-###===========================================================###
 ###Loop to run SES~microenvironmental variables for all traits####
 ###=============C5 NULL MODEL, pool = site====================####
 ###===========================================================###
@@ -137,22 +136,23 @@ comb2 <- env2 |>
          y_coord = row)
 
 
-###Loop starts here
-#These variables have the best diagnostics after comparing diagnostoc plots of log and raw variables
-traitlist <- c("log_LDMC", "Height_cm", "SLA", "Leaf_area_mm2")
+###Loop starts here####
+#These variables have the best diagnostics after comparing diagnostic plots of log and raw variables
+traitlist <- c("Height_cm","Leaf_area_mm2", "log_LDMC","SLA")
+sitelist <- c("GG", "WH", "BK")
 #lists to store results in
-SES_microenv_summary <- vector(mode= "list", length = length(traitlist))
-names(SES_microenv_summary) = traitlist
+SES_microenv_summary <- vector(mode= "list", length = length(traitlist) * length(sitelist))
 
-SES_microenv_Rsq<- vector(mode= "list", length = length(traitlist))
-names(SES_microenv_Rsq) = traitlist
+SES_microenv_Rsq<- vector(mode= "list", length = length(traitlist) * length(sitelist))
 
-SES_microenv_anova<- vector(mode= "list", length = length(traitlist))
-names(SES_microenv_anova) = traitlist
+SES_microenv_anova<- vector(mode= "list", length = length(traitlist) * length(sitelist))
 
+l = 1
 for (t in 1:length(traitlist)) {
+  for(s in 1:length(sitelist)) {
   modeldat <-  comb2 |> 
-    filter(trait == traitlist[t]) |> 
+    filter(trait == traitlist[t], 
+           site == sitelist[s]) |> 
     mutate(elevation = as.factor(elevation), 
            grid = as.factor(grid)) |> 
     drop_na()
@@ -163,21 +163,27 @@ for (t in 1:length(traitlist)) {
               correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
               data = modeldat) #only gaussian family possible
   
-
   #Also save results in a list object so we can call it with quarto
-  SES_microenv_summary[[t]] <- summary(model)
-  SES_microenv_Rsq[[t]] <- r.squaredGLMM(model)
-  SES_microenv_anova[[t]] <- anova(model)
+  names(SES_microenv_summary)[[l]] <- paste(traitlist[t], sitelist[s], sep = "_")
+  SES_microenv_summary[[l]] <- summary(model)
+  
+  names(SES_microenv_Rsq)[[l]] <- paste(traitlist[t], sitelist[s], sep = "_")
+  SES_microenv_Rsq[[l]] <- r.squaredGLMM(model)
+  
+  names(SES_microenv_anova)[[l]] <- paste(traitlist[t], sitelist[s], sep = "_")
+  SES_microenv_anova[[l]] <- anova(model)
+  
+  l = l+1
 
-}
-#plot(checkmodel()) returns the following error: Check it out when you have internet
-#Converting missing values (`NA`) into regular values currently not possible for variables of class `NULL`.
+}}
 
 ```
 
 # Results
 
-`r comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` Cells were included in the analysis, with a total species richness of xx. Elevation did not have a consistent effect on the community assembly of different plant traits (Figure 1). Elevation shifted the assembly of plant height and LDMC from environmental filtering at the low elevation, to limiting similarity at the high elevation. Environmental filtering was the dominant assembly mechanism at all elevations for leaf area and SLA, although the filtering effect of SLA was weakest at the mid elevation.
+`r comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` Cells were included in the analysis, with a total species richness of xx. Elevation did not have a consistent effect on the community assembly of different plant traits (Figure 1). Elevation shifted the assembly of plant height and LDMC from environmental filtering at the low elevation, to limiting similarity at the high elevation. Although communities generally became shorter with elevation (Figure 2a), the diversity of plant height was highest at the high elevation **(Figure 3)**, indicating the presence of very short as well as very tall plants in the alpine. There was strong filtering for high LDMC values at the low elevation (indicated by the narrow CWM distribution). This filtering effect was weaker at the mid elevation, and selected for lower LDMC values on average. The assembly of LDMC shifted to trait divergence at the highest elevation, but once again showing on average more conservative strategies than at the mid elevation (Figure 2).
+
+The assembly of leaf area shifted from being no different from random assembly, to environmental filtering at the mid and high elevation. Environmental filtering was the dominant assembly mechanism at all elevations for SLA, although the filtering effect of SLA was weakest at the mid elevation.
 
 ```{r}
 #| message: false
@@ -195,7 +201,7 @@ ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), rep(
                                          SES_ele_cld$log_LDMC$.group, 
                                          SES_ele_cld$log_LA$.group), 
                              x_pos = c(4.5, 4.5, 4.5,
-                                       6,6,6, 
+                                       4.5,4.5,4.5, 
                                        9,9,9,
                                        8.1,8.1,8.1), 
                              emmean = c(SES_ele_cld$log_Height$emmean,
@@ -236,26 +242,142 @@ ses_ridges <- comb |>
 
 ses_ridges
 ```
-Microenvironmental variables....
 
 ```{r}
-#| label: tbl-gt
-#| tbl-cap: Effects of microenvironmental variables on assembly of traits
+#| label: fig-CWM-elevation-ridges
+#| fig-cap: Community-weighted mean traits of cells at the low, mid and high elevation. Height, LDMC and LA are on the log scale.
+#| warning: false
+#| message: false
 #| echo: false
+
+#import trait and abundance data
+abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
+
+mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1) |> 
+  mutate(log_Height = log(Height_cm), 
+         log_LA = log(Leaf_area_mm2), 
+         log_LDMC = log(LDMC)) |> #use the same log variables as we do in the models
+  select(!c(LDMC, Leaf_area_mm2, Height_cm, Thickness_mm))
+
+
+#compute CWM of each trait for each cell
+library(FD)
+cwm <- functcomp(x = mean_traits, a = as.matrix(abun_matrix))
+cwm <- cwm |>
+  rownames_to_column(var = "cellref") |> 
+  mutate(elevation = case_when(grepl("BK", cellref) == T ~ "3000", #add elevation variable
+                               grepl("WH", cellref) == T ~ "2500",
+                               grepl("GG", cellref) == T ~ "2000",.default = NA)) |> 
+  pivot_longer(cols = c("log_Height", "log_LDMC", "log_LA", "SLA"), names_to = "trait", values_to = "cwm_value")
+cwm$elevation <- as.factor(cwm$elevation) 
+
+##Graph
+l1 <- c("log_Height" = "Plant~height", "SLA" = "SLA", "log_LDMC" = "LDMC", "log_LA" = "LA")
+
+trait_ridges <- cwm |>
+  filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
+  ggplot(aes(x = cwm_value, y = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), 
+             scale = "free_x", strip.position = "bottom")+
+  labs(x = "", y = "Elevation (m a.s.l.)") +
+  #scale_x_continuous(breaks = c(0,25,50))+
+  theme_bw() +
+  theme(legend.position = "none", axis.title = element_text(size = 18), 
+        axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
+        strip.background = element_blank(),
+        strip.placement = "outside", panel.grid = element_blank()) 
+trait_ridges
+```
+
+```{r}
+#| message: false
+#| echo: false
+#| label: fig-RaoQ-elevation-ridges
+#| fig-cap: "Trait diversity, calculated with RaoQ of each trait along the levational gradient"
+#| warning: false
+
+
+l1 <- c("log_Height" = "RaoQ~of~plant~height", "SLA" = "RaoQ~of~SLA", "log_LDMC" = "RaoQ~of~LDMC", "log_LA" = "RaoQ~of~LA")
+
+raoq_ridges <- comb |>
+  filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
+  mutate(elevation = as.factor(elevation)) |> 
+  ggplot(aes(x = RaoQ, y = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", 
+             strip.position = "bottom")+
+  labs(x = " ", y = "Elevation (m a.s.l.)") +
+  theme_bw() +
+  theme(legend.position = "none", axis.title = element_text(size = 18), 
+        axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
+        strip.background = element_blank(),
+        strip.placement = "outside", panel.grid = element_blank()) 
+
+raoq_ridges
+```
+
+
+Micro-environmental factors were related to fine-scale variation in community assembly, although the relationships varied greatly between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (Table 1).
+
+At the low site, soil moisture filtered size traits (height and leaf area) to **XX** (Table 1). Surface heterogeneity was related to divergence of height, while soil moisture and soil depth were related to divergence in leaf area (Table 2). At the mid site, rock cover was related to height divergence, while soil depth and surface heterogeneity was related to divergence in leaf area (Table 3). Micro-environmental factors also affected the assembly of leaf-economic traits at the mid elevation; with soil moisture and soil depth having a filtering effect on LDMC and SLA respectively, and rock cover related to divergence in LDMC (Table 3). At the high site, soil moisture and surface heterogeneity was related to divergence in plant height, and rock cover was related to divergence of leaf area (Table 4). Soil depth had a filtering effect on leaf area, filtering it towards **XX**. Surface heterogeneity was related to divergence of LDMC and SLA (Table 4). Divergence of SLA at the high site was also related to rock cover and soil temperature (Table 4).
+
+Surface heterogeneity and rock cover were always related to divergence in size and leaf-economic traits. The directions of the effects of other micro-environmental variables on assembly were not consistent across sites.
+
+```{r}
+#| label: tbl-R2 models
+#| tbl-cap: Marginal and conditional R2 values of micro-environmehtal models in predicting SES of each trait at the low, mid and high site.
+#| echo: false
+#| message: false
+#| warning: false
 
 library(gt)
 
-microenv_results <- tibble(variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil     depth", "standard deviation of elevation"),
-                height_coef = SES_microenv_summary$Height_cm$coefficients$fixed[2:6], 
-                height_pval = SES_microenv_anova$Height_cm$`p-value`[2:6], 
-                la_coef = SES_microenv_summary$Leaf_area_mm2$coefficients$fixed[2:6], 
-                la_pval = SES_microenv_anova$Leaf_area_mm2$`p-value`[2:6],
-                ldmc_coef = SES_microenv_summary$log_LDMC$coefficients$fixed[2:6], 
-                ldmc_pval = SES_microenv_anova$log_LDMC$`p-value`[2:6],
-                sla_coef = SES_microenv_summary$SLA$coefficients$fixed[2:6], 
-                sla_pval = SES_microenv_anova$SLA$`p-value`[2:6],)
+R2_table <- tibble(trait = c("Height", "Leaf area", "LDMC", "SLA"), 
+                   GG_R2M = c(SES_microenv_Rsq$Height_cm_GG[1,][1], SES_microenv_Rsq$Leaf_area_mm2_GG[1,][1], SES_microenv_Rsq$log_LDMC_GG[1,][1], SES_microenv_Rsq$SLA_GG[1,][1]), 
+                   GG_R2C = c(SES_microenv_Rsq$Height_cm_GG[1,][2], SES_microenv_Rsq$Leaf_area_mm2_GG[1,][2], SES_microenv_Rsq$log_LDMC_GG[1,][2], SES_microenv_Rsq$SLA_GG[1,][2]), 
+                   WH_R2M = c(SES_microenv_Rsq$Height_cm_WH[1,][1], SES_microenv_Rsq$Leaf_area_mm2_WH[1,][1], SES_microenv_Rsq$log_LDMC_WH[1,][1], SES_microenv_Rsq$SLA_WH[1,][1]), 
+                   WH_R2C = c(SES_microenv_Rsq$Height_cm_WH[1,][2], SES_microenv_Rsq$Leaf_area_mm2_WH[1,][2], SES_microenv_Rsq$log_LDMC_WH[1,][2], SES_microenv_Rsq$SLA_WH[1,][2]),
+                   BK_R2M = c(SES_microenv_Rsq$Height_cm_BK[1,][1], SES_microenv_Rsq$Leaf_area_mm2_BK[1,][1], SES_microenv_Rsq$log_LDMC_BK[1,][1], SES_microenv_Rsq$SLA_BK[1,][1]), 
+                   BK_R2C = c(SES_microenv_Rsq$Height_cm_BK[1,][1], SES_microenv_Rsq$Leaf_area_mm2_BK[1,][1], SES_microenv_Rsq$log_LDMC_BK[1,][1], SES_microenv_Rsq$SLA_BK[1,][1]))
 
-microenv_results |> 
+R2_table |> 
+  gt() |> 
+  cols_label(GG_R2M = "Marginal R\u00B2", 
+             GG_R2C = "Conditional R\u00B2", 
+             WH_R2M = "Marginal R\u00B2", 
+             WH_R2C = "Conditional R\u00B2",
+             BK_R2M = "Marginal R\u00B2", 
+             BK_R2C = "Conditional R\u00B2") |> 
+  fmt_number(columns = everything(), decimals = 3) |> 
+  tab_spanner(label = "Low", columns = c(GG_R2M, GG_R2C)) |>
+  tab_spanner(label = "Mid", columns = c(WH_R2M, WH_R2C)) |>
+  tab_spanner(label = "High", columns = c(BK_R2M, BK_R2C))
+  
+
+```
+
+```{r}
+#| label: tbl-GG-microenv
+#| tbl-cap: Effects of microenvironmental variables on assembly of traits at the low site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait.
+#| echo: false
+#| warning: false
+
+
+GG_microenv_reults <- tibble(variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil     depth", "standard deviation of elevation"), 
+                height_coef = SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
+                height_pval = SES_microenv_anova$Height_cm_GG$`p-value`[2:6], 
+                la_coef = SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
+                la_pval = SES_microenv_anova$Leaf_area_mm2_GG$`p-value`[2:6],
+                ldmc_coef = SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
+                ldmc_pval = SES_microenv_anova$log_LDMC_GG$`p-value`[2:6],
+                sla_coef = SES_microenv_summary$SLA_GG$coefficients$fixed[2:6], 
+                sla_pval = SES_microenv_anova$SLA_GG$`p-value`[2:6])
+
+Rsq <- c(SES_microenv_Rsq$Height_cm_GG[1,][1], SES_microenv_Rsq$Leaf_area_mm2_GG[1,][1], 
+                 SES_microenv_Rsq$log_LDMC_GG[1,][1], SES_microenv_Rsq$SLA_GG[1,][1])
+
+GG_microenv_reults |> 
   gt() |> 
   cols_label(height_coef = "coefficient", 
              height_pval = "p-value", 
@@ -269,7 +391,128 @@ microenv_results |>
   tab_spanner(label = "Height", columns = c(height_coef, height_pval)) |>  
   tab_spanner(label = "Leaf area", columns = c(la_coef, la_pval)) |>
   tab_spanner(label = "LDMC", columns = c(ldmc_coef, ldmc_pval)) |>
-  tab_spanner(label = "SLA", columns = c(sla_coef, sla_pval))
+  tab_spanner(label = "SLA", columns = c(sla_coef, sla_pval)) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = height_pval, rows = height_pval < 0.05)
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = la_pval, rows = la_pval < 0.05)
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = ldmc_pval, rows = ldmc_pval < 0.05)
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = sla_pval, rows = sla_pval < 0.05)
+  )
 
 ```
 
+```{r}
+#| label: tbl-WH-microenv
+#| tbl-cap: Effects of microenvironmental variables on assembly of traits at the mid site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait.
+#| echo: false
+#| warning: false
+
+WH_microenv_reults <- tibble(variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil     depth", "standard deviation of elevation"), 
+                height_coef = SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:6], 
+                height_pval = SES_microenv_anova$Height_cm_WH$`p-value`[2:6], 
+                la_coef = SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:6], 
+                la_pval = SES_microenv_anova$Leaf_area_mm2_WH$`p-value`[2:6],
+                ldmc_coef = SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:6], 
+                ldmc_pval = SES_microenv_anova$log_LDMC_WH$`p-value`[2:6],
+                sla_coef = SES_microenv_summary$SLA_WH$coefficients$fixed[2:6], 
+                sla_pval = SES_microenv_anova$SLA_WH$`p-value`[2:6])
+
+Rsq <- c(SES_microenv_Rsq$Height_cm_WH[1,][1], SES_microenv_Rsq$Leaf_area_mm2_WH[1,][1], 
+                 SES_microenv_Rsq$log_LDMC_WH[1,][1], SES_microenv_Rsq$SLA_WH[1,][1])
+
+WH_microenv_reults |> 
+  gt() |> 
+  cols_label(height_coef = "coefficient", 
+             height_pval = "p-value", 
+             la_coef = "coefficient", 
+             la_pval = "p-value", 
+             ldmc_coef = "coefficient", 
+             ldmc_pval = "p-value", 
+             sla_coef = "coefficient", 
+             sla_pval = "p-value") |> 
+  fmt_number(columns = everything(), decimals = 3) |> 
+  tab_spanner(label = "Height", columns = c(height_coef, height_pval)) |>  
+  tab_spanner(label = "Leaf area", columns = c(la_coef, la_pval)) |>
+  tab_spanner(label = "LDMC", columns = c(ldmc_coef, ldmc_pval)) |>
+  tab_spanner(label = "SLA", columns = c(sla_coef, sla_pval)) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = height_pval, rows = height_pval < 0.05)
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = la_pval, rows = la_pval < 0.05)
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = ldmc_pval, rows = ldmc_pval < 0.05)
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = sla_pval, rows = sla_pval < 0.05)
+  )
+
+```
+
+```{r}
+#| label: tbl-BK-microenv
+#| tbl-cap: Effects of microenvironmental variables on assembly of traits at the high site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait.
+#| echo: false
+#| warning: false
+
+BK_microenv_reults <- tibble(variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil     depth", "standard deviation of elevation"), 
+                height_coef = SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:6], 
+                height_pval = SES_microenv_anova$Height_cm_BK$`p-value`[2:6], 
+                la_coef = SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:6], 
+                la_pval = SES_microenv_anova$Leaf_area_mm2_BK$`p-value`[2:6],
+                ldmc_coef = SES_microenv_summary$log_LDMC_BK$coefficients$fixed[2:6], 
+                ldmc_pval = SES_microenv_anova$log_LDMC_BK$`p-value`[2:6],
+                sla_coef = SES_microenv_summary$SLA_BK$coefficients$fixed[2:6], 
+                sla_pval = SES_microenv_anova$SLA_BK$`p-value`[2:6])
+
+Rsq <- c(SES_microenv_Rsq$Height_cm_BK[1,][1], SES_microenv_Rsq$Leaf_area_mm2_BK[1,][1], 
+                 SES_microenv_Rsq$log_LDMC_BK[1,][1], SES_microenv_Rsq$SLA_BK[1,][1])
+
+BK_microenv_reults |> 
+  gt() |> 
+  cols_label(height_coef = "coefficient", 
+             height_pval = "p-value", 
+             la_coef = "coefficient", 
+             la_pval = "p-value", 
+             ldmc_coef = "coefficient", 
+             ldmc_pval = "p-value", 
+             sla_coef = "coefficient", 
+             sla_pval = "p-value") |> 
+  fmt_number(columns = everything(), decimals = 3) |> 
+  tab_spanner(label = "Height", columns = c(height_coef, height_pval)) |>  
+  tab_spanner(label = "Leaf area", columns = c(la_coef, la_pval)) |>
+  tab_spanner(label = "LDMC", columns = c(ldmc_coef, ldmc_pval)) |>
+  tab_spanner(label = "SLA", columns = c(sla_coef, sla_pval)) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = height_pval, rows = height_pval < 0.05)
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = la_pval, rows = la_pval < 0.05)
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = ldmc_pval, rows = ldmc_pval < 0.05)
+  ) |>
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = sla_pval, rows = sla_pval < 0.05)
+  )
+
+```

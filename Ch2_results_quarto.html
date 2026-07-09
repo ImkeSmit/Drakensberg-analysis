@@ -20,41 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -115,61 +80,30 @@ Figure&nbsp;1: The deviation of trait diversity calculated with Height, SLA, LDM
 </div>
 </div>
 </div>
-<p>Microenvironmental variables….</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
+<p>Micro-environmental factors were related to fine-scale variation in community assembly, although the relationships varied greatly between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (Table 1).</p>
+<p>At the low site, soil moisture filtered size traits (height and leaf area) to <strong>XX</strong> (Table 1). Surface heterogeneity was related to divergence of height, while soil moisture and soil depth were related to divergence in leaf area (Table 2). At the mid site, rock cover was related to height divergence, while soil depth and surface heterogeneity was related to divergence in leaf area (Table 3). Micro-environmental factors also affected the assembly of leaf-economic traits at the mid elevation; with soil moisture and soil depth having a filtering effect on LDMC and SLA respectively, and rock cover related to divergence in LDMC (Table 3). At the high site, soil moisture and surface heterogeneity was related to divergence in plant height, and rock cover was related to divergence of leaf area (Table 4). Soil depth had a filtering effect on leaf area, filtering it towards <strong>XX</strong>. Surface heterogeneity was related to divergence of LDMC and SLA (Table 4). Divergence of SLA at the high site was also related to rock cover and soil temperature (Table 4).</p>
+<p>Surface heterogeneity and rock cover was generally alwaysto divergence in size and leaf-economic traits. The directions of the effects of other micro-environmental variables on assembly were not consistent across sites.</p>
+<p>::: {#tbl-R2 models .cell tbl-cap=‘Marginal and conditional R2 values of micro-environmehtal models in predicting SES of each trait at the low, mid and high site.’} ::: {.cell-output .cell-output-stderr}</p>
 <pre><code>Warning: package 'gt' was built under R version 4.5.3</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>microenv_results <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">variable =</span> <span class="fu">c</span>(<span class="st">"mean soil temperature"</span>, <span class="st">"mean soil moisture"</span>, <span class="st">"rock cover"</span>, <span class="st">"mean soil     depth"</span>, <span class="st">"standard deviation of elevation"</span>),</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">height_coef =</span> SES_microenv_summary<span class="sc">$</span>Height_cm<span class="sc">$</span>coefficients<span class="sc">$</span>fixed[<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>], </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">height_pval =</span> SES_microenv_anova<span class="sc">$</span>Height_cm<span class="sc">$</span><span class="st">`</span><span class="at">p-value</span><span class="st">`</span>[<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>], </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">la_coef =</span> SES_microenv_summary<span class="sc">$</span>Leaf_area_mm2<span class="sc">$</span>coefficients<span class="sc">$</span>fixed[<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>], </span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">la_pval =</span> SES_microenv_anova<span class="sc">$</span>Leaf_area_mm2<span class="sc">$</span><span class="st">`</span><span class="at">p-value</span><span class="st">`</span>[<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>],</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">ldmc_coef =</span> SES_microenv_summary<span class="sc">$</span>log_LDMC<span class="sc">$</span>coefficients<span class="sc">$</span>fixed[<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>], </span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">ldmc_pval =</span> SES_microenv_anova<span class="sc">$</span>log_LDMC<span class="sc">$</span><span class="st">`</span><span class="at">p-value</span><span class="st">`</span>[<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>],</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">sla_coef =</span> SES_microenv_summary<span class="sc">$</span>SLA<span class="sc">$</span>coefficients<span class="sc">$</span>fixed[<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>], </span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">sla_pval =</span> SES_microenv_anova<span class="sc">$</span>SLA<span class="sc">$</span><span class="st">`</span><span class="at">p-value</span><span class="st">`</span>[<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>],)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>microenv_results <span class="sc">|&gt;</span> </span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(<span class="at">height_coef =</span> <span class="st">"coefficient"</span>, </span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>             <span class="at">height_pval =</span> <span class="st">"p-value"</span>, </span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">la_coef =</span> <span class="st">"coefficient"</span>, </span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>             <span class="at">la_pval =</span> <span class="st">"p-value"</span>, </span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">ldmc_coef =</span> <span class="st">"coefficient"</span>, </span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">ldmc_pval =</span> <span class="st">"p-value"</span>, </span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>             <span class="at">sla_coef =</span> <span class="st">"coefficient"</span>, </span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>             <span class="at">sla_pval =</span> <span class="st">"p-value"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">everything</span>(), <span class="at">decimals =</span> <span class="dv">3</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(<span class="at">label =</span> <span class="st">"Height"</span>, <span class="at">columns =</span> <span class="fu">c</span>(height_coef, height_pval)) <span class="sc">|&gt;</span>  </span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(<span class="at">label =</span> <span class="st">"Leaf area"</span>, <span class="at">columns =</span> <span class="fu">c</span>(la_coef, la_pval)) <span class="sc">|&gt;</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(<span class="at">label =</span> <span class="st">"LDMC"</span>, <span class="at">columns =</span> <span class="fu">c</span>(ldmc_coef, ldmc_pval)) <span class="sc">|&gt;</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(<span class="at">label =</span> <span class="st">"SLA"</span>, <span class="at">columns =</span> <span class="fu">c</span>(sla_coef, sla_pval))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="tbl-gt" class="cell quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-gt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: Tables with <code>gt()</code>
-</figcaption>
-<div aria-describedby="tbl-gt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<p>:::</p>
 <div class="cell-output-display">
-<div id="iiqcftphpl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#iiqcftphpl table {
+<div id="rufmkqmpmb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#rufmkqmpmb table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#iiqcftphpl thead, #iiqcftphpl tbody, #iiqcftphpl tfoot, #iiqcftphpl tr, #iiqcftphpl td, #iiqcftphpl th {
+#rufmkqmpmb thead, #rufmkqmpmb tbody, #rufmkqmpmb tfoot, #rufmkqmpmb tr, #rufmkqmpmb td, #rufmkqmpmb th {
   border-style: none;
 }
 
-#iiqcftphpl p {
+#rufmkqmpmb p {
   margin: 0;
   padding: 0;
 }
 
-#iiqcftphpl .gt_table {
+#rufmkqmpmb .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -195,12 +129,12 @@ Table&nbsp;1: Tables with <code>gt()</code>
   border-left-color: #D3D3D3;
 }
 
-#iiqcftphpl .gt_caption {
+#rufmkqmpmb .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#iiqcftphpl .gt_title {
+#rufmkqmpmb .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -212,7 +146,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   border-bottom-width: 0;
 }
 
-#iiqcftphpl .gt_subtitle {
+#rufmkqmpmb .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -224,7 +158,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   border-top-width: 0;
 }
 
-#iiqcftphpl .gt_heading {
+#rufmkqmpmb .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -236,13 +170,13 @@ Table&nbsp;1: Tables with <code>gt()</code>
   border-right-color: #D3D3D3;
 }
 
-#iiqcftphpl .gt_bottom_border {
+#rufmkqmpmb .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#iiqcftphpl .gt_col_headings {
+#rufmkqmpmb .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -257,7 +191,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   border-right-color: #D3D3D3;
 }
 
-#iiqcftphpl .gt_col_heading {
+#rufmkqmpmb .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -277,7 +211,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   overflow-x: hidden;
 }
 
-#iiqcftphpl .gt_column_spanner_outer {
+#rufmkqmpmb .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -289,15 +223,15 @@ Table&nbsp;1: Tables with <code>gt()</code>
   padding-right: 4px;
 }
 
-#iiqcftphpl .gt_column_spanner_outer:first-child {
+#rufmkqmpmb .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#iiqcftphpl .gt_column_spanner_outer:last-child {
+#rufmkqmpmb .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#iiqcftphpl .gt_column_spanner {
+#rufmkqmpmb .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -309,11 +243,11 @@ Table&nbsp;1: Tables with <code>gt()</code>
   width: 100%;
 }
 
-#iiqcftphpl .gt_spanner_row {
+#rufmkqmpmb .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#iiqcftphpl .gt_group_heading {
+#rufmkqmpmb .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -339,7 +273,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   text-align: left;
 }
 
-#iiqcftphpl .gt_empty_group_heading {
+#rufmkqmpmb .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -354,15 +288,15 @@ Table&nbsp;1: Tables with <code>gt()</code>
   vertical-align: middle;
 }
 
-#iiqcftphpl .gt_from_md > :first-child {
+#rufmkqmpmb .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#iiqcftphpl .gt_from_md > :last-child {
+#rufmkqmpmb .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#iiqcftphpl .gt_row {
+#rufmkqmpmb .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -381,7 +315,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   overflow-x: hidden;
 }
 
-#iiqcftphpl .gt_stub {
+#rufmkqmpmb .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -394,7 +328,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   padding-right: 5px;
 }
 
-#iiqcftphpl .gt_stub_row_group {
+#rufmkqmpmb .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -408,15 +342,15 @@ Table&nbsp;1: Tables with <code>gt()</code>
   vertical-align: top;
 }
 
-#iiqcftphpl .gt_row_group_first td {
+#rufmkqmpmb .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#iiqcftphpl .gt_row_group_first th {
+#rufmkqmpmb .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#iiqcftphpl .gt_summary_row {
+#rufmkqmpmb .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -426,16 +360,16 @@ Table&nbsp;1: Tables with <code>gt()</code>
   padding-right: 5px;
 }
 
-#iiqcftphpl .gt_first_summary_row {
+#rufmkqmpmb .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#iiqcftphpl .gt_first_summary_row.thick {
+#rufmkqmpmb .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#iiqcftphpl .gt_last_summary_row {
+#rufmkqmpmb .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -445,7 +379,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   border-bottom-color: #D3D3D3;
 }
 
-#iiqcftphpl .gt_grand_summary_row {
+#rufmkqmpmb .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -455,7 +389,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   padding-right: 5px;
 }
 
-#iiqcftphpl .gt_first_grand_summary_row {
+#rufmkqmpmb .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -465,7 +399,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   border-top-color: #D3D3D3;
 }
 
-#iiqcftphpl .gt_last_grand_summary_row_top {
+#rufmkqmpmb .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -475,11 +409,11 @@ Table&nbsp;1: Tables with <code>gt()</code>
   border-bottom-color: #D3D3D3;
 }
 
-#iiqcftphpl .gt_striped {
+#rufmkqmpmb .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#iiqcftphpl .gt_table_body {
+#rufmkqmpmb .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -488,7 +422,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   border-bottom-color: #D3D3D3;
 }
 
-#iiqcftphpl .gt_footnotes {
+#rufmkqmpmb .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -502,7 +436,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   border-right-color: #D3D3D3;
 }
 
-#iiqcftphpl .gt_footnote {
+#rufmkqmpmb .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -511,7 +445,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   padding-right: 5px;
 }
 
-#iiqcftphpl .gt_sourcenotes {
+#rufmkqmpmb .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -525,7 +459,7 @@ Table&nbsp;1: Tables with <code>gt()</code>
   border-right-color: #D3D3D3;
 }
 
-#iiqcftphpl .gt_sourcenote {
+#rufmkqmpmb .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -533,72 +467,605 @@ Table&nbsp;1: Tables with <code>gt()</code>
   padding-right: 5px;
 }
 
-#iiqcftphpl .gt_left {
+#rufmkqmpmb .gt_left {
   text-align: left;
 }
 
-#iiqcftphpl .gt_center {
+#rufmkqmpmb .gt_center {
   text-align: center;
 }
 
-#iiqcftphpl .gt_right {
+#rufmkqmpmb .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#iiqcftphpl .gt_font_normal {
+#rufmkqmpmb .gt_font_normal {
   font-weight: normal;
 }
 
-#iiqcftphpl .gt_font_bold {
+#rufmkqmpmb .gt_font_bold {
   font-weight: bold;
 }
 
-#iiqcftphpl .gt_font_italic {
+#rufmkqmpmb .gt_font_italic {
   font-style: italic;
 }
 
-#iiqcftphpl .gt_super {
+#rufmkqmpmb .gt_super {
   font-size: 65%;
 }
 
-#iiqcftphpl .gt_footnote_marks {
+#rufmkqmpmb .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#iiqcftphpl .gt_asterisk {
+#rufmkqmpmb .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#iiqcftphpl .gt_indent_1 {
+#rufmkqmpmb .gt_indent_1 {
   text-indent: 5px;
 }
 
-#iiqcftphpl .gt_indent_2 {
+#rufmkqmpmb .gt_indent_2 {
   text-indent: 10px;
 }
 
-#iiqcftphpl .gt_indent_3 {
+#rufmkqmpmb .gt_indent_3 {
   text-indent: 15px;
 }
 
-#iiqcftphpl .gt_indent_4 {
+#rufmkqmpmb .gt_indent_4 {
   text-indent: 20px;
 }
 
-#iiqcftphpl .gt_indent_5 {
+#rufmkqmpmb .gt_indent_5 {
   text-indent: 25px;
 }
 
-#iiqcftphpl .katex-display {
+#rufmkqmpmb .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#iiqcftphpl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#rufmkqmpmb div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="gt_col_headings gt_spanner_row header">
+<th rowspan="2" id="trait" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">trait</th>
+<th colspan="2" id="Low" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+Low
+</div></th>
+<th colspan="2" id="Mid" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+Mid
+</div></th>
+<th colspan="2" id="High" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+High
+</div></th>
+</tr>
+<tr class="gt_col_headings even">
+<th id="GG_R2M" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Marginal R²</th>
+<th id="GG_R2C" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Conditional R²</th>
+<th id="WH_R2M" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Marginal R²</th>
+<th id="WH_R2C" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Conditional R²</th>
+<th id="BK_R2M" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Marginal R²</th>
+<th id="BK_R2C" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Conditional R²</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="trait">Height</td>
+<td class="gt_row gt_right" headers="GG_R2M">0.137</td>
+<td class="gt_row gt_right" headers="GG_R2C">0.137</td>
+<td class="gt_row gt_right" headers="WH_R2M">0.022</td>
+<td class="gt_row gt_right" headers="WH_R2C">0.022</td>
+<td class="gt_row gt_right" headers="BK_R2M">0.070</td>
+<td class="gt_row gt_right" headers="BK_R2C">0.070</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="trait">Leaf area</td>
+<td class="gt_row gt_right" headers="GG_R2M">0.334</td>
+<td class="gt_row gt_right" headers="GG_R2C">0.601</td>
+<td class="gt_row gt_right" headers="WH_R2M">0.085</td>
+<td class="gt_row gt_right" headers="WH_R2C">0.213</td>
+<td class="gt_row gt_right" headers="BK_R2M">0.036</td>
+<td class="gt_row gt_right" headers="BK_R2C">0.036</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="trait">LDMC</td>
+<td class="gt_row gt_right" headers="GG_R2M">0.010</td>
+<td class="gt_row gt_right" headers="GG_R2C">0.476</td>
+<td class="gt_row gt_right" headers="WH_R2M">0.038</td>
+<td class="gt_row gt_right" headers="WH_R2C">0.247</td>
+<td class="gt_row gt_right" headers="BK_R2M">0.017</td>
+<td class="gt_row gt_right" headers="BK_R2C">0.017</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="trait">SLA</td>
+<td class="gt_row gt_right" headers="GG_R2M">0.055</td>
+<td class="gt_row gt_right" headers="GG_R2C">0.055</td>
+<td class="gt_row gt_right" headers="WH_R2M">0.051</td>
+<td class="gt_row gt_right" headers="WH_R2C">0.051</td>
+<td class="gt_row gt_right" headers="BK_R2M">0.066</td>
+<td class="gt_row gt_right" headers="BK_R2C">0.066</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<p>:::</p>
+<div class="cell">
+<div id="tbl-GG-microenv" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-GG-microenv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Effects of microenvironmental variables on assembly of traits at the low site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait.
+</figcaption>
+<div aria-describedby="tbl-GG-microenv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="lpkbcunxhj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#lpkbcunxhj table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#lpkbcunxhj thead, #lpkbcunxhj tbody, #lpkbcunxhj tfoot, #lpkbcunxhj tr, #lpkbcunxhj td, #lpkbcunxhj th {
+  border-style: none;
+}
+
+#lpkbcunxhj p {
+  margin: 0;
+  padding: 0;
+}
+
+#lpkbcunxhj .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#lpkbcunxhj .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#lpkbcunxhj .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#lpkbcunxhj .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#lpkbcunxhj .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#lpkbcunxhj .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lpkbcunxhj .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#lpkbcunxhj .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#lpkbcunxhj .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#lpkbcunxhj .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#lpkbcunxhj .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#lpkbcunxhj .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#lpkbcunxhj .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#lpkbcunxhj .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#lpkbcunxhj .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#lpkbcunxhj .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#lpkbcunxhj .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#lpkbcunxhj .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#lpkbcunxhj .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lpkbcunxhj .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#lpkbcunxhj .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#lpkbcunxhj .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#lpkbcunxhj .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lpkbcunxhj .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#lpkbcunxhj .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#lpkbcunxhj .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lpkbcunxhj .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lpkbcunxhj .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#lpkbcunxhj .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lpkbcunxhj .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#lpkbcunxhj .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lpkbcunxhj .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#lpkbcunxhj .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lpkbcunxhj .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#lpkbcunxhj .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lpkbcunxhj .gt_left {
+  text-align: left;
+}
+
+#lpkbcunxhj .gt_center {
+  text-align: center;
+}
+
+#lpkbcunxhj .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#lpkbcunxhj .gt_font_normal {
+  font-weight: normal;
+}
+
+#lpkbcunxhj .gt_font_bold {
+  font-weight: bold;
+}
+
+#lpkbcunxhj .gt_font_italic {
+  font-style: italic;
+}
+
+#lpkbcunxhj .gt_super {
+  font-size: 65%;
+}
+
+#lpkbcunxhj .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#lpkbcunxhj .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#lpkbcunxhj .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#lpkbcunxhj .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#lpkbcunxhj .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#lpkbcunxhj .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#lpkbcunxhj .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#lpkbcunxhj .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#lpkbcunxhj div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -645,58 +1112,1182 @@ SLA
 <tbody class="gt_table_body">
 <tr class="odd">
 <td class="gt_row gt_left" headers="variable">mean soil temperature</td>
-<td class="gt_row gt_right" headers="height_coef">−0.096</td>
-<td class="gt_row gt_right" headers="height_pval">0.302</td>
-<td class="gt_row gt_right" headers="la_coef">−0.081</td>
-<td class="gt_row gt_right" headers="la_pval">0.018</td>
-<td class="gt_row gt_right" headers="ldmc_coef">−0.017</td>
-<td class="gt_row gt_right" headers="ldmc_pval">0.917</td>
-<td class="gt_row gt_right" headers="sla_coef">−0.014</td>
-<td class="gt_row gt_right" headers="sla_pval">0.847</td>
+<td class="gt_row gt_right" headers="height_coef">−0.266</td>
+<td class="gt_row gt_right" headers="height_pval" style="font-weight: bold">0.001</td>
+<td class="gt_row gt_right" headers="la_coef">−0.262</td>
+<td class="gt_row gt_right" headers="la_pval" style="font-weight: bold">0.000</td>
+<td class="gt_row gt_right" headers="ldmc_coef">−0.078</td>
+<td class="gt_row gt_right" headers="ldmc_pval">0.834</td>
+<td class="gt_row gt_right" headers="sla_coef">−0.053</td>
+<td class="gt_row gt_right" headers="sla_pval">0.077</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="variable">mean soil moisture</td>
 <td class="gt_row gt_right" headers="height_coef">0.000</td>
-<td class="gt_row gt_right" headers="height_pval">0.006</td>
+<td class="gt_row gt_right" headers="height_pval">0.937</td>
 <td class="gt_row gt_right" headers="la_coef">0.000</td>
-<td class="gt_row gt_right" headers="la_pval">0.446</td>
+<td class="gt_row gt_right" headers="la_pval" style="font-weight: bold">0.038</td>
 <td class="gt_row gt_right" headers="ldmc_coef">0.000</td>
-<td class="gt_row gt_right" headers="ldmc_pval">0.213</td>
+<td class="gt_row gt_right" headers="ldmc_pval">0.625</td>
 <td class="gt_row gt_right" headers="sla_coef">0.000</td>
-<td class="gt_row gt_right" headers="sla_pval">0.454</td>
+<td class="gt_row gt_right" headers="sla_pval">0.132</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="variable">rock cover</td>
 <td class="gt_row gt_right" headers="height_coef">0.005</td>
-<td class="gt_row gt_right" headers="height_pval">0.010</td>
-<td class="gt_row gt_right" headers="la_coef">0.002</td>
-<td class="gt_row gt_right" headers="la_pval">0.243</td>
-<td class="gt_row gt_right" headers="ldmc_coef">0.003</td>
-<td class="gt_row gt_right" headers="ldmc_pval">0.075</td>
-<td class="gt_row gt_right" headers="sla_coef">0.005</td>
-<td class="gt_row gt_right" headers="sla_pval">0.000</td>
+<td class="gt_row gt_right" headers="height_pval">0.058</td>
+<td class="gt_row gt_right" headers="la_coef">0.003</td>
+<td class="gt_row gt_right" headers="la_pval">0.518</td>
+<td class="gt_row gt_right" headers="ldmc_coef">0.004</td>
+<td class="gt_row gt_right" headers="ldmc_pval">0.131</td>
+<td class="gt_row gt_right" headers="sla_coef">0.001</td>
+<td class="gt_row gt_right" headers="sla_pval">0.889</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="variable">mean soil depth</td>
-<td class="gt_row gt_right" headers="height_coef">0.002</td>
-<td class="gt_row gt_right" headers="height_pval">0.154</td>
-<td class="gt_row gt_right" headers="la_coef">0.003</td>
-<td class="gt_row gt_right" headers="la_pval">0.133</td>
-<td class="gt_row gt_right" headers="ldmc_coef">0.001</td>
-<td class="gt_row gt_right" headers="ldmc_pval">0.591</td>
-<td class="gt_row gt_right" headers="sla_coef">−0.004</td>
-<td class="gt_row gt_right" headers="sla_pval">0.043</td>
+<td class="gt_row gt_right" headers="height_coef">−0.002</td>
+<td class="gt_row gt_right" headers="height_pval">0.852</td>
+<td class="gt_row gt_right" headers="la_coef">0.008</td>
+<td class="gt_row gt_right" headers="la_pval" style="font-weight: bold">0.008</td>
+<td class="gt_row gt_right" headers="ldmc_coef">−0.005</td>
+<td class="gt_row gt_right" headers="ldmc_pval">0.253</td>
+<td class="gt_row gt_right" headers="sla_coef">0.006</td>
+<td class="gt_row gt_right" headers="sla_pval">0.197</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="variable">standard deviation of elevation</td>
-<td class="gt_row gt_right" headers="height_coef">3.284</td>
-<td class="gt_row gt_right" headers="height_pval">0.000</td>
-<td class="gt_row gt_right" headers="la_coef">0.603</td>
-<td class="gt_row gt_right" headers="la_pval">0.180</td>
-<td class="gt_row gt_right" headers="ldmc_coef">1.393</td>
-<td class="gt_row gt_right" headers="ldmc_pval">0.005</td>
-<td class="gt_row gt_right" headers="sla_coef">0.362</td>
-<td class="gt_row gt_right" headers="sla_pval">0.467</td>
+<td class="gt_row gt_right" headers="height_coef">1.679</td>
+<td class="gt_row gt_right" headers="height_pval" style="font-weight: bold">0.005</td>
+<td class="gt_row gt_right" headers="la_coef">0.285</td>
+<td class="gt_row gt_right" headers="la_pval">0.615</td>
+<td class="gt_row gt_right" headers="ldmc_coef">0.141</td>
+<td class="gt_row gt_right" headers="ldmc_pval">0.825</td>
+<td class="gt_row gt_right" headers="sla_coef">−0.975</td>
+<td class="gt_row gt_right" headers="sla_pval">0.146</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-WH-microenv" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-WH-microenv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Effects of microenvironmental variables on assembly of traits at the mid site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait.
+</figcaption>
+<div aria-describedby="tbl-WH-microenv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="lxxyncmlsh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#lxxyncmlsh table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#lxxyncmlsh thead, #lxxyncmlsh tbody, #lxxyncmlsh tfoot, #lxxyncmlsh tr, #lxxyncmlsh td, #lxxyncmlsh th {
+  border-style: none;
+}
+
+#lxxyncmlsh p {
+  margin: 0;
+  padding: 0;
+}
+
+#lxxyncmlsh .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#lxxyncmlsh .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#lxxyncmlsh .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#lxxyncmlsh .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#lxxyncmlsh .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#lxxyncmlsh .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lxxyncmlsh .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#lxxyncmlsh .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#lxxyncmlsh .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#lxxyncmlsh .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#lxxyncmlsh .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#lxxyncmlsh .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#lxxyncmlsh .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#lxxyncmlsh .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#lxxyncmlsh .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#lxxyncmlsh .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#lxxyncmlsh .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#lxxyncmlsh .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#lxxyncmlsh .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lxxyncmlsh .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#lxxyncmlsh .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#lxxyncmlsh .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#lxxyncmlsh .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lxxyncmlsh .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#lxxyncmlsh .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#lxxyncmlsh .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lxxyncmlsh .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lxxyncmlsh .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#lxxyncmlsh .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lxxyncmlsh .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#lxxyncmlsh .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#lxxyncmlsh .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#lxxyncmlsh .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lxxyncmlsh .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#lxxyncmlsh .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#lxxyncmlsh .gt_left {
+  text-align: left;
+}
+
+#lxxyncmlsh .gt_center {
+  text-align: center;
+}
+
+#lxxyncmlsh .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#lxxyncmlsh .gt_font_normal {
+  font-weight: normal;
+}
+
+#lxxyncmlsh .gt_font_bold {
+  font-weight: bold;
+}
+
+#lxxyncmlsh .gt_font_italic {
+  font-style: italic;
+}
+
+#lxxyncmlsh .gt_super {
+  font-size: 65%;
+}
+
+#lxxyncmlsh .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#lxxyncmlsh .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#lxxyncmlsh .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#lxxyncmlsh .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#lxxyncmlsh .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#lxxyncmlsh .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#lxxyncmlsh .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#lxxyncmlsh .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#lxxyncmlsh div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="gt_col_headings gt_spanner_row header">
+<th rowspan="2" id="variable" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">variable</th>
+<th colspan="2" id="Height" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+Height
+</div></th>
+<th colspan="2" id="Leaf area" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+Leaf area
+</div></th>
+<th colspan="2" id="LDMC" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+LDMC
+</div></th>
+<th colspan="2" id="SLA" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+SLA
+</div></th>
+</tr>
+<tr class="gt_col_headings even">
+<th id="height_coef" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">coefficient</th>
+<th id="height_pval" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p-value</th>
+<th id="la_coef" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">coefficient</th>
+<th id="la_pval" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p-value</th>
+<th id="ldmc_coef" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">coefficient</th>
+<th id="ldmc_pval" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p-value</th>
+<th id="sla_coef" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">coefficient</th>
+<th id="sla_pval" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p-value</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="variable">mean soil temperature</td>
+<td class="gt_row gt_right" headers="height_coef">−0.033</td>
+<td class="gt_row gt_right" headers="height_pval">0.882</td>
+<td class="gt_row gt_right" headers="la_coef">−0.009</td>
+<td class="gt_row gt_right" headers="la_pval">0.978</td>
+<td class="gt_row gt_right" headers="ldmc_coef">−0.175</td>
+<td class="gt_row gt_right" headers="ldmc_pval">0.470</td>
+<td class="gt_row gt_right" headers="sla_coef">0.039</td>
+<td class="gt_row gt_right" headers="sla_pval">0.833</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="variable">mean soil moisture</td>
+<td class="gt_row gt_right" headers="height_coef">0.000</td>
+<td class="gt_row gt_right" headers="height_pval">0.258</td>
+<td class="gt_row gt_right" headers="la_coef">0.000</td>
+<td class="gt_row gt_right" headers="la_pval">0.203</td>
+<td class="gt_row gt_right" headers="ldmc_coef">−0.001</td>
+<td class="gt_row gt_right" headers="ldmc_pval" style="font-weight: bold">0.022</td>
+<td class="gt_row gt_right" headers="sla_coef">0.000</td>
+<td class="gt_row gt_right" headers="sla_pval">0.757</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="variable">rock cover</td>
+<td class="gt_row gt_right" headers="height_coef">0.006</td>
+<td class="gt_row gt_right" headers="height_pval" style="font-weight: bold">0.027</td>
+<td class="gt_row gt_right" headers="la_coef">0.001</td>
+<td class="gt_row gt_right" headers="la_pval">0.700</td>
+<td class="gt_row gt_right" headers="ldmc_coef">0.001</td>
+<td class="gt_row gt_right" headers="ldmc_pval">0.714</td>
+<td class="gt_row gt_right" headers="sla_coef">0.004</td>
+<td class="gt_row gt_right" headers="sla_pval" style="font-weight: bold">0.031</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="variable">mean soil depth</td>
+<td class="gt_row gt_right" headers="height_coef">−0.007</td>
+<td class="gt_row gt_right" headers="height_pval">0.206</td>
+<td class="gt_row gt_right" headers="la_coef">0.019</td>
+<td class="gt_row gt_right" headers="la_pval" style="font-weight: bold">0.000</td>
+<td class="gt_row gt_right" headers="ldmc_coef">0.002</td>
+<td class="gt_row gt_right" headers="ldmc_pval">0.546</td>
+<td class="gt_row gt_right" headers="sla_coef">−0.025</td>
+<td class="gt_row gt_right" headers="sla_pval" style="font-weight: bold">0.000</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="variable">standard deviation of elevation</td>
+<td class="gt_row gt_right" headers="height_coef">0.408</td>
+<td class="gt_row gt_right" headers="height_pval">0.692</td>
+<td class="gt_row gt_right" headers="la_coef">1.859</td>
+<td class="gt_row gt_right" headers="la_pval" style="font-weight: bold">0.035</td>
+<td class="gt_row gt_right" headers="ldmc_coef">1.886</td>
+<td class="gt_row gt_right" headers="ldmc_pval">0.062</td>
+<td class="gt_row gt_right" headers="sla_coef">1.076</td>
+<td class="gt_row gt_right" headers="sla_pval">0.302</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-BK-microenv" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-BK-microenv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Effects of microenvironmental variables on assembly of traits at the high site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait.
+</figcaption>
+<div aria-describedby="tbl-BK-microenv-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="hficzfihjx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#hficzfihjx table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#hficzfihjx thead, #hficzfihjx tbody, #hficzfihjx tfoot, #hficzfihjx tr, #hficzfihjx td, #hficzfihjx th {
+  border-style: none;
+}
+
+#hficzfihjx p {
+  margin: 0;
+  padding: 0;
+}
+
+#hficzfihjx .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#hficzfihjx .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#hficzfihjx .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#hficzfihjx .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#hficzfihjx .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#hficzfihjx .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hficzfihjx .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#hficzfihjx .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#hficzfihjx .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#hficzfihjx .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#hficzfihjx .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#hficzfihjx .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#hficzfihjx .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#hficzfihjx .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#hficzfihjx .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#hficzfihjx .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#hficzfihjx .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#hficzfihjx .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#hficzfihjx .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hficzfihjx .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#hficzfihjx .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#hficzfihjx .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#hficzfihjx .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hficzfihjx .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#hficzfihjx .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#hficzfihjx .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hficzfihjx .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hficzfihjx .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#hficzfihjx .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hficzfihjx .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#hficzfihjx .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#hficzfihjx .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#hficzfihjx .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hficzfihjx .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#hficzfihjx .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#hficzfihjx .gt_left {
+  text-align: left;
+}
+
+#hficzfihjx .gt_center {
+  text-align: center;
+}
+
+#hficzfihjx .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#hficzfihjx .gt_font_normal {
+  font-weight: normal;
+}
+
+#hficzfihjx .gt_font_bold {
+  font-weight: bold;
+}
+
+#hficzfihjx .gt_font_italic {
+  font-style: italic;
+}
+
+#hficzfihjx .gt_super {
+  font-size: 65%;
+}
+
+#hficzfihjx .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#hficzfihjx .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#hficzfihjx .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#hficzfihjx .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#hficzfihjx .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#hficzfihjx .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#hficzfihjx .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#hficzfihjx .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#hficzfihjx div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="gt_col_headings gt_spanner_row header">
+<th rowspan="2" id="variable" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">variable</th>
+<th colspan="2" id="Height" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+Height
+</div></th>
+<th colspan="2" id="Leaf area" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+Leaf area
+</div></th>
+<th colspan="2" id="LDMC" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+LDMC
+</div></th>
+<th colspan="2" id="SLA" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+SLA
+</div></th>
+</tr>
+<tr class="gt_col_headings even">
+<th id="height_coef" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">coefficient</th>
+<th id="height_pval" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p-value</th>
+<th id="la_coef" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">coefficient</th>
+<th id="la_pval" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p-value</th>
+<th id="ldmc_coef" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">coefficient</th>
+<th id="ldmc_pval" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p-value</th>
+<th id="sla_coef" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">coefficient</th>
+<th id="sla_pval" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p-value</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="variable">mean soil temperature</td>
+<td class="gt_row gt_right" headers="height_coef">0.152</td>
+<td class="gt_row gt_right" headers="height_pval">0.575</td>
+<td class="gt_row gt_right" headers="la_coef">0.102</td>
+<td class="gt_row gt_right" headers="la_pval">0.085</td>
+<td class="gt_row gt_right" headers="ldmc_coef">0.082</td>
+<td class="gt_row gt_right" headers="ldmc_pval">0.662</td>
+<td class="gt_row gt_right" headers="sla_coef">0.238</td>
+<td class="gt_row gt_right" headers="sla_pval" style="font-weight: bold">0.024</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="variable">mean soil moisture</td>
+<td class="gt_row gt_right" headers="height_coef">0.000</td>
+<td class="gt_row gt_right" headers="height_pval" style="font-weight: bold">0.049</td>
+<td class="gt_row gt_right" headers="la_coef">0.000</td>
+<td class="gt_row gt_right" headers="la_pval">0.399</td>
+<td class="gt_row gt_right" headers="ldmc_coef">0.000</td>
+<td class="gt_row gt_right" headers="ldmc_pval">0.771</td>
+<td class="gt_row gt_right" headers="sla_coef">0.000</td>
+<td class="gt_row gt_right" headers="sla_pval">0.073</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="variable">rock cover</td>
+<td class="gt_row gt_right" headers="height_coef">0.002</td>
+<td class="gt_row gt_right" headers="height_pval">0.523</td>
+<td class="gt_row gt_right" headers="la_coef">0.004</td>
+<td class="gt_row gt_right" headers="la_pval" style="font-weight: bold">0.021</td>
+<td class="gt_row gt_right" headers="ldmc_coef">0.004</td>
+<td class="gt_row gt_right" headers="ldmc_pval">0.197</td>
+<td class="gt_row gt_right" headers="sla_coef">0.008</td>
+<td class="gt_row gt_right" headers="sla_pval" style="font-weight: bold">0.000</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="variable">mean soil depth</td>
+<td class="gt_row gt_right" headers="height_coef">0.004</td>
+<td class="gt_row gt_right" headers="height_pval">0.092</td>
+<td class="gt_row gt_right" headers="la_coef">−0.006</td>
+<td class="gt_row gt_right" headers="la_pval" style="font-weight: bold">0.013</td>
+<td class="gt_row gt_right" headers="ldmc_coef">0.004</td>
+<td class="gt_row gt_right" headers="ldmc_pval">0.144</td>
+<td class="gt_row gt_right" headers="sla_coef">−0.003</td>
+<td class="gt_row gt_right" headers="sla_pval">0.255</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="variable">standard deviation of elevation</td>
+<td class="gt_row gt_right" headers="height_coef">8.369</td>
+<td class="gt_row gt_right" headers="height_pval" style="font-weight: bold">0.000</td>
+<td class="gt_row gt_right" headers="la_coef">−1.281</td>
+<td class="gt_row gt_right" headers="la_pval">0.146</td>
+<td class="gt_row gt_right" headers="ldmc_coef">3.340</td>
+<td class="gt_row gt_right" headers="ldmc_pval" style="font-weight: bold">0.000</td>
+<td class="gt_row gt_right" headers="sla_coef">1.903</td>
+<td class="gt_row gt_right" headers="sla_pval" style="font-weight: bold">0.032</td>
 </tr>
 </tbody>
 </table>
