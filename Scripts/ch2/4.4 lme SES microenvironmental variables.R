@@ -195,7 +195,7 @@ cormat<- cor(cordf)
 corrplot(cormat, type = "lower", method = "number")
 
 
-###Loop starts here
+###Loop starts here####
 #These variables have the best diagnostics after comparing diagnostic plots of log and raw variables
 traitlist <- c("Height_cm","Leaf_area_mm2", "log_LDMC","SLA")
 sitelist <- c("GG", "WH", "BK")
