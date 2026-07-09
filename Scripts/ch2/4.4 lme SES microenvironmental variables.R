@@ -197,16 +197,17 @@ corrplot(cormat, type = "lower", method = "number")
 
 ###Loop starts here
 #These variables have the best diagnostics after comparing diagnostic plots of log and raw variables
-traitlist <- c("log_LDMC", "Height_cm", "SLA", "Leaf_area_mm2")
+traitlist <- c("Height_cm","Leaf_area_mm2", "log_LDMC","SLA")
 sitelist <- c("GG", "WH", "BK")
 #lists to store results in
-SES_microenv_summary <- vector(mode= "list", length = length(traitlist) + length(sitelist))
-names(SES_microenv_summary) = traitlist
+SES_microenv_summary <- vector(mode= "list", length = length(traitlist) * length(sitelist))
+#create names for list elements and order them according to 
+#names<-  as.vector(outer(traitlist, sitelist, paste, sep = "_"))[c(1,5,9, 2,6,10, 3,7,11, 4,8,12)]
 
-SES_microenv_Rsq<- vector(mode= "list", length = length(traitlist) + length(sitelist))
+SES_microenv_Rsq<- vector(mode= "list", length = length(traitlist) * length(sitelist))
 names(SES_microenv_Rsq) = traitlist
 
-SES_microenv_anova<- vector(mode= "list", length = length(traitlist) + length(sitelist))
+SES_microenv_anova<- vector(mode= "list", length = length(traitlist) * length(sitelist))
 names(SES_microenv_anova) = traitlist
 
 l = 1
@@ -277,8 +278,13 @@ for (t in 1:length(traitlist)) {
   sink()
   
   #Also save results in a list object so we can call it with quarto
+  names(SES_microenv_summary)[[l]] <- paste(traitlist[t], sitelist[s], sep = "_")
   SES_microenv_summary[[l]] <- summary(model)
+  
+  names(SES_microenv_Rsq)[[l]] <- paste(traitlist[t], sitelist[s], sep = "_")
   SES_microenv_Rsq[[l]] <- r.squaredGLMM(model)
+  
+  names(SES_microenv_anova)[[l]] <- paste(traitlist[t], sitelist[s], sep = "_")
   SES_microenv_anova[[l]] <- anova(model)
   
   l = l+1
