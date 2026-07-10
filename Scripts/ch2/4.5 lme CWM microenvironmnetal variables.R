@@ -12,7 +12,6 @@ library(multcomp)
 library(conflicted)
 library(performance)
 library(see)
-library(AICcmodavg)
 conflict_prefer_all("tidylog", quiet = TRUE)
 
 #import trait and abundance data
