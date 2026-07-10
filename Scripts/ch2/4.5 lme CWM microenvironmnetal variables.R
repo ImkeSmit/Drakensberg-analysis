@@ -12,6 +12,7 @@ library(multcomp)
 library(conflicted)
 library(performance)
 library(see)
+library(AICcmodavg)
 conflict_prefer_all("tidylog", quiet = TRUE)
 
 #import trait and abundance data
@@ -69,7 +70,7 @@ cwm_comb <- env2 |>
 traitlist <- c("Height_cm","Leaf_area_mm2", "log_LDMC","SLA") #the traits we chose to log here are different to the traits logged in the elevation model.
 sitelist <- c("GG", "WH", "BK")
 variables <- c("mean_T1_growing_season" , "mean_moist_growing_season" , "rock_cover", "mean_soil_depth" , "STD")
-
+#list to save predictions in 
 predictions_list <- vector(mode= "list", length = length(traitlist)*length(sitelist)*length(variables))
 
 l = 1
@@ -98,13 +99,28 @@ for (t in 1:length(traitlist)) {
     
     predicted_cwm <- predict(model, newdata = pred_dat, type = "response")
     
+    #get standard errors
+    predicted_cwm_se <- predictSE(model, newdata = pred_dat, se.fit = TRUE)$se.fit
+    
     plot_data <- pred_dat |> 
       select(all_of(variables)) |> 
-      mutate(predicted_cwm = predicted_cwm)
+      mutate(predicted_cwm = predicted_cwm, 
+             standard_error = predicted_cwm_se) 
     
     predictions_list[[l]] <- plot_data
-    names_predictions_list[[l]] <- paste("CWM", traitlist[t], sitelist[s], "model", variables[v], "predictions", sep = "_")
+    names(predictions_list)[[l]] <- paste("CWM", traitlist[t], sitelist[s], "model", variables[v], "predictions", sep = "_")
   
     l = l+1
     }
-}}
+  }}
+
+
+####Plotting predictions
+df <- predictions_list$CWM_Height_cm_GG_model_mean_T1_growing_season_predictions
+
+cwm_comb |> 
+  filter(trait == "Height_cm", site == "GG") |> 
+  ggplot(aes(x = mean_T1_growing_season, y = cwm_value)) +
+  geom_point() +
+  geom_line(data = df, aes(x = mean_T1_growing_season, y = predicted_cwm), color= "red") +
+  theme_classic()
