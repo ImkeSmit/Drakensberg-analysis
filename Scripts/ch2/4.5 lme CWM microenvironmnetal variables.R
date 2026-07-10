@@ -122,5 +122,7 @@ cwm_comb |>
   filter(trait == "Height_cm", site == "GG") |> 
   ggplot(aes(x = mean_T1_growing_season, y = cwm_value)) +
   geom_point() +
-  geom_line(data = df, aes(x = mean_T1_growing_season, y = predicted_cwm), color= "red") +
+  geom_line(data = df, aes(x = mean_T1_growing_season, y = predicted_cwm), color= "red", size = 1) +
+  geom_ribbon(data = df, aes(x = mean_T1_growing_season, y = predicted_cwm, 
+                              ymin = predicted_cwm - standard_error, ymax = predicted_cwm + standard_error), fill = "red", alpha = 0.2)+
   theme_classic()
