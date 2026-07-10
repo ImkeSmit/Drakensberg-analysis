@@ -447,7 +447,7 @@ raoq_ridges
 
 Micro-environmental factors were related to fine-scale variation in community assembly, although the relationships varied greatly between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (Table 1).
 
-At the low site, soil temperature filtered size traits (height and leaf area) to **XX** (Table 1). Surface heterogeneity was related to divergence of height, while soil moisture and soil depth were related to divergence in leaf area (Table 2). At the mid site, rock cover was related to height divergence, while soil depth and surface heterogeneity was related to divergence in leaf area (Table 3). Micro-environmental factors also affected the assembly of leaf-economic traits at the mid elevation; with soil moisture and soil depth having a filtering effect on LDMC and SLA respectively, and rock cover related to divergence in LDMC (Table 3). At the high site, soil moisture and surface heterogeneity was related to divergence in plant height, and rock cover was related to divergence of leaf area (Table 4). Soil depth had a filtering effect on leaf area, filtering it towards **XX**. Surface heterogeneity was related to divergence of LDMC and SLA (Table 4). Divergence of SLA at the high site was also related to rock cover and soil temperature (Table 4).
+At the low site, soil temperature filtered size traits (height and leaf area) to shorter plants and smaller leaves (Table 2, Figure 4a,b). Surface heterogeneity was related to divergence of height, while soil moisture and soil depth were related to divergence in leaf area (Table 2). At the mid site, rock cover was related to height divergence, while soil depth and surface heterogeneity was related to divergence in leaf area (Table 3). Micro-environmental factors also affected the assembly of leaf-economic traits at the mid elevation; with soil moisture and soil depth having a filtering effect on LDMC and SLA respectively, and rock cover related to divergence in LDMC (Table 3). At the high site, soil moisture and surface heterogeneity was related to divergence in plant height, and rock cover was related to divergence of leaf area (Table 4). Soil depth had a filtering effect on leaf area, filtering it towards **XX**. Surface heterogeneity was related to divergence of LDMC and SLA (Table 4). Divergence of SLA at the high site was also related to rock cover and soil temperature (Table 4).
 
 Surface heterogeneity and rock cover were always related to divergence in size and leaf-economic traits. The directions of the effects of other micro-environmental variables on assembly were not consistent across sites.
 
@@ -646,10 +646,11 @@ BK_microenv_reults |>
 
 ```{r cwm ~ microenvironment models and scatterplots}
 #| label: fig-CWM-microenvironmental scatterplots
-#| fig-cap: Direction of environmental filtering by micro-environmental variables on community-weighted mean traits at the low (a,b), mid site (c) and high elevation (d).
+#| fig-cap: Direction of environmental filtering by micro-environmental variables on community-weighted mean traits at the low (a,b), mid site (c) and high elevation (d). LDMC is shown on the log scale.
 #| echo: false
 #| message: false
 #| warning: false
+
 
 #import trait and abundance data
 abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
@@ -784,6 +785,17 @@ SLA_sdepth_WH <-  cwm_comb |>
   labs(x = "Mean soil depth", y = "CWM SLA") +
   theme_classic()
 
+df5 <- predictions_list$CWM_log_LDMC_WH_model_mean_moist_growing_season_predictions
+LDMC_smoist_WH <-  cwm_comb |> 
+  filter(trait == "log_LDMC", site == "WH") |> 
+  ggplot(aes(x = mean_moist_growing_season, y = cwm_value)) +
+  geom_point() +
+  geom_line(data = df5, aes(x = mean_moist_growing_season, y = predicted_cwm), color= "red", size = 1) +
+  geom_ribbon(data = df5, aes(x = mean_moist_growing_season, y = predicted_cwm, 
+                              ymin = predicted_cwm - standard_error, ymax = predicted_cwm + standard_error), fill = "red", alpha = 0.2) +
+  labs(x = "Mean soil moisture", y = "CWM LDMC") +
+  theme_classic()
+
 df4 <- predictions_list$CWM_Leaf_area_mm2_BK_model_mean_soil_depth_predictions
 LA_sdepth_BK <-  cwm_comb |> 
   filter(trait == "Leaf_area_mm2", site == "BK") |> 
@@ -796,8 +808,7 @@ LA_sdepth_BK <-  cwm_comb |>
   theme_classic()
 
 
-combined_fig <- ggarrange(H_temp_GG, LA_temp_GG, SLA_sdepth_WH, LA_sdepth_BK, labels = "auto")
+combined_fig <- ggarrange(H_temp_GG, LA_temp_GG, SLA_sdepth_WH,LDMC_smoist_WH, LA_sdepth_BK, labels = "auto")
 combined_fig
 
 ```
-
