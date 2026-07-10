@@ -96,11 +96,13 @@ for (t in 1:length(traitlist)) {
       mutate(across(all_of(mean_var), ~ mean(.x, na.rm = TRUE))) 
     
     predicted_cwm <- predict(model, newdata = pred_dat, type = "response", se.fit = TRUE)
+    fitted <- predicted_cwm$fit
+    se <- predicted_cwm$se.fit
     
     plot_data <- pred_dat |> 
       select(all_of(variables)) |> 
-      mutate(predicted_cwm = predicted_cwm$fit, 
-             standard_error = predicted_cwm$se.fit) 
+      mutate(predicted_cwm = fitted, 
+             standard_error = se) 
     
     predictions_list[[l]] <- plot_data
     names(predictions_list)[[l]] <- paste("CWM", traitlist[t], sitelist[s], "model", variables[v], "predictions", sep = "_")
