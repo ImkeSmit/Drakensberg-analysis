@@ -70,8 +70,9 @@ traitlist <- c("Height_cm","Leaf_area_mm2", "log_LDMC","SLA") #the traits we cho
 sitelist <- c("GG", "WH", "BK")
 variables <- c("mean_T1_growing_season" , "mean_moist_growing_season" , "rock_cover", "mean_soil_depth" , "STD")
 
+predictions_list <- vector(mode= "list", length = length(traitlist)*length(sitelist)*length(variables))
 
-
+l = 1
 for (t in 1:length(traitlist)) {
   for(s in 1:length(sitelist)) {
   modeldat <-  cwm_comb |> 
@@ -87,17 +88,23 @@ for (t in 1:length(traitlist)) {
               correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
               data = modeldat) #only gaussian family possible
   
+  #Generate model predictions for each variable setting every other variable to its mean
   for(v in 1:length(variables)) {
     pred_var <- variables[v]
     mean_var <- setdiff(variables, variables[v])
     
     pred_dat <- modeldat |> 
-      mutate(accross(mean_var), ~ mean(.x, na.rm = TRUE))
+      mutate(across(all_of(mean_var), ~ mean(.x, na.rm = TRUE))) 
     
+    predicted_cwm <- predict(model, newdata = pred_dat, type = "response")
     
+    plot_data <- pred_dat |> 
+      select(all_of(variables)) |> 
+      mutate(predicted_cwm = predicted_cwm)
     
-    
-  }
+    predictions_list[[l]] <- plot_data
+    names_predictions_list[[l]] <- paste("CWM", traitlist[t], sitelist[s], "model", variables[v], "predictions", sep = "_")
   
-  
+    l = l+1
+    }
 }}
