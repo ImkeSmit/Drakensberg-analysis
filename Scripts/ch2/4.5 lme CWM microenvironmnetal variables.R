@@ -1,4 +1,4 @@
-###Models of CWm ~ microenvironmental variables with lme####
+###Models of CWm ~ microenvironmental variables with lm for graphing####
 ###And predictions of CWm traits over environmental gradients####
 library(tidyverse)
 library(tidylog)
@@ -84,10 +84,8 @@ for (t in 1:length(traitlist)) {
     drop_na()
   
   
-  model<- lme(cwm_value ~ mean_T1_growing_season + mean_moist_growing_season + rock_cover+ mean_soil_depth + STD ,
-              random = ~1|grid, 
-              correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
-              data = modeldat) #only gaussian family possible
+  model<- lm(cwm_value ~ mean_T1_growing_season + mean_moist_growing_season + rock_cover+ mean_soil_depth + STD,
+              data = modeldat) 
   
   #Generate model predictions for each variable setting every other variable to its mean
   for(v in 1:length(variables)) {
@@ -100,7 +98,7 @@ for (t in 1:length(traitlist)) {
     predicted_cwm <- predict(model, newdata = pred_dat, type = "response")
     
     #get standard errors
-    predicted_cwm_se <- predictSE(model, newdata = pred_dat, se.fit = TRUE)$se.fit
+    predicted_cwm_se <- predicted_cwm$se.fit
     
     plot_data <- pred_dat |> 
       select(all_of(variables)) |> 
@@ -116,13 +114,26 @@ for (t in 1:length(traitlist)) {
 
 
 ####Plotting predictions
-df <- predictions_list$CWM_Height_cm_GG_model_mean_T1_growing_season_predictions
-
-cwm_comb |> 
+df1 <- predictions_list$CWM_Height_cm_GG_model_mean_T1_growing_season_predictions
+H_temp <- cwm_comb |> 
   filter(trait == "Height_cm", site == "GG") |> 
   ggplot(aes(x = mean_T1_growing_season, y = cwm_value)) +
   geom_point() +
-  geom_line(data = df, aes(x = mean_T1_growing_season, y = predicted_cwm), color= "red", size = 1) +
-  geom_ribbon(data = df, aes(x = mean_T1_growing_season, y = predicted_cwm, 
+  geom_line(data = df1, aes(x = mean_T1_growing_season, y = predicted_cwm), color= "red", size = 1) +
+  geom_ribbon(data = df1, aes(x = mean_T1_growing_season, y = predicted_cwm, 
                               ymin = predicted_cwm - standard_error, ymax = predicted_cwm + standard_error), fill = "red", alpha = 0.2)+
+  labs(x = "Mean soil temperature", y = "CWM Height") +
   theme_classic()
+
+df2 <- predictions_list$CWM_Leaf_area_mm2_GG_model_mean_T1_growing_season_predictions
+LA_temp <-  cwm_comb |> 
+  filter(trait == "Leaf_area_mm2", site == "GG") |> 
+  ggplot(aes(x = mean_T1_growing_season, y = cwm_value)) +
+  geom_point() +
+  geom_line(data = df2, aes(x = mean_T1_growing_season, y = predicted_cwm), color= "red", size = 1) +
+  geom_ribbon(data = df2, aes(x = mean_T1_growing_season, y = predicted_cwm, 
+                              ymin = predicted_cwm - standard_error, ymax = predicted_cwm + standard_error), fill = "red", alpha = 0.2)+
+  labs(x = "Mean soil temperature", y = "CWM Leaf area") +
+  theme_classic()
+
+
