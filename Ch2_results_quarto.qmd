@@ -183,7 +183,7 @@ for (t in 1:length(traitlist)) {
 
 `r comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` Cells were included in the analysis, with a total species richness of xx. Elevation did not have a consistent effect on the community assembly of different plant traits (Figure 1). Elevation shifted the assembly of plant height and LDMC from environmental filtering at the low elevation, to limiting similarity at the high elevation. Although communities generally became shorter with elevation (Figure 2a), the diversity of plant height was highest at the high elevation (Figure 3), indicating the presence of very short as well as very tall plants in the alpine. There was strong filtering for high LDMC values at the low elevation (indicated by the narrow CWM distribution). This filtering effect was weaker at the mid elevation, and selected for lower LDMC values on average. The assembly of LDMC shifted to trait divergence at the highest elevation, but once again showed on average more conservative strategies than at the mid elevation (Figure 2).
 
-The assembly of leaf area shifted from being no different from random assembly, to environmental filtering at the mid and high elevation (Figure 1). Filtering was in the direction of larger leaves at the mid elevation, and smaller leaves at the high elevation (Figure 2). Environmental filtering was the dominant assembly mechanism at all elevations for SLA, although the filtering effect of SLA was weakest at the mid elevation (Figure 1). SLA was filtered toward conservative leaf -economic strategies at the low and high elevation, but more acquisitive strategies at the mid elevation (Figure 2).
+The assembly of leaf area shifted from being no different from random assembly, to environmental filtering at the mid and high elevation (Figure 1). Filtering was in the direction of larger leaves at the mid elevation, and smaller leaves at the high elevation (Figure 2). Environmental filtering was the dominant assembly mechanism at all elevations for SLA, although the filtering effect of SLA was weakest at the mid elevation (Figure 1). SLA was filtered toward conservative leaf-economic strategies at the low and high elevation, but more acquisitive strategies at the mid elevation (Figure 2).
 
 ```{r}
 #| message: false
@@ -642,3 +642,11 @@ BK_microenv_reults |>
   )
 
 ```
+
+```{r cwm ~ microenvironment models and scatterplots}
+#| echo: false
+
+
+
+```
+
