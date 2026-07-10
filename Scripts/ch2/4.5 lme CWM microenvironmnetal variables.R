@@ -114,7 +114,7 @@ for (t in 1:length(traitlist)) {
 
 ####Plotting predictions
 df1 <- predictions_list$CWM_Height_cm_GG_model_mean_T1_growing_season_predictions
-H_temp <- cwm_comb |> 
+H_temp_GG <- cwm_comb |> 
   filter(trait == "Height_cm", site == "GG") |> 
   ggplot(aes(x = mean_T1_growing_season, y = cwm_value)) +
   geom_point() +
@@ -125,7 +125,7 @@ H_temp <- cwm_comb |>
   theme_classic()
 
 df2 <- predictions_list$CWM_Leaf_area_mm2_GG_model_mean_T1_growing_season_predictions
-LA_temp <-  cwm_comb |> 
+LA_temp_GG <-  cwm_comb |> 
   filter(trait == "Leaf_area_mm2", site == "GG") |> 
   ggplot(aes(x = mean_T1_growing_season, y = cwm_value)) +
   geom_point() +
@@ -134,5 +134,29 @@ LA_temp <-  cwm_comb |>
                               ymin = predicted_cwm - standard_error, ymax = predicted_cwm + standard_error), fill = "red", alpha = 0.2)+
   labs(x = "Mean soil temperature", y = "CWM Leaf area") +
   theme_classic()
+
+df3 <- predictions_list$CWM_SLA_WH_model_mean_soil_depth_predictions
+SLA_sdepth_WH <-  cwm_comb |> 
+  filter(trait == "SLA", site == "WH") |> 
+  ggplot(aes(x = mean_soil_depth, y = cwm_value)) +
+  geom_point() +
+  geom_line(data = df3, aes(x = mean_soil_depth, y = predicted_cwm), color= "red", size = 1) +
+  geom_ribbon(data = df3, aes(x = mean_soil_depth, y = predicted_cwm, 
+                              ymin = predicted_cwm - standard_error, ymax = predicted_cwm + standard_error), fill = "red", alpha = 0.2)+
+  labs(x = "Mean soil depth", y = "CWM SLA") +
+  theme_classic()
+
+df4 <- predictions_list$CWM_Leaf_area_mm2_BK_model_mean_soil_depth_predictions
+LA_sdepth_BK <-  cwm_comb |> 
+  filter(trait == "Leaf_area_mm2", site == "BK") |> 
+  ggplot(aes(x = mean_soil_depth, y = cwm_value)) +
+  geom_point() +
+  geom_line(data = df4, aes(x = mean_soil_depth, y = predicted_cwm), color= "red", size = 1) +
+  geom_ribbon(data = df4, aes(x = mean_soil_depth, y = predicted_cwm, 
+                              ymin = predicted_cwm - standard_error, ymax = predicted_cwm + standard_error), fill = "red", alpha = 0.2)+
+  labs(x = "Mean soil depth", y = "CWM Leaf area") +
+  theme_classic()
+
+
 
 
