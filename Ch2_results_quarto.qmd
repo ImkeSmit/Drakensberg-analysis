@@ -311,10 +311,28 @@ for (t in 1:length(traitlist)) {
   CWM_ele_cld[[t]] <- comp_letters
 }
 
-##Graph
+##Graph####
 l1 <- c("log_Height" = "Plant~height", "SLA" = "SLA", "log_LDMC" = "LDMC", "log_LA" = "LA")
+cwm_ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), rep("log_LDMC", 3),rep("log_LA", 3)), 
+                             elevation = as.factor(c(rep(c("2000", "2500", "3000"), 4))),
+                             letters = c(CWM_ele_cld$log_Height$.group, 
+                                         CWM_ele_cld$SLA$.group, 
+                                         CWM_ele_cld$log_LDMC$.group, 
+                                         CWM_ele_cld$log_LA$.group), 
+                             x_pos = c(4,4,4,
+                                       62,62,62, 
+                                       6.5,6.5,6.5,
+                                       8.1,8.1,8.1), 
+                             emmean = c(CWM_ele_cld$log_Height$emmean,
+                                        CWM_ele_cld$SLA$emmean,
+                                        CWM_ele_cld$log_LDMC$emmean,
+                                        CWM_ele_cld$log_LA$emmean), 
+                             emmean_SE = c(CWM_ele_cld$log_Height$SE,
+                                           CWM_ele_cld$SLA$SE,
+                                           CWM_ele_cld$log_LDMC$SE,
+                                           CWM_ele_cld$log_LA$SE))
 
-trait_ridges <- cwm |>
+cwm_ridges <- cwm2 |>
   filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
   ggplot(aes(x = cwm_value, y = elevation)) +
   geom_density_ridges(alpha = 0.5) +
@@ -323,11 +341,23 @@ trait_ridges <- cwm |>
   labs(x = "", y = "Elevation (m a.s.l.)") +
   #scale_x_continuous(breaks = c(0,25,50))+
   theme_bw() +
+  geom_text(data = cwm_ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  geom_point(
+    data = cwm_ridges_letters,
+    aes(x = emmean, y = as.numeric(elevation)),
+    size = 2, inherit.aes = FALSE) +
+  geom_errorbarh(
+    data = cwm_ridges_letters,
+    aes(xmin = emmean - emmean_SE,
+        xmax = emmean + emmean_SE,
+        y = as.numeric(elevation)),
+    height = 0.08,
+    linewidth = 1, inherit.aes = FALSE)+
   theme(legend.position = "none", axis.title = element_text(size = 18), 
         axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
         strip.background = element_blank(),
         strip.placement = "outside", panel.grid = element_blank()) 
-trait_ridges
+cwm_ridges
 ```
 
 ```{r}
@@ -338,7 +368,52 @@ trait_ridges
 #| warning: false
 
 
+####model RaoQ ~ elevation####
+traitlist <- c("log_Height", "log_LDMC", "log_LA", "SLA")
+#lists to store results in
+RaoQ_ele_cld<- vector(mode= "list", length = length(traitlist))
+names(RaoQ_ele_cld) = traitlist
+
+for (t in 1:length(traitlist)) {
+  modeldat <-  comb |> 
+    filter(trait == traitlist[t]) |> 
+    mutate(elevation = as.factor(elevation), 
+           grid = as.factor(grid)) |> 
+    drop_na()
+  
+  
+  model<- lme(RaoQ ~ elevation ,
+                  random = ~1|grid, 
+                  correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
+                  data = modeldat) #only gaussian family possible
+  
+  em_model <- emmeans(model, specs = "elevation", type = "response")
+  comp_letters <-cld(em_model, Letters = letters, adjust = "Tukey", sort = FALSE)
+
+  #Also save results in a list object so we can call it with quarto
+RaoQ_ele_cld[[t]] <- comp_letters
+}
+
+###Graph####
 l1 <- c("log_Height" = "RaoQ~of~plant~height", "SLA" = "RaoQ~of~SLA", "log_LDMC" = "RaoQ~of~LDMC", "log_LA" = "RaoQ~of~LA")
+raoq_ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), rep("log_LDMC", 3),rep("log_LA", 3)), 
+                             elevation = as.factor(c(rep(c("2000", "2500", "3000"), 4))),
+                             letters = c(RaoQ_ele_cld$log_Height$.group, 
+                                         RaoQ_ele_cld$SLA$.group, 
+                                         RaoQ_ele_cld$log_LDMC$.group, 
+                                         RaoQ_ele_cld$log_LA$.group), 
+                             x_pos = c(2.2,2.2,2.2,
+                                       2.7,2.7,2.7, 
+                                       5,5,5,
+                                       3.8,3.8,3.8), 
+                             emmean = c(RaoQ_ele_cld$log_Height$emmean,
+                                        RaoQ_ele_cld$SLA$emmean,
+                                        RaoQ_ele_cld$log_LDMC$emmean,
+                                        RaoQ_ele_cld$log_LA$emmean), 
+                             emmean_SE = c(RaoQ_ele_cld$log_Height$SE,
+                                           RaoQ_ele_cld$SLA$SE,
+                                           RaoQ_ele_cld$log_LDMC$SE,
+                                           RaoQ_ele_cld$log_LA$SE))
 
 raoq_ridges <- comb |>
   filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
@@ -349,6 +424,18 @@ raoq_ridges <- comb |>
              strip.position = "bottom")+
   labs(x = " ", y = "Elevation (m a.s.l.)") +
   theme_bw() +
+  geom_text(data = raoq_ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  geom_point(
+    data = raoq_ridges_letters,
+    aes(x = emmean, y = as.numeric(elevation)),
+    size = 2, inherit.aes = FALSE) +
+  geom_errorbarh(
+    data = raoq_ridges_letters,
+    aes(xmin = emmean - emmean_SE,
+        xmax = emmean + emmean_SE,
+        y = as.numeric(elevation)),
+    height = 0.08,
+    linewidth = 1, inherit.aes = FALSE)+
   theme(legend.position = "none", axis.title = element_text(size = 18), 
         axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
         strip.background = element_blank(),
