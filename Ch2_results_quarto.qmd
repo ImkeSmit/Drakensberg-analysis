@@ -491,7 +491,7 @@ R2_table |>
 #| warning: false
 
 
-GG_microenv_reults <- tibble(variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil     depth", "standard deviation of elevation"), 
+GG_microenv_reults <- tibble(variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil     depth", "surface heterogeneity"), 
                 height_coef = SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
                 height_pval = SES_microenv_anova$Height_cm_GG$`p-value`[2:6], 
                 la_coef = SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
@@ -544,7 +544,7 @@ GG_microenv_reults |>
 #| echo: false
 #| warning: false
 
-WH_microenv_reults <- tibble(variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil     depth", "standard deviation of elevation"), 
+WH_microenv_reults <- tibble(variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil     depth", "surface heterogeneity"), 
                 height_coef = SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:6], 
                 height_pval = SES_microenv_anova$Height_cm_WH$`p-value`[2:6], 
                 la_coef = SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:6], 
@@ -597,7 +597,7 @@ WH_microenv_reults |>
 #| echo: false
 #| warning: false
 
-BK_microenv_reults <- tibble(variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil     depth", "standard deviation of elevation"), 
+BK_microenv_reults <- tibble(variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil     depth", "surface heterogeneity"), 
                 height_coef = SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:6], 
                 height_pval = SES_microenv_anova$Height_cm_BK$`p-value`[2:6], 
                 la_coef = SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:6], 
