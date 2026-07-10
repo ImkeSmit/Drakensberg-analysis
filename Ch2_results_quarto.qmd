@@ -15,6 +15,7 @@ library(MuMIn)
 library(DHARMa)
 library(tictoc)
 library(ggridges)
+library(ggpubr)
 library(emmeans)
 library(multcomp)
 library(conflicted)
@@ -644,9 +645,159 @@ BK_microenv_reults |>
 ```
 
 ```{r cwm ~ microenvironment models and scatterplots}
+#| label: fig-CWM-microenvironmental scatterplots
+#| fig-cap: Direction of environmental filtering by micro-environmental variables on community-weighted mean traits at the low (a,b), mid site (c) and high elevation (d).
 #| echo: false
+#| message: false
+#| warning: false
+
+#import trait and abundance data
+abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
+
+mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1) |> 
+  mutate(log_Height = log(Height_cm), 
+         log_LA = log(Leaf_area_mm2), 
+         log_LDMC = log(LDMC))
 
 
+#compute CWM of each trait for each cell
+library(FD)
+cwm <- functcomp(x = mean_traits, a = as.matrix(abun_matrix))
+cwm2 <- cwm |>
+  rownames_to_column(var = "cellref") |> 
+  rename(Cell_ID = cellref) |> 
+  pivot_longer(cols = !Cell_ID, names_to = "trait", values_to = "cwm_value")
+
+#import microenvironmental data
+env2 <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
+  #variables we are interested in
+  select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
+         soil_depth_CV, mean_soil_depth, slope_height) |> 
+  mutate(mean_soil_depth = case_when(mean_soil_depth > 61 ~ 61, 
+                                     .default = mean_soil_depth)) |> 
+  #add elevation variables
+  mutate(elevation = case_when(site == "GG" ~ 2000, 
+                               site == "WH" ~ 2500, 
+                               site == "BK" ~ 3000,
+                               .default = NA))
+
+#import remote sensing derived variables
+rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
+  select(CELL_ID, STD) |> 
+  rename(Cell_ID = CELL_ID)
+
+#import interpolated microclimate indices
+micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
+
+
+##Combine CWM and environmental data
+cwm_comb <- env2 |> 
+  #join to microclimate indices |> 
+  full_join(micro_idw, by = "Cell_ID") |> 
+  #join to remote sensing data |> 
+  full_join(rms, by = "Cell_ID") |> 
+  #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
+  full_join(cwm2, by = "Cell_ID", relationship = "one-to-many") |>
+  mutate(ncolumn = match(column, LETTERS[1:8]), 
+         grid = paste0(site, grid)) |> #each grid must have a unique id 
+  rename(x_coord = ncolumn, 
+         y_coord = row)
+
+
+####model CWM ~ microenvironmental variables####
+traitlist <- c("Height_cm","Leaf_area_mm2", "log_LDMC","SLA") #the traits we chose to log here are different to the traits logged in the elevation model.
+sitelist <- c("GG", "WH", "BK")
+variables <- c("mean_T1_growing_season" , "mean_moist_growing_season" , "rock_cover", "mean_soil_depth" , "STD")
+#list to save predictions in 
+predictions_list <- vector(mode= "list", length = length(traitlist)*length(sitelist)*length(variables))
+
+l = 1
+for (t in 1:length(traitlist)) {
+  for(s in 1:length(sitelist)) {
+  modeldat <-  cwm_comb |> 
+    filter(trait == traitlist[t], 
+           site == sitelist[s]) |> 
+    mutate(elevation = as.factor(elevation), 
+           grid = as.factor(grid)) |> 
+    drop_na()
+  
+  
+  model<- lm(cwm_value ~ mean_T1_growing_season + mean_moist_growing_season + rock_cover+ mean_soil_depth + STD,
+              data = modeldat) 
+  
+  #Generate model predictions for each variable setting every other variable to its mean
+  for(v in 1:length(variables)) {
+    pred_var <- variables[v]
+    mean_var <- setdiff(variables, variables[v])
+    
+    pred_dat <- modeldat |> 
+      mutate(across(all_of(mean_var), ~ mean(.x, na.rm = TRUE))) 
+    
+    predicted_cwm <- predict(model, newdata = pred_dat, type = "response", se.fit = TRUE)
+    fitted <- predicted_cwm$fit
+    se <- predicted_cwm$se.fit
+    
+    plot_data <- pred_dat |> 
+      select(all_of(variables)) |> 
+      mutate(predicted_cwm = fitted, 
+             standard_error = se) 
+    
+    predictions_list[[l]] <- plot_data
+    names(predictions_list)[[l]] <- paste("CWM", traitlist[t], sitelist[s], "model", variables[v], "predictions", sep = "_")
+  
+    l = l+1
+    }
+  }}
+
+
+####Plotting predictions
+df1 <- predictions_list$CWM_Height_cm_GG_model_mean_T1_growing_season_predictions
+H_temp_GG <- cwm_comb |> 
+  filter(trait == "Height_cm", site == "GG") |> 
+  ggplot(aes(x = mean_T1_growing_season, y = cwm_value)) +
+  geom_point() +
+  geom_line(data = df1, aes(x = mean_T1_growing_season, y = predicted_cwm), color= "red", size = 1) +
+  geom_ribbon(data = df1, aes(x = mean_T1_growing_season, y = predicted_cwm, 
+                              ymin = predicted_cwm - standard_error, ymax = predicted_cwm + standard_error), fill = "red", alpha = 0.2)+
+  labs(x = "Mean soil temperature", y = "CWM Height") +
+  theme_classic()
+
+df2 <- predictions_list$CWM_Leaf_area_mm2_GG_model_mean_T1_growing_season_predictions
+LA_temp_GG <-  cwm_comb |> 
+  filter(trait == "Leaf_area_mm2", site == "GG") |> 
+  ggplot(aes(x = mean_T1_growing_season, y = cwm_value)) +
+  geom_point() +
+  geom_line(data = df2, aes(x = mean_T1_growing_season, y = predicted_cwm), color= "red", size = 1) +
+  geom_ribbon(data = df2, aes(x = mean_T1_growing_season, y = predicted_cwm, 
+                              ymin = predicted_cwm - standard_error, ymax = predicted_cwm + standard_error), fill = "red", alpha = 0.2)+
+  labs(x = "Mean soil temperature", y = "CWM Leaf area") +
+  theme_classic()
+
+df3 <- predictions_list$CWM_SLA_WH_model_mean_soil_depth_predictions
+SLA_sdepth_WH <-  cwm_comb |> 
+  filter(trait == "SLA", site == "WH") |> 
+  ggplot(aes(x = mean_soil_depth, y = cwm_value)) +
+  geom_point() +
+  geom_line(data = df3, aes(x = mean_soil_depth, y = predicted_cwm), color= "red", size = 1) +
+  geom_ribbon(data = df3, aes(x = mean_soil_depth, y = predicted_cwm, 
+                              ymin = predicted_cwm - standard_error, ymax = predicted_cwm + standard_error), fill = "red", alpha = 0.2)+
+  labs(x = "Mean soil depth", y = "CWM SLA") +
+  theme_classic()
+
+df4 <- predictions_list$CWM_Leaf_area_mm2_BK_model_mean_soil_depth_predictions
+LA_sdepth_BK <-  cwm_comb |> 
+  filter(trait == "Leaf_area_mm2", site == "BK") |> 
+  ggplot(aes(x = mean_soil_depth, y = cwm_value)) +
+  geom_point() +
+  geom_line(data = df4, aes(x = mean_soil_depth, y = predicted_cwm), color= "red", size = 1) +
+  geom_ribbon(data = df4, aes(x = mean_soil_depth, y = predicted_cwm, 
+                              ymin = predicted_cwm - standard_error, ymax = predicted_cwm + standard_error), fill = "red", alpha = 0.2)+
+  labs(x = "Mean soil depth", y = "CWM Leaf area") +
+  theme_classic()
+
+
+combined_fig <- ggarrange(H_temp_GG, LA_temp_GG, SLA_sdepth_WH, LA_sdepth_BK, labels = "auto")
+combined_fig
 
 ```
 
