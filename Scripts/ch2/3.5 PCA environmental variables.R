@@ -8,7 +8,8 @@ env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
   tibble() |> 
   #variables we are interested in
   select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
-         soil_depth_CV, mean_soil_depth, slope_height) |> 
+         soil_depth_CV, mean_soil_depth, slope_height) |>
+  mutate(mean_soil_depth = case_when(mean_soil_depth > 61 ~ 61, .default = mean_soil_depth))
   #add elevation variables
   mutate(elevation = case_when(site == "GG" ~ 2000, 
                                site == "WH" ~ 2500, 
