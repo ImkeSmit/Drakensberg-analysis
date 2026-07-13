@@ -568,41 +568,34 @@ WH_microenv_reults <- tibble(variable = c("mean soil temperature", "mean soil mo
                 sla_coef = SES_microenv_summary$SLA_WH$coefficients$fixed[2:6], 
                 sla_pval = SES_microenv_anova$SLA_WH$`p-value`[2:6])
 
-Rsq <- c(SES_microenv_Rsq$Height_cm_WH[1,][1], SES_microenv_Rsq$Leaf_area_mm2_WH[1,][1], 
-                 SES_microenv_Rsq$log_LDMC_WH[1,][1], SES_microenv_Rsq$SLA_WH[1,][1])
 
 WH_microenv_reults |> 
-  gt() |> 
-  cols_label(height_coef = "coefficient", 
-             height_pval = "p-value", 
-             la_coef = "coefficient", 
-             la_pval = "p-value", 
-             ldmc_coef = "coefficient", 
-             ldmc_pval = "p-value", 
-             sla_coef = "coefficient", 
-             sla_pval = "p-value") |> 
-  fmt_number(columns = everything(), decimals = 3) |> 
-  tab_spanner(label = "Height", columns = c(height_coef, height_pval)) |>  
-  tab_spanner(label = "Leaf area", columns = c(la_coef, la_pval)) |>
-  tab_spanner(label = "LDMC", columns = c(ldmc_coef, ldmc_pval)) |>
-  tab_spanner(label = "SLA", columns = c(sla_coef, sla_pval)) |> 
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_body(columns = height_pval, rows = height_pval < 0.05)
-  ) |>
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_body(columns = la_pval, rows = la_pval < 0.05)
-  ) |>
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_body(columns = ldmc_pval, rows = ldmc_pval < 0.05)
-  ) |>
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_body(columns = sla_pval, rows = sla_pval < 0.05)
-  ) |> 
-  tab_options(table.width = pct(100))
+      flextable() |> 
+  colformat_double(j = 2:9, digits = 3) |>
+  set_header_labels(variable = "Variable", 
+                    height_coef = "coefficient", 
+                   height_pval = "p-value", 
+                   la_coef = "coefficient", 
+                   la_pval = "p-value", 
+                   ldmc_coef = "coefficient", 
+                   ldmc_pval = "p-value", 
+                   sla_coef = "coefficient", 
+                   sla_pval = "p-value") |> 
+  add_header_row(
+    values    = c("Trait", "Height", "Leaf area", "LDMC", "SLA"),
+    colwidths = c(1, 2, 2, 2, 2),
+    top       = TRUE) |> 
+  merge_v(j = 1, part = "header") |>
+  align(align = "center", part = "header") |>
+  align(align = "center", part = "body", j = 2:9) |>
+  valign(valign = "bottom", part = "header") |>
+  bold(i = ~ height_pval < 0.05, j = "height_pval") |>
+  bold(i = ~ la_pval < 0.05,     j = "la_pval") |>
+  bold(i = ~ ldmc_pval < 0.05,   j = "ldmc_pval") |>
+  bold(i = ~ sla_pval < 0.05,    j = "sla_pval") |>
+  theme_vanilla() |>
+  autofit() |>
+  fit_to_width(max_width = 6.5)
 
 ```
 
