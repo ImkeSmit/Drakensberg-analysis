@@ -504,6 +504,8 @@ R2_table |>
 #| echo: false
 #| warning: false
 
+library(gt)
+
 
 GG_microenv_reults <- tibble(variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil     depth", "surface heterogeneity"), 
                 height_coef = SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
