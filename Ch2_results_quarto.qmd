@@ -8,6 +8,27 @@ fig-width: 6
 bibliography: testlib.txt
 ---
 
+```{r loading libraries}
+#| message: false
+#| echo: false
+#| warning: false
+library(tidyverse)
+library(tidylog)
+library(nlme)
+library(MuMIn)
+library(DHARMa)
+library(tictoc)
+library(ggridges)
+library(ggpubr)
+library(emmeans)
+library(multcomp)
+library(conflicted)
+library(performance)
+library(see)
+library(ggbiplot)
+conflict_prefer_all("tidylog", quiet = TRUE)
+```
+
 Research questions: How does community assembly change with elevation?
 
 Does fine-scale environmental heterogeneity influence community assembly?
@@ -29,7 +50,76 @@ At each site, species composition and functional traits were sampled using a gri
 
 Vegetation surveys were conducted in the summer growing seasons between 2019-2023, wherein the identity and cover of each species in each cell was recorded, and a subset of species were measured for functional traits. The functional trait survey collected traits for many species at the two ends of each grid but sampled sparsely in the centre of the grid. A species was not sampled for functional traits in adjacent cells. Common species were sampled more frequently than rare species. The following traits were measured (following the standardised methods of (Perez-Harguindeguy et al., 2013): plant height, leaf area (LA), specific leaf area (SLA) and leaf dry matter content (LDMC). Thirty-five percent of species were measured for traits at least once, with these species comprising 87% of the total vegetation cover.
 
-Many environmental variables were measured in the sampling grids:
+Several environmental variables were measured in each cell of each grid: Rock cover was visually estimated as the percentage of a cell covered by rock large enough to impede plant growth. Soil depth was measured by inserting a metal rod of 60 cm in length into the soil until further penetration was impeded. Soils deeper than 60 cm were given a depth of 61 cm. Three soil depth measurements were taken in each cell and the mean calculated. Northness was calculated as the cosine of the aspect of each cell, measured by placing a compass on the ground (how should I describe how this was measured?). Slope height was measured as the vertical difference between the highest and lowest point in a cell. Surface heterogeneity was calculated as the standard deviation of elevation in a cell from a digital surface model. The digital surface model was created from drone imagery captured on XX date and... (I probably need to give more info on the imagery here, I will consult with Anika about what is appropriate).
+
+The mean soil moisture and temperature of the growing season were calculated using readings from Temperature-Moisture-Sensors (TMS, (Wild et al., 2019)). Six or seven TMS were placed in each grid, and recorded soil moisture and temperature readings every 15 minutes for one year (12 January 2023 – 21 January 2024).
+
+```{r}
+#| label: fig-environmental-PCA
+#| fig-cap: "Principal component analysis of environmental variables measured in sampling grids"
+#| warning: false
+#| message: false
+#| echo: false
+#import microenvironmental data
+env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
+  tibble() |> 
+  #variables we are interested in
+  select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
+         soil_depth_CV, mean_soil_depth, slope_height) |>
+  mutate(mean_soil_depth = case_when(mean_soil_depth > 61 ~ 61, .default = mean_soil_depth)) |> 
+  #add elevation variables
+  mutate(elevation = case_when(site == "GG" ~ 2000, 
+                               site == "WH" ~ 2500, 
+                               site == "BK" ~ 3000,
+                               .default = NA), 
+         soil_depth_CV = as.numeric(soil_depth_CV)) #NA are ones with 100% rock
+
+#import remote sensing derived variables
+rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
+  select(CELL_ID, STD) |> 
+  rename(Cell_ID = CELL_ID)
+
+#import interpolated microclimate indices
+micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
+
+
+##Combine SES and environmental data
+all_env <- env |> 
+  #join to microclimate indices |> 
+  full_join(micro_idw, by = "Cell_ID") |> 
+  #join to remote sensing data |> 
+  full_join(rms, by = "Cell_ID") |> 
+  mutate(ncolumn = match(column, LETTERS[1:8])) |> 
+  rename(x_coord = ncolumn, 
+         y_coord = row)
+
+  
+####Do the principal component analysis####
+all_env_subs <- all_env |> 
+  drop_na() |> 
+  select(site, rock_cover:slope_height, mean_T1_growing_season:STD) |> 
+  mutate(across(where(is.numeric), ~as.vector(scale(.))))
+
+
+all_env_pca <- princomp(all_env_subs[2:ncol(all_env_subs)], scores = T) #not including elevation
+summary(all_env_pca) #proportion of variance is the variance explained by the PC
+all_env_pca$scores #
+all_env_pca$loadings #How much each var contributed to building the PC
+all_env_pca$scale #scaling applied to each variable
+all_env_pca$center #means
+
+
+###GGplot biplot
+env_pca <- ggbiplot(all_env_pca, choices = c(1,2), 
+                      varname.size = 4, varname.color = "black", 
+                      groups = c(all_env_subs$site)) +
+  geom_point(aes(color = all_env_subs$site), alpha = 0.8)+
+  scale_color_manual(values = c("blue", "red", "grey"))+
+  theme_classic() 
+env_pca$layers <- c(env_pca$layers, env_pca$layers[[2]], env_pca$layers[[3]]) #move the arrows to plot in the foreground
+env_pca
+
+```
 
 ## Statistical methods
 
