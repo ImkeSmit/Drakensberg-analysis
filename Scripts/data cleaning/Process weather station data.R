@@ -49,7 +49,7 @@ Rai_witsies <- witsies2 |>
 
 
 
-####Sentinel car park
+####Sentinel car park####
 
 scarpark <- read.delim("All_data\\weather station data\\Sentinel_car_park_daily_21May.txt", sep = ",", header = F, row.names = NULL)
 colnames(scarpark) <- c("Timestamp","StationID","WSpd_Min","WSpd_TMn",          
