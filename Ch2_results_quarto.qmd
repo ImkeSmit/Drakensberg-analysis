@@ -926,3 +926,29 @@ combined_fig <- ggarrange(H_temp_GG, LA_temp_GG, SLA_sdepth_WH,LDMC_smoist_WH, L
 combined_fig
 
 ```
+
+
+# Appendix
+```{r}
+#| label: fbl-validation-results
+#| tbl-cap: Validation results
+#| message: false
+#| echo: false
+
+#import validation results
+validation_results <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_interpolation_validation.csv")
+
+validation_grid <- validation_results |> 
+  group_by(site, grid_number, variable) |> 
+  summarise(
+    n        = n(),
+    R2       = ifelse(var(observed) > 0, 
+                      cor(observed, predicted)^2, NA_real_),
+    RMSE     = sqrt(mean(error^2)),
+    bias     = mean(error),
+    .groups  = "drop"
+  ) |> 
+  flextable()
+
+```
+
