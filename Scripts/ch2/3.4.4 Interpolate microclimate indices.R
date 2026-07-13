@@ -252,6 +252,7 @@ validation_results <- map_dfr(CELL_LEVEL_VARS, function(var) {
     run_loloo_validation(sc, gn, indices_spatial, var)
   })
 })
+write.csv(validation_results, "All_data/clean_data/Environmental data/Imke_microclimate_indices_interpolation_validation.csv")
 
 # =============================================================================
 # Validation summary
