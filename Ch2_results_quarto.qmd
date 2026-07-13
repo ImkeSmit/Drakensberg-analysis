@@ -577,6 +577,10 @@ WH_microenv_reults <- tibble(variable = c("mean soil temperature", "mean soil mo
 WH_microenv_reults |> 
       flextable() |> 
   colformat_double(j = 2:9, digits = 3) |>
+  compose(j = "height_pval", value = as_paragraph(ifelse(height_pval < 0.001, "<0.001", sprintf("%.3f", height_pval)))) |>
+  compose(j = "la_pval",     value = as_paragraph(ifelse(la_pval < 0.001,     "<0.001", sprintf("%.3f", la_pval)))) |>
+  compose(j = "ldmc_pval",   value = as_paragraph(ifelse(ldmc_pval < 0.001,   "<0.001", sprintf("%.3f", ldmc_pval)))) |>
+  compose(j = "sla_pval",    value = as_paragraph(ifelse(sla_pval < 0.001,    "<0.001", sprintf("%.3f", sla_pval)))) |>
   set_header_labels(variable = "Variable", 
                     height_coef = "coefficient", 
                    height_pval = "p-value", 
