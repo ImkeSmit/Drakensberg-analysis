@@ -15,8 +15,9 @@ Species composition and functional trait data were collected from three sites sp
 
 ```{r}
 #| label: fig-sitemap
-#| fig-cap: "Site locations and sampling design in the Maloti-Drakensberg. a) Location of each of the three sites along the elevational gradient. b) Layout of the sampling grids at each site. c) A schematic of one sampling grid, consisting of 160 1 x 1m cells"
-knitr::include_graphics("C:\Users\imke6\Documents\PhD 2025\Spatial analysis\Figure1_proposal_13Jul26.png")
+#| fig-cap: "Site locations and sampling design in the Maloti-Drakensberg. a) Location of each of the three sites along the elevational gradient. b) Layout of the sampling grids at each site. c) A schematic of one sampling grid, consisting of 160 1 x 1m cells. This map was created in QGIS with Bing Maps Satellite Imagery."
+library(knitr)
+knitr::include_graphics("C:\\Users\\imke6\\Documents\\PhD 2025\\Spatial analysis\\Figure1_proposal_13Jul26.png")
 ```
 
 ```{r setup chunk}
