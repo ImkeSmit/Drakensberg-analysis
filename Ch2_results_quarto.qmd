@@ -1,7 +1,10 @@
 ---
 title: "Ch2_results"
-format: html
+format: docx
 editor: visual
+fig-format: png
+fig-dpi: 300
+fig-width: 6
 ---
 
 ```{r setup chunk}
@@ -466,7 +469,7 @@ R2_table <- tibble(trait = c("Height", "Leaf area", "LDMC", "SLA"),
                    WH_R2M = c(SES_microenv_Rsq$Height_cm_WH[1,][1], SES_microenv_Rsq$Leaf_area_mm2_WH[1,][1], SES_microenv_Rsq$log_LDMC_WH[1,][1], SES_microenv_Rsq$SLA_WH[1,][1]), 
                    WH_R2C = c(SES_microenv_Rsq$Height_cm_WH[1,][2], SES_microenv_Rsq$Leaf_area_mm2_WH[1,][2], SES_microenv_Rsq$log_LDMC_WH[1,][2], SES_microenv_Rsq$SLA_WH[1,][2]),
                    BK_R2M = c(SES_microenv_Rsq$Height_cm_BK[1,][1], SES_microenv_Rsq$Leaf_area_mm2_BK[1,][1], SES_microenv_Rsq$log_LDMC_BK[1,][1], SES_microenv_Rsq$SLA_BK[1,][1]), 
-                   BK_R2C = c(SES_microenv_Rsq$Height_cm_BK[1,][1], SES_microenv_Rsq$Leaf_area_mm2_BK[1,][1], SES_microenv_Rsq$log_LDMC_BK[1,][1], SES_microenv_Rsq$SLA_BK[1,][1]))
+                   BK_R2C = c(SES_microenv_Rsq$Height_cm_BK[1,][2], SES_microenv_Rsq$Leaf_area_mm2_BK[1,][2], SES_microenv_Rsq$log_LDMC_BK[1,][2], SES_microenv_Rsq$SLA_BK[1,][2]))
 
 R2_table |> 
   gt() |> 
