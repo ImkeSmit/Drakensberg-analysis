@@ -461,7 +461,7 @@ Surface heterogeneity and rock cover were always related to divergence in size a
 #| message: false
 #| warning: false
 
-library(gt)
+library(flextable)
 
 R2_table <- tibble(trait = c("Height", "Leaf area", "LDMC", "SLA"), 
                    GG_R2M = c(SES_microenv_Rsq$Height_cm_GG[1,][1], SES_microenv_Rsq$Leaf_area_mm2_GG[1,][1], SES_microenv_Rsq$log_LDMC_GG[1,][1], SES_microenv_Rsq$SLA_GG[1,][1]), 
@@ -471,19 +471,30 @@ R2_table <- tibble(trait = c("Height", "Leaf area", "LDMC", "SLA"),
                    BK_R2M = c(SES_microenv_Rsq$Height_cm_BK[1,][1], SES_microenv_Rsq$Leaf_area_mm2_BK[1,][1], SES_microenv_Rsq$log_LDMC_BK[1,][1], SES_microenv_Rsq$SLA_BK[1,][1]), 
                    BK_R2C = c(SES_microenv_Rsq$Height_cm_BK[1,][2], SES_microenv_Rsq$Leaf_area_mm2_BK[1,][2], SES_microenv_Rsq$log_LDMC_BK[1,][2], SES_microenv_Rsq$SLA_BK[1,][2]))
 
-R2_table |> 
-  gt() |> 
-  cols_label(GG_R2M = "Marginal R\u00B2", 
-             GG_R2C = "Conditional R\u00B2", 
-             WH_R2M = "Marginal R\u00B2", 
-             WH_R2C = "Conditional R\u00B2",
-             BK_R2M = "Marginal R\u00B2", 
-             BK_R2C = "Conditional R\u00B2") |> 
-  fmt_number(columns = everything(), decimals = 3) |> 
-  tab_spanner(label = "Low", columns = c(GG_R2M, GG_R2C)) |>
-  tab_spanner(label = "Mid", columns = c(WH_R2M, WH_R2C)) |>
-  tab_spanner(label = "High", columns = c(BK_R2M, BK_R2C))
-  
+R2_table |>
+  flextable() |>
+  colformat_double(j = 2:7, digits = 3) |>
+  set_header_labels(
+    trait  = "Trait",
+    GG_R2M = "Marginal R\u00B2",
+    GG_R2C = "Conditional R\u00B2",
+    WH_R2M = "Marginal R\u00B2",
+    WH_R2C = "Conditional R\u00B2",
+    BK_R2M = "Marginal R\u00B2",
+    BK_R2C = "Conditional R\u00B2"
+  ) |>
+  add_header_row(
+    values    = c("Trait", "Low", "Mid", "High"),
+    colwidths = c(1, 2, 2, 2),
+    top       = TRUE
+  ) |>
+  merge_v(j = 1, part = "header") |>
+  align(align = "center", part = "header") |>
+  align(align = "center", part = "body", j = 2:7) |>
+  valign(valign = "bottom", part = "header") |>
+  theme_vanilla() |>
+  autofit() |>
+  fit_to_width(max_width = 6.5)
 
 ```
 
@@ -537,7 +548,8 @@ GG_microenv_reults |>
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_body(columns = sla_pval, rows = sla_pval < 0.05)
-  )
+  ) |> 
+  tab_options(table.width = pct(100))
 
 ```
 
@@ -590,7 +602,8 @@ WH_microenv_reults |>
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_body(columns = sla_pval, rows = sla_pval < 0.05)
-  )
+  ) |> 
+  tab_options(table.width = pct(100))
 
 ```
 
@@ -643,7 +656,8 @@ BK_microenv_reults |>
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_body(columns = sla_pval, rows = sla_pval < 0.05)
-  )
+  ) |> 
+  tab_options(table.width = pct(100))
 
 ```
 
