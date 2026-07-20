@@ -23,6 +23,7 @@ library(conflicted)
 library(performance)
 library(see)
 library(ggbiplot)
+library(flextable)
 conflict_prefer_all("tidylog", quiet = TRUE)
 ```
 
@@ -34,7 +35,7 @@ Does fine-scale environmental heterogeneity influence community assembly?
 
 ## Study site
 
-Species composition and functional trait data were collected from three sites spread over an elevation gradient spanning 1000 m: Golden Gate Highlands National Park (low site) at 2000 m a.s.l., Wistieshoek (mid site) at 2500 m a.s.l. and Bokong Nature Reserve (high site) at 3000 m a.s.l @fig-sitemap. Mean annual air temperature at the three sites is 12℃ at the low site, 10℃ at the mid site and 7℃ at at the high site. Total annual rainfall varies between the three sites, with the low site receiving 1310 mm, the mid site receiving 1558 mm and the high site receiving 913 mm (mean annual temperature and rainfall was calculated as the mean daily temperature and total rainfall between 22/05/2025 and 21/05/2026 measured by the nearest weather stations of the African Mountain Research Foundation). The low site is formally conserved as a National Park where livestock has been excluded, but with large herbivores like zebra, blue wildebeest and eland present at the site. The mid site is situated on land owned by the Batlokoa Royal House and the high site is situated in the Bokong Nature Reserve managed by the National Government of Lesotho. Livestock are not excluded from the mid or high site but were not observed at the sites. Mountain reedbuck, klipspringer and baboon have been observed at the mid site. Grey rhebuck, ice rat and rock hyrax are present at the high site. All three sites are located on basaltic bedrock.
+Species composition and functional trait data were collected from three sites spread over an elevation gradient spanning 1000 m: Golden Gate Highlands National Park (low site) at 2000 m a.s.l., Wistieshoek (mid site) at 2500 m a.s.l. and Bokong Nature Reserve (high site) at 3000 m a.s.l @fig-sitemap. Mean annual air temperature is 12℃ at the low site, 10℃ at the mid site and 7℃ at at the high site. Total annual rainfall varies between the three sites, with the low site receiving 1310 mm, the mid site receiving 1558 mm and the high site receiving 913 mm (mean annual temperature and rainfall was calculated as the mean daily temperature and total rainfall between 22/05/2025 and 21/05/2026 measured by the nearest weather stations of the African Mountain Research Foundation). The low site is formally conserved as a National Park where livestock has been excluded, but with large herbivores like zebra, blue wildebeest and eland present at the site. The mid site is situated on land owned by the Batlokoa Royal House and the high site is situated in the Bokong Nature Reserve managed by the National Government of Lesotho. Livestock are not excluded from the mid or high site but were not observed at the sites. Mountain reedbuck, klipspringer and baboon have been observed at the mid site. Grey rhebuck, ice rat and rock hyrax are present at the high site. All three sites are located on basaltic bedrock.
 
 ```{r}
 #| message: false
@@ -45,13 +46,15 @@ library(knitr)
 knitr::include_graphics("C:\\Users\\imke6\\Documents\\PhD 2025\\Spatial analysis\\Figure1_proposal_13Jul26.png")
 ```
 
-At each site, species composition and functional traits were sampled using a grid design (Figure 1c). Each grid is 8 x 20 m, consisting of 160 contiguous 1 x 1 m cells. Eight grids were sampled at the low site, and seven were sampled at the mid and high site (Figure 1b). The grids were spaced \> 80 m apart in each site and were positioned to encompass the full range of environmental conditions at the site, covering a range of topographies and vegetation characteristics. In addition, individual grids were orientated to capture as much local variation in vegetation and topography as possible. This sampling design has previously been applied in high-altitude and high-latitude systems to sample broad environmental gradients and allows the influence of fine-scale heterogeneity to be examined without the confounding effect of macroclimate or species pools (e.g., (Mod, le Roux, & Luoto, 2014; Momberg et al., 2021).
+At each site, species composition and functional traits were sampled using a grid design @fig-sitemap c. Each grid is 8 x 20 m, consisting of 160 contiguous 1 x 1 m cells. Eight grids were sampled at the low site, and seven were sampled at the mid and high site @fig-sitemap b. The grids were spaced \> 80 m apart in each site and were positioned to encompass the full range of environmental conditions at the site, covering a range of topographies and vegetation characteristics. In addition, individual grids were orientated to capture as much local variation in vegetation and topography as possible. This sampling design has previously been applied in high-altitude and high-latitude systems to sample broad environmental gradients and allows the influence of fine-scale heterogeneity to be examined without the confounding effect of macroclimate or species pools (e.g., (Mod, le Roux, & Luoto, 2014; Momberg et al., 2021).
 
 Vegetation surveys were conducted in the summer growing seasons between 2019-2023, wherein the identity and cover of each species in each cell was recorded, and a subset of species were measured for functional traits. The functional trait survey collected traits for many species at the two ends of each grid but sampled sparsely in the centre of the grid. A species was not sampled for functional traits in adjacent cells. Common species were sampled more frequently than rare species. The following traits were measured (following the standardised methods of (Perez-Harguindeguy et al., 2013): plant height, leaf area (LA), specific leaf area (SLA) and leaf dry matter content (LDMC). Thirty-five percent of species were measured for traits at least once, with these species comprising 87% of the total vegetation cover.
 
-Several environmental variables were measured in each cell of each grid: Rock cover was visually estimated as the percentage of a cell covered by rock large enough to impede plant growth. Soil depth was measured by inserting a metal rod of 60 cm in length into the soil until further penetration was impeded. Soils deeper than 60 cm were given a depth of 61 cm. Three soil depth measurements were taken in each cell and the mean calculated. Northness was calculated as the cosine of the aspect of each cell, measured by placing a compass on the ground (how should I describe how this was measured?). Slope height was measured as the vertical difference between the highest and lowest point in a cell. Surface heterogeneity was calculated as the standard deviation of elevation in a cell from a digital surface model. The digital surface model was created from drone imagery captured on XX date and... (I probably need to give more info on the imagery here, I will consult with Anika about what is appropriate).
+Several environmental variables were measured in each cell of each grid: Rock cover was visually estimated as the percentage of a cell covered by rock large enough to impede plant growth. Soil depth was measured by inserting a metal rod of 60 cm in length into the soil until further penetration was impeded. Soils deeper than 60 cm were given a depth of 61 cm. Three soil depth measurements were taken in each cell and the mean calculated. Northness was calculated as the cosine of the aspect of each cell. Slope height was measured as the vertical difference between the highest and lowest point in a cell. Surface heterogeneity was calculated as the standard deviation of elevation in a cell from a digital surface model. The digital surface model was created from drone imagery captured on XX date and... (I probably need to give more info on the imagery here, I will consult with Anika about what is appropriate). Soil moisture was measured in each cell more than 24hours after the last rainfall event, using a handheld time-domain soil moisture meter (FieldScout 300 TDR; Spectrum Technologies, Plainfield, IL, US) at a depth of 7.5 cm.
 
-The mean soil moisture and temperature of the growing season were calculated using readings from Temperature-Moisture-Sensors (TMS, (Wild et al., 2019)). Six or seven TMS were placed in each grid, and recorded soil moisture and temperature readings every 15 minutes for one year (12 January 2023 – 21 January 2024). The start of the growing season was defined as the first day after 21 June when the minimum daily temperature of all loggers at a site were above 5℃. The end of the growing season was the first day before 21 June when all logers at a site had a minimum daily temperature below 5℃. The growing season was from 23 August to 8 July at the low site, 1 September to 6 June at the mid site, and 10 October to 3 April at the high site. The mean soil moisture and temperature for the growing season was calculated for each logger and interpolated to all other cells in the grid. An inverse-distance-weighted interpolation algorithm was used with a power parameter of two. Cells with more than 50% rock were not used in the interpolation if they contained a logger, or did not receive an interpolated value if they were without a logger. Cross validation showed that the interpolation algorithm could predict the soil moisture and temperature fairly well (Appendix A1). \[I am still a little bit unsure about the quality of this interpolation, these R2 values don't actually look very good to me. I also tried linear modelling with environmental variables to predict soil moisture and temperature, but the soil moisture models perform very poorly. This is an easy place for a reviewer to poke a hole, and I don't feel like I'm covering my bases well enough at the moment.\]
+The mean soil moisture and temperature of the growing season were calculated using readings from Temperature-Moisture-Sensors (TMS, (Wild et al., 2019)). Six or seven TMS were placed in each grid, and recorded soil moisture and temperature readings every 15 minutes for one year (12 January 2023 – 21 January 2024). The start of the growing season was defined as the first day after 21 June when the minimum daily temperature of all loggers at a site were above 5℃. The end of the growing season was the first day before 21 June when all loggers at a site had a minimum daily temperature below 5℃. The growing season was from 23 August to 8 July at the low site, 1 September to 6 June at the mid site, and 10 October to 3 April at the high site. The mean soil moisture and temperature for the growing season was calculated for each logger and interpolated to all other cells in the grid. An inverse-distance-weighted interpolation algorithm was used with a power parameter of two. Cells with more than 50% rock were not used in the interpolation if they contained a logger and did not receive an interpolated value if they were without a logger. Cross validation showed that the interpolation algorithm could predict the soil moisture and temperature fairly well @tbl-validation-results. [I am still a little bit unsure about the quality of this interpolation, these R2 values don't actually look very good to me. I also tried linear modelling with environmental variables to predict soil moisture and temperature, but the soil moisture models perform very poorly. This is an easy place for a reviewer to poke a hole, and I don't know if I'm covering my bases well enough at the moment.]
+
+A principal component analysis was performed to identify the main axes of environmental variation across the three sites @fig-environmental-PCA. The following variables were selected to test whether fine-scale variation in community assembly is shaped by micro-environmental variation: mean soil temperature of the growing season, mean soil moisture of the growing season, rock cover, mean soil depth and surface heterogeneity.
 
 ```{r}
 #| label: fig-environmental-PCA
@@ -97,7 +100,11 @@ all_env <- env |>
 all_env_subs <- all_env |> 
   drop_na() |> 
   select(site, rock_cover:slope_height, mean_T1_growing_season:STD) |> 
-  mutate(across(where(is.numeric), ~as.vector(scale(.))))
+  mutate(across(where(is.numeric), ~as.vector(scale(.)))) |> 
+  rename( mean_soil_temp_growing_season = mean_T1_growing_season, 
+          mean_soil_moist_growing_season = mean_moist_growing_season, 
+          surface_heterogeneity= STD, 
+          instant_soil_moist = soil_moisture_adj_campaign2)
 
 
 all_env_pca <- princomp(all_env_subs[2:ncol(all_env_subs)], scores = T) #not including elevation
@@ -927,11 +934,11 @@ combined_fig
 
 ```
 
-
 # Appendix
+
 ```{r}
-#| label: fbl-validation-results
-#| tbl-cap: Validation results
+#| label: tbl-validation-results
+#| tbl-cap: Cross validation results from inverse-distance-weighted interpolation of the mean soil moisture and mean soil temperature of the growing season. Grid number is the unique ID of each grid in each site.Number of loggers are the number of TMS loggers used to create the interpolated temperature or moisture surface. $R^2$ is the squared Pearson correlation coefficient between the observed and interpolated temperature or moisture value. The root mean square error is the square root of the mean squared difference between observed and interpolated values in the grid. The bias is the mean of the differences between observed and interpolated values in the grid.
 #| message: false
 #| echo: false
 
@@ -948,7 +955,29 @@ validation_grid <- validation_results |>
     bias     = mean(error),
     .groups  = "drop"
   ) |> 
-  flextable()
+  mutate(site = case_when(site == "BK" ~ "high", 
+                          site == "WH" ~ "mid", 
+                          site == "GG" ~ "low"), 
+         site = factor(site, levels = c("low", "mid", "high")), 
+         variable = case_when(variable == "mean_T1_growing_season" ~ "mean soil temperature", 
+                              variable == "mean_moist_growing_season" ~ "mean soil moisture")) |> 
+  arrange(variable, site, grid_number) |> 
+  flextable() |> 
+  colformat_double(j = 4:6, digits = 3) |> 
+  set_header_labels(site = "Site", 
+                    grid_number = "Grid number", 
+                    variable = "Variable", 
+                    n = "Number of loggers", 
+                    R2 = "R\u00B2", 
+                    RMSE = "Root mean square error", 
+                    bias = "Bias") |> 
+  align(j = 1:6, align = "center", part = "all") |>
+  theme_vanilla() |> 
+  bold(part = "header") |> 
+  autofit()
+
+validation_grid
+  
+  
 
 ```
-
