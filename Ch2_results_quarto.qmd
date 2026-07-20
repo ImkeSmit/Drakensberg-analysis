@@ -576,15 +576,15 @@ raoq_ridges <- comb |>
 raoq_ridges
 ```
 
-Micro-environmental factors were related to fine-scale variation in community assembly, although the relationships varied greatly between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (Table 1).
+Micro-environmental factors were related to fine-scale variation in community assembly, although the relationships varied greatly between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (@tbl-R2-models).
 
-At the low site, soil temperature filtered size traits (height and leaf area) to shorter plants and smaller leaves (Table 2, Figure 4a,b). Surface heterogeneity was related to divergence of height, while soil moisture and soil depth were related to divergence in leaf area (Table 2). At the mid site, rock cover was related to divergence of height and LDMC, while soil depth and surface heterogeneity was related to divergence in leaf area (Table 3). Soil moisture was related to filtering of LDMC (Table 3), although this filtering effect was not strongly directional (LDMC did not change with soil moisture, Figure 4d). Soil depth was related to the filtering of SLA toward more acquisitive leaf-economic strategies (Table 3, Figure 4c). At the high site, soil moisture and surface heterogeneity was related to divergence in plant height, and rock cover was related to divergence of leaf area (Table 4). Soil depth had a filtering effect on leaf area, but was not strongly directional (Figure 4e). Surface heterogeneity was related to divergence of LDMC and SLA (Table 4). Divergence of SLA at the high site was also related to rock cover and soil temperature (Table 4).
+At the low site, soil temperature filtered size traits (height and leaf area) to shorter plants and smaller leaves (@tbl-GG-microenv, @fig-CWM-microenvironmental-scatterplots a,b). Surface heterogeneity was related to divergence of height, while soil moisture and soil depth were related to divergence in leaf area (@tbl-GG-microenv). At the mid site, rock cover was related to divergence of height and LDMC, while soil depth and surface heterogeneity was related to divergence in leaf area (@tbl-WH-microenv). Soil moisture was related to filtering of LDMC (@tbl-WH-microenv), although this filtering effect was not strongly directional (LDMC did not change with soil moisture, @fig-CWM-microenvironmental-scatterplots d). Soil depth was related to the filtering of SLA toward more acquisitive leaf-economic strategies (@tbl-WH-microenv, @fig-CWM-microenvironmental-scatterplots c). At the high site, soil moisture and surface heterogeneity was related to divergence in plant height, and rock cover was related to divergence of leaf area @tbl-BK-microenv. Soil depth had a filtering effect on leaf area, but was not strongly directional (@fig-CWM-microenvironmental-scatterplots e). Surface heterogeneity was related to divergence of LDMC and SLA (@tbl-BK-microenv). Divergence of SLA at the high site was also related to rock cover and soil temperature @tbl-BK-microenv.
 
 Surface heterogeneity and rock cover were always related to divergence in size and leaf-economic traits. The directions of the effects of other micro-environmental variables on assembly were not consistent across sites.
 
 ```{r}
 #| label: tbl-R2-models
-#| tbl-cap: Marginal and conditional R2 values of micro-environmental models in predicting SES of each trait at the low, mid and high site.
+#| tbl-cap: Marginal and conditional $R^2$ values of micro-environmental models in predicting SES of each trait at the low, mid and high site.
 #| echo: false
 #| message: false
 #| warning: false
@@ -617,10 +617,10 @@ R2_table |>
     top       = TRUE
   ) |>
   merge_v(j = 1, part = "header") |>
+  theme_vanilla() |>
   align(align = "center", part = "header") |>
   align(align = "center", part = "body", j = 2:7) |>
   valign(valign = "bottom", part = "header") |>
-  theme_vanilla() |>
   autofit() |>
   fit_to_width(max_width = 6.5)
 
@@ -632,7 +632,6 @@ R2_table |>
 #| echo: false
 #| warning: false
 
-library(flextable)
 conflicts_prefer(flextable::compose)
 
 
