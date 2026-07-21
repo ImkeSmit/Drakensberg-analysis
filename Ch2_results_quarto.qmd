@@ -7,6 +7,7 @@ fig-dpi: 300
 fig-width: 6
 fig-height: 4.5
 bibliography: packages.bib
+bibliography: Ch2_community_assembly_library.bib
 ---
 
 ```{r loading libraries}
@@ -54,7 +55,7 @@ library(knitr)
 knitr::include_graphics("C:\\Users\\imke6\\Documents\\PhD 2025\\Spatial analysis\\Figure1_proposal_13Jul26.png")
 ```
 
-At each site, species composition and functional traits were sampled using a grid design (@fig-sitemap c). Each grid is 8 x 20 m in size, consisting of 160 contiguous 1 x 1 m cells. Eight grids were sampled at the low site, and seven were sampled at the mid and high site (@fig-sitemap b). The grids were spaced \> 80 m apart in each site and were positioned to encompass the full range of environmental conditions at the site, covering a range of topographies and vegetation characteristics. In addition, individual grids were orientated to capture as much local variation in vegetation and topography as possible. This sampling design has previously been applied in high-altitude and high-latitude systems to sample broad environmental gradients and allows the influence of fine-scale heterogeneity to be examined without the confounding effect of macroclimate or species pools (e.g., (Mod, le Roux, & Luoto, 2014; Momberg et al., 2021).
+At each site, species composition and functional traits were sampled using a grid design (@fig-sitemap c). Each grid is 8 x 20 m in size, consisting of 160 contiguous 1 x 1 m cells. Eight grids were sampled at the low site, and seven were sampled at the mid and high site (@fig-sitemap b). The grids were spaced \> 80 m apart in each site and were positioned to encompass the full range of environmental conditions at the site, covering a range of topographies and vegetation characteristics. In addition, individual grids were orientated to capture as much local variation in vegetation and topography as possible. This sampling design has previously been applied in high-altitude and high-latitude systems to sample broad environmental gradients and allows the influence of fine-scale heterogeneity to be examined without the confounding effect of macroclimate or species pools [e.g., @mod2014; @momberg2021].
 
 Vegetation surveys were conducted in the summer growing seasons between 2019-2023, wherein the identity and cover of each species in each cell was recorded, and a subset of species were measured for functional traits. The functional trait survey collected traits for many species at the two ends of each grid but sampled sparsely in the centre of the grid. A species was not sampled for functional traits in adjacent cells. Common species were sampled more frequently than rare species. The following traits were measured (following the standardised methods of (Perez-Harguindeguy et al., 2013): plant height, leaf area (LA), specific leaf area (SLA) and leaf dry matter content (LDMC). Thirty-five percent of species were measured for traits at least once, with these species comprising 87% of the total vegetation cover.
 
@@ -954,6 +955,13 @@ combined_fig <- ggarrange(H_temp_GG, LA_temp_GG, SLA_sdepth_WH,LDMC_smoist_WH, L
 combined_fig
 
 ```
+
+#References
+
+::: {#refs}
+
+::: 
+
 
 # Appendix
 
