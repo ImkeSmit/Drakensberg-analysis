@@ -26,8 +26,8 @@ RQ_obs_cells <- calc_RaoQ_weighted(mean_traits, abun_matrix)
 set.seed(150)
 nullcomm_cells <- generate_C2_null(abun_matrix, 999, pool = "site")
 
-saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/nullmodel_C2_cells.rds")
-nullcomm_cells <- readRDS("All_data/comm_assembly_results/nullmodel_C2_cells.rds")
+saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/nullmodel_C2_cells_poolsite.rds")
+nullcomm_cells <- readRDS("All_data/comm_assembly_results/nullmodel_C2_cell_poolsite.rds")
 #Calculate SES, with unscaled RaoQ#
 #we need to calculate RaoQ for each of the observed null communities
 
@@ -70,7 +70,7 @@ RQ_cells_summary <- null_RQ |>
   inner_join(RQ_obs_cells, by = c("trait", "cellref")) |> 
   mutate(SES = (RaoQ - mean_null)/sd_null)
 
-write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_weighted_cells_C2_site.csv")
+write.csv(RQ_cells_summary, "All_data/comm_assembly_results/RQ_weighted_cells_C2_poolsite.csv")
 
 ##NB! Using this null model, RQnull may have been calculated with less sites and less species than RQobs
 #This is because the C2 nullmodel may create empty species columns.
