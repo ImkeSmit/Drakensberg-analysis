@@ -288,3 +288,137 @@ for (t in 1:length(traitlist)) {
 }}
 #plot(checkmodel()) returns the following error: Check it out when you have internet
 #Converting missing values (`NA`) into regular values currently not possible for variables of class `NULL`.
+
+
+
+
+###=========================================###
+###Loop to run SES~elevation for all traits####
+###=====C2 NULL MODEL, pool = site=========####
+###=========================================###
+#import SES data
+cell_ses <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C2_poolsite.csv", row.names = 1) |> 
+  mutate(site = str_sub(cellref, start = 1, end = 2), #we have to create the new Cell_ID variable because this is from an old run. We shuld run it again.
+         grid = str_sub(cellref,start = 3, end = 3), 
+         column = str_sub(cellref,start = 4, end = 4), 
+         row = str_sub(cellref, start = 5, end = 6)) |> 
+  mutate(Cell_ID = paste0(site, "_G", grid, "_", column, row)) |> 
+  select(Cell_ID, SES)
+
+#import microenvironmental data containing x and y coordinates
+env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
+  #variables we are interested in
+  select(Cell_ID:row) |> 
+  #add elevation variables
+  mutate(elevation = case_when(site == "GG" ~ 2000, 
+                               site == "WH" ~ 2500, 
+                               site == "BK" ~ 3000,
+                               .default = NA))
+
+##Combine SES and environmental data
+comb <- env |> 
+  #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
+  inner_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
+  mutate(ncolumn = match(column, LETTERS[1:8]), 
+         grid = paste0(site, grid)) |> #each grid must have a unique id 
+  rename(x_coord = ncolumn, 
+         y_coord = row)
+
+#Run the loop for all traits
+traitlist <- c("log_Height", "log_LDMC", "log_LA", "log_SLA", "Height_cm", "LDMC", "Leaf_area_mm2", "SLA")
+#lists to store results in
+SES_ele_summary <- vector(mode= "list", length = length(traitlist))
+names(SES_ele_summary) = traitlist
+
+SES_ele_Rsq<- vector(mode= "list", length = length(traitlist))
+names(SES_ele_Rsq) = traitlist
+
+SES_ele_anova<- vector(mode= "list", length = length(traitlist))
+names(SES_ele_anova) = traitlist
+
+SES_ele_cld<- vector(mode= "list", length = length(traitlist))
+names(SES_ele_cld) = traitlist
+
+for (t in 1:length(traitlist)) {
+  modeldat <-  comb |> 
+    filter(trait == traitlist[t]) |> 
+    mutate(elevation = as.factor(elevation), 
+           grid = as.factor(grid)) |> 
+    drop_na()
+  
+  
+  model<- lme(SES ~ elevation ,
+              random = ~1|grid, 
+              correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
+              data = modeldat) #only gaussian family possible
+  
+  ###Save check_model plot
+  plot_file <- paste0("All_data/comm_assembly_results/checkmodel_SES_elevation_checkmodel_lme_SES_", traitlist[t], "_elevation.png")
+  png(plot_file, width = 1600, height = 1200, res = 150)
+  print(check_model(model))   # print() forces the plot to actually draw to the device
+  dev.off()
+  
+  ###Save model results
+  output_file <- paste0("All_data/comm_assembly_results/lme_results_SES_elevation/lme_SES_" ,traitlist[t], "_elevation_results.txt")
+  sink(output_file)
+  
+  # ── 1.Trait ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  TRAIT\n")
+  cat("===========================================\n")
+  print(traitlist[t])
+  cat("\n\n")
+  
+  
+  # ── 1. Model Formula ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  MODEL FORMULA\n")
+  cat("===========================================\n")
+  print(formula(model))
+  cat("\n\n")
+  
+  # ── 2. Summary Table ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  MODEL SUMMARY\n")
+  cat("===========================================\n")
+  print(summary(model))
+  cat("\n\n")
+  
+  
+  # ── 2. R squared ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  R SQUARED\n")
+  cat("===========================================\n")
+  print(r.squaredGLMM(model))
+  cat("\n\n")
+  
+  
+  # ── 3. ANOVA Table ────────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  ANOVA TABLE\n")
+  cat("===========================================\n")
+  print(anova(model))
+  cat("\n\n")
+  
+  # ── 4. EMmeans Table ──────────────────────────────────────────
+  cat("===========================================\n")
+  cat("  ESTIMATED MARGINAL MEANS (emmeans)\n")
+  cat("===========================================\n")
+  em_model <- emmeans(model, specs = "elevation", type = "response")
+  comp_letters <-cld(em_model, Letters = letters, adjust = "Tukey", sort = FALSE)
+  print(comp_letters)
+  cat("\n")
+  
+  # --- Close the sink ---
+  sink()
+  
+  #Also save results in a list object so we can call it with quarto
+  SES_ele_summary[[t]] <- summary(model)
+  SES_ele_Rsq[[t]] <- r.squaredGLMM(model)
+  SES_ele_anova[[t]] <- anova(model)
+  SES_ele_cld[[t]] <- comp_letters
+  
+}
+
+###Using the logged traits are generally better for model diagnostics than the raw traits
+##BUT the leaf area diagnostics are still very bad
