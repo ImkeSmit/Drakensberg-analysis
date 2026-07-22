@@ -70,13 +70,13 @@ for (t in 1:length(traitlist)) {
                   data = modeldat) #only gaussian family possible
   
   ###Save check_model plot
-  plot_file <- paste0("All_data/comm_assembly_results/checkmodel_SES_elevation_checkmodel_lme_SES_", traitlist[t], "_elevation.png")
+  plot_file <- paste0("All_data/comm_assembly_results/C5_null_model_results/checkmodel_SES_elevation/checkmodel_lme_SES_", traitlist[t], "_elevation.png")
   png(plot_file, width = 1600, height = 1200, res = 150)
   print(check_model(model))   # print() forces the plot to actually draw to the device
   dev.off()
   
   ###Save model results
-  output_file <- paste0("All_data/comm_assembly_results/lme_results_SES_elevation/lme_SES_" ,traitlist[t], "_elevation_results.txt")
+  output_file <- paste0("All_data/comm_assembly_results/C5_null_model_results/lme_results_SES_elevation/lme_SES_" ,traitlist[t], "_elevation_results.txt")
   sink(output_file)
   
   # ── 1.Trait ──────────────────────────────────────────
