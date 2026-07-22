@@ -298,12 +298,7 @@ for (t in 1:length(traitlist)) {
 ###=========================================###
 #import SES data
 cell_ses <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C2_poolsite.csv", row.names = 1) |> 
-  mutate(site = str_sub(cellref, start = 1, end = 2), #we have to create the new Cell_ID variable because this is from an old run. We shuld run it again.
-         grid = str_sub(cellref,start = 3, end = 3), 
-         column = str_sub(cellref,start = 4, end = 4), 
-         row = str_sub(cellref, start = 5, end = 6)) |> 
-  mutate(Cell_ID = paste0(site, "_G", grid, "_", column, row)) |> 
-  select(Cell_ID, SES)
+  rename(Cell_ID = cellref)
 
 #import microenvironmental data containing x and y coordinates
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
@@ -327,17 +322,17 @@ comb <- env |>
 #Run the loop for all traits
 traitlist <- c("log_Height", "log_LDMC", "log_LA", "log_SLA", "Height_cm", "LDMC", "Leaf_area_mm2", "SLA")
 #lists to store results in
-SES_ele_summary <- vector(mode= "list", length = length(traitlist))
-names(SES_ele_summary) = traitlist
+C2_SES_ele_summary <- vector(mode= "list", length = length(traitlist))
+names(C2_SES_ele_summary) = traitlist
 
-SES_ele_Rsq<- vector(mode= "list", length = length(traitlist))
-names(SES_ele_Rsq) = traitlist
+C2_SES_ele_Rsq<- vector(mode= "list", length = length(traitlist))
+names(C2_SES_ele_Rsq) = traitlist
 
-SES_ele_anova<- vector(mode= "list", length = length(traitlist))
-names(SES_ele_anova) = traitlist
+C2_SES_ele_anova<- vector(mode= "list", length = length(traitlist))
+names(C2_SES_ele_anova) = traitlist
 
-SES_ele_cld<- vector(mode= "list", length = length(traitlist))
-names(SES_ele_cld) = traitlist
+C2_SES_ele_cld<- vector(mode= "list", length = length(traitlist))
+names(C2_SES_ele_cld) = traitlist
 
 for (t in 1:length(traitlist)) {
   modeldat <-  comb |> 
@@ -353,13 +348,13 @@ for (t in 1:length(traitlist)) {
               data = modeldat) #only gaussian family possible
   
   ###Save check_model plot
-  plot_file <- paste0("All_data/comm_assembly_results/checkmodel_SES_elevation_checkmodel_lme_SES_", traitlist[t], "_elevation.png")
+  plot_file <- paste0("All_data/comm_assembly_results/C2_null_model_results/checkmodel_SES_elevation/checkmodel_lme_SES_", traitlist[t], "_elevation.png")
   png(plot_file, width = 1600, height = 1200, res = 150)
   print(check_model(model))   # print() forces the plot to actually draw to the device
   dev.off()
   
   ###Save model results
-  output_file <- paste0("All_data/comm_assembly_results/lme_results_SES_elevation/lme_SES_" ,traitlist[t], "_elevation_results.txt")
+  output_file <- paste0("All_data/comm_assembly_results/C2_null_model_results/lme_results_SES_elevation/lme_SES_" ,traitlist[t], "_elevation_results.txt")
   sink(output_file)
   
   # ── 1.Trait ──────────────────────────────────────────
@@ -413,12 +408,9 @@ for (t in 1:length(traitlist)) {
   sink()
   
   #Also save results in a list object so we can call it with quarto
-  SES_ele_summary[[t]] <- summary(model)
-  SES_ele_Rsq[[t]] <- r.squaredGLMM(model)
-  SES_ele_anova[[t]] <- anova(model)
-  SES_ele_cld[[t]] <- comp_letters
+  C2_SES_ele_summary[[t]] <- summary(model)
+  C2_SES_ele_Rsq[[t]] <- r.squaredGLMM(model)
+  C2_SES_ele_anova[[t]] <- anova(model)
+  C2_SES_ele_cld[[t]] <- comp_letters
   
 }
-
-###Using the logged traits are generally better for model diagnostics than the raw traits
-##BUT the leaf area diagnostics are still very bad
