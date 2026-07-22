@@ -32,7 +32,7 @@ set.seed(150)
 nullcomm_cells <- generate_C2_null(abun_matrix, 999, pool = "site")
 
 saveRDS(nullcomm_cells, file = "All_data/comm_assembly_results/nullmodel_C2_cells_poolsite.rds")
-nullcomm_cells <- readRDS("All_data/comm_assembly_results/nullmodel_C2_cell_poolsite.rds")
+nullcomm_cells <- readRDS("All_data/comm_assembly_results/nullmodel_C2_cells_poolsite.rds")
 #Calculate SES, with unscaled RaoQ#
 #we need to calculate RaoQ for each of the observed null communities
 
