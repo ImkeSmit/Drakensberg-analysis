@@ -15,7 +15,12 @@ library(future.apply)
 ####Import community and trait data####
 abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
 
-mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1)
+mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1) |> 
+  mutate(log_Height = log(Height_cm), 
+         log_LDMC = log(LDMC), 
+         log_LA = log(Leaf_area_mm2), 
+         log_SLA = log(SLA), 
+         log_Thickness = log(Thickness_mm))
 
 
 ####All species - SES at cell scale, C2, pool = site, weighted RaoQ####
