@@ -31,6 +31,10 @@ library(knitr)
 conflict_prefer_all("tidylog", quiet = TRUE)
 ```
 
+# The effect of macro- and micro-scale environmental drivers on community assembly
+
+Understanding what drives community assembly has been a central goal of ecology for a long time [@hillerislambers_rethinking_2012, @diamond_assembly_1975, @weiher_community_1998]. Not taking dispersal limitations into account, community composition is thought to be shaped by environmental constraints, competition, neutral processes, or a combination of all three [@gotzenberger_ecological_2012]. Investigating the functional trait patterns in communities offers insight into the dominant assembly processes at work in a community, and which environmental factors most strongly shape community composition. Environmental conditions are hypothesised to act as a filter, excluding species which may be able to disperse to a site but not survive there [@gotzenberger_ecological_2012, @kraft_community_2015]. This should create a pattern of trait convergence toward an optimum trait for survival [@gotzenberger_ecological_2012]. Competition is expected to promote divergence of functional traits under the theory of coexistence by niche differentiation [@weiher_community_1998]. However, competition may also generate a pattern of trait convergence if species with traits conferring higher competitive ability exclude species with weakly competitive traits [@mayfield2010].
+
 Research questions: How does community assembly change with elevation?
 
 Does fine-scale environmental heterogeneity influence community assembly?
