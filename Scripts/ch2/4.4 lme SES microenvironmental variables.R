@@ -315,7 +315,9 @@ comb <- env |>
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
   inner_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
   mutate(ncolumn = match(column, LETTERS[1:8]), 
-         grid = paste0(site, grid)) |> #each grid must have a unique id 
+         grid = paste0(site, grid), #each grid must have a unique id 
+         elevation = as.factor(elevation), 
+         grid = as.factor(grid)) |> 
   rename(x_coord = ncolumn, 
          y_coord = row)
 
@@ -337,8 +339,6 @@ names(C2_SES_ele_cld) = traitlist
 for (t in 1:length(traitlist)) {
   modeldat <-  comb |> 
     filter(trait == traitlist[t]) |> 
-    mutate(elevation = as.factor(elevation), 
-           grid = as.factor(grid)) |> 
     drop_na()
   
   
