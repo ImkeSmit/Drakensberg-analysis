@@ -32,6 +32,8 @@ env2 <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental
   #variables we are interested in
   select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
          soil_depth_CV, mean_soil_depth, slope_height) |> 
+  mutate(mean_soil_depth = case_when(mean_soil_depth > 61 ~ 61, #some last minute cleaning
+                                     .default = mean_soil_depth)) |> 
   #add elevation variables
   mutate(elevation = case_when(site == "GG" ~ 2000, 
                                site == "WH" ~ 2500, 
@@ -410,43 +412,21 @@ rm(model, modeldat) #remove to be safe
 ###=============C2 NULL MODEL, pool = site====================####
 ###===========================================================###
 #import ses
-cell_ses_poolsite <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C2_poolsite.csv", row.names = 1) |> 
+C2_cell_ses_poolsite <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C2_poolsite.csv", row.names = 1) |> 
   rename(Cell_ID = cellref) 
-
-#import microenvironmental data
-env2 <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
-  #variables we are interested in
-  select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
-         soil_depth_CV, mean_soil_depth, slope_height) |> 
-  #add elevation variables
-  mutate(elevation = case_when(site == "GG" ~ 2000, 
-                               site == "WH" ~ 2500, 
-                               site == "BK" ~ 3000,
-                               .default = NA))
-
-#import remote sensing derived variables
-rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
-  select(CELL_ID, STD) |> 
-  rename(Cell_ID = CELL_ID)
-
-#import interpolated microclimate indices
-micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
 
 
 ##Combine SES and environmental data
-comb2 <- env2 |> 
+C2_microenv_comb <- env2 |> 
   #join to microclimate indices |> 
   full_join(micro_idw, by = "Cell_ID") |> 
   #join to remote sensing data |> 
   full_join(rms, by = "Cell_ID") |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
-  full_join(cell_ses_poolsite, by = "Cell_ID", relationship = "one-to-many") |>
-  mutate(ncolumn = match(column, LETTERS[1:8]), 
-         grid = paste0(site, grid), 
+  full_join(C2_cell_ses_poolsite, by = "Cell_ID", relationship = "one-to-many") |>
+  mutate(grid = paste0(site, grid), 
          elevation = as.factor(elevation), 
-         grid = as.factor(grid)) |> #each grid must have a unique id 
-  rename(x_coord = ncolumn, 
-         y_coord = row)
+         grid = as.factor(grid)) 
 
 
 ###Loop starts here####
@@ -463,7 +443,7 @@ C2_SES_microenv_anova<- vector(mode= "list", length = length(traitlist) * length
 l = 1
 for (t in 1:length(traitlist)) {
   for(s in 1:length(sitelist)) {
-    modeldat <-  comb2 |> 
+    modeldat <-  C2_microenv_comb |> 
       filter(trait == traitlist[t], 
              site == sitelist[s]) |> 
       drop_na()
