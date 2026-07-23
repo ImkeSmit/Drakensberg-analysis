@@ -298,32 +298,17 @@ rm(model, modeldat)
 ###=====C2 NULL MODEL, pool = site=========####
 ###=========================================###
 #import SES data
-cell_ses <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C2_poolsite.csv", row.names = 1) |> 
+C2_cell_ses_poolsite <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C2_poolsite.csv", row.names = 1) |> 
   rename(Cell_ID = cellref)
 
-#import microenvironmental data containing x and y coordinates
-env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
-  #variables we are interested in
-  select(Cell_ID:row) |> 
-  #add elevation variables
-  mutate(elevation = case_when(site == "GG" ~ 2000, 
-                               site == "WH" ~ 2500, 
-                               site == "BK" ~ 3000,
-                               .default = NA))
 
 ##Combine SES and environmental data
-comb <- env |> 
+C2_ele_comb <- pos |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
-  inner_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
-  mutate(ncolumn = match(column, LETTERS[1:8]), 
-         grid = paste0(site, grid), #each grid must have a unique id 
-         elevation = as.factor(elevation), 
-         grid = as.factor(grid)) |> 
-  rename(x_coord = ncolumn, 
-         y_coord = row)
+  inner_join(C2_cell_ses_poolsite, by = "Cell_ID", relationship = "one-to-many") 
 
 #Run the loop for all traits
-traitlist <- c("log_Height", "log_LDMC", "log_LA", "log_SLA", "Height_cm", "LDMC", "Leaf_area_mm2", "SLA")
+traitlist <- c("log_Height", "log_LDMC", "log_LA", "SLA")
 #lists to store results in
 C2_SES_ele_summary <- vector(mode= "list", length = length(traitlist))
 names(C2_SES_ele_summary) = traitlist
@@ -337,8 +322,9 @@ names(C2_SES_ele_anova) = traitlist
 C2_SES_ele_cld<- vector(mode= "list", length = length(traitlist))
 names(C2_SES_ele_cld) = traitlist
 
+
 for (t in 1:length(traitlist)) {
-  modeldat <-  comb |> 
+  modeldat <-  C2_ele_comb |> 
     filter(trait == traitlist[t]) |> 
     drop_na()
   
@@ -415,6 +401,7 @@ for (t in 1:length(traitlist)) {
   C2_SES_ele_cld[[t]] <- comp_letters
   
 }
+rm(model, modeldat) #remove to be safe
 
 
 
