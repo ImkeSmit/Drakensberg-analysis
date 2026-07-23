@@ -474,8 +474,8 @@ ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), rep(
                                          C5_SES_ele_cld$log_LA$.group), 
                              x_pos = c(5,5,5,
                                        4,4,4, 
-                                       7,7,7,
-                                       12,12,12), 
+                                       9,9,9,
+                                       8.5,8.5,8.5), 
                              emmean = c(C5_SES_ele_cld$log_Height$emmean,
                                         C5_SES_ele_cld$SLA$emmean,
                                         C5_SES_ele_cld$log_LDMC$emmean,
@@ -485,7 +485,7 @@ ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), rep(
                                            C5_SES_ele_cld$log_LDMC$SE,
                                            C5_SES_ele_cld$log_LA$SE))
 
-ses_ridges <- comb |>
+ses_ridges <- C5_ele_comb |>
   filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
   mutate(elevation = as.factor(elevation)) |> 
   ggplot(aes(x = SES, y = elevation)) +
@@ -543,7 +543,7 @@ ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), rep(
                                            C2_SES_ele_cld$log_LDMC$SE,
                                            C2_SES_ele_cld$log_LA$SE))
 
-C2_ses_ridges <- C2_comb |>
+C2_ses_ridges <- C2_ele_comb |>
   filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
   mutate(elevation = as.factor(elevation)) |> 
   ggplot(aes(x = SES, y = elevation)) +
