@@ -220,7 +220,7 @@ C5_ele_comb <- pos |>
   
 #These variables have the best diagnostics
 #LA and SLA still have TERRIBLE DIAGNOSTICS
-traitlist <- c("Height_cm", "LDMC", "Leaf_area_mm2","SLA",  "log_Height", "log_LDMC", "log_LA", "log_SLA")
+traitlist <- c("SLA",  "log_Height", "log_LDMC", "log_LA")
 #lists to store results in
 C5_SES_ele_summary <- vector(mode= "list", length = length(traitlist))
 names(C5_SES_ele_summary) = traitlist
@@ -287,7 +287,7 @@ C5_microenv_comb <- env2 |>
 
 ###Loop starts here####
 #These variables have the best diagnostics after comparing diagnostic plots of log and raw variables
-traitlist <- c("Height_cm", "LDMC", "Leaf_area_mm2","SLA",  "log_Height", "log_LDMC", "log_LA", "log_SLA")
+traitlist <- c("log_LDMC", "Height_cm", "Leaf_area_mm2", "SLA")
 sitelist <- c("GG", "WH", "BK")
 #lists to store results in
 C5_SES_microenv_summary <- vector(mode= "list", length = length(traitlist) * length(sitelist))
@@ -344,7 +344,7 @@ C2_ele_comb <- pos |>
   inner_join(C2_cell_ses_poolsite, by = "Cell_ID", relationship = "one-to-many") 
 
 #Run the loop for all traits
-traitlist <- c("Height_cm", "LDMC", "Leaf_area_mm2","SLA",  "log_Height", "log_LDMC", "log_LA", "log_SLA")
+traitlist <- c("SLA",  "log_Height", "log_LDMC", "log_LA")
 #lists to store results in
 C2_SES_ele_summary <- vector(mode= "list", length = length(traitlist))
 names(C2_SES_ele_summary) = traitlist
@@ -409,7 +409,7 @@ C2_microenv_comb <- env2 |>
 
 ###Loop starts here####
 #Run the loop for all traits
-traitlist <- c("log_Height", "log_LDMC", "log_LA", "log_SLA", "Height_cm", "LDMC", "Leaf_area_mm2", "SLA")
+traitlist <- c("log_LDMC", "Height_cm", "Leaf_area_mm2", "SLA")
 sitelist <- c("GG", "WH", "BK")
 #lists to store results in
 C2_SES_microenv_summary <- vector(mode= "list", length = length(traitlist) * length(sitelist))
@@ -455,7 +455,11 @@ for (t in 1:length(traitlist)) {
 
 The assembly of leaf area shifted from being no different from random assembly, to environmental filtering at the mid and high elevation @fig-SES-elevation-ridges. Filtering was in the direction of larger leaves at the mid elevation, and smaller leaves at the high elevation (@fig-CWM-elevation-ridges). Environmental filtering was the dominant assembly mechanism at all elevations for SLA, although the filtering effect of SLA was weakest at the mid elevation (@fig-SES-elevation-ridges). SLA was filtered toward conservative leaf-economic strategies at the low and high elevation, but more acquisitive strategies at the mid elevation (@fig-CWM-elevation-ridges).
 
-C2 results show filtering at all elevations for all traits - reafirming that env filtering is teh dominant mechanism.
+C2 results show filtering at all elevations for all traits - reaffirming that env filtering is the dominant mechanism. Although the strength of filtering does vary with elevation, only LA follows the expected pattern of increasing strength of filtering with elevation. Filtering is sometimes weakest at the mid or high elevation... What could be the reason?
+
+Environmental heterogeneity promotes divergence of certain traits at the high or mid elevation.
+
+Trait covariation is reduced due to weaker competitive interactions?
 
 ```{r}
 #| message: false
@@ -706,7 +710,7 @@ RaoQ_ele_cld<- vector(mode= "list", length = length(traitlist))
 names(RaoQ_ele_cld) = traitlist
 
 for (t in 1:length(traitlist)) {
-  modeldat <-  comb |> 
+  modeldat <-  C5_ele_comb |> 
     filter(trait == traitlist[t]) |> 
     mutate(elevation = as.factor(elevation), 
            grid = as.factor(grid)) |> 
@@ -746,7 +750,7 @@ raoq_ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3),
                                            RaoQ_ele_cld$log_LDMC$SE,
                                            RaoQ_ele_cld$log_LA$SE))
 
-raoq_ridges <- comb |>
+raoq_ridges <- C5_ele_comb |> #doesn't matter which df we use here, observed RaoQ should stay the same
   filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
   mutate(elevation = as.factor(elevation)) |> 
   ggplot(aes(x = RaoQ, y = elevation)) +
@@ -782,8 +786,8 @@ At the low site, soil temperature filtered size traits (height and leaf area) to
 Surface heterogeneity and rock cover were always related to divergence in size and leaf-economic traits. The directions of the effects of other micro-environmental variables on assembly were not consistent across sites.
 
 ```{r}
-#| label: tbl-R2-models
-#| tbl-cap: Marginal and conditional $R^2$ values of micro-environmental models in predicting SES of each trait at the low, mid and high site.
+#| label: tbl-R2-models_C5
+#| tbl-cap: Marginal and conditional $R^2$ values of micro-environmental models in predicting SES of each trait calculated with the C5 null model at the low, mid and high site.
 #| echo: false
 #| message: false
 #| warning: false
