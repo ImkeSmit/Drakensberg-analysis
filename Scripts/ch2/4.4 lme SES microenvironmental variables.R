@@ -13,32 +13,56 @@ library(performance)
 library(see)
 conflict_prefer_all("tidylog", quiet = TRUE)
 
-###=========================================###
-###Loop to run SES~elevation for all traits####
-###=====C5 NULL MODEL, pool = entire========####
-###=========================================###
-#import SES data
-cell_ses <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
-  rename(Cell_ID = cellref) 
-
 #import microenvironmental data containing x and y coordinates
-env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
+pos <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
   #variables we are interested in
   select(Cell_ID:row) |> 
   #add elevation variables
   mutate(elevation = case_when(site == "GG" ~ 2000, 
                                site == "WH" ~ 2500, 
                                site == "BK" ~ 3000,
-                               .default = NA))
-
-##Combine SES and environmental data
-comb <- env |> 
-  #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
-  inner_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") |>
+                               .default = NA)) |> 
   mutate(ncolumn = match(column, LETTERS[1:8]), 
          grid = paste0(site, grid)) |> #each grid must have a unique id 
   rename(x_coord = ncolumn, 
          y_coord = row)
+
+#import microenvironmental data containing microenv variables
+env2 <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data.csv") |> 
+  #variables we are interested in
+  select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
+         soil_depth_CV, mean_soil_depth, slope_height) |> 
+  #add elevation variables
+  mutate(elevation = case_when(site == "GG" ~ 2000, 
+                               site == "WH" ~ 2500, 
+                               site == "BK" ~ 3000,
+                               .default = NA)) |> 
+  mutate(ncolumn = match(column, LETTERS[1:8]),  #also add x and y coordinates
+         grid = paste0(site, grid)) |> #each grid must have a unique id 
+  rename(x_coord = ncolumn, 
+         y_coord = row)
+
+#import remote sensing derived variables
+rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
+  select(CELL_ID, STD) |> 
+  rename(Cell_ID = CELL_ID)
+
+#import interpolated microclimate indices
+micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
+
+
+###=========================================###
+###Loop to run SES~elevation for all traits####
+###=====C5 NULL MODEL, pool = entire========####
+###=========================================###
+#import SES data
+C5_cell_ses_poolentire <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_entire.csv", row.names = 1) |> 
+  rename(Cell_ID = cellref) 
+
+##Combine SES and environmental data
+C5_ele_comb <- pos |> 
+  #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
+  inner_join(cell_ses, by = "Cell_ID", relationship = "one-to-many") 
   
 #These variables have the best diagnostics
 #LA and SLA still have TERRIBLE DIAGNOSTICS
