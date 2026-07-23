@@ -231,7 +231,7 @@ for (t in 1:length(traitlist)) {
   ###Save check_model plot
   plot_file <- paste0("All_data/comm_assembly_results/C5_null_model_results/checkmodel_SES_microenv/checkmodel_lme_SES_", traitlist[t], "_microenv_", sitelist[s], ".png")
   png(plot_file, width = 1600, height = 1200, res = 150)
-  print(check_model(model, check = c("linearity", "homogeneity", "reqq")))   # print() forces the plot to actually draw to the device
+  print(check_model(model, check = c("linearity", "homogeneity", "qq", "reqq")))   # print() forces the plot to actually draw to the device
   dev.off()
   
   ###Save model results
@@ -342,7 +342,7 @@ for (t in 1:length(traitlist)) {
   ###Save check_model plot
   plot_file <- paste0("All_data/comm_assembly_results/C2_null_model_results/checkmodel_SES_elevation/checkmodel_lme_SES_", traitlist[t], "_elevation.png")
   png(plot_file, width = 1600, height = 1200, res = 150)
-  print(check_model(model, check = c("linearity", "homogeneity", "reqq")))   # print() forces the plot to actually draw to the device
+  print(check_model(model, check = c("linearity", "homogeneity", "qq", "reqq")))   # print() forces the plot to actually draw to the device
   dev.off()
   
   ###Save model results
@@ -460,7 +460,7 @@ for (t in 1:length(traitlist)) {
     ###Save check_model plot
     plot_file <- paste0("All_data/comm_assembly_results/C2_null_model_results/checkmodel_SES_microenv/checkmodel_lme_SES_", traitlist[t], "_microenv_", sitelist[s], ".png")
     png(plot_file, width = 1600, height = 1200, res = 150)
-    print(check_model(model, check = c("linearity", "homogeneity", "reqq")))   # print() forces the plot to actually draw to the device
+    print(check_model(model, check = c("linearity", "homogeneity", "qq", "reqq")))   # print() forces the plot to actually draw to the device
     dev.off()
     
     ###Save model results
