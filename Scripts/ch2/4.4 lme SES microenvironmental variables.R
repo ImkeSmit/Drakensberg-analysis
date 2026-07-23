@@ -23,7 +23,9 @@ pos <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
                                site == "BK" ~ 3000,
                                .default = NA)) |> 
   mutate(ncolumn = match(column, LETTERS[1:8]), 
-         grid = paste0(site, grid)) |> #each grid must have a unique id 
+         grid = paste0(site, grid), 
+         elevation = as.factor(elevation), 
+         grid = as.factor(grid)) |> #each grid must have a unique id 
   rename(x_coord = ncolumn, 
          y_coord = row)
 
@@ -40,7 +42,9 @@ env2 <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental
                                site == "BK" ~ 3000,
                                .default = NA)) |> 
   mutate(ncolumn = match(column, LETTERS[1:8]),  #also add x and y coordinates
-         grid = paste0(site, grid)) |> #each grid must have a unique id 
+         grid = paste0(site, grid), 
+        elevation = as.factor(elevation), 
+        grid = as.factor(grid)) |> #each grid must have a unique id 
   rename(x_coord = ncolumn, 
          y_coord = row)
 
@@ -96,7 +100,7 @@ for (t in 1:length(traitlist)) {
   ###Save check_model plot
   plot_file <- paste0("All_data/comm_assembly_results/C5_null_model_results/checkmodel_SES_elevation/checkmodel_lme_SES_", traitlist[t], "_elevation.png")
   png(plot_file, width = 1600, height = 1200, res = 150)
-  print(check_model(model, check = c("linearity", "homogeneity", "reqq")))   # print() forces the plot to actually draw to the device
+  print(check_model(model, check = c("linearity", "homogeneity", "qq", "reqq")))   # print() forces the plot to actually draw to the device
   dev.off()
   
   ###Save model results
@@ -225,13 +229,13 @@ for (t in 1:length(traitlist)) {
               data = modeldat) #only gaussian family possible
   
   ###Save check_model plot
-  plot_file <- paste0("All_data/comm_assembly_results/checkmodel_SES_microenv/checkmodel_lme_SES_", traitlist[t], "_microenv_", sitelist[s], ".png")
+  plot_file <- paste0("All_data/comm_assembly_results/C5_null_model_results/checkmodel_SES_microenv/checkmodel_lme_SES_", traitlist[t], "_microenv_", sitelist[s], ".png")
   png(plot_file, width = 1600, height = 1200, res = 150)
   print(check_model(model, check = c("linearity", "homogeneity", "reqq")))   # print() forces the plot to actually draw to the device
   dev.off()
   
   ###Save model results
-  output_file <- paste0("All_data/comm_assembly_results/lme_results_SES_microenv/lme_SES_" ,traitlist[t], "_microenv_", sitelist[s], ".txt")
+  output_file <- paste0("All_data/comm_assembly_results/C5_null_model_results/lme_results_SES_microenv/lme_SES_" ,traitlist[t], "_microenv_", sitelist[s], ".txt")
   sink(output_file)
   
   # ── 1.Trait ──────────────────────────────────────────
@@ -289,8 +293,7 @@ for (t in 1:length(traitlist)) {
 
   }}
 rm(model, modeldat)
-#plot(checkmodel()) returns the following error: Check it out when you have internet
-#Converting missing values (`NA`) into regular values currently not possible for variables of class `NULL`.
+
 
 
 
