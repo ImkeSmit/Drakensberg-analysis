@@ -442,30 +442,30 @@ The assembly of leaf area shifted from being no different from random assembly, 
 ```{r}
 #| message: false
 #| echo: false
-#| label: fig-SES-elevation-ridges
-#| fig-cap: "Distributions of standard effect sizes (SES) calculated with plant height, SLA, LDMC and leaf area along an elevational gradient. SES calculated with plant height, LDMC and leaf area used the traits on the log scale."
+#| label: fig-C5_SES-elevation-ridges
+#| fig-cap: "Distributions of standard effect sizes (SES) from the C% entire pool null model calculated with plant height, SLA, LDMC and leaf area along the elevational gradient. SES calculated with plant height, LDMC and leaf area used the traits on the log scale."
 #| warning: false
 
 
 l1 <- c("log_Height" = "SES~of~plant~height", "SLA" = "SES~of~SLA", "log_LDMC" = "SES~of~LDMC", "log_LA" = "SES~of~LA")
 ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), rep("log_LDMC", 3),rep("log_LA", 3)), 
                              elevation = as.factor(c(rep(c("2000", "2500", "3000"), 4))),
-                             letters = c(SES_ele_cld$log_Height$.group, 
-                                         SES_ele_cld$SLA$.group, 
-                                         SES_ele_cld$log_LDMC$.group, 
-                                         SES_ele_cld$log_LA$.group), 
+                             letters = c(C5_SES_ele_cld$log_Height$.group, 
+                                         C5_SES_ele_cld$SLA$.group, 
+                                         C5_SES_ele_cld$log_LDMC$.group, 
+                                         C5_SES_ele_cld$log_LA$.group), 
                              x_pos = c(4.5, 4.5, 4.5,
                                        4.5,4.5,4.5, 
                                        9,9,9,
                                        8.1,8.1,8.1), 
-                             emmean = c(SES_ele_cld$log_Height$emmean,
-                                        SES_ele_cld$SLA$emmean,
-                                        SES_ele_cld$log_LDMC$emmean,
-                                        SES_ele_cld$log_LA$emmean), 
-                             emmean_SE = c(SES_ele_cld$log_Height$SE,
-                                           SES_ele_cld$SLA$SE,
-                                           SES_ele_cld$log_LDMC$SE,
-                                           SES_ele_cld$log_LA$SE))
+                             emmean = c(C5_SES_ele_cld$log_Height$emmean,
+                                        C5_SES_ele_cld$SLA$emmean,
+                                        C5_SES_ele_cld$log_LDMC$emmean,
+                                        C5_SES_ele_cld$log_LA$emmean), 
+                             emmean_SE = c(C5_SES_ele_cld$log_Height$SE,
+                                           C5_SES_ele_cld$SLA$SE,
+                                           C5_SES_ele_cld$log_LDMC$SE,
+                                           C5_SES_ele_cld$log_LA$SE))
 
 ses_ridges <- comb |>
   filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
@@ -496,6 +496,69 @@ ses_ridges <- comb |>
 
 ses_ridges
 ```
+
+```{r}
+#| message: false
+#| echo: false
+#| label: fig-C2_SES-elevation-ridges
+#| fig-cap: "Distributions of standard effect sizes (SES) from the C2 site pool null model calculated with plant height, SLA, LDMC and leaf area along the elevational gradient. SES calculated with plant height, LDMC and leaf area used the traits on the log scale."
+#| warning: false
+
+
+l1 <- c("log_Height" = "SES~of~plant~height", "SLA" = "SES~of~SLA", "log_LDMC" = "SES~of~LDMC", "log_LA" = "SES~of~LA")
+ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), rep("log_LDMC", 3),rep("log_LA", 3)), 
+                             elevation = as.factor(c(rep(c("2000", "2500", "3000"), 4))),
+                             letters = c(C2_SES_ele_cld$log_Height$.group, 
+                                         C2_SES_ele_cld$SLA$.group, 
+                                         C2_SES_ele_cld$log_LDMC$.group, 
+                                         C2_SES_ele_cld$log_LA$.group), 
+                             x_pos = c(4.5, 4.5, 4.5,
+                                       4.5,4.5,4.5, 
+                                       9,9,9,
+                                       8.1,8.1,8.1), 
+                             emmean = c(C2_SES_ele_cld$log_Height$emmean,
+                                        C2_SES_ele_cld$SLA$emmean,
+                                        C2_SES_ele_cld$log_LDMC$emmean,
+                                        C2_SES_ele_cld$log_LA$emmean), 
+                             emmean_SE = c(C2_SES_ele_cld$log_Height$SE,
+                                           C2_SES_ele_cld$SLA$SE,
+                                           C2_SES_ele_cld$log_LDMC$SE,
+                                           C2_SES_ele_cld$log_LA$SE))
+
+C2_ses_ridges <- C2_comb |>
+  filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
+  mutate(elevation = as.factor(elevation)) |> 
+  ggplot(aes(x = SES, y = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", 
+             strip.position = "bottom")+
+  labs(x = " ", y = "Elevation (m a.s.l.)") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  geom_point(
+    data = ridges_letters,
+    aes(x = emmean, y = as.numeric(elevation)),
+    size = 2, inherit.aes = FALSE) +
+  geom_errorbarh(
+    data = ridges_letters,
+    aes(xmin = emmean - emmean_SE,
+        xmax = emmean + emmean_SE,
+        y = as.numeric(elevation)),
+    height = 0.08,
+    linewidth = 1, inherit.aes = FALSE)+
+  theme_bw() +
+  theme(legend.position = "none", axis.title = element_text(size = 18), 
+        axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
+        strip.background = element_blank(),
+        strip.placement = "outside", panel.grid = element_blank()) 
+
+C2_ses_ridges
+
+```
+
+
+
+
 
 ```{r}
 #| label: fig-CWM-elevation-ridges
