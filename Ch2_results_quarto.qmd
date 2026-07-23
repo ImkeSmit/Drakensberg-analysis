@@ -556,10 +556,6 @@ C2_ses_ridges
 
 ```
 
-
-
-
-
 ```{r}
 #| label: fig-CWM-elevation-ridges
 #| fig-cap: Community-weighted mean traits of cells at the low, mid and high elevation. Height, LDMC and leaf area are on the log scale.
