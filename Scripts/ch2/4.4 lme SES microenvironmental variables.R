@@ -313,7 +313,7 @@ C2_ele_comb <- pos |>
   inner_join(C2_cell_ses_poolsite, by = "Cell_ID", relationship = "one-to-many") 
 
 #Run the loop for all traits
-traitlist <- c("log_Height", "log_LDMC", "log_LA", "SLA")
+traitlist <- c("Height_cm", "LDMC", "Leaf_area_mm2","SLA",  "log_Height", "log_LDMC", "log_LA", "log_SLA")
 #lists to store results in
 C2_SES_ele_summary <- vector(mode= "list", length = length(traitlist))
 names(C2_SES_ele_summary) = traitlist
