@@ -207,7 +207,7 @@ C5_cell_ses_poolentire <- read.csv("All_data/comm_assembly_results/SES_RQ_weight
   rename(Cell_ID = cellref) 
 
 ##Combine SES and environmental data
-comb <- pos |> 
+C5_ele_comb <- pos |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
   inner_join(C5_cell_ses_poolentire, by = "Cell_ID", relationship = "one-to-many") |> 
   mutate(elevation = as.factor(elevation), 
@@ -230,7 +230,7 @@ C5_SES_ele_cld<- vector(mode= "list", length = length(traitlist))
 names(C5_SES_ele_cld) = traitlist
 
 for (t in 1:length(traitlist)) {
-  modeldat <-  comb |> 
+  modeldat <-  C5_ele_comb |> 
     filter(trait == traitlist[t]) |> 
     drop_na()
   
@@ -250,6 +250,7 @@ for (t in 1:length(traitlist)) {
   C5_SES_ele_cld[[t]] <- comp_letters
   
 }
+rm(modeldat, model) #remove before next loop to make sure we don't carry over the wrong object
 
 ###Using the logged traits are generally better for model diagnostics than the raw traits
 ##BUT the leaf area diagnostics are still very bad
@@ -266,7 +267,7 @@ C5_cell_ses_poolsite <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted
 
 
 ##Combine SES and environmental data
-comb2 <- env2 |> 
+C5_microenv_comb <- env2 |> 
   #join to microclimate indices |> 
   full_join(micro_idw, by = "Cell_ID") |> 
   #join to remote sensing data |> 
@@ -288,10 +289,11 @@ C5_SES_microenv_Rsq<- vector(mode= "list", length = length(traitlist) * length(s
 
 C5_SES_microenv_anova<- vector(mode= "list", length = length(traitlist) * length(sitelist))
 
+
 l = 1
 for (t in 1:length(traitlist)) {
   for(s in 1:length(sitelist)) {
-  modeldat <-  comb2 |> 
+  modeldat <-  C5_microenv_comb |> 
     filter(trait == traitlist[t], 
            site == sitelist[s]) |> 
     drop_na()
@@ -315,6 +317,8 @@ for (t in 1:length(traitlist)) {
   l = l+1
 
   }}
+rm(modeldat, model) #remove before next loop to make sure we don't carry over the wrong object
+
 
 
 
@@ -328,7 +332,7 @@ C2_cell_ses_poolsite <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted
 
 
 ##Combine SES and environmental data
-C2_comb <- pos |> 
+C2_ele_comb <- pos |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
   inner_join(C2_cell_ses_poolsite, by = "Cell_ID", relationship = "one-to-many") 
 
@@ -348,7 +352,7 @@ C2_SES_ele_cld<- vector(mode= "list", length = length(traitlist))
 names(C2_SES_ele_cld) = traitlist
 
 for (t in 1:length(traitlist)) {
-  modeldat <-  C2_comb |> 
+  modeldat <-  C2_ele_comb |> 
     filter(trait == traitlist[t]) |> 
     drop_na()
   
@@ -366,6 +370,8 @@ for (t in 1:length(traitlist)) {
   C2_SES_ele_cld[[t]] <- comp_letters
   
 }
+rm(modeldat, model) #remove before next loop to make sure we don't carry over the wrong object
+
 
 
 
@@ -379,7 +385,7 @@ C2_cell_ses_poolsite <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted
 
 
 ##Combine SES and environmental data
-C2_comb2 <- env2 |> 
+C2_microenv_comb <- env2 |> 
   #join to microclimate indices |> 
   full_join(micro_idw, by = "Cell_ID") |> 
   #join to remote sensing data |> 
@@ -405,7 +411,7 @@ C2_SES_microenv_anova<- vector(mode= "list", length = length(traitlist) * length
 l = 1
 for (t in 1:length(traitlist)) {
   for(s in 1:length(sitelist)) {
-    modeldat <-  C2_comb2 |> 
+    modeldat <-  C2_microenv_comb |> 
       filter(trait == traitlist[t], 
              site == sitelist[s]) |> 
       drop_na()
@@ -430,6 +436,7 @@ for (t in 1:length(traitlist)) {
     l = l+1
     
   }}
+rm(modeldat, model) #remove before next loop to make sure we don't carry over the wrong object
 
 ```
 
@@ -438,6 +445,8 @@ for (t in 1:length(traitlist)) {
 `r comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` Cells were included in the analysis. Elevation did not have a consistent effect on the community assembly of different plant traits (@fig-SES-elevation-ridges). Elevation shifted the assembly of plant height and LDMC from environmental filtering at the low elevation, to limiting similarity at the high elevation [(Is this limiting similarity or due to greater env. heterogeneity at the high site?)]{.underline}. Although communities generally became shorter with elevation (@fig-CWM-elevation-ridges a), the diversity of plant height was highest at the high elevation (@fig-RaoQ-elevation-ridges), indicating the presence of very short as well as very tall plants in the alpine. There was strong filtering for high LDMC values at the low elevation (indicated by the narrow CWM distribution). This filtering effect was weaker at the mid elevation, and selected for lower LDMC values on average. The assembly of LDMC shifted to trait divergence at the highest elevation, but once again showed on average more conservative strategies than at the mid elevation (@fig-CWM-elevation-ridges).
 
 The assembly of leaf area shifted from being no different from random assembly, to environmental filtering at the mid and high elevation @fig-SES-elevation-ridges. Filtering was in the direction of larger leaves at the mid elevation, and smaller leaves at the high elevation (@fig-CWM-elevation-ridges). Environmental filtering was the dominant assembly mechanism at all elevations for SLA, although the filtering effect of SLA was weakest at the mid elevation (@fig-SES-elevation-ridges). SLA was filtered toward conservative leaf-economic strategies at the low and high elevation, but more acquisitive strategies at the mid elevation (@fig-CWM-elevation-ridges).
+
+C2 results show filtering at all elevations for all traits - reafirming that env filtering is teh dominant mechanism.
 
 ```{r}
 #| message: false
