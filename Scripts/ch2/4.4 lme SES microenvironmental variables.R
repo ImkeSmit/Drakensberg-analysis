@@ -68,7 +68,7 @@ C5_ele_comb <- pos |>
   
 #These variables have the best diagnostics
 #LA and SLA still have TERRIBLE DIAGNOSTICS
-traitlist <- c("log_Height", "log_LDMC", "log_LA", "SLA")
+traitlist <- c("Height_cm", "LDMC", "Leaf_area_mm2","SLA",  "log_Height", "log_LDMC", "log_LA", "log_SLA")
 #lists to store results in
 C5_SES_ele_summary <- vector(mode= "list", length = length(traitlist))
 names(C5_SES_ele_summary) = traitlist
@@ -96,7 +96,7 @@ for (t in 1:length(traitlist)) {
   ###Save check_model plot
   plot_file <- paste0("All_data/comm_assembly_results/C5_null_model_results/checkmodel_SES_elevation/checkmodel_lme_SES_", traitlist[t], "_elevation.png")
   png(plot_file, width = 1600, height = 1200, res = 150)
-  print(check_model(model))   # print() forces the plot to actually draw to the device
+  print(check_model(model, check = c("linearity", "homogeneity", "qq")))   # print() forces the plot to actually draw to the device
   dev.off()
   
   ###Save model results
