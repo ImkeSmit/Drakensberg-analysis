@@ -204,6 +204,7 @@ rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |>
 #import interpolated microclimate indices
 micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
 
+
 ###=========================================###
 ###Loop to run SES~elevation for all traits####
 ###=====C5 NULL MODEL, pool = entire========####
@@ -215,13 +216,11 @@ C5_cell_ses_poolentire <- read.csv("All_data/comm_assembly_results/SES_RQ_weight
 ##Combine SES and environmental data
 C5_ele_comb <- pos |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
-  inner_join(C5_cell_ses_poolentire, by = "Cell_ID", relationship = "one-to-many") |> 
-  mutate(elevation = as.factor(elevation), 
-           grid = as.factor(grid))
+  inner_join(C5_cell_ses_poolentire, by = "Cell_ID", relationship = "one-to-many") 
   
 #These variables have the best diagnostics
 #LA and SLA still have TERRIBLE DIAGNOSTICS
-traitlist <- c("log_Height", "log_LDMC", "log_LA", "SLA")
+traitlist <- c("Height_cm", "LDMC", "Leaf_area_mm2","SLA",  "log_Height", "log_LDMC", "log_LA", "log_SLA")
 #lists to store results in
 C5_SES_ele_summary <- vector(mode= "list", length = length(traitlist))
 names(C5_SES_ele_summary) = traitlist
@@ -246,9 +245,8 @@ for (t in 1:length(traitlist)) {
                   correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
                   data = modeldat) #only gaussian family possible
   
-  em_model <- emmeans(model, specs = "elevation", type = "response")
-  comp_letters <-cld(em_model, Letters = letters, adjust = "Tukey", sort = FALSE)
-
+  
+  
   #Also save results in a list object so we can call it with quarto
   C5_SES_ele_summary[[t]] <- summary(model)
   C5_SES_ele_Rsq[[t]] <- r.squaredGLMM(model)
@@ -256,7 +254,7 @@ for (t in 1:length(traitlist)) {
   C5_SES_ele_cld[[t]] <- comp_letters
   
 }
-rm(modeldat, model) #remove before next loop to make sure we don't carry over the wrong object
+rm(model, modeldat) #remove to make sure we don't carry the wrong object over
 
 ###Using the logged traits are generally better for model diagnostics than the raw traits
 ##BUT the leaf area diagnostics are still very bad
@@ -264,6 +262,7 @@ rm(modeldat, model) #remove before next loop to make sure we don't carry over th
 
 
 
+###===========================================================###
 ###Loop to run SES~microenvironmental variables for all traits####
 ###=============C5 NULL MODEL, pool = site====================####
 ###===========================================================###
@@ -281,12 +280,12 @@ C5_microenv_comb <- env2 |>
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
   full_join(C5_cell_ses_poolsite, by = "Cell_ID", relationship = "one-to-many") |> 
   mutate(elevation = as.factor(elevation), 
-           grid = as.factor(grid))
+         grid = as.factor(grid))
 
 
 ###Loop starts here####
 #These variables have the best diagnostics after comparing diagnostic plots of log and raw variables
-traitlist <- c("Height_cm","Leaf_area_mm2", "log_LDMC","SLA")
+traitlist <- c("Height_cm", "LDMC", "Leaf_area_mm2","SLA",  "log_Height", "log_LDMC", "log_LA", "log_SLA")
 sitelist <- c("GG", "WH", "BK")
 #lists to store results in
 C5_SES_microenv_summary <- vector(mode= "list", length = length(traitlist) * length(sitelist))
@@ -294,7 +293,6 @@ C5_SES_microenv_summary <- vector(mode= "list", length = length(traitlist) * len
 C5_SES_microenv_Rsq<- vector(mode= "list", length = length(traitlist) * length(sitelist))
 
 C5_SES_microenv_anova<- vector(mode= "list", length = length(traitlist) * length(sitelist))
-
 
 l = 1
 for (t in 1:length(traitlist)) {
@@ -323,7 +321,8 @@ for (t in 1:length(traitlist)) {
   l = l+1
 
   }}
-rm(modeldat, model) #remove before next loop to make sure we don't carry over the wrong object
+rm(model, modeldat)
+
 
 
 
@@ -343,7 +342,7 @@ C2_ele_comb <- pos |>
   inner_join(C2_cell_ses_poolsite, by = "Cell_ID", relationship = "one-to-many") 
 
 #Run the loop for all traits
-traitlist <- c("log_Height", "log_LDMC", "log_LA", "SLA")
+traitlist <- c("Height_cm", "LDMC", "Leaf_area_mm2","SLA",  "log_Height", "log_LDMC", "log_LA", "log_SLA")
 #lists to store results in
 C2_SES_ele_summary <- vector(mode= "list", length = length(traitlist))
 names(C2_SES_ele_summary) = traitlist
@@ -356,6 +355,7 @@ names(C2_SES_ele_anova) = traitlist
 
 C2_SES_ele_cld<- vector(mode= "list", length = length(traitlist))
 names(C2_SES_ele_cld) = traitlist
+
 
 for (t in 1:length(traitlist)) {
   modeldat <-  C2_ele_comb |> 
@@ -376,8 +376,7 @@ for (t in 1:length(traitlist)) {
   C2_SES_ele_cld[[t]] <- comp_letters
   
 }
-rm(modeldat, model) #remove before next loop to make sure we don't carry over the wrong object
-
+rm(model, modeldat) #remove to be safe
 
 
 
@@ -405,7 +404,7 @@ C2_microenv_comb <- env2 |>
 
 ###Loop starts here####
 #Run the loop for all traits
-traitlist <- c("Height_cm", "log_LDMC", "Leaf_area_mm2", "SLA")
+traitlist <- c("log_Height", "log_LDMC", "log_LA", "log_SLA", "Height_cm", "LDMC", "Leaf_area_mm2", "SLA")
 sitelist <- c("GG", "WH", "BK")
 #lists to store results in
 C2_SES_microenv_summary <- vector(mode= "list", length = length(traitlist) * length(sitelist))
@@ -442,7 +441,6 @@ for (t in 1:length(traitlist)) {
     l = l+1
     
   }}
-rm(modeldat, model) #remove before next loop to make sure we don't carry over the wrong object
 
 ```
 
