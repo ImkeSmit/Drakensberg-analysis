@@ -245,7 +245,9 @@ for (t in 1:length(traitlist)) {
                   correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
                   data = modeldat) #only gaussian family possible
   
-  
+  #emmeans and letters
+  em_model <- emmeans(model, specs = "elevation", type = "response")
+  comp_letters <-cld(em_model, Letters = letters, adjust = "Tukey", sort = FALSE)
   
   #Also save results in a list object so we can call it with quarto
   C5_SES_ele_summary[[t]] <- summary(model)
