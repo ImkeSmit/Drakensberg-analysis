@@ -171,7 +171,9 @@ pos <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
                                site == "BK" ~ 3000,
                                .default = NA)) |> 
   mutate(ncolumn = match(column, LETTERS[1:8]), 
-         grid = paste0(site, grid)) |> #each grid must have a unique id 
+         grid = paste0(site, grid), 
+         elevation = as.factor(elevation), 
+         grid = as.factor(grid)) |> #each grid must have a unique id 
   rename(x_coord = ncolumn, 
          y_coord = row)
 
@@ -188,7 +190,9 @@ env2 <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental
                                site == "BK" ~ 3000,
                                .default = NA)) |> 
   mutate(ncolumn = match(column, LETTERS[1:8]),  #also add x and y coordinates
-         grid = paste0(site, grid)) |> #each grid must have a unique id 
+         grid = paste0(site, grid), 
+        elevation = as.factor(elevation), 
+        grid = as.factor(grid)) |> #each grid must have a unique id 
   rename(x_coord = ncolumn, 
          y_coord = row)
 
