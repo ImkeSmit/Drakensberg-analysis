@@ -932,27 +932,27 @@ GG_microenv_plot
 #| echo: false
 #| warning: false
 
-GG_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
+WH_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
                          variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil depth", "surface heterogeneity")) |> 
   mutate(
-    coefficient = c(C5_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
-    C5_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
-    C5_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
-    C5_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6],
-    C2_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
-    C2_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
-    C2_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
-    C2_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6]), 
+    coefficient = c(C5_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$SLA_WH$coefficients$fixed[2:6],
+    C2_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$SLA_WH$coefficients$fixed[2:6]), 
 
-    std_error = c(C5_SES_microenv_summary$Height_cm_GG$tTable[2:6,2], 
-    C5_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:6,2], 
-    C5_SES_microenv_summary$log_LDMC_GG$tTable[2:6,2], 
-    C5_SES_microenv_summary$SLA_GG$tTable[2:6,2],
-    C2_SES_microenv_summary$Height_cm_GG$tTable[2:6,2], 
-    C2_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:6,2], 
-    C2_SES_microenv_summary$log_LDMC_GG$tTable[2:6,2], 
-    C2_SES_microenv_summary$SLA_GG$tTable[2:6,2])) |>  
+    std_error = c(C5_SES_microenv_summary$Height_cm_WH$tTable[2:6,2], 
+    C5_SES_microenv_summary$Leaf_area_mm2_WH$tTable[2:6,2], 
+    C5_SES_microenv_summary$log_LDMC_WH$tTable[2:6,2], 
+    C5_SES_microenv_summary$SLA_WH$tTable[2:6,2],
+    C2_SES_microenv_summary$Height_cm_WH$tTable[2:6,2], 
+    C2_SES_microenv_summary$Leaf_area_mm2_WH$tTable[2:6,2], 
+    C2_SES_microenv_summary$log_LDMC_WH$tTable[2:6,2], 
+    C2_SES_microenv_summary$SLA_WH$tTable[2:6,2])) |>  
     mutate(
     lower_ci = coefficient - 1.96*std_error, 
     upper_ci = coefficient + 1.96*std_error)
@@ -960,7 +960,7 @@ GG_microenv_results <- expand_grid(null_model = c("C5", "C2"),
 
                     
 l1 <- c("Height_cm" = "Height", "SLA" = "SLA", "LDMC" = "LDMC", "Leaf_area_mm2" = "LA")
-GG_microenv_plot <- GG_microenv_results |> 
+WH_microenv_plot <- WH_microenv_results |> 
   ggplot(aes(x = coefficient, y = variable, color = null_model)) +
   geom_point(position = position_dodge(width = 0.5)) +
   geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0, 
@@ -972,7 +972,7 @@ GG_microenv_plot <- GG_microenv_results |>
   theme_bw() +
   labs(y = " ", x = "Slope estimate", color = "Null model") +
   theme(panel.grid = element_blank())
-GG_microenv_plot
+WH_microenv_plot
 
 ```
 
