@@ -896,11 +896,12 @@ C2_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6]))
 
                     
 
-GG_microenv_plot <- testable |> 
-  ggplot(aes(x = coefficient, y = variable)) +
+GG_microenv_plot <- testable2 |> 
+  ggplot(aes(x = coefficient, y = variable, color = null_model)) +
   geom_point() +
-  facet_wrap(~trait)
-
+  facet_wrap(~trait) +
+  theme_bw()
+GG_microenv_plot
 
 
   
