@@ -1027,6 +1027,113 @@ BK_microenv_plot
 ```
 
 ```{r}
+#| label: fig-allsites-microenv_C5_C2
+#| tbl-cap: Effects of microenvironmental variables on assembly of traits at the mid site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait and each null model
+#| echo: false
+#| warning: false
+
+#Create tables of coeffieicents for each site, it is easier to manage this way
+GG_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
+                         trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
+                         variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil depth", "surface heterogeneity")) |> 
+  mutate(
+    coefficient = c(C5_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6],
+    C2_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6]), 
+
+    std_error = c(C5_SES_microenv_summary$Height_cm_GG$tTable[2:6,2], 
+    C5_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:6,2], 
+    C5_SES_microenv_summary$log_LDMC_GG$tTable[2:6,2], 
+    C5_SES_microenv_summary$SLA_GG$tTable[2:6,2],
+    C2_SES_microenv_summary$Height_cm_GG$tTable[2:6,2], 
+    C2_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:6,2], 
+    C2_SES_microenv_summary$log_LDMC_GG$tTable[2:6,2], 
+    C2_SES_microenv_summary$SLA_GG$tTable[2:6,2])) |>  
+    mutate(
+    lower_ci = coefficient - 1.96*std_error, 
+    upper_ci = coefficient + 1.96*std_error)
+
+WH_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
+                         trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
+                         variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil depth", "surface heterogeneity")) |> 
+  mutate(
+    coefficient = c(C5_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$SLA_WH$coefficients$fixed[2:6],
+    C2_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$SLA_WH$coefficients$fixed[2:6]), 
+
+    std_error = c(C5_SES_microenv_summary$Height_cm_WH$tTable[2:6,2], 
+    C5_SES_microenv_summary$Leaf_area_mm2_WH$tTable[2:6,2], 
+    C5_SES_microenv_summary$log_LDMC_WH$tTable[2:6,2], 
+    C5_SES_microenv_summary$SLA_WH$tTable[2:6,2],
+    C2_SES_microenv_summary$Height_cm_WH$tTable[2:6,2], 
+    C2_SES_microenv_summary$Leaf_area_mm2_WH$tTable[2:6,2], 
+    C2_SES_microenv_summary$log_LDMC_WH$tTable[2:6,2], 
+    C2_SES_microenv_summary$SLA_WH$tTable[2:6,2])) |>  
+    mutate(
+    lower_ci = coefficient - 1.96*std_error, 
+    upper_ci = coefficient + 1.96*std_error)
+
+BK_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
+                         trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
+                         variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil depth", "surface heterogeneity")) |> 
+  mutate(
+    coefficient = c(C5_SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$log_LDMC_BK$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$SLA_BK$coefficients$fixed[2:6],
+    C2_SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$log_LDMC_BK$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$SLA_BK$coefficients$fixed[2:6]), 
+
+    std_error = c(C5_SES_microenv_summary$Height_cm_BK$tTable[2:6,2], 
+    C5_SES_microenv_summary$Leaf_area_mm2_BK$tTable[2:6,2], 
+    C5_SES_microenv_summary$log_LDMC_BK$tTable[2:6,2], 
+    C5_SES_microenv_summary$SLA_BK$tTable[2:6,2],
+    C2_SES_microenv_summary$Height_cm_BK$tTable[2:6,2], 
+    C2_SES_microenv_summary$Leaf_area_mm2_BK$tTable[2:6,2], 
+    C2_SES_microenv_summary$log_LDMC_BK$tTable[2:6,2], 
+    C2_SES_microenv_summary$SLA_BK$tTable[2:6,2])) |>  
+    mutate(
+    lower_ci = coefficient - 1.96*std_error, 
+    upper_ci = coefficient + 1.96*std_error)
+
+
+#bind all tabes together
+allsites_microenv <- bind_rows(GG_microenv_results, WH_microenv_results, BK_microenv_results) |> 
+  mutate(site = c(rep("low", nrow(GG_microenv_results)), rep("mid", nrow(WH_microenv_results)), rep("high", nrow(BK_microenv_results))), 
+         site = factor(site, levels = c("low", "mid", "high")))
+
+l1 <- c("Height_cm" = "Height", "SLA" = "SLA", "LDMC" = "LDMC", "Leaf_area_mm2" = "LA", "low" = "low", "mid" = "mid", "high" = "high")
+allsites_microenv_plot <- allsites_microenv |> 
+  ggplot(aes(x = coefficient, y = variable, color = null_model)) +
+  geom_point(position = position_dodge(width = 0.5)) +
+  geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0, 
+                position = position_dodge(width = 0.5), 
+                orientation = "y")+
+  scale_color_manual(values = c("C5" = "black", "C2" = "grey50"))+
+  geom_vline(xintercept = 0, linetype = "dashed")+
+  facet_grid(site~trait
+             , labeller = as_labeller(l1, default = label_parsed)
+             ) +
+  theme_bw() +
+  labs(y = " ", x = "Slope estimate", color = "Null model") +
+  theme(panel.grid = element_blank())
+allsites_microenv_plot
+
+```
+
+```{r}
 #| label: fig-CWM-microenvironmental-scatterplots
 #| fig-cap: Direction of environmental filtering by micro-environmental variables on community-weighted mean traits at the low (a,b), mid site (c) and high elevation (d). LDMC is shown on the log scale.
 #| echo: false
