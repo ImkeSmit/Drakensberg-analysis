@@ -874,33 +874,51 @@ C2_R2_table |>
 ```
 
 ```{r}
-#| label: tbl-GG-microenv_C5
-#| tbl-cap: Effects of microenvironmental variables on assembly of traits at the low site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait.
+#| label: fig-GG-microenv_C5_C2
+#| tbl-cap: Effects of microenvironmental variables on assembly of traits at the low site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait and with each null model.
 #| echo: false
 #| warning: false
 
-conflicts_prefer(flextable::compose)
-
-testable2 <- expand_grid(null_model = c("C5", "C2"), 
+GG_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
                          variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil depth", "surface heterogeneity")) |> 
-  mutate(coefficient = c(C5_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
-C5_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
-C5_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
-C5_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6],
-C2_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
-C2_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
-C2_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
-C2_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6]))
+  mutate(
+    coefficient = c(C5_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6],
+    C2_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6]), 
+
+    std_error = c(C5_SES_microenv_summary$Height_cm_GG$tTable[2:6,2], 
+    C5_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:6,2], 
+    C5_SES_microenv_summary$log_LDMC_GG$tTable[2:6,2], 
+    C5_SES_microenv_summary$SLA_GG$tTable[2:6,2],
+    C2_SES_microenv_summary$Height_cm_GG$tTable[2:6,2], 
+    C2_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:6,2], 
+    C2_SES_microenv_summary$log_LDMC_GG$tTable[2:6,2], 
+    C2_SES_microenv_summary$SLA_GG$tTable[2:6,2])) |>  
+    mutate(
+    lower_ci = coefficient - 1.96*std_error, 
+    upper_ci = coefficient + 1.96*std_error)
 
 
                     
-
-GG_microenv_plot <- testable2 |> 
+l1 <- c("Height_cm" = "Height", "SLA" = "SLA", "LDMC" = "LDMC", "Leaf_area_mm2" = "LA")
+GG_microenv_plot <- GG_microenv_results |> 
   ggplot(aes(x = coefficient, y = variable, color = null_model)) +
-  geom_point() +
-  facet_wrap(~trait) +
-  theme_bw()
+  geom_point(position = position_dodge(width = 0.5)) +
+  geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0, 
+                position = position_dodge(width = 0.5), 
+                orientation = "y")+
+  scale_color_manual(values = c("C5" = "black", "C2" = "grey50"))+
+  geom_vline(xintercept = 0, linetype = "dashed")+
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed)) +
+  theme_bw() +
+  labs(y = " ", x = "Slope estimate", color = "Null model") +
+  theme(panel.grid = element_blank())
 GG_microenv_plot
 
 
@@ -909,53 +927,52 @@ GG_microenv_plot
 ```
 
 ```{r}
-#| label: tbl-WH-microenv
-#| tbl-cap: Effects of microenvironmental variables on assembly of traits at the mid site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait.
+#| label: fig-WH-microenv_C5_C2
+#| tbl-cap: Effects of microenvironmental variables on assembly of traits at the mid site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait and each null model
 #| echo: false
 #| warning: false
 
-WH_microenv_reults <- tibble(variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil     depth", "surface heterogeneity"), 
-                height_coef = SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:6], 
-                height_pval = SES_microenv_anova$Height_cm_WH$`p-value`[2:6], 
-                la_coef = SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:6], 
-                la_pval = SES_microenv_anova$Leaf_area_mm2_WH$`p-value`[2:6],
-                ldmc_coef = SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:6], 
-                ldmc_pval = SES_microenv_anova$log_LDMC_WH$`p-value`[2:6],
-                sla_coef = SES_microenv_summary$SLA_WH$coefficients$fixed[2:6], 
-                sla_pval = SES_microenv_anova$SLA_WH$`p-value`[2:6])
+GG_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
+                         trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
+                         variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil depth", "surface heterogeneity")) |> 
+  mutate(
+    coefficient = c(C5_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6],
+    C2_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6]), 
+
+    std_error = c(C5_SES_microenv_summary$Height_cm_GG$tTable[2:6,2], 
+    C5_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:6,2], 
+    C5_SES_microenv_summary$log_LDMC_GG$tTable[2:6,2], 
+    C5_SES_microenv_summary$SLA_GG$tTable[2:6,2],
+    C2_SES_microenv_summary$Height_cm_GG$tTable[2:6,2], 
+    C2_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:6,2], 
+    C2_SES_microenv_summary$log_LDMC_GG$tTable[2:6,2], 
+    C2_SES_microenv_summary$SLA_GG$tTable[2:6,2])) |>  
+    mutate(
+    lower_ci = coefficient - 1.96*std_error, 
+    upper_ci = coefficient + 1.96*std_error)
 
 
-WH_microenv_reults |> 
-      flextable() |> 
-  colformat_double(j = 2:9, digits = 3) |>
-  compose(j = "height_pval", value = as_paragraph(ifelse(height_pval < 0.001, "<0.001", sprintf("%.3f", height_pval)))) |>
-  compose(j = "la_pval",     value = as_paragraph(ifelse(la_pval < 0.001,     "<0.001", sprintf("%.3f", la_pval)))) |>
-  compose(j = "ldmc_pval",   value = as_paragraph(ifelse(ldmc_pval < 0.001,   "<0.001", sprintf("%.3f", ldmc_pval)))) |>
-  compose(j = "sla_pval",    value = as_paragraph(ifelse(sla_pval < 0.001,    "<0.001", sprintf("%.3f", sla_pval)))) |>
-  set_header_labels(variable = "Variable", 
-                    height_coef = "coefficient", 
-                   height_pval = "p-value", 
-                   la_coef = "coefficient", 
-                   la_pval = "p-value", 
-                   ldmc_coef = "coefficient", 
-                   ldmc_pval = "p-value", 
-                   sla_coef = "coefficient", 
-                   sla_pval = "p-value") |> 
-  add_header_row(
-    values    = c("Trait", "Height", "Leaf area", "LDMC", "SLA"),
-    colwidths = c(1, 2, 2, 2, 2),
-    top       = TRUE) |> 
-  merge_v(j = 1, part = "header") |>
-  align(align = "center", part = "header") |>
-  align(align = "center", part = "body", j = 2:9) |>
-  valign(valign = "bottom", part = "header") |>
-  bold(i = ~ height_pval < 0.05, j = "height_pval") |>
-  bold(i = ~ la_pval < 0.05,     j = "la_pval") |>
-  bold(i = ~ ldmc_pval < 0.05,   j = "ldmc_pval") |>
-  bold(i = ~ sla_pval < 0.05,    j = "sla_pval") |>
-  theme_vanilla() |>
-  autofit() |>
-  fit_to_width(max_width = 6.5)
+                    
+l1 <- c("Height_cm" = "Height", "SLA" = "SLA", "LDMC" = "LDMC", "Leaf_area_mm2" = "LA")
+GG_microenv_plot <- GG_microenv_results |> 
+  ggplot(aes(x = coefficient, y = variable, color = null_model)) +
+  geom_point(position = position_dodge(width = 0.5)) +
+  geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0, 
+                position = position_dodge(width = 0.5), 
+                orientation = "y")+
+  scale_color_manual(values = c("C5" = "black", "C2" = "grey50"))+
+  geom_vline(xintercept = 0, linetype = "dashed")+
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed)) +
+  theme_bw() +
+  labs(y = " ", x = "Slope estimate", color = "Null model") +
+  theme(panel.grid = element_blank())
+GG_microenv_plot
 
 ```
 
