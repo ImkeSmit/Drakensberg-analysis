@@ -773,11 +773,7 @@ raoq_ridges <- C5_ele_comb |> #doesn't matter which df we use here, observed Rao
 raoq_ridges
 ```
 
-Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (@tbl-R2-models-C5, @tbl-R2-models-C2).
-
-At the low site, soil temperature filtered size traits (height and leaf area) to shorter plants and smaller leaves (@tbl-GG-microenv, @fig-CWM-microenvironmental-scatterplots a,b). Surface heterogeneity was related to divergence of height, while soil moisture and soil depth were related to divergence in leaf area (@tbl-GG-microenv). At the mid site, rock cover was related to divergence of height and LDMC, while soil depth and surface heterogeneity was related to divergence in leaf area (@tbl-WH-microenv). Soil moisture was related to filtering of LDMC (@tbl-WH-microenv), although this filtering effect was not strongly directional (LDMC did not change with soil moisture, @fig-CWM-microenvironmental-scatterplots d). Soil depth was related to the filtering of SLA toward more acquisitive leaf-economic strategies (@tbl-WH-microenv, @fig-CWM-microenvironmental-scatterplots c). At the high site, soil moisture and surface heterogeneity was related to divergence in plant height, and rock cover was related to divergence of leaf area @tbl-BK-microenv. Soil depth had a filtering effect on leaf area, but was not strongly directional (@fig-CWM-microenvironmental-scatterplots e). Surface heterogeneity was related to divergence of LDMC and SLA (@tbl-BK-microenv). Divergence of SLA at the high site was also related to rock cover and soil temperature @tbl-BK-microenv.
-
-Surface heterogeneity and rock cover were always related to divergence in size and leaf-economic traits. The directions of the effects of other micro-environmental variables on assembly were not consistent across sites.
+Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (@tbl-R2-models-C5, @tbl-R2-models-C2). Only surface heterogeneity had a somewaht consistent relationship with community assembly, often being related to higher than expected trait divergence (@fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits . Other micro-environmental factors had weak effects on community assembly.
 
 ```{r}
 #| label: tbl-R2-models_C5
@@ -953,7 +949,11 @@ BK_microenv_results <- expand_grid(null_model = c("C5", "C2"),
 #bind all tabes together
 allsites_microenv <- bind_rows(GG_microenv_results, WH_microenv_results, BK_microenv_results) |> 
   mutate(site = c(rep("low", nrow(GG_microenv_results)), rep("mid", nrow(WH_microenv_results)), rep("high", nrow(BK_microenv_results))), 
-         site = factor(site, levels = c("low", "mid", "high")))
+         site = factor(site, levels = c("low", "mid", "high"))) |> 
+  mutate(sign = if_else(lower_ci < 0 & upper_ci > 0,"N", "Y")) |> 
+  relocate(sign, .after = variable)
+
+write.csv(allsites_microenv, "All_data/comm_assembly_results/SES_microenv_model_results_table.csv")
 
 l1 <- c("Height_cm" = "Height", "SLA" = "SLA", "LDMC" = "LDMC", "Leaf_area_mm2" = "LA", "low" = "low", "mid" = "mid", "high" = "high")
 allsites_microenv_plot <- allsites_microenv |> 
@@ -964,14 +964,14 @@ allsites_microenv_plot <- allsites_microenv |>
                 orientation = "y")+
   scale_color_manual(values = c("C5" = "black", "C2" = "grey50"))+
   geom_vline(xintercept = 0, linetype = "dashed")+
-  facet_grid(site~trait
-             , labeller = as_labeller(l1, default = label_parsed)
-             ) +
+  facet_grid(site~trait,
+             labeller = as_labeller(l1, default = label_parsed)) +
   theme_bw() +
   labs(y = " ", x = "Slope estimate", color = "Null model") +
   theme(panel.grid = element_blank())
 allsites_microenv_plot
 
+ggsave("allsites_SES_microenv_coef.png", plot = allsites_microenv_plot, path = "Figures")
 ```
 
 ```{r}
