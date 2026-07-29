@@ -878,7 +878,7 @@ C2_R2_table |>
 
 ```{r}
 #| label: fig-allsites-microenv_C5_C2
-#| tbl-cap: Effects of microenvironmental variables on assembly of traits at the mid site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait and each null model
+#| tbl-cap: Effects of microenvironmental variables on assembly of traits at the mid site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait and each null model. Positive coefficients indicate that the variable is related to higher than expected trait divergence, while negative coefficients indicate thet the variable is related to higher than expected trait convergence. Stars indicate significant relationships. 
 #| echo: false
 #| warning: false
 #| width: 6.5
@@ -965,7 +965,7 @@ BK_microenv_results <- expand_grid(null_model = c("C5", "C2"),
 allsites_microenv <- bind_rows(GG_microenv_results, WH_microenv_results, BK_microenv_results) |> 
   mutate(site = c(rep("low", nrow(GG_microenv_results)), rep("mid", nrow(WH_microenv_results)), rep("high", nrow(BK_microenv_results))), 
          site = factor(site, levels = c("low", "mid", "high"))) |> 
-  mutate(sign = if_else(lower_ci < 0 & upper_ci > 0,"N", "Y")) |> 
+  mutate(sign = if_else(lower_ci < 0 & upper_ci > 0," ", "*")) |> 
   relocate(sign, .after = variable)
 
 write.csv(allsites_microenv, "All_data/comm_assembly_results/SES_microenv_model_results_table.csv")
@@ -980,6 +980,9 @@ allsites_microenv_plot <- allsites_microenv |>
                 orientation = "y")+
   scale_color_manual(values = c("C5" = "black", "C2" = "grey50"))+
   geom_vline(xintercept = 0, linetype = "dashed")+
+  geom_text(aes(x = 1, y = variable, label = sign),
+            size = 5, position = position_dodge(width = 0.5), 
+            show.legend = FALSE)+
   facet_grid(site~trait,
              labeller = as_labeller(l1, default = label_parsed)) +
   theme_bw() +
