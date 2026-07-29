@@ -56,7 +56,6 @@ Species composition and functional trait data were collected from three sites sp
 #| echo: false
 #| label: fig-sitemap
 #| fig-cap: "Site locations and sampling design in the Maloti-Drakensberg. a) Location of each of the three sites along the elevational gradient. b) Layout of the sampling grids at each site. c) A schematic of one sampling grid, consisting of 160 1 x 1m cells. This map was created in QGIS with Bing Maps Satellite Imagery."
-library(knitr)
 knitr::include_graphics("C:\\Users\\imke6\\Documents\\PhD 2025\\Spatial analysis\\Figure1_proposal_13Jul26.png")
 ```
 
@@ -451,7 +450,7 @@ for (t in 1:length(traitlist)) {
 
 # Results
 
-`r C5_ele_comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` Cells were included in testing how community assembly varies with elevation. `r C5_ele_comb``|> filter(trait == "log_Height", site == "GG") |> drop_na() |> summarise(n = n())` Cells were from the low site, `r C5_ele_comb |> filter(trait == "log_Height", site == "WH") |> drop_na() |> summarise(n = n())` cells were from the mid site, and `r C5_ele_comb |> filter(trait == "log_Height", site == "BK") |> drop_na() |> summarise(n = n())` cells were from the high site. The C5 null model showed higher than expected trait divergence for plant height and LDMC at the highest elevation (@fig-C5-SES-elevation-ridges), but the C2 null model detected no limiting similarity for any trait at any elevation (@fig-C2-SES-elevation-ridges). Therefore, we conclude that environmental filtering was the dominant assembly mechanism for all traits at all elevations. Only leaf area followed the expected trend, with environmental filtering becoming stronger with increasing elevation (@fig-C5-SES-elevation-ridges). The environmental filtering of plant height and LDMC became weaker with elevation, while the assembly of SLA showed a hump-shaped relationship with elevation, with environmental filtering being weaker at the mid site than at the low and high site (@fig-C5-SES-elevation-ridges).
+`r C5_ele_comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` Cells were included in testing how community assembly varies with elevation. `r C5_ele_comb|> filter(trait == "log_Height", site == "GG") |> drop_na() |> summarise(n = n()) ` Cells were from the low site, `r C5_ele_comb |> filter(trait == "log_Height", site == "WH") |> drop_na() |> summarise(n = n())` cells were from the mid site, and `r C5_ele_comb |> filter(trait == "log_Height", site == "BK") |> drop_na() |> summarise(n = n())` cells were from the high site. The C5 null model showed higher than expected trait divergence for plant height and LDMC at the highest elevation (@fig-C5-SES-elevation-ridges), but the C2 null model detected no limiting similarity for any trait at any elevation (@fig-C2-SES-elevation-ridges). Therefore, we conclude that environmental filtering was the dominant assembly mechanism for all traits at all elevations. Only leaf area followed the expected trend, with environmental filtering becoming stronger with increasing elevation (@fig-C5-SES-elevation-ridges). The environmental filtering of plant height and LDMC became weaker with elevation, while the assembly of SLA showed a hump-shaped relationship with elevation, with environmental filtering being weaker at the mid site than at the low and high site (@fig-C5-SES-elevation-ridges).
 
 Plant height was generally filtered toward shorter plants with elevation, but the diversity of plant height increased with elevation (@fig-RaoQ-elevation-ridges), showing the existence of very short as well as very tall plants in the alpine (@fig-CWM-elevation-ridges). The direction of filtering for leaf area, SLA and LDMC showed a hump shaped relationship with elevation (@fig-CWM-elevation-ridges), with communities at the mid site having larger leaves and less conservative resource-use strategies than at the high and low site.
 
@@ -461,7 +460,6 @@ Plant height was generally filtered toward shorter plants with elevation, but th
 #| label: fig-C5_SES-elevation-ridges
 #| fig-cap: "Distributions of standard effect sizes (SES) from the C% entire pool null model calculated with plant height, SLA, LDMC and leaf area along the elevational gradient. SES calculated with plant height, LDMC and leaf area used the traits on the log scale."
 #| warning: false
-
 
 l1 <- c("log_Height" = "SES~of~plant~height", "SLA" = "SES~of~SLA", "log_LDMC" = "SES~of~LDMC", "log_LA" = "SES~of~LA")
 ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), rep("log_LDMC", 3),rep("log_LA", 3)), 
@@ -511,7 +509,10 @@ ses_ridges <- C5_ele_comb |>
         strip.placement = "outside", panel.grid = element_blank()) 
 
 ses_ridges
+
+
 ```
+
 
 ```{r}
 #| message: false
