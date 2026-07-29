@@ -450,7 +450,7 @@ for (t in 1:length(traitlist)) {
 
 # Results
 
-`r C5_ele_comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` Cells were included in testing how community assembly varies with elevation. `r C5_ele_comb|> filter(trait == "log_Height", site == "GG") |> drop_na() |> summarise(n = n()) ` Cells were from the low site, `r C5_ele_comb |> filter(trait == "log_Height", site == "WH") |> drop_na() |> summarise(n = n())` cells were from the mid site, and `r C5_ele_comb |> filter(trait == "log_Height", site == "BK") |> drop_na() |> summarise(n = n())` cells were from the high site. The C5 null model showed higher than expected trait divergence for plant height and LDMC at the highest elevation (@fig-C5-SES-elevation-ridges), but the C2 null model detected no limiting similarity for any trait at any elevation (@fig-C2-SES-elevation-ridges). Therefore, we conclude that environmental filtering was the dominant assembly mechanism for all traits at all elevations. Only leaf area followed the expected trend, with environmental filtering becoming stronger with increasing elevation (@fig-C5-SES-elevation-ridges). The environmental filtering of plant height and LDMC became weaker with elevation, while the assembly of SLA showed a hump-shaped relationship with elevation, with environmental filtering being weaker at the mid site than at the low and high site (@fig-C5-SES-elevation-ridges).
+`r C5_ele_comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` Cells were included in testing how community assembly varies with elevation. `r C5_ele_comb|> filter(trait == "log_Height", site == "GG") |> drop_na() |> summarise(n = n())` Cells were from the low site, `r C5_ele_comb |> filter(trait == "log_Height", site == "WH") |> drop_na() |> summarise(n = n())` cells were from the mid site, and `r C5_ele_comb |> filter(trait == "log_Height", site == "BK") |> drop_na() |> summarise(n = n())` cells were from the high site. The C5 null model showed higher than expected trait divergence for plant height and LDMC at the highest elevation (@fig-C5-SES-elevation-ridges), but the C2 null model detected no limiting similarity for any trait at any elevation (@fig-C2-SES-elevation-ridges). Therefore, we conclude that environmental filtering was the dominant assembly mechanism for all traits at all elevations. Only leaf area followed the expected trend, with environmental filtering becoming stronger with increasing elevation (@fig-C5-SES-elevation-ridges). The environmental filtering of plant height and LDMC became weaker with elevation, while the assembly of SLA showed a hump-shaped relationship with elevation, with environmental filtering being weaker at the mid site than at the low and high site (@fig-C5-SES-elevation-ridges).
 
 Plant height was generally filtered toward shorter plants with elevation, but the diversity of plant height increased with elevation (@fig-RaoQ-elevation-ridges), showing the existence of very short as well as very tall plants in the alpine (@fig-CWM-elevation-ridges). The direction of filtering for leaf area, SLA and LDMC showed a hump shaped relationship with elevation (@fig-CWM-elevation-ridges), with communities at the mid site having larger leaves and less conservative resource-use strategies than at the high and low site.
 
@@ -512,7 +512,6 @@ ses_ridges
 
 
 ```
-
 
 ```{r}
 #| message: false
@@ -774,7 +773,7 @@ raoq_ridges <- C5_ele_comb |> #doesn't matter which df we use here, observed Rao
 raoq_ridges
 ```
 
-Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (@tbl-R2-models-C5, @tbl-R2-models-C2). Only surface heterogeneity had a somewaht consistent relationship with community assembly, often being related to higher than expected trait divergence (@fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits . Other micro-environmental factors had weak effects on community assembly.
+Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (@tbl-R2-models-C5, @tbl-R2-models-C2). Only surface heterogeneity had a somewhat consistent relationship with community assembly, often being related to higher than expected trait divergence (@fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits . Other micro-environmental factors had weak effects on community assembly.
 
 ```{r}
 #| label: tbl-R2-models_C5
