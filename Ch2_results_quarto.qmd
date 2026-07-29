@@ -37,7 +37,7 @@ conflict_prefer_all("tidylog", quiet = TRUE)
 
 Understanding what drives community assembly has been a central goal of ecology for a long time [@hillerislambers_rethinking_2012, @diamond_assembly_1975, @weiher_community_1998]. Not taking dispersal limitations into account, community composition is thought to be shaped by environmental constraints, competition, neutral processes, or a combination of all three [@gotzenberger_ecological_2012]. Investigating the functional trait patterns in communities offers insight into the dominant assembly processes at work in a community, and which environmental factors most strongly shape community composition. Environmental conditions are hypothesised to act as a filter, excluding species which may be able to disperse to a site but not survive there [@gotzenberger_ecological_2012, @kraft_community_2015]. This should create a pattern of trait convergence toward an optimum trait for survival [@gotzenberger_ecological_2012]. Competition is expected to promote divergence of functional traits under the theory of coexistence by niche differentiation [@weiher_community_1998]. However, competition may also generate a pattern of trait convergence if species with traits conferring higher competitive ability exclude species with weakly competitive traits [@mayfield2010].
 
-Macroclimatic conditions are expected to act as filters, selecting for species with optimum traits for survival under the prevailing climate conditions. This filtering effect is expected to become stronger with increasing environmental severity [@louthan_where_2015]. For example, floral size and onset of flowering were strongly filtered toward... in the western Himalayas, but showed divergence in the lowlands [@ahmad_role_2023]. However, contrasting patterns have also been found?? Not sure if I should end the paragraph before this?
+Macroclimatic conditions are expected to act as filters, selecting for species with optimum traits for survival under the prevailing climate conditions. This filtering effect is expected to become stronger with increasing environmental severity [@louthan_where_2015]. For example, convergence of SLA and seed mass increased with elevation in the Gaudarrama mountains of Spain [@pescador_spatial_2021]. However, contrasting patterns have also been found. For example, elevation was only weakly related to variation in community assembly in the Swiss Alps [@scherrer_disentangling_2019], and trait divergence increases with aridity in global drylands [@gross2024]. [More examples?]{.underline} Thus, the increased strength of environmental filtering in severe environments is not an ecological generality, and should be investigated further.
 
 The role of micro-environmental conditions in driving community assembly has been acknowledged [@kemppinen_microclimate_2024, @vernham_understanding_2023], but has not been investigated.
 
@@ -143,7 +143,7 @@ A null-model approach was used to determine whether RaoQ was significantly diffe
 
 The C2 null model shuffles the abundances of species in cells, keeping the richness and total cover of cells constant. The frequency and total cover of species, as well as the identity of species in each cell are allowed to deviate from the observed matrix. The link between a species' mean trait value and its abundance is not maintained in this null model. This gives the model good power to detect limiting similarity, because the competitive ability of species and thus their abundances, should be linked to their trait values. Thus, one can determine whether composition is random compared to a scenario where the competitive ability of species are not linked to their traits, while controlling for the total abundance and richness of cells [@gotzenberger_which_2016]. The species pool from which the matrix was filled was restricted to the site-level species pool to exclude the filtering effect of macroclimate.
 
-To determine whether functional diversity is higher or lower than expected from random assembly, we calculated the standard effect size (SES) of RaoQ as a measure of deviance between the observed matrix and null model. SES is calculated as:
+To determine whether functional diversity is higher or lower than expected from random assembly, we calculated the standard effect size [SES, @gotelli2002] of RaoQ as a measure of deviance between the observed matrix and null model. SES is calculated as:
 
 $$
 SES = (RaoQ_{observed} - \mu{RaoQ_{null}})/\sigma{RaoQ_{null}}
@@ -469,7 +469,7 @@ for (t in 1:length(traitlist)) {
 
 `r C5_ele_comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` Cells were included in testing how community assembly varies with elevation. `r C5_ele_comb|> filter(trait == "log_Height", site == "GG") |> drop_na() |> summarise(n = n())` Cells were from the low site, `r C5_ele_comb |> filter(trait == "log_Height", site == "WH") |> drop_na() |> summarise(n = n())` cells were from the mid site, and `r C5_ele_comb |> filter(trait == "log_Height", site == "BK") |> drop_na() |> summarise(n = n())` cells were from the high site. The C5 null model showed higher than expected trait divergence for plant height and LDMC at the highest elevation (@fig-C5-SES-elevation-ridges), but the C2 null model detected no limiting similarity for any trait at any elevation (@fig-C2-SES-elevation-ridges). Therefore, we conclude that environmental filtering was the dominant assembly mechanism for all traits at all elevations. Only leaf area followed the expected trend, with environmental filtering becoming stronger with increasing elevation (@fig-C5-SES-elevation-ridges). The environmental filtering of plant height and LDMC became weaker with elevation, while the assembly of SLA showed a hump-shaped relationship with elevation, with environmental filtering being weaker at the mid site than at the low and high site (@fig-C5-SES-elevation-ridges).
 
-Plant height was generally filtered toward shorter plants with elevation, but the diversity of plant height increased with elevation (@fig-RaoQ-elevation-ridges), showing the existence of very short as well as very tall plants in the alpine (@fig-CWM-elevation-ridges). The direction of filtering for leaf area, SLA and LDMC showed a hump shaped relationship with elevation (@fig-CWM-elevation-ridges), with communities at the mid site having larger leaves and less conservative resource-use strategies than at the high and low site.
+Plant height was generally filtered toward shorter plants with elevation, but the diversity of plant height increased with elevation (@fig-RaoQ-elevation-ridges), showing the existence of very short as well as very tall plants in the alpine (@fig-CWM-elevation-ridges) [(Should I put the coefficients and whole model statistics for these models in the appendix?)]{.underline}. The direction of filtering for leaf area, SLA and LDMC showed a hump shaped relationship with elevation (@fig-CWM-elevation-ridges), with communities at the mid site having larger leaves and less conservative resource-use strategies than at the high and low site.
 
 ```{r}
 #| message: false
@@ -1165,6 +1165,16 @@ combined_fig <- ggarrange(H_temp_GG, LA_temp_GG, SLA_sdepth_WH,LDMC_smoist_WH, L
 combined_fig
 
 ```
+
+# Discussion
+
+Some preliminary ideas:
+
+Environmental filtering dominant assembly mechanism, not consistently increasing in strength with elevation. Mid site shows unexpected deviation to less conservative, larger leafed species. This could be due to relaxation of environmental filters here, or because of strong competition selecting for more acquisitive (competitive?) traits.
+
+Micro-environmental variables only weakly influence community assembly, and do not have consistent effects. This suggests that assembly at this scale is largely neutral, despite large differences in micro-environmental conditions?
+
+Perhaps missing: An analysis or figure showing the extent of environmental variation present here?
 
 # References
 
