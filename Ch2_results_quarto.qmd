@@ -282,13 +282,15 @@ C5_microenv_comb <- env2 |>
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
   full_join(C5_cell_ses_poolsite, by = "Cell_ID", relationship = "one-to-many") |> 
   mutate(elevation = as.factor(elevation), 
-         grid = as.factor(grid), 
-         #standardise the variables we will use in the model
+         grid = as.factor(grid)) |> 
+  group_by(site) |> 
+  mutate(       #standardise the variables we will use in the model, per site
          mean_T1_growing_season = as.numeric(scale(mean_T1_growing_season)), 
          mean_moist_growing_season = as.numeric(scale(mean_moist_growing_season)), 
          rock_cover = as.numeric(scale(rock_cover)), 
          mean_soil_depth = as.numeric(scale(mean_soil_depth)), 
-         STD = as.numeric(scale(STD)))
+         STD = as.numeric(scale(STD))) |> 
+  ungroup()
 
 
 ###Loop starts here####
@@ -410,13 +412,15 @@ C2_microenv_comb <- env2 |>
   full_join(C2_cell_ses_poolsite, by = "Cell_ID", relationship = "one-to-many") |>
   mutate(grid = paste0(site, grid), 
          elevation = as.factor(elevation), 
-         grid = as.factor(grid),
-         #standardise the variables we will use in the model
+         grid = as.factor(grid)) |> 
+  group_by(site) |> 
+  mutate(       #standardise the variables we will use in the model, per site
          mean_T1_growing_season = as.numeric(scale(mean_T1_growing_season)), 
          mean_moist_growing_season = as.numeric(scale(mean_moist_growing_season)), 
          rock_cover = as.numeric(scale(rock_cover)), 
          mean_soil_depth = as.numeric(scale(mean_soil_depth)), 
-         STD = as.numeric(scale(STD)))
+         STD = as.numeric(scale(STD))) |> 
+  ungroup()
 
 
 ###Loop starts here####
