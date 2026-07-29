@@ -882,7 +882,7 @@ C2_R2_table |>
 
 ```{r}
 #| label: fig-allsites-microenv_C5_C2
-#| tbl-cap: Effects of microenvironmental variables on assembly of traits at the mid site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait and each null model. Positive coefficients indicate that the variable is related to higher than expected trait divergence, while negative coefficients indicate thet the variable is related to higher than expected trait convergence. Stars indicate significant relationships. 
+#| fig-cap: Effects of microenvironmental variables on assembly of traits at the mid site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait and each null model. Positive coefficients indicate that the variable is related to higher than expected trait divergence, while negative coefficients indicate thet the variable is related to higher than expected trait convergence. Stars indicate significant relationships. 
 #| echo: false
 #| warning: false
 #| width: 6.5
