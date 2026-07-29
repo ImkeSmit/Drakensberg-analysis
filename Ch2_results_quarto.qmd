@@ -786,7 +786,7 @@ raoq_ridges <- C5_ele_comb |> #doesn't matter which df we use here, observed Rao
 raoq_ridges
 ```
 
-Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (@tbl-R2-models-C5, @tbl-R2-models-C2). Only surface heterogeneity had a somewhat consistent relationship with community assembly. Surface heterogeneity was often related to higher than expected trait divergence (@fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits . Other micro-environmental factors had weak effects on community assembly.
+Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (@tbl-R2-models-C5, @tbl-R2-models-C2). Only surface heterogeneity had a somewhat consistent relationship with community assembly. Surface heterogeneity was often related to higher than expected trait divergence (@fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits. Other micro-environmental factors had weak and inconsistent effects on community assembly.
 
 ```{r}
 #| label: tbl-R2-models_C5
