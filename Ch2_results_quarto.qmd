@@ -773,7 +773,7 @@ raoq_ridges <- C5_ele_comb |> #doesn't matter which df we use here, observed Rao
 raoq_ridges
 ```
 
-Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (@tbl-R2-models-C5, @tbl-R2-models-C2). Only surface heterogeneity had a somewhat consistent relationship with community assembly, often being related to higher than expected trait divergence (@fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits . Other micro-environmental factors had weak effects on community assembly.
+Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (@tbl-R2-models-C5, @tbl-R2-models-C2). Only surface heterogeneity had a somewhat consistent relationship with community assembly. Surface heterogeneity was often related to higher than expected trait divergence (@fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits . Other micro-environmental factors had weak effects on community assembly.
 
 ```{r}
 #| label: tbl-R2-models_C5
@@ -955,6 +955,7 @@ allsites_microenv <- bind_rows(GG_microenv_results, WH_microenv_results, BK_micr
 
 write.csv(allsites_microenv, "All_data/comm_assembly_results/SES_microenv_model_results_table.csv")
 
+
 l1 <- c("Height_cm" = "Height", "SLA" = "SLA", "LDMC" = "LDMC", "Leaf_area_mm2" = "LA", "low" = "low", "mid" = "mid", "high" = "high")
 allsites_microenv_plot <- allsites_microenv |> 
   ggplot(aes(x = coefficient, y = variable, color = null_model)) +
@@ -968,7 +969,7 @@ allsites_microenv_plot <- allsites_microenv |>
              labeller = as_labeller(l1, default = label_parsed)) +
   theme_bw() +
   labs(y = " ", x = "Slope estimate", color = "Null model") +
-  theme(panel.grid = element_blank())
+  theme(panel.grid = element_blank()) 
 allsites_microenv_plot
 
 ggsave("allsites_SES_microenv_coef.png", plot = allsites_microenv_plot, path = "Figures")
