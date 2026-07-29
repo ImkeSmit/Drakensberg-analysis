@@ -33,6 +33,9 @@ cor(moisture_dat$soil_moisture_adj_campaign1, moisture_dat$mean_moist_growing_se
 cor(moisture_dat$soil_moisture_adj_campaign2, moisture_dat$mean_moist_growing_season)
 #0.6347639 a bit better
 
+#campaign 1 and 2
+cor(moisture_dat$soil_moisture_adj_campaign2, moisture_dat$soil_moisture_adj_campaign1)
+#0.8113965 
 
 
 ###Correlation between soil moisture TEMPERATURE and interpolated soil temperature of the growing season
@@ -44,6 +47,27 @@ cor(moisture_dat$soil_temperature_adj_campaign1, moisture_dat$mean_T1_growing_se
 #campaign 2
 cor(moisture_dat$soil_temperature_adj_campaign2, moisture_dat$mean_T1_growing_season)
 #0.6850881 a bit better
+
+#campaign 1 and 2
+cor(moisture_dat$soil_temperature_adj_campaign2, moisture_dat$soil_temperature_adj_campaign1)
+#0.6857863
+
+
+##Graph
+#temperature
+moisture_dat |> 
+  pivot_longer(cols = contains(c("campaign", "growing")), names_to = "variable", values_to = "value") |> 
+  filter(variable %in% c("mean_T1_growing_season", "soil_temperature_adj_campaign1", "soil_temperature_adj_campaign2")) |> 
+ggplot(aes(x = Cell_ID, y = value, color = variable)) +
+  geom_point()
+
+#moisture
+moisture_dat |> 
+  pivot_longer(cols = contains(c("campaign", "growing")), names_to = "variable", values_to = "value") |> 
+  filter(variable %in% c("mean_moist_growing_season", "soil_moisture_adj_campaign1", "soil_moisture_adj_campaign2")) |> 
+  ggplot(aes(x = Cell_ID, y = value, color = variable)) +
+  geom_point() +
+  ylim(0, 100)
 
 
 
