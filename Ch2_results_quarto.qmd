@@ -999,9 +999,6 @@ allsites_microenv_plot
 ggsave("allsites_SES_microenv_coef.png", plot = allsites_microenv_plot, path = "Figures")
 ```
 
-```         
-```
-
 # Discussion
 
 Some preliminary ideas:
