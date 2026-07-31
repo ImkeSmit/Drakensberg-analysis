@@ -477,7 +477,7 @@ Plant height was generally filtered toward shorter plants with elevation, but th
 #| message: false
 #| echo: false
 #| label: fig-C5_SES-elevation-ridges
-#| fig-cap: "Distributions of standard effect sizes (SES) from the C% entire pool null model calculated with plant height, SLA, LDMC and leaf area along the elevational gradient. SES calculated with plant height, LDMC and leaf area used the traits on the log scale."
+#| fig-cap: "Distributions of standard effect sizes (SES) from the C5 entire pool null model calculated with plant height, SLA, LDMC and leaf area along the elevational gradient. SES calculated with plant height, LDMC and leaf area used the traits on the log scale. Points with error bars show the mean and confidence interval of the SES."
 #| warning: false
 
 l1 <- c("log_Height" = "SES~of~plant~height", "SLA" = "SES~of~SLA", "log_LDMC" = "SES~of~LDMC", "log_LA" = "SES~of~LA")
@@ -536,7 +536,7 @@ ses_ridges
 #| message: false
 #| echo: false
 #| label: fig-C2_SES-elevation-ridges
-#| fig-cap: "Distributions of standard effect sizes (SES) from the C2 site pool null model calculated with plant height, SLA, LDMC and leaf area along the elevational gradient. SES calculated with plant height, LDMC and leaf area used the traits on the log scale."
+#| fig-cap: "Distributions of standard effect sizes (SES) from the C2 site pool null model calculated with plant height, SLA, LDMC and leaf area along the elevational gradient. SES calculated with plant height, LDMC and leaf area used the traits on the log scale. Points with error bars show the mean and confidence interval of the SES."
 #| warning: false
 
 
@@ -593,7 +593,7 @@ C2_ses_ridges
 
 ```{r}
 #| label: fig-CWM-elevation-ridges
-#| fig-cap: Community-weighted mean traits of cells at the low, mid and high elevation. Height, LDMC and leaf area are on the log scale.
+#| fig-cap: Community-weighted mean traits of cells at the low, mid and high elevation. Height, LDMC and leaf area are on the log scale. Points with error bars show the mean and confidence interval of the CWM of cells at each site.
 #| warning: false
 #| message: false
 #| echo: false
@@ -712,7 +712,7 @@ cwm_ridges
 #| message: false
 #| echo: false
 #| label: fig-RaoQ-elevation-ridges
-#| fig-cap: "Trait diversity, calculated with RaoQ, of each trait along the elevation gradient"
+#| fig-cap: "Trait diversity, calculated with RaoQ, of each trait along the elevation gradient. Points with error bars show the mean and confidence interval of RaoQ for each site."
 #| warning: false
 
 
@@ -796,7 +796,7 @@ Micro-environmental factors were weakly related to fine-scale variation in commu
 
 ```{r}
 #| label: tbl-R2-models_C5
-#| tbl-cap: Marginal and conditional $R^2$ values of micro-environmental models in predicting SES of each trait calculated with the C5 null model at the low, mid and high site. The SES of LDMC was calculated with LDMC on the log scale
+#| tbl-cap: Marginal and conditional $R^2$ values of micro-environmental models in predicting SES of each trait calculated with the C5 null model at the low, mid and high site. The SES of LDMC was calculated with LDMC on the log scale.
 #| echo: false
 #| message: false
 #| warning: false
@@ -840,7 +840,7 @@ R2_table |>
 
 ```{r}
 #| label: tbl-R2-models_C2
-#| tbl-cap: Marginal and conditional $R^2$ values of micro-environmental models in predicting SES of each trait calculated with the C2 null model at the low, mid and high site. The SES of LDMC was calculated with LDMC on the log scale
+#| tbl-cap: Marginal and conditional $R^2$ values of micro-environmental models in predicting SES of each trait calculated with the C2 null model at the low, mid and high site. The SES of LDMC was calculated with LDMC on the log scale.
 #| echo: false
 #| message: false
 #| warning: false
