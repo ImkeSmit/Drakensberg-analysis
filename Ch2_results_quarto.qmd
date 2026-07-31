@@ -1,5 +1,5 @@
 ---
-title: "Ch2_results"
+title: "The effect of macro- and micro-scale environmental drivers on community assembly"
 format: docx
 editor: visual
 fig-format: png
@@ -30,8 +30,6 @@ library(FD)
 library(knitr)
 conflict_prefer_all("tidylog", quiet = TRUE)
 ```
-
-# The effect of macro- and micro-scale environmental drivers on community assembly
 
 # Introduction
 
