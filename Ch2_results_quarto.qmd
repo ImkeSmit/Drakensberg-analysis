@@ -981,7 +981,7 @@ allsites_microenv_plot <- allsites_microenv |>
              labeller = as_labeller(l1, default = label_parsed)) +
   theme_bw() +
   labs(y = " ", x = "Slope estimate", color = "Null model") +
-  theme(panel.grid = element_blank()) 
+  theme(panel.grid = element_blank(), legend.position = "bottom") 
 allsites_microenv_plot
 
 ggsave("allsites_SES_microenv_coef.png", plot = allsites_microenv_plot, path = "Figures")
