@@ -92,12 +92,25 @@ lost <- ref |>
   summarise(n = n())
 
 ###Correlate interpolation with instantaneous####
+#import microenvironmental data containing instantaneous temperature variables
+inst_micro <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
+  tibble() |> 
+  #variables we are interested in
+  select(Cell_ID:row, soil_moisture_adj_campaign2, soil_moisture_adj_campaign1, 
+         soil_temperature_adj_campaign1, soil_temperature_adj_campaign2, rock_cover) |> 
+  mutate(across(contains("soil"), as.numeric)) 
 
+###JOin instantaneous and interpolated 
+moisture_dat <- inst_micro |> 
+  inner_join(ind, by = "Cell_ID") |> 
+  drop_na()
 
 ```
 
 The mean soil moisture and temperature of the growing season were calculated using readings from Temperature-Moisture-Sensors [TMS, @wild_climate_2019]. Six or seven TMS were placed in each grid, and recorded soil moisture and temperature readings at 8 cm below the soil surface every 15 minutes for one year (12 January 2023 – 21 January 2024). The start of the growing season was defined as the first day after 21 June when the minimum daily temperature of all loggers at a site were above 5℃. The end of the growing season was the first day before 21 June when all loggers at a site had a minimum daily temperature below 5℃. Following these definitions, the growing season was from 23 August to 8 July at the low site, 1 September to 6 June at the mid site, and 10 October to 3 April at the high site. The mean soil moisture and temperature for the growing season was calculated for each logger and interpolated to other cells in the grid. An inverse-distance-weighted interpolation algorithm was used with a power parameter of two. Cells with more than 50% rock cover were not used in the interpolation process if they contained a logger and did not receive an interpolated value if they were without a logger. Following this threshold, `r lost[2,2]` cells were excluded from interpolation at the low site, `r lost[3,2]` cells were excluded from the mid site, and `r lost[1,2]` cells were excluded from the high site.
-Cross-validation showed that the interpolation algorithm could not predict the soil moisture and temperature equally well in all grids (@tbl-validation-results). Although the data is noisy, it still gives an estimate of which cells are wetter or drier than others (I could put a correlation analysis with the instantaneous soil moisture campaigns in the appendix).
+Cross-validation showed that the interpolation algorithm could not predict the soil moisture and temperature equally well in all grids (@tbl-validation-results). However, the interpolated soil moisture and temperature for the growing season correlated well with the instantaneous soil moisture and temperature measurements (pearson correlation coefficient between instantaneous and interpolated soil moisture = `r cor(moisture_dat$soil_moisture_adj_campaign2, moisture_dat$mean_moist_growing_season)`, pearson correlation coefficient between instantaneous and interpolated soil temperature = `r cor(moisture_dat$soil_temperature_adj_campaign2, moisture_dat$mean_T1_growing_season)`).
+
+Although the data is noisy, it still gives an estimate of which cells are wetter or drier than others (I could put a correlation analysis with the instantaneous soil moisture campaigns in the appendix).
 
 A principal component analysis was performed to identify the main axes of environmental variation across the three sites (@fig-environmental-PCA). The following variables were selected to test whether fine-scale variation in community assembly is shaped by micro-environmental variation: mean soil temperature of the growing season, mean soil moisture of the growing season, rock cover, mean soil depth and surface heterogeneity. These variables describe the main axes of environmental variation across the three sites, and may affect community assembly in the following ways: Microclimatic temperature and moisture conditions may differ greatly from the macroclimatic conditions, even in open systems such as grasslands. Different microclimates may act as different filters, selecting for different plant assemblages within short distances of one another [@kemppinen_microclimate_2024]. Rock cover and surface heterogeneity may increase the available niche space, promoting the coexistence of plants with divergent trait syndromes [@vernham_understanding_2023]. Soil depth may be related to higher soil moisture and increased access to resources [@price_within-community_2017], and increased opportunity for underground resource partitioning.
 
