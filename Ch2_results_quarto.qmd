@@ -113,7 +113,7 @@ A principal component analysis was performed to identify the main axes of enviro
 
 ```{r}
 #| label: fig-environmental-PCA
-#| fig-cap: "Principal component analysis of environmental variables measured in sampling grids."
+#| fig-cap: "Principal component analysis of all environmental variables measured in sampling grids, as well as interpolated soil moisture and temperature."
 #| warning: false
 #| message: false
 #| echo: false
@@ -166,13 +166,15 @@ all_env_pca <- princomp(all_env_subs[2:ncol(all_env_subs)], scores = T) #not inc
 ###GGplot biplot
 env_pca <- ggbiplot(all_env_pca, choices = c(1,2), 
                       varname.size = 4, varname.color = "black", 
-                      groups = c(all_env_subs$site)) +
-  geom_point(aes(color = all_env_subs$site), alpha = 0.8)+
+                      groups = c(all_env_subs$site), 
+                    ellipse = TRUE, ellipse.fill = FALSE, 
+                    alpha = 0.4) +
+  #geom_point(aes(color = all_env_subs$site), alpha = 0.2)+
   scale_color_manual(values = c("blue", "grey", "red"))+
   theme_classic() +
   labs(color = "Site") +
   theme(legend.position = "bottom")
-env_pca$layers <- c(env_pca$layers, env_pca$layers[[2]], env_pca$layers[[3]]) #move the arrows to plot in the foreground
+env_pca$layers <- c(env_pca$layers, env_pca$layers[[2]], env_pca$layers[[4]]) #move the arrows to plot in the foreground
 env_pca
 
 ```
