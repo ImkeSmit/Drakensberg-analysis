@@ -293,3 +293,27 @@ validation_grid %>%
   arrange(desc(mean_R2)) %>%
   print()
 
+
+####How many cells did we lose?###
+#environmental data for reverence 
+ref <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
+  select(site, Cell_ID)
+
+#How many cells in env
+ref |> group_by(site) |> 
+  distinct(Cell_ID) |> 
+  summarise(n = n()) #allcells present
+
+#import interpolated indices
+ind <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1) |> 
+  drop_na()
+
+#Cells we lost
+lost <- ref |> 
+  anti_join(ind, by = "Cell_ID") |> 
+  group_by(site) |> 
+  summarise(n = n())
+
+
+
+
