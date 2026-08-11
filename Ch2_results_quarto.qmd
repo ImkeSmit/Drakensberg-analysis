@@ -646,6 +646,93 @@ C2_ses_ridges
 ```
 
 ```{r}
+#| message: false
+#| echo: false
+#| label: fig-RaoQ-elevation-ridges
+#| fig-cap: "Trait diversity, calculated with RaoQ, of each trait along the elevation gradient. Points with error bars show the mean and confidence interval of RaoQ for each site."
+#| warning: false
+
+
+####model RaoQ ~ elevation####
+traitlist <- c("log_Height", "log_LDMC", "log_LA", "SLA")
+#lists to store results in
+RaoQ_ele_cld<- vector(mode= "list", length = length(traitlist))
+names(RaoQ_ele_cld) = traitlist
+
+for (t in 1:length(traitlist)) {
+  modeldat <-  C5_ele_comb |> 
+    filter(trait == traitlist[t]) |> 
+    mutate(elevation = as.factor(elevation), 
+           grid = as.factor(grid)) |> 
+    drop_na()
+  
+  
+  model<- lme(RaoQ ~ elevation ,
+                  random = ~1|grid, 
+                  correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
+                  data = modeldat) #only gaussian family possible
+  
+  em_model <- emmeans(model, specs = "elevation", type = "response")
+  comp_letters <-cld(em_model, Letters = letters, adjust = "Tukey", sort = FALSE)
+
+  #Also save results in a list object so we can call it with quarto
+RaoQ_ele_cld[[t]] <- comp_letters
+}
+
+###Graph####
+l1 <- c("log_Height" = "RaoQ~of~plant~height", "SLA" = "RaoQ~of~SLA", "log_LDMC" = "RaoQ~of~LDMC", "log_LA" = "RaoQ~of~LA")
+raoq_ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), rep("log_LDMC", 3),rep("log_LA", 3)), 
+                             elevation = as.factor(c(rep(c("2000", "2500", "3000"), 4))),
+                             letters = c(RaoQ_ele_cld$log_Height$.group, 
+                                         RaoQ_ele_cld$SLA$.group, 
+                                         RaoQ_ele_cld$log_LDMC$.group, 
+                                         RaoQ_ele_cld$log_LA$.group), 
+                             x_pos = c(2.2,2.2,2.2,
+                                       2.7,2.7,2.7, 
+                                       5,5,5,
+                                       3.8,3.8,3.8), 
+                             emmean = c(RaoQ_ele_cld$log_Height$emmean,
+                                        RaoQ_ele_cld$SLA$emmean,
+                                        RaoQ_ele_cld$log_LDMC$emmean,
+                                        RaoQ_ele_cld$log_LA$emmean), 
+                             emmean_SE = c(RaoQ_ele_cld$log_Height$SE,
+                                           RaoQ_ele_cld$SLA$SE,
+                                           RaoQ_ele_cld$log_LDMC$SE,
+                                           RaoQ_ele_cld$log_LA$SE))
+
+raoq_ridges <- C5_ele_comb |> #doesn't matter which df we use here, observed RaoQ should stay the same
+  filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
+  mutate(elevation = as.factor(elevation)) |> 
+  ggplot(aes(x = RaoQ, y = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", 
+             strip.position = "bottom")+
+  labs(x = " ", y = "Elevation (m a.s.l.)") +
+  theme_bw() +
+  geom_text(data = raoq_ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  geom_point(
+    data = raoq_ridges_letters,
+    aes(x = emmean, y = as.numeric(elevation)),
+    size = 2, inherit.aes = FALSE) +
+  geom_errorbarh(
+    data = raoq_ridges_letters,
+    aes(xmin = emmean - emmean_SE,
+        xmax = emmean + emmean_SE,
+        y = as.numeric(elevation)),
+    height = 0.08,
+    linewidth = 1, inherit.aes = FALSE)+
+  theme(legend.position = "none", axis.title = element_text(size = 18), 
+        axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
+        strip.background = element_blank(),
+        strip.placement = "outside", panel.grid = element_blank()) 
+
+raoq_ridges
+
+```
+
+
+
+```{r}
 #| label: fig-CWM-elevation-ridges
 #| fig-cap: Community-weighted mean traits of cells at the low, mid and high elevation. Height, LDMC and leaf area are on the log scale. Points with error bars show the mean and confidence interval of the CWM of cells at each site.
 #| warning: false
@@ -750,89 +837,6 @@ cwm_ridges <- cwm_comb |>
 cwm_ridges
 ```
 
-```{r}
-#| message: false
-#| echo: false
-#| label: fig-RaoQ-elevation-ridges
-#| fig-cap: "Trait diversity, calculated with RaoQ, of each trait along the elevation gradient. Points with error bars show the mean and confidence interval of RaoQ for each site."
-#| warning: false
-
-
-####model RaoQ ~ elevation####
-traitlist <- c("log_Height", "log_LDMC", "log_LA", "SLA")
-#lists to store results in
-RaoQ_ele_cld<- vector(mode= "list", length = length(traitlist))
-names(RaoQ_ele_cld) = traitlist
-
-for (t in 1:length(traitlist)) {
-  modeldat <-  C5_ele_comb |> 
-    filter(trait == traitlist[t]) |> 
-    mutate(elevation = as.factor(elevation), 
-           grid = as.factor(grid)) |> 
-    drop_na()
-  
-  
-  model<- lme(RaoQ ~ elevation ,
-                  random = ~1|grid, 
-                  correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
-                  data = modeldat) #only gaussian family possible
-  
-  em_model <- emmeans(model, specs = "elevation", type = "response")
-  comp_letters <-cld(em_model, Letters = letters, adjust = "Tukey", sort = FALSE)
-
-  #Also save results in a list object so we can call it with quarto
-RaoQ_ele_cld[[t]] <- comp_letters
-}
-
-###Graph####
-l1 <- c("log_Height" = "RaoQ~of~plant~height", "SLA" = "RaoQ~of~SLA", "log_LDMC" = "RaoQ~of~LDMC", "log_LA" = "RaoQ~of~LA")
-raoq_ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), rep("log_LDMC", 3),rep("log_LA", 3)), 
-                             elevation = as.factor(c(rep(c("2000", "2500", "3000"), 4))),
-                             letters = c(RaoQ_ele_cld$log_Height$.group, 
-                                         RaoQ_ele_cld$SLA$.group, 
-                                         RaoQ_ele_cld$log_LDMC$.group, 
-                                         RaoQ_ele_cld$log_LA$.group), 
-                             x_pos = c(2.2,2.2,2.2,
-                                       2.7,2.7,2.7, 
-                                       5,5,5,
-                                       3.8,3.8,3.8), 
-                             emmean = c(RaoQ_ele_cld$log_Height$emmean,
-                                        RaoQ_ele_cld$SLA$emmean,
-                                        RaoQ_ele_cld$log_LDMC$emmean,
-                                        RaoQ_ele_cld$log_LA$emmean), 
-                             emmean_SE = c(RaoQ_ele_cld$log_Height$SE,
-                                           RaoQ_ele_cld$SLA$SE,
-                                           RaoQ_ele_cld$log_LDMC$SE,
-                                           RaoQ_ele_cld$log_LA$SE))
-
-raoq_ridges <- C5_ele_comb |> #doesn't matter which df we use here, observed RaoQ should stay the same
-  filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
-  mutate(elevation = as.factor(elevation)) |> 
-  ggplot(aes(x = RaoQ, y = elevation)) +
-  geom_density_ridges(alpha = 0.5) +
-  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", 
-             strip.position = "bottom")+
-  labs(x = " ", y = "Elevation (m a.s.l.)") +
-  theme_bw() +
-  geom_text(data = raoq_ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
-  geom_point(
-    data = raoq_ridges_letters,
-    aes(x = emmean, y = as.numeric(elevation)),
-    size = 2, inherit.aes = FALSE) +
-  geom_errorbarh(
-    data = raoq_ridges_letters,
-    aes(xmin = emmean - emmean_SE,
-        xmax = emmean + emmean_SE,
-        y = as.numeric(elevation)),
-    height = 0.08,
-    linewidth = 1, inherit.aes = FALSE)+
-  theme(legend.position = "none", axis.title = element_text(size = 18), 
-        axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
-        strip.background = element_blank(),
-        strip.placement = "outside", panel.grid = element_blank()) 
-
-raoq_ridges
-```
 
 Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (@tbl-R2-models-C5, @tbl-R2-models-C2). Only surface heterogeneity had a somewhat consistent relationship with community assembly, often being related to higher than expected trait divergence (@fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits. Other micro-environmental factors had weak and inconsistent effects on community assembly.
 
