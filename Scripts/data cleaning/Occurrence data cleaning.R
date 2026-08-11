@@ -17,12 +17,22 @@ gg_summer <- read_excel("All_data/raw_data/raw_occurrence_data/GoldenGate/Golden
          grid = as.numeric(grid), 
          row = as.numeric(row),
          cellref = paste0(site, "_", "G", grid, "_", column, row), 
-         cover = as.numeric(cover)) |> 
+         cover = as.numeric(cover))
+
+
+##Cells with zero species richness
+gg_summer |> 
+  group_by(cellref) |> 
+  summarise(sum_cover = sum(cover)) |> 
+  filter(sum_cover == 0) #19 cells with zero species richness
+
+#remove species with no cover from long format data
+gg_summer <- gg_summer |> 
   filter(!cover == 0)
 
 #check that all grids and cells are there:
 length(unique(gg_summer$grid)) #all 8
-length(unique(gg_summer$cellref)) #1280 all cells from the 8 grids present
+length(unique(gg_summer$cellref)) #19 cells with no species missing
 
 #check that cover values make sense
 ggplot(gg_summer) +
