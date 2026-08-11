@@ -8,8 +8,7 @@ cell_trait_coverage <- function() {
   drak <-read.csv("All_data/clean_data/micro_climb_occurrence.csv", row.names = 1) 
   
   #import mean traits
-  mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1) |> 
-    rownames_to_column(var = "taxon")
+  mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1) 
   
   
   abundances <- drak |> 
