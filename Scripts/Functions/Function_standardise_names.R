@@ -11,6 +11,8 @@ standardise_names <- function(data, #dataframe containing species names that nee
   #add change tracker column to keep track of names changed
   data$change_tracker <- NA
   
+  data <- tibble(data)
+  
   #remove names that do not have synonyms
   naming_system <- naming_system |> 
     filter(!is.na(synonym1))
