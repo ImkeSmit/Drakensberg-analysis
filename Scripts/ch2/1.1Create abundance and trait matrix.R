@@ -69,6 +69,8 @@ for(r in 1:nrow(abun_matrix)) {
 
 #remove sites that have less than 3 species 
 no <- specnumber(abun_matrix)
+#how many cells have species richness lower than 3?
+length(which(no<3)) #23
 abun_matrix <- abun_matrix[-which(no < 3), ]
 
 #order species alphabetically
