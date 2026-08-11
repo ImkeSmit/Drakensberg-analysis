@@ -562,7 +562,7 @@ ses_ridges <- C5_ele_comb |>
   mutate(elevation = as.factor(elevation)) |> 
   ggplot(aes(x = SES, y = elevation)) +
   geom_density_ridges(alpha = 0.5) +
-  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", 
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", nrow = 4, ncol = 1,
              strip.position = "bottom")+
   labs(x = " ", y = "Elevation (m a.s.l.)") +
   geom_vline(xintercept = 0, linetype = "dashed") +
@@ -616,29 +616,53 @@ ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), rep(
                              emmean_SE = c(C2_SES_ele_cld$log_Height$SE,
                                            C2_SES_ele_cld$SLA$SE,
                                            C2_SES_ele_cld$log_LDMC$SE,
-                                           C2_SES_ele_cld$log_LA$SE))
+                                           C2_SES_ele_cld$log_LA$SE))|> 
+  mutate(upper_ci = emmean+1.96*emmean_SE, 
+         lower_ci = emmean-1.96*emmean_SE, 
+         sign = if_else(lower_ci < 0 & upper_ci > 0,"no", "significant"))
+
+
+C5_dat <- C5_ele_comb |>
+  filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
+  mutate(elevation = as.factor(elevation), 
+         model = "C5 entire pool")
+
+C2_dat <- C2_ele_comb |>
+  filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
+  mutate(elevation = as.factor(elevation), 
+         model = "C2 site pool")
+
+models_comb <- C5_dat |> bind_rows(C2_dat) |> 
+  mutate(model = factor(model, levels = c("C5 entire pool", "C2 site pool")))
+
+l1 <- c("log_Height" = "SES~of~plant~height", "SLA" = "SES~of~SLA", "log_LDMC" = "SES~of~LDMC", "log_LA" = "SES~of~LA", "C5 entire pool" = "C5~entire~pool", 
+        "C2 site pool" = "C2~site~pool")
+SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_grid(trait~model, labeller = as_labeller(l1, default = label_parsed), scale = "free_x",)
 
 C2_ses_ridges <- C2_ele_comb |>
   filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
   mutate(elevation = as.factor(elevation)) |> 
   ggplot(aes(x = SES, y = elevation)) +
   geom_density_ridges(alpha = 0.5) +
-  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", 
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", nrow = 4, ncol = 1,
              strip.position = "bottom")+
   labs(x = " ", y = "Elevation (m a.s.l.)") +
   geom_vline(xintercept = 0, linetype = "dashed") +
   geom_text(data = ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
   geom_point(
     data = ridges_letters,
-    aes(x = emmean, y = as.numeric(elevation)),
+    aes(x = emmean, y = as.numeric(elevation), color = sign),
     size = 2, inherit.aes = FALSE) +
   geom_errorbarh(
     data = ridges_letters,
     aes(xmin = emmean - emmean_SE,
         xmax = emmean + emmean_SE,
-        y = as.numeric(elevation)),
+        y = as.numeric(elevation), color = sign),
     height = 0.08,
     linewidth = 1, inherit.aes = FALSE)+
+  scale_color_manual(values = c("no" ="black","significant" = "red")) +
   theme_bw() +
   theme(legend.position = "none", axis.title = element_text(size = 18), 
         axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
@@ -646,6 +670,11 @@ C2_ses_ridges <- C2_ele_comb |>
         strip.placement = "outside", panel.grid = element_blank()) 
 
 C2_ses_ridges
+
+
+combined_SES_ridges <- ggarrange(ses_ridges, C2_ses_ridges)
+
+
 
 ```
 
