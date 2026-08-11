@@ -25,6 +25,7 @@ gg_summer |>
   group_by(cellref) |> 
   summarise(sum_cover = sum(cover)) |> 
   filter(sum_cover == 0) #19 cells with zero species richness
+#these seem to be cells with 100% rock cover
 
 #remove species with no cover from long format data
 gg_summer2 <- gg_summer |> 
@@ -47,18 +48,28 @@ wh <- read_excel("All_data/raw_data/raw_occurrence_data/Witsieshoek/Data entry 2
   select(!species_richness) |> 
   pivot_longer(cols= 4:187, names_to = "taxon", values_to = "cover") |> 
   mutate(site = "WH", 
-         cellref = paste0(site, "_", "G", grid, "_", column, row)) |> 
+         cellref = paste0(site, "_", "G", grid, "_", column, row)) 
+
+##Cells with zero species richness
+wh |> 
+  group_by(cellref) |> 
+  summarise(sum_cover = sum(cover)) |> 
+  filter(sum_cover == 0) #4 cells with zero species richness
+#these seem to be cells with 100% rock cover
+
+#remove species with no cover from long format data
+wh2 <- wh |> 
   filter(!cover == 0)
 
 #check that all grids and cells are there:
-length(unique(wh$grid)) #all 7
-length(unique(wh$cellref)) #1120 all cells from the 8 grids present
+length(unique(wh2$grid)) #all 7
+length(unique(wh2$cellref)) #1116 
 
 #check that cover values make sense
-ggplot(wh) +
+ggplot(wh2) +
   geom_histogram(aes(x = cover))
-min(wh$cover)
-max(wh$cover)
+min(wh2$cover)
+max(wh2$cover)
 
 
 ####BOKONG####
