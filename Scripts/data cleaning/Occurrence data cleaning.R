@@ -115,6 +115,13 @@ bk <- bk[-which(bk$cover == 0), ] #sp not present on sheet, remove
 bk[which(bk$cover == 0.2), which(colnames(bk) == "cover")] <- 0.5 #checked on paper sheet
 bk[which(bk$cover == 1510.0), which(colnames(bk) == "cover")] <-15  #checked on paper sheet
 
+
+##Cells with zero species richness
+bk |> 
+  group_by(cellref) |> 
+  summarise(sum_cover = sum(cover)) |> 
+  filter(sum_cover == 0) #none
+
 ####Bind sites together and extract speciesnames####
 allsites <- gg_summer |> 
   bind_rows(wh) |> 
