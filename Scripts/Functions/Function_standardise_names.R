@@ -11,8 +11,6 @@ standardise_names <- function(data, #dataframe containing species names that nee
   #add change tracker column to keep track of names changed
   data$change_tracker <- NA
   
-  data <- tibble(data)
-  
   #remove names that do not have synonyms
   naming_system <- naming_system |> 
     filter(!is.na(synonym1))
@@ -24,7 +22,7 @@ standardise_names <- function(data, #dataframe containing species names that nee
     found <- FALSE
     for (j in 1:nrow(naming_system)) { # looks whether species name should be corrected and replaces it with the new name
       #found <- grepl(old_name, naming_system[j, which(colnames(naming_system) %in% synonym)])
-      found <- any(old_name$data_species_column == as.character(naming_system[j, synonym]))
+      found <- any(unlist(old_name) == as.character(naming_system[j, synonym]))
       
       # if (is.na(found)){ # only runs if the species is missing
       #    found <- FALSE
