@@ -26,6 +26,7 @@ mean_traits_all <- FT |>
   pivot_wider(names_from = trait, values_from = mean_trait) |> 
   ungroup() |> 
   arrange(taxon)
+write.csv(mean_traits_all, "All_data/comm_assembly_results/mean_traits.csv")
 
 #Do inner join between trait and cover data to get sp that match between the two
 FT_join <- drak |> 
@@ -37,7 +38,7 @@ FT_join <- drak |>
 #Run Function_cell_trait_coverage.R
 coverage <- cell_trait_coverage() 
 to_keep<- coverage |> 
-  filter(Trait_Coverage >= 0.8) #594 cells to remove,17%
+  filter(Trait_Coverage >= 0.8) #430 cells to remove,12%
 
 #Remove cells with less than 80% trait coverage
 FT_join2 <- FT_join |> 
