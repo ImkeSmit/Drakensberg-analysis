@@ -632,7 +632,7 @@ SES_elevation_ridges
 #| message: false
 #| echo: false
 #| label: fig-RaoQ-elevation-ridges
-#| fig-cap: "Trait diversity, calculated with RaoQ, of each trait along the elevation gradient. Points with error bars show the mean and confidence interval of the SES. Letters indicate significant differences between the mean RaoQ of different elevations."
+#| fig-cap: "Trait diversity of cells, calculated with RaoQ, of plant height, leaf area (LA), leaf dry matter content (LDMC), and specific leaf area (SLA) at the low, mid and high elevation. Points with error bars show the mean and confidence interval of RaoQ for cells at each elevation. Letters indicate significant differences between the mean RaoQ of different elevations."
 #| warning: false
 
 
@@ -664,7 +664,7 @@ RaoQ_ele_cld[[t]] <- comp_letters
 
 ###Graph####
 l1 <- c("log_Height" = "RaoQ~of~plant~height", "SLA" = "RaoQ~of~SLA", "log_LDMC" = "RaoQ~of~LDMC", "log_LA" = "RaoQ~of~LA")
-raoq_ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), rep("log_LDMC", 3),rep("log_LA", 3)), 
+raoq_ridges_letters <- tibble(trait = c(rep("log_Height", 3), rep("SLA", 3), rep("log_LDMC", 3),rep("log_LA", 3)), 
                              elevation = as.factor(c(rep(c("2000", "2500", "3000"), 4))),
                              letters = c(RaoQ_ele_cld$log_Height$.group, 
                                          RaoQ_ele_cld$SLA$.group, 
@@ -681,7 +681,9 @@ raoq_ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3),
                              emmean_SE = c(RaoQ_ele_cld$log_Height$SE,
                                            RaoQ_ele_cld$SLA$SE,
                                            RaoQ_ele_cld$log_LDMC$SE,
-                                           RaoQ_ele_cld$log_LA$SE))
+                                           RaoQ_ele_cld$log_LA$SE)) |> 
+                              mutate(upper_ci = emmean+1.96*emmean_SE, 
+                                     lower_ci = emmean-1.96*emmean_SE)
 
 raoq_ridges <- C5_ele_comb |> #doesn't matter which df we use here, observed RaoQ should stay the same
   filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
@@ -699,8 +701,8 @@ raoq_ridges <- C5_ele_comb |> #doesn't matter which df we use here, observed Rao
     size = 2, inherit.aes = FALSE) +
   geom_errorbarh(
     data = raoq_ridges_letters,
-    aes(xmin = emmean - emmean_SE,
-        xmax = emmean + emmean_SE,
+    aes(xmin = lower_ci,
+        xmax = upper_ci,
         y = as.numeric(elevation)),
     height = 0.08,
     linewidth = 1, inherit.aes = FALSE)+
@@ -715,7 +717,7 @@ raoq_ridges
 
 ```{r}
 #| label: fig-CWM-elevation-ridges
-#| fig-cap: Community-weighted mean (CWM) traits of cells at the low, mid and high elevation. Height, LDMC and leaf area are on the log scale. Points with error bars show the mean and confidence interval of the CWM of cells at each site.Points with error bars show the mean and confidence interval of the SES. Letters indicate significant differences between the CWM of different elevations.
+#| fig-cap: Community-weighted mean (CWM) traits of plant height (cm), leaf area (LA, mm$^2$), leaf dry matter content (LDMC, mg.g$^-1$), and specific leaf area (SLA, mm$^2$.mg$^-1$) at the low, mid and high elevation. Height, LDMC and leaf area are on the log scale. Points with error bars show the mean and confidence interval of the CWM at each elevation. Letters indicate significant differences between the CWM of different elevations.
 #| warning: false
 #| message: false
 #| echo: false
@@ -788,7 +790,9 @@ cwm_ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), 
                              emmean_SE = c(CWM_ele_cld$log_Height$SE,
                                            CWM_ele_cld$SLA$SE,
                                            CWM_ele_cld$log_LDMC$SE,
-                                           CWM_ele_cld$log_LA$SE))
+                                           CWM_ele_cld$log_LA$SE)) |> 
+                              mutate(upper_ci = emmean+1.96*emmean_SE, 
+                                     lower_ci = emmean-1.96*emmean_SE)
 
 cwm_ridges <- cwm_comb |>
   filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
@@ -806,8 +810,8 @@ cwm_ridges <- cwm_comb |>
     size = 2, inherit.aes = FALSE) +
   geom_errorbarh(
     data = cwm_ridges_letters,
-    aes(xmin = emmean - emmean_SE,
-        xmax = emmean + emmean_SE,
+    aes(xmin = lower_ci,
+        xmax = upper_ci,
         y = as.numeric(elevation)),
     height = 0.08,
     linewidth = 1, inherit.aes = FALSE)+
