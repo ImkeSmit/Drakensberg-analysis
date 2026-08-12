@@ -519,7 +519,6 @@ for (t in 1:length(traitlist)) {
 
 Plant height was generally filtered toward shorter plants with elevation (@fig-CWM-elevation-ridges), but the diversity of plant height increased with elevation (@fig-RaoQ-elevation-ridges), showing the existence of very short as well as very tall plants in the alpine. The community weighted means of leaf area, SLA and LDMC didn't show a linear relationship with altitude, with communities at the mid site having larger leaves and less conservative resource-use strategies than at the high and low site (@fig-CWM-elevation-ridges).
 
-
 ```{r}
 #| message: false
 #| echo: false
@@ -626,7 +625,6 @@ SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
 SES_elevation_ridges
 
 ```
-
 
 ```{r}
 #| message: false
@@ -822,7 +820,7 @@ cwm_ridges <- cwm_comb |>
 cwm_ridges
 ```
 
-Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power, with R squared values generally below 0.1 (@tbl-R2-models-C5, @tbl-R2-models-C2). Only surface heterogeneity had a somewhat consistent relationship with community assembly, often being related to higher than expected trait divergence (@fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits. Other micro-environmental factors had weak and inconsistent effects on community assembly.
+Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power with marginal R\$\^2\$ values generally below 0.1 (@tbl-R2-models-C5, @tbl-R2-models-C2), although the models for leaf area (marginal R\$\^2\$, C5 site pool model = 0.333, marginal R\$\^2\$, C2 site pool model = 0.275) and plant height (marginal R\$\^2\$, C5 site pool model = 0.143, marginal R\$\^2\$, C2 site pool model = 0.127) at the low site had better explanatory power. Only surface heterogeneity had a somewhat consistent relationship with community assembly, often being related to higher than expected trait divergence (in 5 out of 12 trait x site combinations, @fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits. Other micro-environmental factors had weak and inconsistent effects on community assembly. For example, rock cover was significantly related to limiting similarity in 1 out of 12 trait x site combinations, but was not significantly related to assembly patterns in any other trait (@fig-allsites-microenv_C5_C2). Soil depth was significantly related to limiting similarity in 6 trait x site combinations, but significantly related to environmental filtering in 3 trait x site combinations (@fig-allsites-microenv_C5_C2).
 
 ```{r}
 #| label: tbl-R2-models-C5
