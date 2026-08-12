@@ -732,7 +732,7 @@ letters_comb <- C5_ridges_letters |> bind_rows(C2_ridges_letters)|>
   mutate(model = factor(model, levels = c("C5 entire pool", "C2 site pool")))
 
 
-l1 <- c("log_Height" = "SES~of~plant~height", "SLA" = "SES~of~SLA", "log_LDMC" = "SES~of~LDMC", "log_LA" = "SES~of~LA", "C5 entire pool" = "C5~entire~pool", 
+l1 <- c("log_Height" = "Plant~height", "SLA" = "SLA", "log_LDMC" = "LDMC", "log_LA" = "LA", "C5 entire pool" = "C5~entire~pool", 
         "C2 site pool" = "C2~site~pool")
 SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
   geom_density_ridges(alpha = 0.5) +
@@ -754,7 +754,7 @@ SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
   scale_color_manual(values = c("no" ="black","significant" = "red")) +
   theme_bw() +
   theme(legend.position = "none", axis.title = element_text(size = 18), 
-        axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
+        axis.text = element_text(size = 14), strip.text = element_text(size = 18), strip.text.y.right = element_text(angle = 0, hjust = 0),
         strip.background = element_blank(),
         strip.placement = "outside", panel.grid = element_blank())
   
