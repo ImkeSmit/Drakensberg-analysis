@@ -820,7 +820,7 @@ cwm_ridges <- cwm_comb |>
 cwm_ridges
 ```
 
-Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power with marginal R\$\^2\$ values generally below 0.1 (@tbl-R2-models-C5, @tbl-R2-models-C2), although the models for leaf area (marginal R\$\^2\$, C5 site pool model = 0.333, marginal R\$\^2\$, C2 site pool model = 0.275) and plant height (marginal R\$\^2\$, C5 site pool model = 0.143, marginal R\$\^2\$, C2 site pool model = 0.127) at the low site had better explanatory power. Only surface heterogeneity had a somewhat consistent relationship with community assembly, often being related to higher than expected trait divergence (in 5 out of 12 trait x site combinations, @fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits. Other micro-environmental factors had weak and inconsistent effects on community assembly. For example, rock cover was significantly related to limiting similarity in 1 out of 12 trait x site combinations, but was not significantly related to assembly patterns in any other trait (@fig-allsites-microenv_C5_C2). Soil depth was significantly related to limiting similarity in 6 trait x site combinations, but significantly related to environmental filtering in 3 trait x site combinations (@fig-allsites-microenv_C5_C2).
+Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power with marginal R\$\^2\$ values generally below 0.1 (@fig-allsites-microenv_C5_C2), although the models for leaf area (marginal R\$\^2\$, C5 site pool model = 0.333, marginal R\$\^2\$, C2 site pool model = 0.275) and plant height (marginal R\$\^2\$, C5 site pool model = 0.143, marginal R\$\^2\$, C2 site pool model = 0.127) at the low site had better explanatory power. Only surface heterogeneity had a somewhat consistent relationship with community assembly, often being related to higher than expected trait divergence (in 5 out of 12 trait x site combinations, @fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits. Other micro-environmental factors had weak and inconsistent effects on community assembly. For example, rock cover was significantly related to limiting similarity in 1 out of 12 trait x site combinations, but was not significantly related to assembly patterns in any other trait (@fig-allsites-microenv_C5_C2). Soil depth was significantly related to limiting similarity in 6 trait x site combinations, but significantly related to environmental filtering in 3 trait x site combinations (@fig-allsites-microenv_C5_C2).
 
 ```{r}
 #| label: fig-allsites-microenv_C5_C2
@@ -996,7 +996,7 @@ allsites_microenv_plot <- microenv_dat_all |>
   theme(panel.grid = element_blank(), legend.position = "bottom", 
         strip.background = element_blank(), 
         strip.text.y.right = element_text(angle = 0)) +
-  geom_text(aes(x = -1, y = "surface heterogeneity", label = R2_label),
+  geom_text(aes(x = -0.6, y = "surface heterogeneity", label = R2_label),
             size = 2.5, position = position_dodge(width = 1), 
             show.legend = FALSE, parse = TRUE)
 allsites_microenv_plot
