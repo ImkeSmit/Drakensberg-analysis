@@ -824,14 +824,14 @@ Micro-environmental factors were weakly related to fine-scale variation in commu
 
 ```{r}
 #| label: tbl-R2-models-C5
-#| tbl-cap: Marginal and conditional $R^2$ values of micro-environmental models in predicting SES of each trait calculated with the C5 null model at the low, mid and high site. The SES of LDMC was calculated with LDMC on the log scale.
+#| tbl-cap: Marginal and conditional $R^2$ values of micro-environmental models in predicting SES of plant height, leaf area (LA), leaf dry matter content (LDMC) and specific leaf area (SLA) calculated with the C5 null model at the low, mid and high site.
 #| echo: false
 #| message: false
 #| warning: false
 
 library(flextable)
 
-R2_table <- tibble(trait = c("Height", "Leaf area", "LDMC", "SLA"), 
+R2_table <- tibble(trait = c("Plant height", "LA", "LDMC", "SLA"), 
                    GG_R2M = c(C5_SES_microenv_Rsq$Height_cm_GG[1,][1], C5_SES_microenv_Rsq$Leaf_area_mm2_GG[1,][1], C5_SES_microenv_Rsq$log_LDMC_GG[1,][1], C5_SES_microenv_Rsq$SLA_GG[1,][1]), 
                    GG_R2C = c(C5_SES_microenv_Rsq$Height_cm_GG[1,][2], C5_SES_microenv_Rsq$Leaf_area_mm2_GG[1,][2], C5_SES_microenv_Rsq$log_LDMC_GG[1,][2], C5_SES_microenv_Rsq$SLA_GG[1,][2]), 
                    WH_R2M = c(C5_SES_microenv_Rsq$Height_cm_WH[1,][1], C5_SES_microenv_Rsq$Leaf_area_mm2_WH[1,][1], C5_SES_microenv_Rsq$log_LDMC_WH[1,][1], C5_SES_microenv_Rsq$SLA_WH[1,][1]), 
@@ -868,14 +868,14 @@ R2_table |>
 
 ```{r}
 #| label: tbl-R2-models-C2
-#| tbl-cap: Marginal and conditional $R^2$ values of micro-environmental models in predicting SES of each trait calculated with the C2 null model at the low, mid and high site. The SES of LDMC was calculated with LDMC on the log scale.
+#| tbl-cap: Marginal and conditional $R^2$ values of micro-environmental models in predicting SES of plant height, leaf area (LA), leaf dry matter content (LDMC) and specific leaf area (SLA) calculated with the C2 null model at the low, mid and high site.
 #| echo: false
 #| message: false
 #| warning: false
 
 library(flextable)
 
-C2_R2_table <- tibble(trait = c("Height", "Leaf area", "LDMC", "SLA"), 
+C2_R2_table <- tibble(trait = c("Plant height", "LA", "LDMC", "SLA"), 
                    GG_R2M = c(C2_SES_microenv_Rsq$Height_cm_GG[1,][1], C2_SES_microenv_Rsq$Leaf_area_mm2_GG[1,][1], C2_SES_microenv_Rsq$log_LDMC_GG[1,][1], C2_SES_microenv_Rsq$SLA_GG[1,][1]), 
                    GG_R2C = c(C2_SES_microenv_Rsq$Height_cm_GG[1,][2], C2_SES_microenv_Rsq$Leaf_area_mm2_GG[1,][2], C2_SES_microenv_Rsq$log_LDMC_GG[1,][2], C2_SES_microenv_Rsq$SLA_GG[1,][2]), 
                    WH_R2M = c(C2_SES_microenv_Rsq$Height_cm_WH[1,][1], C2_SES_microenv_Rsq$Leaf_area_mm2_WH[1,][1], C2_SES_microenv_Rsq$log_LDMC_WH[1,][1], C2_SES_microenv_Rsq$SLA_WH[1,][1]), 
@@ -917,7 +917,7 @@ C2_R2_table |>
 #| warning: false
 #| message: false
 #| width: 6.5
-#| height: 5
+#| height: 6
 
 #Create tables of coeffieicents for each site, it is easier to manage this way
 GG_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
@@ -1005,9 +1005,45 @@ allsites_microenv <- bind_rows(GG_microenv_results, WH_microenv_results, BK_micr
 
 write.csv(allsites_microenv, "All_data/comm_assembly_results/SES_microenv_model_results_table.csv")
 
+#R squared values for each model, C5
+C2_R2_table_long <- C2_R2_table |> 
+  pivot_longer(cols = contains("R2"), names_to = 'metric', values_to = "R2") |> 
+  mutate(site = case_when(grepl("GG", metric)~"low", 
+                          grepl("WH", metric)~"mid", 
+                          grepl("BK", metric)~"high", 
+                          .default = NA), 
+         null_model = "C2", 
+         trait = case_when(trait == "Plant height" ~ "Height_cm", 
+                           trait == "LA"~ "Leaf_area_mm2", 
+                           .default = trait), 
+         R2 = round(R2, digits = 3), 
+         R2_label = paste0("R2M = ", R2)) |> 
+  filter(grepl("M", metric)) 
+
+#R squared values for each model, C2
+C5_R2_table_long <- R2_table |> 
+  pivot_longer(cols = contains("R2"), names_to = 'metric', values_to = "R2") |> 
+  mutate(site = case_when(grepl("GG", metric)~"low", 
+                          grepl("WH", metric)~"mid", 
+                          grepl("BK", metric)~"high", 
+                          .default = NA), 
+         null_model = "C5", 
+         trait = case_when(trait == "Plant height" ~ "Height_cm", 
+                           trait == "LA"~ "Leaf_area_mm2", 
+                           .default = trait), 
+         R2 = round(R2, digits = 3), 
+         R2_label = paste0("R2M = ", R2)) |> 
+  filter(grepl("M", metric))
+
+microenv_dat_all <- C2_R2_table_long |> 
+  bind_rows(C5_R2_table_long) |> 
+  right_join(allsites_microenv, by = c("trait", "site", "null_model"))
+
+
+
 
 l1 <- c("Height_cm" = "Height", "SLA" = "SLA", "LDMC" = "LDMC", "Leaf_area_mm2" = "LA", "low" = "low", "mid" = "mid", "high" = "high")
-allsites_microenv_plot <- allsites_microenv |> 
+allsites_microenv_plot <- microenv_dat_all |> 
   ggplot(aes(x = coefficient, y = variable, color = null_model)) +
   geom_point(position = position_dodge(width = 0.5)) +
   geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0, 
@@ -1023,10 +1059,33 @@ allsites_microenv_plot <- allsites_microenv |>
   scale_x_continuous(breaks = c(-0.8,0,0.8)) +
   theme_bw() +
   labs(y = " ", x = "Slope estimate", color = "Null model") +
-  theme(panel.grid = element_blank(), legend.position = "bottom") 
+  theme(panel.grid = element_blank(), legend.position = "bottom", 
+        strip.background = element_blank()) 
 allsites_microenv_plot
 
-ggsave("allsites_SES_microenv_coef.png", plot = allsites_microenv_plot, path = "Figures")
+
+C2_R2_table_long <- C2_R2_table |> 
+  pivot_longer(cols = contains("R2"), names_to = 'metric', values_to = "R2_C2") |> 
+  mutate(site = case_when(grepl("GG", metric)~"low", 
+                          grepl("WH", metric)~"mid", 
+                          grepl("BK", metric)~"high", 
+                          .default = NA), 
+         null_model = "C2", 
+         trait = case_when(trait == "Plant height" ~ "Height_cm", 
+                           trait == "LA"~ "Leaf_area_mm2", 
+                           .default = trait), 
+         R2_C2 = round(R2_C2, digits = 2), 
+         R2_label = paste0("R2M = ", R2_C2)) |> 
+  filter(grepl("M", metric)) |> 
+  right_join(allsites_microenv, by = c("trait", "site", "null_model"))
+
+
+
+allsites_microenv_plot+
+  geom_text(aes(x = -1, y = "surface heterogeneity", label = R2_label),
+            size = 2.5, position = position_dodge(width = 1), 
+            show.legend = FALSE)
+
 ```
 
 # Discussion
