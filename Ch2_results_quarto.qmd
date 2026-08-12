@@ -524,7 +524,7 @@ Plant height was generally filtered toward shorter plants with elevation (@fig-C
 #| message: false
 #| echo: false
 #| label: fig-SES-elevation-ridges-combined
-#| fig-cap: "Distributions of standard effect sizes (SES) from the C2 site pool null model calculated with plant height, SLA, LDMC and leaf area along the elevational gradient. SES calculated with plant height, LDMC and leaf area used the traits on the log scale. Points with error bars show the mean and confidence interval of the SES. Points in red are significantly different from zero. letters indicate significant differences between the mean SES of different elevations."
+#| fig-cap: "Distributions of standard effect sizes (SES) from theC5 entire pool and  C2 site pool null model calculated with plant height, SLA, LDMC and leaf area along the elevational gradient. SES calculated with plant height, LDMC and leaf area used the traits on the log scale. Points with error bars show the mean and confidence interval of the SES. Points in red are significantly different from zero. Letters indicate significant differences between the mean SES of different elevations."
 #| warning: false
 
 
@@ -625,9 +625,6 @@ SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
 
 SES_elevation_ridges
 ```
-
-
-
 
 
 ```{r}
