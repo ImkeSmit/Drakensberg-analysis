@@ -1059,7 +1059,8 @@ C2_R2_table_long <- C2_R2_table |>
 #Bind to coefficients table
 microenv_dat_all <- C2_R2_table_long |> 
   bind_rows(C5_R2_table_long) |> 
-  right_join(allsites_microenv, by = c("trait", "site", "null_model"))
+  right_join(allsites_microenv, by = c("trait", "site", "null_model")) |> 
+  mutate(site = factor(site, levels = c("high", "mid", "low")))
 
 
 #Plot
@@ -1081,7 +1082,8 @@ allsites_microenv_plot <- microenv_dat_all |>
   theme_bw() +
   labs(y = " ", x = "Slope estimate", color = "Null model") +
   theme(panel.grid = element_blank(), legend.position = "bottom", 
-        strip.background = element_blank()) +
+        strip.background = element_blank(), 
+        strip.text.y.right = element_text(angle = 0)) +
   geom_text(aes(x = -1, y = "surface heterogeneity", label = R2_label),
             size = 2.5, position = position_dodge(width = 1), 
             show.legend = FALSE, parse = TRUE)
