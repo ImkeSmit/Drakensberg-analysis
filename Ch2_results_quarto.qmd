@@ -996,7 +996,7 @@ BK_microenv_results <- expand_grid(null_model = c("C5", "C2"),
     upper_ci = coefficient + 1.96*std_error)
 
 
-#bind all tabes together
+#bind all coefficient tables together
 allsites_microenv <- bind_rows(GG_microenv_results, WH_microenv_results, BK_microenv_results) |> 
   mutate(site = c(rep("low", nrow(GG_microenv_results)), rep("mid", nrow(WH_microenv_results)), rep("high", nrow(BK_microenv_results))), 
          site = factor(site, levels = c("low", "mid", "high"))) |> 
@@ -1005,22 +1005,27 @@ allsites_microenv <- bind_rows(GG_microenv_results, WH_microenv_results, BK_micr
 
 write.csv(allsites_microenv, "All_data/comm_assembly_results/SES_microenv_model_results_table.csv")
 
-#R squared values for each model, C5
-C2_R2_table_long <- C2_R2_table |> 
-  pivot_longer(cols = contains("R2"), names_to = 'metric', values_to = "R2") |> 
-  mutate(site = case_when(grepl("GG", metric)~"low", 
-                          grepl("WH", metric)~"mid", 
-                          grepl("BK", metric)~"high", 
-                          .default = NA), 
-         null_model = "C2", 
-         trait = case_when(trait == "Plant height" ~ "Height_cm", 
-                           trait == "LA"~ "Leaf_area_mm2", 
-                           .default = trait), 
-         R2 = round(R2, digits = 3), 
-         R2_label = paste0("R^2*m*' = '*", R2)) |> 
-  filter(grepl("M", metric)) 
 
-#R squared values for each model, C2
+#create two tables for the R suqared values associated with each null model
+#C5 model
+R2_table <- tibble(trait = c("Plant height", "LA", "LDMC", "SLA"), 
+                   GG_R2M = c(C5_SES_microenv_Rsq$Height_cm_GG[1,][1], C5_SES_microenv_Rsq$Leaf_area_mm2_GG[1,][1], C5_SES_microenv_Rsq$log_LDMC_GG[1,][1], C5_SES_microenv_Rsq$SLA_GG[1,][1]), 
+                   GG_R2C = c(C5_SES_microenv_Rsq$Height_cm_GG[1,][2], C5_SES_microenv_Rsq$Leaf_area_mm2_GG[1,][2], C5_SES_microenv_Rsq$log_LDMC_GG[1,][2], C5_SES_microenv_Rsq$SLA_GG[1,][2]), 
+                   WH_R2M = c(C5_SES_microenv_Rsq$Height_cm_WH[1,][1], C5_SES_microenv_Rsq$Leaf_area_mm2_WH[1,][1], C5_SES_microenv_Rsq$log_LDMC_WH[1,][1], C5_SES_microenv_Rsq$SLA_WH[1,][1]), 
+                   WH_R2C = c(C5_SES_microenv_Rsq$Height_cm_WH[1,][2], C5_SES_microenv_Rsq$Leaf_area_mm2_WH[1,][2], C5_SES_microenv_Rsq$log_LDMC_WH[1,][2], C5_SES_microenv_Rsq$SLA_WH[1,][2]),
+                   BK_R2M = c(C5_SES_microenv_Rsq$Height_cm_BK[1,][1], C5_SES_microenv_Rsq$Leaf_area_mm2_BK[1,][1], C5_SES_microenv_Rsq$log_LDMC_BK[1,][1], C5_SES_microenv_Rsq$SLA_BK[1,][1]), 
+                   BK_R2C = c(C5_SES_microenv_Rsq$Height_cm_BK[1,][2], C5_SES_microenv_Rsq$Leaf_area_mm2_BK[1,][2], C5_SES_microenv_Rsq$log_LDMC_BK[1,][2], C5_SES_microenv_Rsq$SLA_BK[1,][2]))
+
+#C2 model
+C2_R2_table <- tibble(trait = c("Plant height", "LA", "LDMC", "SLA"), 
+                   GG_R2M = c(C2_SES_microenv_Rsq$Height_cm_GG[1,][1], C2_SES_microenv_Rsq$Leaf_area_mm2_GG[1,][1], C2_SES_microenv_Rsq$log_LDMC_GG[1,][1], C2_SES_microenv_Rsq$SLA_GG[1,][1]), 
+                   GG_R2C = c(C2_SES_microenv_Rsq$Height_cm_GG[1,][2], C2_SES_microenv_Rsq$Leaf_area_mm2_GG[1,][2], C2_SES_microenv_Rsq$log_LDMC_GG[1,][2], C2_SES_microenv_Rsq$SLA_GG[1,][2]), 
+                   WH_R2M = c(C2_SES_microenv_Rsq$Height_cm_WH[1,][1], C2_SES_microenv_Rsq$Leaf_area_mm2_WH[1,][1], C2_SES_microenv_Rsq$log_LDMC_WH[1,][1], C2_SES_microenv_Rsq$SLA_WH[1,][1]), 
+                   WH_R2C = c(C2_SES_microenv_Rsq$Height_cm_WH[1,][2], C2_SES_microenv_Rsq$Leaf_area_mm2_WH[1,][2], C2_SES_microenv_Rsq$log_LDMC_WH[1,][2], C2_SES_microenv_Rsq$SLA_WH[1,][2]),
+                   BK_R2M = c(C2_SES_microenv_Rsq$Height_cm_BK[1,][1], C2_SES_microenv_Rsq$Leaf_area_mm2_BK[1,][1], C2_SES_microenv_Rsq$log_LDMC_BK[1,][1], C2_SES_microenv_Rsq$SLA_BK[1,][1]), 
+                   BK_R2C = c(C2_SES_microenv_Rsq$Height_cm_BK[1,][2], C2_SES_microenv_Rsq$Leaf_area_mm2_BK[1,][2], C2_SES_microenv_Rsq$log_LDMC_BK[1,][2], C2_SES_microenv_Rsq$SLA_BK[1,][2]))
+
+#Change to long format
 C5_R2_table_long <- R2_table |> 
   pivot_longer(cols = contains("R2"), names_to = 'metric', values_to = "R2") |> 
   mutate(site = case_when(grepl("GG", metric)~"low", 
@@ -1035,13 +1040,29 @@ C5_R2_table_long <- R2_table |>
          R2_label = paste0("R^2*m*' = '*", R2)) |> 
   filter(grepl("M", metric))
 
+
+C2_R2_table_long <- C2_R2_table |> 
+  pivot_longer(cols = contains("R2"), names_to = 'metric', values_to = "R2") |> 
+  mutate(site = case_when(grepl("GG", metric)~"low", 
+                          grepl("WH", metric)~"mid", 
+                          grepl("BK", metric)~"high", 
+                          .default = NA), 
+         null_model = "C2", 
+         trait = case_when(trait == "Plant height" ~ "Height_cm", 
+                           trait == "LA"~ "Leaf_area_mm2", 
+                           .default = trait), 
+         R2 = round(R2, digits = 3), 
+         R2_label = paste0("R^2*m*' = '*", R2)) |> 
+  filter(grepl("M", metric)) 
+
+
+#Bind to coefficients table
 microenv_dat_all <- C2_R2_table_long |> 
   bind_rows(C5_R2_table_long) |> 
   right_join(allsites_microenv, by = c("trait", "site", "null_model"))
 
 
-
-
+#Plot
 l1 <- c("Height_cm" = "Plant~height", "SLA" = "SLA", "LDMC" = "LDMC", "Leaf_area_mm2" = "LA", "low" = "low", "mid" = "mid", "high" = "high")
 allsites_microenv_plot <- microenv_dat_all |> 
   ggplot(aes(x = coefficient, y = variable, color = null_model)) +
