@@ -115,6 +115,8 @@ A principal component analysis was performed to identify the main axes of enviro
 #| warning: false
 #| message: false
 #| echo: false
+#| fig-width: 6.5
+#| fig-height: 4
 #import microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
   tibble() |> 
@@ -523,6 +525,8 @@ Plant height was generally filtered toward shorter plants with elevation (@fig-C
 #| label: fig-SES-elevation-ridges
 #| fig-cap: "Distributions of standard effect sizes (SES) from the C5 entire pool and  C2 site pool null model calculated with plant height, SLA, LDMC and leaf area along the elevational gradient. SES calculated with plant height, LDMC and leaf area used the traits on the log scale. Points with error bars show the mean and confidence interval of the SES. Points in red are significantly different from zero. Letters indicate significant differences between the mean SES of different elevations."
 #| warning: false
+#| fig-width: 6.5
+#| fig-height: 7
 
 
 C5_dat <- C5_ele_comb |>
@@ -614,8 +618,8 @@ SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
     linewidth = 1, inherit.aes = FALSE)+
   scale_color_manual(values = c("no" ="black","significant" = "red")) +
   theme_bw() +
-  theme(legend.position = "none", axis.title = element_text(size = 18), 
-        axis.text = element_text(size = 14), strip.text = element_text(size = 18), strip.text.y.right = element_text(angle = 0, hjust = 0),
+  theme(legend.position = "none", axis.title = element_text(size = 14), 
+        axis.text = element_text(size = 12), strip.text = element_text(size = 14), strip.text.y.right = element_text(angle = 0, hjust = 0),
         strip.background = element_blank(),
         strip.placement = "outside", panel.grid = element_blank())
   
@@ -630,6 +634,8 @@ SES_elevation_ridges
 #| label: fig-RaoQ-elevation-ridges
 #| fig-cap: "Trait diversity of cells, calculated with RaoQ, of plant height, leaf area (LA), leaf dry matter content (LDMC), and specific leaf area (SLA) at the low, mid and high elevation. Points with error bars show the mean and confidence interval of RaoQ for cells at each elevation. Letters indicate significant differences between the mean RaoQ of different elevations."
 #| warning: false
+#| fig-width: 6
+#| fig-height: 4
 
 
 ####model RaoQ ~ elevation####
@@ -702,8 +708,8 @@ raoq_ridges <- C5_ele_comb |> #doesn't matter which df we use here, observed Rao
         y = as.numeric(elevation)),
     height = 0.08,
     linewidth = 1, inherit.aes = FALSE)+
-  theme(legend.position = "none", axis.title = element_text(size = 18), 
-        axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
+  theme(legend.position = "none", axis.title = element_text(size = 14), 
+        axis.text = element_text(size = 12), strip.text = element_text(size = 14), 
         strip.background = element_blank(),
         strip.placement = "outside", panel.grid = element_blank()) 
 
@@ -717,6 +723,8 @@ raoq_ridges
 #| warning: false
 #| message: false
 #| echo: false
+#| fig-width: 6
+#| fig-height: 4
 
 #import trait and abundance data
 abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
@@ -811,8 +819,8 @@ cwm_ridges <- cwm_comb |>
         y = as.numeric(elevation)),
     height = 0.08,
     linewidth = 1, inherit.aes = FALSE)+
-  theme(legend.position = "none", axis.title = element_text(size = 18), 
-        axis.text = element_text(size = 14), strip.text = element_text(size = 18), 
+  theme(legend.position = "none", axis.title = element_text(size = 14), 
+        axis.text = element_text(size = 12), strip.text = element_text(size = 14), 
         strip.background = element_blank(),
         strip.placement = "outside", panel.grid = element_blank()) 
 cwm_ridges
@@ -827,7 +835,7 @@ Micro-environmental factors were weakly related to fine-scale variation in commu
 #| warning: false
 #| message: false
 #| width: 6.5
-#| height: 6
+#| height: 8
 
 #Create tables of coeffieicents for each site, it is easier to manage this way
 GG_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
@@ -993,7 +1001,9 @@ allsites_microenv_plot <- microenv_dat_all |>
   labs(y = " ", x = "Slope estimate", color = "Null model") +
   theme(panel.grid = element_blank(), legend.position = "bottom", 
         strip.background = element_blank(), 
-        strip.text.y.right = element_text(angle = 0)) +
+        strip.text.y.right = element_text(angle = 0), 
+        axis.title = element_text(size = 14), axis.text = element_text(size = 12), 
+        strip.text = element_text(size = 14), legend.text = element_text(size = 14)) +
   geom_text(aes(x = -0.6, y = "surface heterogeneity", label = R2_label),
             size = 2.5, position = position_dodge(width = 1), 
             show.legend = FALSE, parse = TRUE)
@@ -1056,6 +1066,7 @@ validation_grid <- validation_results |>
                     RMSE = "Root mean square error", 
                     bias = "Bias") |> 
   align(j = 1:6, align = "center", part = "all") |>
+  fontsize(size = 18, part = "all") |> 
   theme_vanilla() |> 
   bold(part = "header") |> 
   autofit() |> 
