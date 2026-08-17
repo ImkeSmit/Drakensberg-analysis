@@ -116,7 +116,7 @@ A principal component analysis was performed to identify the main axes of enviro
 #| message: false
 #| echo: false
 #| fig-width: 6.5
-#| fig-height: 4
+#| fig-height: 5
 #import microenvironmental data
 env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
   tibble() |> 
@@ -834,13 +834,13 @@ Micro-environmental factors were weakly related to fine-scale variation in commu
 #| echo: false
 #| warning: false
 #| message: false
-#| width: 6.5
-#| height: 8
+#| fig-width: 6.5
+#| fig-height: 7
 
 #Create tables of coeffieicents for each site, it is easier to manage this way
 GG_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
-                         variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil depth", "surface heterogeneity")) |> 
+                         variable = c("soil temperature", "soil moisture", "rock cover", "soil depth", "surface heterogeneity")) |> 
   mutate(
     coefficient = c(C5_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
     C5_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
@@ -865,7 +865,7 @@ GG_microenv_results <- expand_grid(null_model = c("C5", "C2"),
 
 WH_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
-                         variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil depth", "surface heterogeneity")) |> 
+                         variable = c("soil temperature", "soil moisture", "rock cover", "soil depth", "surface heterogeneity")) |> 
   mutate(
     coefficient = c(C5_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:6], 
     C5_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:6], 
@@ -890,7 +890,7 @@ WH_microenv_results <- expand_grid(null_model = c("C5", "C2"),
 
 BK_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
-                         variable = c("mean soil temperature", "mean soil moisture", "rock cover", "mean soil depth", "surface heterogeneity")) |> 
+                         variable = c("soil temperature", "soil moisture", "rock cover", "soil depth", "surface heterogeneity")) |> 
   mutate(
     coefficient = c(C5_SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:6], 
     C5_SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:6], 
@@ -1013,6 +1013,10 @@ allsites_microenv_plot
 ```
 
 # Discussion
+
+Our analysis of trait diversity along an elevation gradient did not support the predictions of the SDH, with plant height, LDMC and SLA showing filtering, and LA showing random assembly at all elevations. No trait showed limiting similarity at any elevation.
+
+The C5 null model showed that the diversity of plant height was lower than expected at the low and mid elevation, but higher than expected at the high elevation. However, the C2 null model did not detect significant divergence at the high site. Therefore, we suggest that plant height is structured by competitive filtering at the low site, with this effect decreasing with elevation. This is supported by the fact that selection is in the direction of tall plants at the low site (able to compete for light), but shorter plants at the mid an high site.
 
 Some preliminary ideas:
 
