@@ -1016,7 +1016,15 @@ allsites_microenv_plot
 
 Our analysis of trait diversity along an elevation gradient did not support the predictions of the SDH, with plant height, LDMC and SLA showing filtering, and LA showing random assembly at all elevations. No trait showed limiting similarity at any elevation.
 
-The C5 null model showed that the diversity of plant height was lower than expected at the low and mid elevation, but higher than expected at the high elevation. However, the C2 null model did not detect significant divergence at the high site. Therefore, we suggest that plant height is structured by competitive filtering at the low site, with this effect decreasing with elevation. This is supported by the fact that selection is in the direction of tall plants at the low site (able to compete for light), but shorter plants at the mid an high site.
+The C5 null model showed that the diversity of plant height was lower than expected at the low and mid elevation, but higher than expected at the high elevation. However, the C2 null model did not detect significant divergence at the high site. Therefore, we suggest that plant height is structured by competitive filtering at the low site, with this effect decreasing with elevation. This is supported by the fact that selection is in the direction of tall plants at the low site (able to compete for light), but shorter plants at the mid an high site. The diversity of height increases with elevation, suggesting that constraints on plant height due to competition is relaxed at the high site.
+
+SLA showed greater than expected trait convergence at all elevations. Communities at the low and high site had low SLA values, while communities at the mid site had higher SLA, indicating a more acquisitive, less efficient resource-use strategy. This could be due to high competition for resources at the mid site, filtering species toward a fast strategy. Alternatively, it could be due to a relaxation of environmental filters at the mid site. We suggest that environmental filtering is responsible for the selection of low SLA, more conservative species at the low and high site. Low SLA is not associated with high competitive ability, so this could not be due to competitive filtering. We suggest that high temperatures at the low site, and cold temperatures at the high site favour conservative strategies.
+
+LDMC is also filtered toward low LDMC, conservative strategies at the low elevation, but seems to be randomly assembled at the mid and high site.
+
+LA shows random assembly at all elevations, but is higher at the mid site than at the low and high site.
+
+Thus, competitive and environmental filtering simulatneously structure communities in the Maloti-Drakensberg mountains. At the low site, high temperatures favour conservative resource use strategies, while competition for light simultaneously selects tall species. At the mid site, the high CWM SLA could be due to the relaxation of temperature filters, or due to competitive filtering toward acquisitive species(need more support to justify this). At the high site, environmental filtering selects for conservative species with low SLA and high LDMC. COntrary to expectations, plant height is not strongly filtered toward short species. Indicating that tall and short species are successfull in the alpine.
 
 Some preliminary ideas:
 
