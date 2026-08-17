@@ -1024,7 +1024,13 @@ LDMC is also filtered toward low LDMC, conservative strategies at the low elevat
 
 LA shows random assembly at all elevations, but is higher at the mid site than at the low and high site.
 
-Thus, competitive and environmental filtering simulatneously structure communities in the Maloti-Drakensberg mountains. At the low site, high temperatures favour conservative resource use strategies, while competition for light simultaneously selects tall species. At the mid site, the high CWM SLA could be due to the relaxation of temperature filters, or due to competitive filtering toward acquisitive species(need more support to justify this). At the high site, environmental filtering selects for conservative species with low SLA and high LDMC. COntrary to expectations, plant height is not strongly filtered toward short species. Indicating that tall and short species are successfull in the alpine.
+Thus, competitive and environmental filtering simultaneously structure communities in the Maloti-Drakensberg mountains. At the low site, high temperatures favour conservative resource use strategies, while competition for light simultaneously selects tall species. At the mid site, the high CWM SLA could be due to the relaxation of temperature filters, or due to competitive filtering toward acquisitive species(need more support to justify this). At the high site, environmental filtering selects for conservative species with low SLA and high LDMC. Contrary to expectations, plant height is not strongly filtered toward short species. Indicating that tall and short species are successfull in the alpine.
+
+These trends do not follow the predictions of the SDH, as the influence of the environment is present at all sites on the elevation gradient (integrating all traits here).
+
+Micro-environmental factors had weak and inconsistent relationships with community assembly, challenging the perception that microclimate and microtopography act as an additional filter in community assembly. The most consistent relationship was with surface heterogeneity, which promoted trait divergence. Did we sample broad enough micro-environmental gradients? - yes. Are the environmental variables measured at a biologocially relavant scale - yes. This suggests that stochastic processes may dominate assembly at these scales, and that species are adapted to the average conditions...
+
+Conclusion: SDH is not a general trend, plants are always stressed by the prevailing conditions. Environmental or competitive filtering can happen anywhere. In grasslands, this happens at a large scale and not at the scale of individual plants.
 
 Some preliminary ideas:
 
