@@ -1032,7 +1032,7 @@ Thus, competitive and environmental filtering simultaneously structure communiti
 
 Micro-environmental factors had weak and inconsistent relationships with community assembly, challenging the perception that microclimate and microtopography act as an additional filter in community assembly. The most consistent relationship was with surface heterogeneity, which promoted trait divergence. Did we sample broad enough micro-environmental gradients? - yes. Are the environmental variables measured at a biologocially relavant scale - yes. This suggests that stochastic processes may dominate assembly at these scales, and that species are adapted to the average conditions...
 
-Conclusion: SDH is not a general trend, plants are always stressed by the prevailing conditions. Environmental or competitive filtering can happen anywhere. In grasslands, this happens at a large scale and not at the scale of individual plants.
+Conclusions: In contrast to the predictions of the SDH, strong environmental filtering did not prevail at high elevations. Suggesting that plants may use diverse strategies to survive severe conditions in the alpine. Microenvironmental conditions did not play a large role in structuring communities.
 
 Perhaps missing: An analysis or figure showing the extent of environmental variation present here?
 
