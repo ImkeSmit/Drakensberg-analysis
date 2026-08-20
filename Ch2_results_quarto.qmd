@@ -517,7 +517,7 @@ for (t in 1:length(traitlist)) {
 
 # Results
 
-`r C5_ele_comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` cells were included in testing how community assembly varies with elevation. `r C5_ele_comb|> filter(trait == "log_Height", site == "GG") |> drop_na() |> summarise(n = n())` Cells were from the low site, `r C5_ele_comb |> filter(trait == "log_Height", site == "WH") |> drop_na() |> summarise(n = n())` cells were from the mid site, and `r C5_ele_comb |> filter(trait == "log_Height", site == "BK") |> drop_na() |> summarise(n = n())` cells were from the high site. In the C5 null model, plant height showed stronger than expected trait convergence at low and mid elevation, but higher than expected divergence at the high elevation (@fig-SES-elevation-ridges). The diversity of plant height increased with elevation (@fig-RaoQ-elevation-ridges), however, the C2 null model did not detect significant divergence in height at any elevation (@fig-SES-elevation-ridges). The trait distributions of LA was no different from random assembly at any elevation in both the C2 and C5 null model (@fig-SES-elevation-ridges), and the diversity of LA did not change with elevation (@fig-RaoQ-elevation-ridges). LDMC showed a shift from convergence, to random assembly, to divergence with elevation in the C5 null model. Although the diversity of LDMC was highest at the high elevation, the C2 null model did not detect significant divergence (@fig-SES-elevation-ridges). SLA showed significant convergence at all elevations in the C5 and C2 null model, although the convergence was weaker at the mid elevation (@fig-SES-elevation-ridges). The diversity of SLA was highest at the mid elevation (@fig-RaoQ-elevation-ridges). No trait followed the predictions of the SDH, with environmental filtering being the dominant assembly mechanism in most instances (SLA at all elevations, plant height at low and mid elevation, LDMC at low elevation), but some traits exhibiting random trait distribution patterns (SLA at all elevations, plant height at high elevation, LDMC at mid and high elevation).
+`r C5_ele_comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` cells were included in testing how community assembly varies with elevation. `r C5_ele_comb|> filter(trait == "log_Height", site == "GG") |> drop_na() |> summarise(n = n())` Cells were from the low site, `r C5_ele_comb |> filter(trait == "log_Height", site == "WH") |> drop_na() |> summarise(n = n())` cells were from the mid site, and `r C5_ele_comb |> filter(trait == "log_Height", site == "BK") |> drop_na() |> summarise(n = n())` cells were from the high site. In the C5 null model, plant height showed stronger than expected trait convergence at low and mid elevation, but higher than expected divergence at the high elevation (@fig-SES-elevation-ridges). The diversity of plant height increased with elevation (@fig-RaoQ-elevation-ridges), however, the C2 null model did not detect significant divergence in height at any elevation (@fig-SES-elevation-ridges). The trait distributions of LA was no different from random assembly at any elevation in both the C2 and C5 null model (@fig-SES-elevation-ridges), and the diversity of LA did not change with elevation (@fig-RaoQ-elevation-ridges). LDMC showed a shift from convergence, to random assembly, to divergence with elevation in the C5 null model. Although the diversity of LDMC was highest at the high elevation, the C2 null model did not detect significant divergence (@fig-SES-elevation-ridges). SLA showed significant convergence at all elevations in the C5 and C2 null model, although the convergence was weaker at the mid elevation (@fig-SES-elevation-ridges). The diversity of SLA was highest at the mid elevation (@fig-RaoQ-elevation-ridges). No trait followed the predictions of the SDH, with environmental filtering being the dominant assembly mechanism in most instances (SLA at all elevations, plant height at low and mid elevation, LDMC at low elevation), but some traits exhibiting random trait distribution patterns (SLA at all elevations, plant height at high elevation, LDMC at mid and high elevation). See (@tbl-ele-model-results) for model statistics. 
 
 Plant height was generally filtered toward shorter plants with elevation (@fig-CWM-elevation-ridges), but the diversity of plant height increased with elevation (@fig-RaoQ-elevation-ridges), showing the existence of very short as well as very tall plants in the alpine. The community weighted means of leaf area, SLA and LDMC didn't show a linear relationship with altitude, with communities at the mid site having larger leaves and less conservative resource-use strategies than at the high and low site (@fig-CWM-elevation-ridges).
 
@@ -1105,4 +1105,46 @@ validation_grid
 #| label: fig-nullmodel
 #| fig-cap: "The different null models used here, and how to interepret their results. To test the SDH, the C5 entire pool model and the C2 site pool model is used. The C5 entire pool model shuffles cover values accross cells, keeping species richness of cells, species frequency and species total cover constant. If SES<0 calculated with the C5 null model, we interpret it as a signal of environmental filtering. SES>0 indicates that no environmental filtering effect is present. The C2 site pool model shuffles cover values accross species, but only accorss the species that occur at the site in the observed species by site matrix. The richness and total vascular cover of cells are kept constant. SES>0 from this null model indicates that limiting similarity is present, while SES<0 shows no evidence of limiting similarity. The SDH predicts that community assembly will shift from limiting similarity to environmental filtering with elevation, thus that SES values should decrease with elevation. To test whether micro-environmental conditions affect community assembly within sites, the C2 site pool model and C5 site pool model are used. The C5 site pool model shuffles cover values across the cells in each site, so that a species unique to one site may not occur in another site. SES<0 from this null model indicates environmental filtering, while a SES>0 does not give evidence of environmental filtering. We expect micro-environmental conditions to have a negative or positive linear relationship with SES."
 knitr::include_graphics("C:\\Users\\imke6\\Documents\\PhD 2025\\Ch1 Drakensberg analysis community assembly\\Ch2_write_up\\null model figure.png")
+```
+
+
+``` {r}
+#| label: tbl-ele-model-results
+#| tbl-cap: Model results from linear mixed effect models models testing the SDH. Tests were performed with SES calculated from the C5 site pool and C2 null model for each trait. The F ratio and p value test the hypothesis that there is no difference between the mean SES of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
+#| message: false
+#| echo: false
+
+#build table with model results
+ele_model_results <- expand_grid(null_model = c("C5 entire pool", "C2 site pool"), 
+                                    trait = c("Plant height", "LA", "LDMC","SLA")) |> 
+  mutate(F_value = c(C5_SES_ele_anova$log_Height$`F-value`[2], C5_SES_ele_anova$log_LA$`F-value`[2],
+                     C5_SES_ele_anova$log_LDMC$`F-value`[2], C5_SES_ele_anova$SLA$`F-value`[2], 
+                     C2_SES_ele_anova$log_Height$`F-value`[2], C2_SES_ele_anova$log_LA$`F-value`[2],
+                     C2_SES_ele_anova$log_LDMC$`F-value`[2], C2_SES_ele_anova$SLA$`F-value`[2]), 
+         p_value = c(C5_SES_ele_anova$log_Height$`p-value`[2], C5_SES_ele_anova$log_LA$`p-value`[2],
+                     C5_SES_ele_anova$log_LDMC$`p-value`[2], C5_SES_ele_anova$SLA$`p-value`[2], 
+                     C2_SES_ele_anova$log_Height$`p-value`[2], C2_SES_ele_anova$log_LA$`p-value`[2],
+                     C2_SES_ele_anova$log_LDMC$`p-value`[2], C2_SES_ele_anova$SLA$`p-value`[2]), 
+         marginal_R_squared = c(C5_SES_ele_Rsq$log_Height[1], C5_SES_ele_Rsq$log_LA[1],
+                                C5_SES_ele_Rsq$log_LDMC[1],C5_SES_ele_Rsq$SLA[1],
+                                C2_SES_ele_Rsq$log_Height[1], C2_SES_ele_Rsq$log_LA[1],
+                                C2_SES_ele_Rsq$log_LDMC[1],C2_SES_ele_Rsq$SLA[1]))
+
+ele_results_table <- ele_model_results |> 
+  flextable() |> 
+  set_header_labels(null_model = "Null model", 
+                    trait = "Trait", 
+                    F_value = "F value", 
+                    p_value = "p value", 
+                    marginal_R_squared = "marginal R\u00B2") |> 
+  align(j = 1:5, align = "center", part = "all") |>
+  fontsize(size = 18, part = "all") |> 
+  theme_vanilla() |> 
+  bold(part = "header") |> 
+  autofit() |> 
+  fit_to_width(max_width = 6.5)
+
+ele_results_table
+
+
 ```
