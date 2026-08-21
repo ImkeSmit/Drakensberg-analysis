@@ -1210,7 +1210,7 @@ C5_microenv_comb <- env2 |>
 
 
 ###Calculate the difference between cells at different distance intervals
-grid <- C5_microenv_comb[which(C5_microenv_comb$grid == "BK1"), ]
+grid <- as.data.frame(C5_microenv_comb[which(C5_microenv_comb$grid == "BK1"), ])
 
 #actually we should make a complete grid here and just use cell indexes
 coords <- as.matrix(grid[, c("x_coord", "y_coord")])
@@ -1218,7 +1218,24 @@ rownames(coords) <- grid$Cell_ID
 
 distances <- dist(coords, method = "euclidean")
 
+pairs <- expand_grid(cell1 = grid$Cell_ID, cell2 =grid$Cell_ID) |> 
+  filter(!cell1 == cell2) |> 
+  distinct()
 
+pairdiff <- data.frame(cell1 = NA, cell2 = NA, difference = NA, variable = NA)
+
+#get differences in soil depth between each cell and every cell
+
+for(r in 1:nrow(pairs)) {
+
+diffs <- grid[which(grid$Cell_ID == pairs$cell1[r]), which(colnames(grid) == "mean_soil_depth")] - C5_microenv_comb[which(grid$Cell_ID == pairs$cell2[r]), which(colnames(grid) == "mean_soil_depth")]
+  
+pairdiff[r, "cell1"] <- pairs$cell1[r]
+pairdiff[r, "cell2"] <- pairs$cell2[r]
+pairdiff[r, "difference"] <- diffs[1,1]
+pairdiff[r, "variable"] <- "mean_soil_depth"
+  
+}
 
 
 
