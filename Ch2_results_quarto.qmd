@@ -1184,9 +1184,10 @@ rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |>
 #import interpolated microclimate indices
 micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
 
-#import ses
-C5_cell_ses_poolsite <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_poolsite.csv", row.names = 1) |> 
-  rename(Cell_ID = cellref) 
+#import ses, get the cells we have SES for
+SES_Cell_IDs <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_poolsite.csv", row.names = 1) |> 
+  rename(Cell_ID = cellref) |> 
+  distinct(Cell_ID)
 
 
 ##Combine SES and environmental data to make sure we have the correct cells
@@ -1196,59 +1197,64 @@ C5_microenv_comb <- env2 |>
   #join to remote sensing data |> 
   full_join(rms, by = "Cell_ID") |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
-  full_join(C5_cell_ses_poolsite, by = "Cell_ID", relationship = "one-to-many") |> 
-  mutate(elevation = as.factor(elevation), 
-         grid = as.factor(grid)) |> 
-  group_by(site) |> 
-  mutate(       #standardise the variables we will use in the model, per site
-         mean_T1_growing_season = as.numeric(scale(mean_T1_growing_season)), 
-         mean_moist_growing_season = as.numeric(scale(mean_moist_growing_season)), 
-         rock_cover = as.numeric(scale(rock_cover)), 
-         mean_soil_depth = as.numeric(scale(mean_soil_depth)), 
-         STD = as.numeric(scale(STD))) |> 
-  ungroup()
+  full_join(SES_Cell_IDs, by = "Cell_ID") |> 
+  mutate(grid = as.factor(grid)) |> 
+  mutate(soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2))
 
 
-###Calculate the difference between cells at different distance intervals
 
-#actually we should make a complete grid here and just use cell indexes
+
+#Get the distances between each cell in the grid
 coords <- pos |> 
-  filter(grid == "BK3") |> 
+  filter(grid == "BK3") |> #get any grid to get row and column indexes
   mutate(cellindex = str_split_i(Cell_ID, "_", 3)) |> 
   select(cellindex, x_coord, y_coord)
   
 coords_mat <- as.matrix(coords[, c("x_coord", "y_coord")])
 rownames(coords_mat) <- coords$cellindex
 
+#euclidean distances between each cell
 distances <- as.matrix(dist(coords_mat, method = "euclidean", diag = F, upper = F))
 distances_long <- distances |> 
   as_tibble(rownames = "cell1") |> 
   pivot_longer(cols = -cell1, names_to = "cell2", values_to = "distance")
 
+#all possible pairs of cells
 pairs <- expand_grid(cell1 = coords$cellindex, cell2 =coords$cellindex) |> 
   filter(!cell1 == cell2) |> 
   distinct()
 
+#empty dataframe to put results in 
 pairdiff <- data.frame(cell1 = NA, cell2 = NA, difference = NA, variable = NA)
 
-#get differences in soil depth between each cell and every cell
+
+gridlist <- c(unique(pos$grid))
+variable_list <- colnames(C5_microenv_comb)[c(6:10, 13:15)]
+
+l = 1
+
+for(g in 1:length(gridlist)){
+
 #subset for one grid
 grid <- C5_microenv_comb |> 
-  filter(grid == "BK3") |> 
-  mutate(cellindex = str_split_i(Cell_ID, "_", 3)) |> 
-  distinct(Cell_ID, grid, cellindex, mean_soil_depth)
+  filter(grid == gridlist[g]) |> 
+  mutate(cellindex = str_split_i(Cell_ID, "_", 3))
+
+for(v in 1:length(variable_list)){
 
 for(r in 1:nrow(pairs)) {
 
-diffs <- grid[which(grid$cellindex == pairs$cell1[r]), which(colnames(grid) == "mean_soil_depth")] - grid[which(grid$cellindex == pairs$cell2[r]), which(colnames(grid) == "mean_soil_depth")]
+diffs <- grid[which(grid$cellindex == pairs$cell1[r]), which(colnames(grid) == variable_list[v])] - grid[which(grid$cellindex == pairs$cell2[r]), which(colnames(grid) == variable_list[v])]
   
-pairdiff[r, "cell_ID"] <- grid[r, which(colnames(grid) == "Cell_ID")]
-pairdiff[r, "cell1"] <- pairs$cell1[r]
-pairdiff[r, "cell2"] <- pairs$cell2[r]
-pairdiff[r, "difference"] <- diffs[1,1]
-pairdiff[r, "variable"] <- "mean_soil_depth"
-  
-}
+pairdiff[l, "cell_ID"] <- grid[r, which(colnames(grid) == "Cell_ID")]
+pairdiff[l, "cell1"] <- pairs$cell1[r]
+pairdiff[l, "cell2"] <- pairs$cell2[r]
+pairdiff[l, "difference"] <- diffs
+pairdiff[l, "variable"] <- variable_list[v]
+
+l = l+1  
+}}}
+
 
 #now we just have to join the distances
 pairdiff2 <- pairdiff |> 
