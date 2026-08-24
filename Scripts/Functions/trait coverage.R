@@ -42,3 +42,5 @@ percent_trait_cover <- trait_cover/total_cover *100 #89%
 coverage <- cell_trait_coverage(level = "grid") |> 
   arrange(Trait_Coverage)
 
+arrange(coverage, sp_coverage)
+
