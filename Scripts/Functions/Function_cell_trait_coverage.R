@@ -8,17 +8,18 @@ cell_trait_coverage <- function() {
   drak <-read.csv("All_data/clean_data/micro_climb_occurrence.csv", row.names = 1) 
   
   #import mean traits
-  mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1) 
+  mean_traits <- read.csv("All_data/comm_assembly_results/mean_traits.csv") |>
+    rename(taxon = X)
+    
   
   
   abundances <- drak |> 
     filter(cover>0) #table with covers
-  mean_traits <- mean_traits #table with mean traits for species
-  
+
   Cell_IDlist <- c(unique(abundances$Cell_ID))
   
   for(c in Cell_IDlist) {
-    cell_abun <- abundances[abundances$Cell_ID ==c, ]
+    cell_abun <- abundances[abundances$Cell_ID == c, ]
     
     merge <- cell_abun |> 
       left_join(mean_traits, by = "taxon")
