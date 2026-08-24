@@ -1232,6 +1232,7 @@ gridlist <- c(unique(pos$grid))
 variable_list <- colnames(C5_microenv_comb)[c(6:10, 13:15)]
 
 #loop through all grids, calculating differences between each pair of cells for each variable
+##CHUNK THIS
 l = 1
 for(g in 1:length(gridlist)){
 
