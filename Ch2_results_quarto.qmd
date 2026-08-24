@@ -1231,8 +1231,8 @@ pairdiff <- data.frame(cell1 = NA, cell2 = NA, difference = NA, variable = NA)
 gridlist <- c(unique(pos$grid))
 variable_list <- colnames(C5_microenv_comb)[c(6:10, 13:15)]
 
+#loop through all grids, calculating differences between each pair of cells for each variable
 l = 1
-
 for(g in 1:length(gridlist)){
 
 #subset for one grid
@@ -1258,7 +1258,7 @@ l = l+1
 
 #now we just have to join the distances
 pairdiff2 <- pairdiff |> 
-  left_join(distances_long, by = c("cell1", "cell2"))
+  left_join(distances_long, by = c("cell1", "cell2"), relationship = "many-to-one")
 
 
 
