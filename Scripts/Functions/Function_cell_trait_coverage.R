@@ -37,11 +37,20 @@ cell_trait_coverage <- function(level) {
     
     trait_coverage <- trait_cov/total_cov
     
+    #What percent of species did we measure traits for?
+    total_sp <- length(merge$taxon)
+    
+    trait_sp <- merge |> 
+      filter(if_all(Height_cm:Thickness_mm, ~ !is.na(.))) |> 
+      summarise(nsp = n())
+    
+    sp_coverage <- trait_sp$nsp/total_sp
+    
     #put results in a table
     if(c == Cell_IDlist[1]) {
-    result <- data.frame(Cell_ID = c, Trait_Coverage = as.numeric(trait_coverage))
+    result <- data.frame(Cell_ID = c, Trait_Coverage = as.numeric(trait_coverage), sp_coverage = as.numeric(sp_coverage))
       }else {
-        temp<- data.frame(Cell_ID = c, Trait_Coverage = as.numeric(trait_coverage))
+        temp<- data.frame(Cell_ID = c, Trait_Coverage = as.numeric(trait_coverage), sp_coverage = as.numeric(sp_coverage))
         result<- rbind(result, temp)
       }
     
@@ -55,6 +64,7 @@ cell_trait_coverage <- function(level) {
       merge <- grid_abun |> 
         left_join(mean_traits, by = "taxon")
       
+      #what percent of vascular cover did we measure traits for?
       total_cov <- sum(merge$cover)
       
       trait_cov <- merge |> 
@@ -63,11 +73,21 @@ cell_trait_coverage <- function(level) {
       
       trait_coverage <- trait_cov/total_cov
       
+      #What percent of species did we measure traits for?
+      total_sp <- length(merge$taxon)
+      
+      trait_sp <- merge |> 
+        filter(if_all(Height_cm:Thickness_mm, ~ !is.na(.))) |> 
+        summarise(nsp = n())
+      
+      sp_coverage <- trait_sp$nsp/total_sp
+      
+      
       #put results in a table
       if(g == gridlist[1]) {
-        result <- data.frame(grid = g, Trait_Coverage = as.numeric(trait_coverage))
+        result <- data.frame(grid = g, Trait_Coverage = as.numeric(trait_coverage), sp_coverage = as.numeric(sp_coverage))
       }else {
-        temp<- data.frame(grid = g, Trait_Coverage = as.numeric(trait_coverage))
+        temp<- data.frame(grid = g, Trait_Coverage = as.numeric(trait_coverage), sp_coverage = as.numeric(sp_coverage))
         result<- rbind(result, temp)
       }
     }#finish loop through grids
