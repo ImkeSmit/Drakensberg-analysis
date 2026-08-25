@@ -113,6 +113,17 @@ moisture_dat <- inst_micro |>
   inner_join(ind, by = "Cell_ID") |> 
   drop_na()
 
+#import validation results
+validation_results <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_interpolation_validation.csv")
+
+#mean R2 for soil moisture and temp
+mean_R2 <- validation_results |> 
+  group_by(site, grid_number, variable) |> 
+  summarise(
+    R2       = ifelse(var(observed) > 0, 
+                      cor(observed, predicted)^2, NA_real_)) |> 
+  group_by(variable) |> 
+  summarise(mean_R2 = mean(R2))
 ```
 
 The instantaneous measures of soil moisture and temperature only reflect microclimate conditions at one time point, and may not accurately reflect persistent microclimatic differences between cells. Therefore, we also measured soil moisture and temperature over one year in a subset of cells (six or seven cells in each grid), and calculated the mean soil moisture and temperature of the growing season. We interpolated the mean soil moisture and temperature values to other cells in the grid, and performed cross validation to assess the quality of the interpolation. We also performed a correlation analysis to assess how well the interpolated values of mean soil moisture and temperature correspond to the instantaneous soil moisture and temperature. We used Temperature-Moisture-Sensors [TMS, @wild_climate_2019] to record soil moisture and temperature readings at 8 cm below the soil surface every 15 minutes for one year (12 January 2023 – 21 January 2024). The start of the growing season was defined as the first day after 21 June when the minimum daily temperature of all loggers at a site were above 5℃. The end of the growing season was the first day before 21 June when all loggers at a site had a minimum daily temperature below 5℃. Following these definitions, the growing season was from 23 August to 8 July at the low site, 1 September to 6 June at the mid site, and 10 October to 3 April at the high site. The mean soil moisture and temperature for the growing season was calculated for each sensor and interpolated to other cells in the grid. An inverse-distance-weighted interpolation algorithm was used from the gstat package [@gräler2016] with a power parameter of two. Cells with more than 50% rock cover were not used in the interpolation process if they contained a sensor and did not receive an interpolated value if they were without a sensor. Following this threshold, `r lost[2,2]` cells were excluded from interpolation at the low site, `r lost[3,2]` cells were excluded from the mid site, and `r lost[1,2]` cells were excluded from the high site. The ability of the interpolation algorithm to predict observed mean soil temperature and moisture values varied by grid (Appendix @tbl-validation-results), but was generally poor, with the mean $R^2$ of mean soil temperature = `r mean_R2[1,2]`, and the mean $R^2$ of mean soil moisture = `r mean_R2[2,2]`. However, the interpolated soil moisture and temperature for the growing season correlated well with the instantaneous soil moisture and temperature measurements (pearson correlation coefficient between instantaneous and interpolated soil moisture = `r round(cor(moisture_dat$soil_moisture_adj_campaign2, digits), moisture_dat$mean_moist_growing_season), digits = 2)`, pearson correlation coefficient between instantaneous and interpolated soil temperature = `r round(cor(moisture_dat$soil_temperature_adj_campaign2, moisture_dat$mean_T1_growing_season), digits = 2)`).
@@ -1065,15 +1076,6 @@ Perhaps missing: An analysis or figure showing the extent of environmental varia
 
 #import validation results
 validation_results <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_interpolation_validation.csv")
-
-#mean R2 for soil moisture and temp
-mean_R2 <- validation_results |> 
-  group_by(site, grid_number, variable) |> 
-  summarise(
-    R2       = ifelse(var(observed) > 0, 
-                      cor(observed, predicted)^2, NA_real_)) |> 
-  group_by(variable) |> 
-  summarise(mean_R2 = mean(R2))
 
 validation_grid <- validation_results |> 
   group_by(site, grid_number, variable) |> 
