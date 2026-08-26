@@ -1179,7 +1179,7 @@ ele_results_table
 #| message: false
 #| echo: false
 #| label: fig-env-heterogeneity
-#| fig-cap: environmental heterogeneity over small scales
+#| fig-cap: Scatterplot showing how micro-environmental variables vary with distance in the grids. The filled symbols show the maximum difference in a micro-environmental variable between cells at increasing distances from each other. The empty symbols show the mean difference in a micro-environmental variable between cells at increasing distances from each other. Differences are absolute values. Mean and maximum differences were calculated accross all grids in all sites. 
 
 #import microenvironmental data containing x and y coordinates
 pos <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
@@ -1305,8 +1305,34 @@ plan(sequential) # good practice: shut down workers when done
 
 # ---- 6. Join distances (same lookup table for every grid) ----
 pairdiff2 <- pairdiff |>
-  left_join(distances_long, by = c("cell1", "cell2"))
+  left_join(distances_long, by = c("cell1", "cell2"), relationship = "many-to-one")
 
 
+#7. calculate mean and maximum differences for every distance category
+diff_summary <- pairdiff2 |> 
+  filter(!is.na(difference)) |>
+  mutate(difference =abs(difference)) |> #use absolute values
+  group_by(variable, distance) |> 
+  summarise(max_diff = max(difference), 
+            mean_diff = mean(difference))
 
+
+#8. Graph 
+
+difference_plot <- ggplot(diff_summary) +
+  geom_point(aes(x = distance, y = max_diff, shape = "Maximum difference"))+
+  geom_point(aes(x = distance, y = mean_diff, shape = "Mean difference"))+
+  facet_wrap(~variable, scale = "free_y", ncol = 2, 
+             labeller = as_labeller(c("mean_moist_growing_season" = "Soil moisture", 
+                                    "mean_soil_depth" = "Soil depth (cm)", 
+                                    "mean_T1_growing_season" = "Soil temperature (°C)", 
+                                    "rock_cover" = "Rock cover (%)", 
+                                    "STD" = "Surface heterogeneity"))) +
+  scale_shape_manual(name = " ", values = c("Maximum difference" = 16, "Mean difference"= 21))+
+  xlab("Distance (m)")+
+  ylab("Absolute value of the difference")+
+  theme_classic()
+
+difference_plot
+  
 ```
