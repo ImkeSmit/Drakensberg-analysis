@@ -1240,64 +1240,85 @@ C5_microenv_comb <- env2 |>
 
 
 
-#Get the distances between each cell in the grid
-coords <- pos |> 
-  filter(grid == "BK3") |> #get any grid to get row and column indexes
-  mutate(cellindex = str_split_i(Cell_ID, "_", 3)) |> 
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(purrr)
+library(furrr)
+
+# -------------------------------------------------------------------
+# (everything above this point — building `pos`, `env2`, `rms`,
+#  `micro_idw`, `SES_Cell_IDs`, `C5_microenv_comb` — is unchanged)
+# -------------------------------------------------------------------
+
+variable_list <- colnames(C5_microenv_comb)[c(6:10, 13:15)]
+gridlist      <- unique(pos$grid)
+
+# ---- 1. Distances: same for every grid, since all grids share the ----
+#         same 160-cell row/column layout — compute once, as in your
+#         original script.
+coords <- pos |>
+  filter(grid == "BK3") |> # any grid works, layout is identical across all
+  mutate(cellindex = str_split_i(Cell_ID, "_", 3)) |>
   select(cellindex, x_coord, y_coord)
-  
+
 coords_mat <- as.matrix(coords[, c("x_coord", "y_coord")])
 rownames(coords_mat) <- coords$cellindex
 
-#euclidean distances between each cell
-distances <- as.matrix(dist(coords_mat, method = "euclidean", diag = F, upper = F))
-distances_long <- distances |> 
-  as_tibble(rownames = "cell1") |> 
+distances_long <- as.matrix(dist(coords_mat, method = "euclidean")) |>
+  as_tibble(rownames = "cell1") |>
   pivot_longer(cols = -cell1, names_to = "cell2", values_to = "distance")
 
-#all possible pairs of cells
-pairs <- expand_grid(cell1 = coords$cellindex, cell2 =coords$cellindex) |> 
-  filter(!cell1 == cell2) |> 
-  distinct()
+# ---- 2. Reshape env data to long format once ----
+grid_long <- C5_microenv_comb |>
+  filter(grid %in% gridlist) |>
+  mutate(cellindex = str_split_i(Cell_ID, "_", 3)) |>
+  select(grid, Cell_ID, cellindex, all_of(variable_list)) |>
+  pivot_longer(cols = all_of(variable_list),
+               names_to = "variable", values_to = "value")
 
-#empty dataframe to put results in 
-pairdiff <- data.frame(cell1 = NA, cell2 = NA, difference = NA, variable = NA)
+# ---- 3. Pairs table: same for every grid (shared layout), so build once ----
+pairs <- expand_grid(cell1 = coords$cellindex, cell2 = coords$cellindex) |>
+  filter(cell1 != cell2)
 
+# ---- 4. Function: compute all pairwise diffs for ONE grid ----
+compute_grid_pairdiff <- function(g, grid_long, pairs) {
 
-gridlist <- c(unique(pos$grid))
-variable_list <- colnames(C5_microenv_comb)[c(6:10, 13:15)]
+  gd <- grid_long |> filter(grid == g)
 
-#loop through all grids, calculating differences between each pair of cells for each variable
-##CHUNK THIS
-l = 1
-for(g in 1:length(gridlist)){
+  val1 <- gd |>
+    select(cellindex, variable, value, Cell_ID) |>
+    rename(cell1 = cellindex, value1 = value, cell_ID = Cell_ID)
 
-#subset for one grid
-grid <- C5_microenv_comb |> 
-  filter(grid == gridlist[g]) |> 
-  mutate(cellindex = str_split_i(Cell_ID, "_", 3))
+  val2 <- gd |>
+    select(cellindex, variable, value) |>
+    rename(cell2 = cellindex, value2 = value)
 
-for(v in 1:length(variable_list)){
+  pairs |>
+    crossing(variable = unique(gd$variable)) |>
+    left_join(val1, by = c("cell1", "variable")) |>
+    left_join(val2, by = c("cell2", "variable")) |>
+    mutate(difference = value1 - value2, grid = g) |>
+    select(grid, cell_ID, cell1, cell2, variable, difference)
+}
 
-for(r in 1:nrow(pairs)) {
+# ---- 5. Run in parallel across grids ----
+# adjust workers to number of cores you want to use (leave 1 free)
+plan(multisession, workers = max(1, parallel::detectCores() - 1))
 
-diffs <- grid[which(grid$cellindex == pairs$cell1[r]), which(colnames(grid) == variable_list[v])] - grid[which(grid$cellindex == pairs$cell2[r]), which(colnames(grid) == variable_list[v])]
-  
-pairdiff[l, "cell_ID"] <- grid[r, which(colnames(grid) == "Cell_ID")]
-pairdiff[l, "cell1"] <- pairs$cell1[r]
-pairdiff[l, "cell2"] <- pairs$cell2[r]
-pairdiff[l, "difference"] <- diffs
-pairdiff[l, "variable"] <- variable_list[v]
+pairdiff <- future_map_dfr(
+  gridlist,
+  compute_grid_pairdiff,
+  grid_long = grid_long,
+  pairs = pairs,
+  .options = furrr_options(seed = TRUE)
+)
 
-l = l+1  
-}}}
+plan(sequential) # good practice: shut down workers when done
 
-
-#now we just have to join the distances
-pairdiff2 <- pairdiff |> 
-  left_join(distances_long, by = c("cell1", "cell2"), relationship = "many-to-one")
-
-
+# ---- 6. Join distances (same lookup table for every grid) ----
+pairdiff2 <- pairdiff |>
+  left_join(distances_long, by = c("cell1", "cell2"))
 
 
 
