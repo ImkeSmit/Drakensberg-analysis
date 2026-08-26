@@ -29,6 +29,28 @@ hypothesis_ses_ridges <- hp_dat |>
 ggsave(hypothesis_ses_ridges, filename = "hypothesis_SES_elevation_poster.png", path = "Figures", 
        width = 1100, height = 1100, units = "px")
 
+####Hypothesis figure SES scatterplot####
+set.seed(42) # for reproducibility
+
+# generate 20 x values, then y values with a positive linear trend + some noise
+n <- 20
+x <- runif(n, min = 0, max = 10)
+y_raw <- 2 * x + rnorm(n, mean = 0, sd = 2) # slope of 2, with random noise
+y <- -1 + 2 * (y_raw - min(y_raw)) / (max(y_raw) - min(y_raw)) #rescale to [-1;1]
+
+df <- data.frame(x = x, y = y)
+
+hypothesis_ses_scatter<- ggplot(df, aes(x = x, y = y)) +
+  geom_point(size = 3) +
+  xlab("Micro-environmental variable") +
+  ylab("SES")+
+  theme_bw() +
+  theme( axis.title = element_text(size = 20), 
+        axis.text = element_text(size = 18), 
+        panel.grid = element_blank()) 
+ggsave(hypothesis_ses_scatter, filename = "hypothesis_SES_scatter.png", path = "Figures", 
+       width = 1400, height = 1100, units = "px")
+
 
 
 ####Hypothesis grid maps####
