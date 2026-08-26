@@ -1176,6 +1176,9 @@ ele_model_results <- expand_grid(null_model = c("C5 entire pool", "C2 site pool"
                                 C2_SES_ele_Rsq$log_LDMC[1],C2_SES_ele_Rsq$SLA[1]))
 
 ele_results_table <- ele_model_results |> 
+  mutate(F_value = round(F_value, digits = 3), 
+         p_value = round(p_value, digits = 3), 
+         marginal_R_squared = round(marginal_R_squared, digits = 3)) |> 
   flextable() |> 
   set_header_labels(null_model = "Null model", 
                     trait = "Trait", 
@@ -1196,29 +1199,32 @@ ele_results_table
 
 ```{r}
 #| label: tbl-ele-RaoQ-CWM-results
-#| tbl-cap: Model results from linear mixed effect models testing whether the RoaQ and CWm of traits vary with elevation. The F ratio and p value test the hypothesis that there is no difference between the mean CWM traits or mean RaoQ of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
+#| tbl-cap: Model results from linear mixed effect models testing whether the RoaQ and CWM of traits vary with elevation. The F ratio and p value test the hypothesis that there is no difference between the mean of cell-level CWM or RaoQ of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
 #| message: false
 #| echo: false
 
 #build table with model results
-RaoQ_model_results <- tibbel(response = c("CWM", "RaoQ"), 
+RaoQ_model_results <- expand_grid(response = c("CWM", "RaoQ"), 
                                     trait = c("Plant height", "LA", "LDMC","SLA")) |> 
-  mutate(F_value = c(C5_SES_ele_anova$log_Height$`F-value`[2], C5_SES_ele_anova$log_LA$`F-value`[2],
-                     C5_SES_ele_anova$log_LDMC$`F-value`[2], C5_SES_ele_anova$SLA$`F-value`[2], 
-                     C2_SES_ele_anova$log_Height$`F-value`[2], C2_SES_ele_anova$log_LA$`F-value`[2],
-                     C2_SES_ele_anova$log_LDMC$`F-value`[2], C2_SES_ele_anova$SLA$`F-value`[2]), 
-         p_value = c(C5_SES_ele_anova$log_Height$`p-value`[2], C5_SES_ele_anova$log_LA$`p-value`[2],
-                     C5_SES_ele_anova$log_LDMC$`p-value`[2], C5_SES_ele_anova$SLA$`p-value`[2], 
-                     C2_SES_ele_anova$log_Height$`p-value`[2], C2_SES_ele_anova$log_LA$`p-value`[2],
-                     C2_SES_ele_anova$log_LDMC$`p-value`[2], C2_SES_ele_anova$SLA$`p-value`[2]), 
-         marginal_R_squared = c(C5_SES_ele_Rsq$log_Height[1], C5_SES_ele_Rsq$log_LA[1],
-                                C5_SES_ele_Rsq$log_LDMC[1],C5_SES_ele_Rsq$SLA[1],
-                                C2_SES_ele_Rsq$log_Height[1], C2_SES_ele_Rsq$log_LA[1],
-                                C2_SES_ele_Rsq$log_LDMC[1],C2_SES_ele_Rsq$SLA[1]))
+  mutate(F_value = c(RaoQ_ele_anova$log_Height$`F-value`[2], RaoQ_ele_anova$log_LA$`F-value`[2],
+                     RaoQ_ele_anova$log_LDMC$`F-value`[2], RaoQ_ele_anova$SLA$`F-value`[2], 
+                     CWM_ele_anova$log_Height$`F-value`[2], CWM_ele_anova$log_LA$`F-value`[2],
+                     CWM_ele_anova$log_LDMC$`F-value`[2], CWM_ele_anova$SLA$`F-value`[2]), 
+         p_value = c(RaoQ_ele_anova$log_Height$`p-value`[2], RaoQ_ele_anova$log_LA$`p-value`[2],
+                     RaoQ_ele_anova$log_LDMC$`p-value`[2], RaoQ_ele_anova$SLA$`p-value`[2], 
+                     CWM_ele_anova$log_Height$`p-value`[2], CWM_ele_anova$log_LA$`p-value`[2],
+                     CWM_ele_anova$log_LDMC$`p-value`[2], CWM_ele_anova$SLA$`p-value`[2]), 
+         marginal_R_squared = c(RaoQ_ele_Rsq$log_Height[1], RaoQ_ele_Rsq$log_LA[1],
+                                RaoQ_ele_Rsq$log_LDMC[1],RaoQ_ele_Rsq$SLA[1],
+                                CWM_ele_Rsq$log_Height[1], CWM_ele_Rsq$log_LA[1],
+                                CWM_ele_Rsq$log_LDMC[1],CWM_ele_Rsq$SLA[1]))
 
-ele_results_table <- ele_model_results |> 
+RaoQ_results_table <- RaoQ_model_results |> 
+  mutate(F_value = round(F_value, digits = 3), 
+         p_value = round(p_value, digits = 3), 
+         marginal_R_squared = round(marginal_R_squared, digits = 3)) |> 
   flextable() |> 
-  set_header_labels(null_model = "Null model", 
+  set_header_labels(response = "Response variable", 
                     trait = "Trait", 
                     F_value = "F value", 
                     p_value = "p value", 
@@ -1230,7 +1236,52 @@ ele_results_table <- ele_model_results |>
   autofit() |> 
   fit_to_width(max_width = 6.5)
 
-ele_results_table
+RaoQ_results_table
+
+
+```
+
+```{r}
+#| label: tbl-microenv-models-results
+#| tbl-cap: Model results 
+#| message: false
+#| echo: false
+
+#build table with model results
+RaoQ_model_results <- expand_grid(null model = c("C5 site pool", "C2 site pool"), 
+                                    trait = c("Plant height", "LA", "LDMC","SLA")) |> 
+  mutate(estimate = 
+    F_value = c(RaoQ_ele_anova$log_Height$`F-value`[2], RaoQ_ele_anova$log_LA$`F-value`[2],
+                     RaoQ_ele_anova$log_LDMC$`F-value`[2], RaoQ_ele_anova$SLA$`F-value`[2], 
+                     CWM_ele_anova$log_Height$`F-value`[2], CWM_ele_anova$log_LA$`F-value`[2],
+                     CWM_ele_anova$log_LDMC$`F-value`[2], CWM_ele_anova$SLA$`F-value`[2]), 
+         p_value = c(RaoQ_ele_anova$log_Height$`p-value`[2], RaoQ_ele_anova$log_LA$`p-value`[2],
+                     RaoQ_ele_anova$log_LDMC$`p-value`[2], RaoQ_ele_anova$SLA$`p-value`[2], 
+                     CWM_ele_anova$log_Height$`p-value`[2], CWM_ele_anova$log_LA$`p-value`[2],
+                     CWM_ele_anova$log_LDMC$`p-value`[2], CWM_ele_anova$SLA$`p-value`[2]), 
+         marginal_R_squared = c(RaoQ_ele_Rsq$log_Height[1], RaoQ_ele_Rsq$log_LA[1],
+                                RaoQ_ele_Rsq$log_LDMC[1],RaoQ_ele_Rsq$SLA[1],
+                                CWM_ele_Rsq$log_Height[1], CWM_ele_Rsq$log_LA[1],
+                                CWM_ele_Rsq$log_LDMC[1],CWM_ele_Rsq$SLA[1]))
+
+RaoQ_results_table <- RaoQ_model_results |> 
+  mutate(F_value = round(F_value, digits = 3), 
+         p_value = round(p_value, digits = 3), 
+         marginal_R_squared = round(marginal_R_squared, digits = 3)) |> 
+  flextable() |> 
+  set_header_labels(response = "Response variable", 
+                    trait = "Trait", 
+                    F_value = "F value", 
+                    p_value = "p value", 
+                    marginal_R_squared = "marginal R\u00B2") |> 
+  align(j = 1:5, align = "center", part = "all") |>
+  fontsize(size = 18, part = "all") |> 
+  theme_vanilla() |> 
+  bold(part = "header") |> 
+  autofit() |> 
+  fit_to_width(max_width = 6.5)
+
+RaoQ_results_table
 
 
 ```
