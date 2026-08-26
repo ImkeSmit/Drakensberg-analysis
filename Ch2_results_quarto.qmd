@@ -136,6 +136,8 @@ The instantaneous measures of soil moisture and temperature only reflect microcl
 
 A principal component analysis was performed using the princomp [@rcoreteam2025] function to identify the main axes of micro-environmental variation across the three sites (@fig-environmental-PCA). Most of the micro-environmental variation across the three sites was attributed to differences in soil moisture and temperature (PC1, explaining 34% of the variation), as well as soil depth (PC2, explaining 17% of the variation). We selected the following uncorrelated micro-environmental variables to test whether fine-scale variation in community assembly is shaped by micro-environmental variation: mean soil temperature of the growing season (hereafter referred to as soil temperature), mean soil moisture of the growing season (hereafter referred to as soil moisture), rock cover, mean soil depth and surface heterogeneity.`r C5_ele_comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` cells were included in testing how community assembly varies with elevation. `r C5_ele_comb|> filter(trait == "log_Height", site == "GG") |> drop_na() |> summarise(n = n())` Cells were from the low site, `r C5_ele_comb |> filter(trait == "log_Height", site == "WH") |> drop_na() |> summarise(n = n())` cells were from the mid site, and `r C5_ele_comb |> filter(trait == "log_Height", site == "BK") |> drop_na() |> summarise(n = n())` cells were from the high site. `r sprich$n` Species occurred across the three sites.
 
+There was high heterogeneity of micro-environmental variables in the grids (@fig-env-heterogeneity). For example, soil depth could vary by 44 cm between adjacent cells, and rock cover could vary by 99% between adjacent cells (@fig-env-heterogeneity).
+
 ```{r}
 #| label: fig-environmental-PCA
 #| fig-cap: "Principal component analysis of all environmental variables measured in sampling grids, as well as interpolated soil moisture and temperature."
@@ -1177,6 +1179,7 @@ ele_results_table
 
 ```{r}
 #| message: false
+#| warning: false
 #| echo: false
 #| label: fig-env-heterogeneity
 #| fig-cap: Scatterplot showing how micro-environmental variables vary with distance in the grids. The filled symbols show the maximum difference in a micro-environmental variable between cells at increasing distances from each other. The empty symbols show the mean difference in a micro-environmental variable between cells at increasing distances from each other. Differences are absolute values. Mean and maximum differences were calculated accross all grids in all sites. 
@@ -1334,5 +1337,11 @@ difference_plot <- ggplot(diff_summary) +
   theme_classic()
 
 difference_plot
+
+#some descriptive stats
+diff_summary |> 
+  group_by(variable) |> 
+  filter(distance == 1)
+  
   
 ```
