@@ -697,6 +697,13 @@ traitlist <- c("log_Height", "log_LDMC", "log_LA", "SLA")
 RaoQ_ele_cld<- vector(mode= "list", length = length(traitlist))
 names(RaoQ_ele_cld) = traitlist
 
+RaoQ_ele_anova<- vector(mode= "list", length = length(traitlist))
+names(RaoQ_ele_anova) = traitlist
+
+RaoQ_ele_Rsq<- vector(mode= "list", length = length(traitlist))
+names(RaoQ_ele_Rsq) = traitlist
+
+
 for (t in 1:length(traitlist)) {
   modeldat <-  C5_ele_comb |> 
     filter(trait == traitlist[t]) |> 
@@ -715,6 +722,8 @@ for (t in 1:length(traitlist)) {
 
   #Also save results in a list object so we can call it with quarto
 RaoQ_ele_cld[[t]] <- comp_letters
+RaoQ_ele_anova[[t]] <- anova(model)
+RaoQ_ele_Rsq[[t]] <- r.squaredGLMM(model)
 }
 
 ###Graph####
@@ -808,6 +817,12 @@ traitlist <- c("log_Height", "log_LDMC", "log_LA", "SLA")
 CWM_ele_cld<- vector(mode= "list", length = length(traitlist))
 names(CWM_ele_cld) = traitlist
 
+CWM_ele_anova<- vector(mode= "list", length = length(traitlist))
+names(CWM_ele_anova) = traitlist
+
+CWM_ele_Rsq<- vector(mode= "list", length = length(traitlist))
+names(CWM_ele_Rsq) = traitlist
+
 for (t in 1:length(traitlist)) {
   modeldat <-  cwm_comb |> 
     filter(trait == traitlist[t]) |> 
@@ -826,6 +841,8 @@ for (t in 1:length(traitlist)) {
 
   #Also save results in a list object so we can call it with quarto
   CWM_ele_cld[[t]] <- comp_letters
+  CWM_ele_anova[[t]] <- anova(model)
+  CWM_ele_Rsq[[t]] <- r.squaredGLMM(model)
 }
 
 ##Graph####
@@ -1079,7 +1096,7 @@ Thus, competitive and environmental filtering simultaneously structure communiti
 
 Conclusions: In contrast to the predictions of the SDH, strong environmental filtering did not prevail at high elevations. Suggesting that plants may use diverse strategies to survive severe conditions in the alpine. Microenvironmental conditions did not play a large role in structuring communities.
 
-Perhaps missing: An analysis or figure showing the extent of environmental variation present here?
+The perception that the composition and functional charactersitics of high altitude communities are predominantly shaped by environmental stress toward convergent strategies may warrant reconsideration. Other examples of high stress communities with divergent traits.
 
 # References
 
@@ -1176,6 +1193,48 @@ ele_results_table
 
 
 ```
+
+```{r}
+#| label: tbl-ele-RaoQ-CWM-results
+#| tbl-cap: Model results from linear mixed effect models testing whether the RoaQ and CWm of traits vary with elevation. The F ratio and p value test the hypothesis that there is no difference between the mean CWM traits or mean RaoQ of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
+#| message: false
+#| echo: false
+
+#build table with model results
+RaoQ_model_results <- tibbel(response = c("CWM", "RaoQ"), 
+                                    trait = c("Plant height", "LA", "LDMC","SLA")) |> 
+  mutate(F_value = c(C5_SES_ele_anova$log_Height$`F-value`[2], C5_SES_ele_anova$log_LA$`F-value`[2],
+                     C5_SES_ele_anova$log_LDMC$`F-value`[2], C5_SES_ele_anova$SLA$`F-value`[2], 
+                     C2_SES_ele_anova$log_Height$`F-value`[2], C2_SES_ele_anova$log_LA$`F-value`[2],
+                     C2_SES_ele_anova$log_LDMC$`F-value`[2], C2_SES_ele_anova$SLA$`F-value`[2]), 
+         p_value = c(C5_SES_ele_anova$log_Height$`p-value`[2], C5_SES_ele_anova$log_LA$`p-value`[2],
+                     C5_SES_ele_anova$log_LDMC$`p-value`[2], C5_SES_ele_anova$SLA$`p-value`[2], 
+                     C2_SES_ele_anova$log_Height$`p-value`[2], C2_SES_ele_anova$log_LA$`p-value`[2],
+                     C2_SES_ele_anova$log_LDMC$`p-value`[2], C2_SES_ele_anova$SLA$`p-value`[2]), 
+         marginal_R_squared = c(C5_SES_ele_Rsq$log_Height[1], C5_SES_ele_Rsq$log_LA[1],
+                                C5_SES_ele_Rsq$log_LDMC[1],C5_SES_ele_Rsq$SLA[1],
+                                C2_SES_ele_Rsq$log_Height[1], C2_SES_ele_Rsq$log_LA[1],
+                                C2_SES_ele_Rsq$log_LDMC[1],C2_SES_ele_Rsq$SLA[1]))
+
+ele_results_table <- ele_model_results |> 
+  flextable() |> 
+  set_header_labels(null_model = "Null model", 
+                    trait = "Trait", 
+                    F_value = "F value", 
+                    p_value = "p value", 
+                    marginal_R_squared = "marginal R\u00B2") |> 
+  align(j = 1:5, align = "center", part = "all") |>
+  fontsize(size = 18, part = "all") |> 
+  theme_vanilla() |> 
+  bold(part = "header") |> 
+  autofit() |> 
+  fit_to_width(max_width = 6.5)
+
+ele_results_table
+
+
+```
+
 
 ```{r}
 #| message: false
