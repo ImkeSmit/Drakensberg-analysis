@@ -28,6 +28,8 @@ library(ggbiplot)
 library(flextable)
 library(FD)
 library(knitr)
+library(purrr)
+library(furrr)
 conflict_prefer_all("tidylog", quiet = TRUE)
 ```
 
@@ -1237,26 +1239,11 @@ C5_microenv_comb <- env2 |>
   mutate(grid = as.factor(grid)) |> 
   mutate(soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2))
 
-
-
-
-library(dplyr)
-library(tidyr)
-library(stringr)
-library(purrr)
-library(furrr)
-
-# -------------------------------------------------------------------
-# (everything above this point — building `pos`, `env2`, `rms`,
-#  `micro_idw`, `SES_Cell_IDs`, `C5_microenv_comb` — is unchanged)
-# -------------------------------------------------------------------
-
-variable_list <- colnames(C5_microenv_comb)[c(6:10, 13:15)]
+variable_list <- c("rock_cover", "mean_T1_growing_season", "mean_moist_growing_season", "STD", "mean_soil_depth")
 gridlist      <- unique(pos$grid)
 
 # ---- 1. Distances: same for every grid, since all grids share the ----
-#         same 160-cell row/column layout — compute once, as in your
-#         original script.
+#         same 160-cell row/column layout — compute once
 coords <- pos |>
   filter(grid == "BK3") |> # any grid works, layout is identical across all
   mutate(cellindex = str_split_i(Cell_ID, "_", 3)) |>
@@ -1270,21 +1257,21 @@ distances_long <- as.matrix(dist(coords_mat, method = "euclidean")) |>
   pivot_longer(cols = -cell1, names_to = "cell2", values_to = "distance")
 
 # ---- 2. Reshape env data to long format once ----
-grid_long <- C5_microenv_comb |>
-  filter(grid %in% gridlist) |>
+microenv_long <- C5_microenv_comb |>
   mutate(cellindex = str_split_i(Cell_ID, "_", 3)) |>
   select(grid, Cell_ID, cellindex, all_of(variable_list)) |>
   pivot_longer(cols = all_of(variable_list),
-               names_to = "variable", values_to = "value")
+               names_to = "variable", values_to = "value") |> 
+  filter(variable %in% variable_list)
 
 # ---- 3. Pairs table: same for every grid (shared layout), so build once ----
 pairs <- expand_grid(cell1 = coords$cellindex, cell2 = coords$cellindex) |>
   filter(cell1 != cell2)
 
 # ---- 4. Function: compute all pairwise diffs for ONE grid ----
-compute_grid_pairdiff <- function(g, grid_long, pairs) {
+compute_grid_pairdiff <- function(g, microenv_long, pairs) {
 
-  gd <- grid_long |> filter(grid == g)
+  gd <- microenv_long |> filter(grid == g)
 
   val1 <- gd |>
     select(cellindex, variable, value, Cell_ID) |>
@@ -1309,7 +1296,7 @@ plan(multisession, workers = max(1, parallel::detectCores() - 1))
 pairdiff <- future_map_dfr(
   gridlist,
   compute_grid_pairdiff,
-  grid_long = grid_long,
+  microenv_long = microenv_long,
   pairs = pairs,
   .options = furrr_options(seed = TRUE)
 )
