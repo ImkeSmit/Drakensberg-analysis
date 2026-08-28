@@ -557,10 +557,17 @@ IDlist <- C5_ele_comb |>
   distinct(Cell_ID)
 
 #total species richness
-sprich <- read_csv("All_data/clean_data/micro_climb_occurrence.csv") |> 
+composition <- read_csv("All_data/clean_data/micro_climb_occurrence.csv") 
+composition |> 
   inner_join(IDlist, by = "Cell_ID") |> 
   distinct(taxon) |> 
   summarise(n = n())
+
+#median foliar cover
+median_cover <- composition |> 
+  inner_join(IDlist, by = "Cell_ID") |>
+  summarise(median_cover = median(cover, na.rm = T))
+
   
 ```
 
@@ -892,6 +899,10 @@ cwm_ridges <- cwm_comb |>
         strip.background = element_blank(),
         strip.placement = "outside", panel.grid = element_blank()) 
 cwm_ridges
+
+#median height
+median_height <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1) |> 
+  summarise(median_height = median(Height_cm))
 ```
 
 Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power with marginal $R^2$ values generally below 0.1 (@fig-allsites-microenv_C5_C2), although the models for leaf area (marginal $R^2$, C5 site pool model = 0.333, marginal $R^2$, C2 site pool model = 0.275) and plant height (marginal $R^2$, C5 site pool model = 0.143, marginal $R^2$, C2 site pool model = 0.127) at the low site had better explanatory power. Only surface heterogeneity had a somewhat consistent relationship with community assembly, often being related to higher than expected trait divergence (in 5 out of 12 trait x site combinations, @fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits. Other micro-environmental factors had weak and inconsistent effects on community assembly. For example, soil depth was significantly related to limiting similarity in 6 trait x site combinations, but significantly related to environmental filtering in 3 trait x site combinations (@fig-allsites-microenv_C5_C2). Rock cover and soil moisture and soil temperature had few significant relationships with SES. Rock cover was only significantly related to trait divergence of LA at the low site and soil moisture was only significantly related to convergence of LDMC at the mid site (@fig-allsites-microenv_C5_C2). Soil temperature was significantly related to convergence of plant height and LA at the low site (@fig-allsites-microenv_C5_C2).
@@ -1088,7 +1099,7 @@ This study is not the first to observe high trait diversity in high stress envir
 
 We expected that the assembly of leaf economic traits would shift from limiting similarity to environmental filtering with elevation. Instead, SLA exhibited significant trait convergence at all elevations, while LDMC exhibited convergence at the low elevation, and random assembly at the mid and high elevation. Community weighted means of SLA tended toward low SLA at low and high elevation, but high SLA at the mid elevation. The CWM of LDMC exhibits the inverse trend, with lower LDMC values at the mid site than at the high and low site. This reflects faster leaf economic strategies and higher competitive ability at the mid site than at the low and high site[@fynn2011; @reich2014]. This may be the result of competitive filtering toward acquisitive, fast growing species at the mid site. Alternatively, the high CWM SLA at the mid elevation may be the result of relaxed environmental constraints [@schroeder2024]. High summer temperatures at the low site, and cold temperatures at the high site may favour low SLA, conservative species [@scheepens2010]. The mid site may be released from these temperature constraints allowing a greater diversity of SLA and more acquisitive strategies. Given that SLA and LDMC are inversely related here, it is unclear why LDMC does not exhibit significant trait convergence at the mid and high elevation.
 
-Micro-environmental factors had weak and inconsistent relationships with community assembly, challenging the perception that microclimate and microtopography acts as an additional filter in community assembly. The most consistent relationship was with surface heterogeneity, which likely promoted trait divergence by providing diverse environmental conditions suited to species with diverse environmental requirements [@bergholz2017; @price_within-community_2017; @williams2014]. The lack of relationship between trait diversity patterns and other micro-environmental variables may suggest that we did not sample broad enough environmental gradients, or that we did not measure variables at biologically relevant scales. However, our sampling design inherently attempted to maximise the micro-environmental variation sampled, and we observed large variation in micro-environmental variables over short distances (@fig-env-heterogeneity). The scale of
+Micro-environmental factors had weak and inconsistent relationships with community assembly, challenging the perception that microclimate and microtopography acts as an additional filter in community assembly. The most consistent relationship was with surface heterogeneity, which likely promoted trait divergence by providing diverse environmental conditions suited to species with diverse environmental requirements [@bergholz2017; @price_within-community_2017; @williams2014]. The lack of relationship between trait diversity patterns and other micro-environmental variables may suggest that we did not sample broad enough environmental gradients, or that we did not measure variables at biologically relevant scales. However, our sampling design inherently attempted to maximise the micro-environmental variation sampled, and we observed large variation in micro-environmental variables over short distances (@fig-env-heterogeneity). The scale at which assembly processes function are influenced by the size of individuals [@mcnickle2018]. On this elevation gradient, the median height of species is `r median_height$median_height`cm, and the median foliar cover is `r median_cover$median_cover`% (100 $cm^$). Therefore, we believe that the scale of 1$m^2$ could reasonably be the scale at which micro-environmental conditions and species interactions influence composition. This falls within the range of 0.5 - 1.5 at which assembly processes were found to function in the Canadian prairie [@mcnickle2018].
 
 Micro-environmental factors had weak and inconsistent relationships with community assembly, challenging the perception that microclimate and microtopography act as an additional filter in community assembly. The most consistent relationship was with surface heterogeneity, which promoted trait divergence. Did we sample broad enough micro-environmental gradients? - yes. Are the environmental variables measured at a biologocially relavant scale - yes. This suggests that stochastic processes may dominate assembly at these scales, and that species are adapted to the average conditions...
 
