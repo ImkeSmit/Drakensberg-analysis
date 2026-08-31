@@ -1250,10 +1250,9 @@ RaoQ_results_table
 #| echo: false
 
 #build table with model results
-RaoQ_model_results <- expand_grid(null model = c("C5 site pool", "C2 site pool"), 
+RaoQ_model_results <- expand_grid(null_model = c("C5 site pool", "C2 site pool"), 
                                     trait = c("Plant height", "LA", "LDMC","SLA")) |> 
-  mutate(estimate = 
-    F_value = c(RaoQ_ele_anova$log_Height$`F-value`[2], RaoQ_ele_anova$log_LA$`F-value`[2],
+  mutate(F_value = c(RaoQ_ele_anova$log_Height$`F-value`[2], RaoQ_ele_anova$log_LA$`F-value`[2],
                      RaoQ_ele_anova$log_LDMC$`F-value`[2], RaoQ_ele_anova$SLA$`F-value`[2], 
                      CWM_ele_anova$log_Height$`F-value`[2], CWM_ele_anova$log_LA$`F-value`[2],
                      CWM_ele_anova$log_LDMC$`F-value`[2], CWM_ele_anova$SLA$`F-value`[2]), 
