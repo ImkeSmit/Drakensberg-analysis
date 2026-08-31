@@ -1376,7 +1376,7 @@ ele_results_table <- ele_model_results |>
                     p_value = "p value", 
                     marginal_R_squared = "marginal R\u00B2") |> 
   align(j = 1:5, align = "center", part = "all") |>
-  fontsize(size = 18, part = "all") |> 
+  fontsize(size = 12, part = "all") |> 
   theme_vanilla() |> 
   bold(part = "header") |> 
   autofit() |> 
@@ -1420,7 +1420,7 @@ RaoQ_results_table <- RaoQ_model_results |>
                     p_value = "p value", 
                     marginal_R_squared = "marginal R\u00B2") |> 
   align(j = 1:5, align = "center", part = "all") |>
-  fontsize(size = 18, part = "all") |> 
+  fontsize(size = 12, part = "all") |> 
   theme_vanilla() |> 
   bold(part = "header") |> 
   autofit() |> 
