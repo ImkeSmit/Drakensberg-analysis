@@ -35,23 +35,25 @@ conflict_prefer_all("tidylog", quiet = TRUE)
 
 # Introduction
 
-Understanding what drives community assembly is a central goal of ecology [@hillerislambers_rethinking_2012; @diamond_assembly_1975; @weiher_community_1998]. Community composition is understood to be shaped by environmental conditions, interactions with other plant species, neutral processes, or a combination of all three[@gotzenberger_ecological_2012]. From the pool of species that are able to disperse to a site, only a subset species may be able to survive the environmental conditions in the absence of other species. This assembly mechanism is termed environmental filtering [@kraft_community_2015]. Other species may influence community composition through competition. The principle of competitive exclusion dictates that species with similar niches cannot coexist [@hardin1960]. Therefore, interspecific competition should lead to the coexistence of species with divergent niches [@macarthur1967; but see @mayfield2010]. This assembly mechanism is termed limiting similarity. Neutral assembly processes refer to stochastic forces that govern the composition of communities [@hubbell2001]. Under this assembly mechanism, all species are equally good competitors, and have an equal probability of entering the community should an individual die [@hubbell2001; @hubbell2006].
+Understanding what drives community assembly is a central goal of ecology [@hillerislambers_rethinking_2012; @diamond_assembly_1975; @weiher_community_1998]. Community composition is understood to be shaped by environmental conditions, interactions with other plant species, neutral processes, or a combination of all three [@gotzenberger_ecological_2012]. From the pool of species that are able to disperse to a site, only a subset species may be able to survive the environmental conditions in the absence of other species. This assembly mechanism is termed environmental filtering [@kraft_community_2015]. Other species may influence community composition through competition. The principle of competitive exclusion dictates that species with similar niches cannot coexist [@hardin1960]. Therefore, interspecific competition should lead to the coexistence of species with divergent niches [@macarthur1967; but see @mayfield2010]. This assembly mechanism is termed limiting similarity. Neutral assembly processes refer to stochastic forces that govern the composition of communities [@hubbell2001]. Under this assembly mechanism, all species are equally good competitors, and have an equal probability of entering the community should an individual die [@hubbell2001; @hubbell2006].
 
 Investigating the functional trait patterns in communities offers insight into the dominant assembly processes at work in a community [@ackerly2007; @gotzenberger_ecological_2012]. Plant functional traits are related to the environmental requirements and competitive effects of species [@violle_towards_2009; @schöb2017; @funk_revisiting_2017]. Therefore, assembly mechanisms should generate predictable patterns of trait convergence or divergence. Environmental filtering selects species with traits that allow them to survive the abiotic environment, and should create a pattern of trait convergence toward an optimum trait for survival [@gotzenberger_ecological_2012]. In contrast, limiting similarity should create a pattern of trait divergence of in the community, as only species with divergent niches are able to coexist [@weiher_community_1998]. Under neutral assembly, a species' trait should not affect it's presence in the community, and should therefore generate a random distribution of traits [@hubbell2006].
 
-The importance of competition and environmental filtering as an assembly mechanism is influenced by environmental severity. Competition is predicted to play a larger role in structuring communities in less stressful or high resource environments, while environmental filtering is predicted to be more important in abiotically harsh environments [@weiher_community_1998; @grime1977]. This is termed the stress dominance hypothesis [SDH, @swenson2007; @coyle2014]. Support for this hypothesis is mixed. For example, the functional diversity of vascular plants decreased with elevation in the Scandes [@asplund2022]. The convergence of specific leaf area (SLA) and seed mass increased with elevation in dry alpine grassland[@pescador_spatial_2021], and the assembly of height and leaf area shifted from limiting similarity to environmental filtering with elevation in alpine tundra [@spasojevic2012]. However, SLA, stomatal conductance, and chlorophyll content showed increased divergence along the same elevation gradient [@spasojevic2012]. Other studies found no changes in assembly mechanisms along stress gradients, for example, along an aridity gradient in the Atacama desert [@carvajal2023], along gradients of soil water and nutrient availability in forests [@coyle2014], and along an elevation gradient in the Swiss Alps [@scherrer_disentangling_2019].
+The importance of competition and environmental filtering as an assembly mechanism is influenced by environmental severity. Competition is predicted to play a larger role in structuring communities in less stressful or high resource environments, while environmental filtering is predicted to be more important in abiotically harsh environments [@weiher_community_1998; @grime1977]. This is termed the stress dominance hypothesis [SDH, @swenson2007; @coyle2014]. Support for this hypothesis is mixed. For example, the functional diversity of vascular plants decreased with elevation in the Scandes [@asplund2022]. The convergence of specific leaf area (SLA) and seed mass increased with elevation in dry alpine grassland [@pescador_spatial_2021], and the assembly of height and leaf area shifted from limiting similarity to environmental filtering with elevation in alpine tundra [@spasojevic2012]. However, SLA, stomatal conductance, and chlorophyll content showed increased divergence along the same elevation gradient [@spasojevic2012]. Other studies found no changes in assembly mechanisms along stress gradients, for example, along an aridity gradient in the Atacama desert [@carvajal2023], along gradients of soil water and nutrient availability in forests [@coyle2014], and along an elevation gradient in the Swiss Alps [@scherrer_disentangling_2019].
 
 Micro-environmental conditions are known to influence community composition [@kemppinen_microclimate_2024; @vernham_understanding_2023], but their specific effect on community assembly processes has not been investigated extensively. Micro-environmental conditions may pose an additional filter after the effect of macroclimate, selecting species with optimum traits adapted to local micro-environmental conditions [@bergholz2017; @kemppinen_microclimate_2024]. Rock cover and surface heterogeneity may increase the diversity of available niche space, promoting the coexistence of plants with divergent trait syndromes [@vernham_understanding_2023]. Soil depth may be related to higher soil moisture and increased access to soil resources [@price_within-community_2017], and increased opportunity for underground resource partitioning. Evidence for micro-environmental conditions affecting community assembly is limited. Mean moisture and temperature conditions within a 10m transect had a filtering effect on leaf area and plant height, but was related to divergence in leaf dry matter content (LDMC) [@stark2017]. Heterogeneity of temperature and moisture conditions within the transect was related to divergence in height and LDMC [@stark2017]. Other studies find that plant communities follow neutral dynamics at fine scales [@bowman2018], or that there is little variation community assembly with micro-environmental variation [@aiello-lammens2017].
 
-Here we investigate the effects of macro- and micro-environmental conditions on community assembly, using a species-rich montane grassland in South Africa as a model system. We use an elevation gradient to test the effect of macro-environment; and fine-scale physical, temperature and moisture conditions to investigate the effect of micro-environment. Following the predictions of the SDH, we expect that competition will be the dominant force in community assembly at low elevation (high productivity and temperature environment), but that environmental filtering will be the most important structuring force at high elevation (low productivity and temperature environment). We will examine patterns of convergence and divergence in four plant functional traits: plant height, leaf area (LA), SLA and LDMC. These traits form two differentiating axes of plant size (informed by plant height and LA) and leaf economics (informed by SLA and LDMC), which describe most of the variation in plant form and function worldwide [@díaz2016; @reich2014]. Plant size is related to species' ability compete for light [@violle_competition_2009], which is especially important in productive environments. Plant size is also related to species' ability to tolerate cold temperatures, with shorter, small leaved species better able to accumulate heat in their canopy and thus decouple their temperature from the air temperature [@pellissier2018; @körner2021]. SLA and LDMC are inversely related to each other on the leaf economics spectrum, a continuum between "fast" (high SLA, low LDMC) and "slow" (low SLA, high LDMC) leaf economic strategies [@reich2014]. Species with "fast" leaf economics have a photosynthetic and growth rate, and require a high availability of nutrients. these species also tend to have a high competitive ability [@fynn2011]. Species with "slow" leaf economics acquire soil nutrients and water at a lower rate, and thus have a slower growth and photosynthetic rate, but typically have a higher stress tolerance.
+Here we investigate the effects of macro- and micro-environmental conditions on community assembly, using a species-rich montane grassland in South Africa as a model system. We use an elevation gradient to test the effect of macro-environment; and fine-scale physical, temperature and moisture conditions to investigate the effect of micro-environment. Following the predictions of the SDH, we expect that limiting similarity will be the dominant community assembly mechanism at low elevation (high productivity and temperature environment), but that environmental filtering will be the most important structuring force at high elevation (low productivity and temperature environment). To test this hypothesis, we will examine patterns of convergence and divergence in four plant functional traits: plant height, leaf area (LA), SLA and LDMC. These traits form two differentiating axes of plant size (informed by plant height and LA) and leaf economics (informed by SLA and LDMC), which describe most of the variation in plant form and function worldwide [@díaz2016; @reich2014]. Plant size is related to species' ability compete for light [@violle_competition_2009], which is especially important in productive environments. Plant size is also related to species' ability to tolerate cold temperatures, with shorter, small leaved species better able to accumulate heat in their canopy and thus decouple their temperature from the air temperature [@pellissier2018; @körner2021]. SLA and LDMC are inversely related to each other on the leaf economics spectrum, a continuum between "fast" (high SLA, low LDMC) and "slow" (low SLA, high LDMC) leaf economic strategies [@reich2014]. Species with "fast" leaf economics have a high photosynthetic and growth rate, and require a high availability of nutrients. These species also tend to have a high competitive ability [@fynn2011]. Species with "slow" leaf economics acquire soil nutrients and water at a lower rate, and thus have a slower growth and photosynthetic rate, but typically have a higher stress tolerance.
 
 In accordance with the predictions of the SDH, we expect that communities will be structured by limiting similarity at low elevation, and environmental filtering at high elevation. Thus, that trait distributions will become more convergent with elevation. We expect that rock cover, surface heterogeneity and soil depth will be related to trait divergence, while fine-scale temperature and moisture conditions will have a filtering effect on size and leaf economic traits.
 
 # Methods
+
 ```{r setup chunk}
 #| message: false
 #| echo: false
 #| warning: false
+#| include: false
 
 
 #import microenvironmental data containing x and y coordinates
@@ -362,7 +364,7 @@ IDlist <- C5_ele_comb |>
 
 #total species richness
 composition <- read_csv("All_data/clean_data/micro_climb_occurrence.csv") 
-composition |> 
+sprich <- composition |> 
   inner_join(IDlist, by = "Cell_ID") |> 
   distinct(taxon) |> 
   summarise(n = n())
@@ -377,11 +379,11 @@ median_cover <- composition |>
 
 ## Study site
 
-This study was conducted on an elevation gradient spanning 1000m in the Northern Malot-Drakensberg in South Africa (@fig-sitemap a). The Maloti-Drakensberg is the highest extension of the great escarpment of South Africa, formed during the Jurassic period when outflows of basaltic lava covered sedimentary rocks of the Karoo supergroup [@knight2015]. The Maloti-Drakensberg is the only mountain range south of Kilimanjaro with an alpine zone [@kotze2023], with its highest peak reaching 3482 m a.s.l. The Maloti-Drakensberg falls within the grassland biome of South Africa [@mucina2006], where Poaceae species dominate in terms of cover and biomass. Herbaceous forbs have low cover but contribute the most to species richness, and woody shrubs or trees are sparse. The vegetation in the Maloti-Drakensberg is highly diverse, forming the Drakensberg Mountain Centre of endemism with a 9% plant endemism rate [@carbutt2019].
+This study was conducted on an elevation gradient spanning 1000m in the Northern Maloti-Drakensberg in South Africa (@fig-sitemap a). The Maloti-Drakensberg is the highest extension of the great escarpment of South Africa, formed during the Jurassic period when outflows of basaltic lava covered sedimentary rocks of the Karoo supergroup [@knight2015]. The Maloti-Drakensberg is the only mountain range south of Kilimanjaro with an alpine zone [@kotze2023], with its highest peak reaching 3482 m a.s.l. The Maloti-Drakensberg falls within the grassland biome of South Africa [@mucina2006], where Poaceae species dominate in terms of cover and biomass. Herbaceous forbs have low cover but contribute the most to species richness, and woody shrubs or trees are sparse. The vegetation in the Maloti-Drakensberg is highly diverse, forming the Drakensberg Mountain Centre of endemism with a 9% plant endemism rate [@carbutt2019].
 
 The elevation gradient consited of three study sites; located in the Golden Gate Highlands National Park (low site) at 2000 m a.s.l., Wistieshoek (mid site) at 2500 m a.s.l. and the Bokong Nature Reserve (high site) at 3000 m a.s.l (@fig-sitemap a). All three sites were located on basaltic bedrock. The low site falls within the Northern Drakensberg Highland Grassland vegetation type [@mucina2006], characterised by taller, C4 grasses, and the presence of some trees such as *Protea* species, *Leucosidea sericea* and *Buddleja* species. The mid site falls within the uKahlamba Basalt grassland vegetation type [@mucina2006], which includes many C3 grass genera such as *Festuca*, *Pentameris* and *Tenaxia*, and a very high diversity of forbs. The high site is in the Lesotho Highland Basalt grassland vegetation type [@mucina2006], where the grass is extremely short and dominated by C3 species. Shrubs of e.g., *Erica* and *Passerina* are present, as well as cushion forming *Helichrysum* shrubs.
 
-The climate in the Northern Maloti-Drakensberg is characterised by highly seasonal rainfall, with 75% of annual rainfall occurring in the summer months between November and March [@nel2009]. Rainfall occurs as thundershowers formed through orographic lift [@nel2009]. The total annual rainfall at the three sites are approximately 1310 mm p.a. at the low site, 1558 mm p.a. at the mid site, and 913 mm p.a. at the high site (total rainfall measured between 22/05/2025 and 21/05/2026 by the Witsieshoek \[35 km from site\], Sentinel car park \[at site\] and Alpine base \[56 km from site\] weather stations of the African Mountain Research Foundation; <https://africanmountainresearch.com/the-solutions/our-data/>). Very little rainfall occurs in the winter (10mm - 190mm), but precipitation may also occur in the form of snow [@mulder2009; @nel2009]. Snow occurs when cold fronts or cutoff low pressure cells move over the Drakensberg [@mulder2009], and tends to melt before the next cold weather system arrives. Summer temperatures are mild, but winters are cold, with minimum temperatures regularly dropping below freezing in winter [@nel2008]. Mean annual air temperature is 12℃ at the low site, 10℃ at the mid site and 7℃ at the high site (mean daily temperature between 22/05/2025 and 21/05/2026 measured by the nearest weather stations of the African Mountain Research Foundation).
+The climate in the Northern Maloti-Drakensberg is characterised by highly seasonal rainfall, with 75% of annual rainfall occurring in the summer months between November and March [@nel2009]. Rainfall occurs as thundershowers formed through orographic lift [@nel2009]. The total annual rainfall at the three sites are approximately 1310 mm p.a. at the low site, 1558 mm p.a. at the mid site, and 913 mm p.a. at the high site (total rainfall measured between 22/05/2025 and 21/05/2026 by the Witsieshoek \[35 km from site\], Sentinel car park \[at site\] and Alpine base \[56 km from site\] weather stations of the African Mountain Research Foundation; <https://africanmountainresearch.com/the-solutions/our-data/>). Very little rainfall occurs in the winter (10mm - 190mm), but precipitation may also occur in the form of snow [@mulder2009; @nel2009]. Snow occurs when cold fronts or cutoff low pressure cells move over the Drakensberg [@mulder2009], and tends to melt before the next cold weather system arrives. Summer temperatures are mild, but winters are cold, with minimum temperatures regularly dropping below freezing in winter [@nel2008]. Mean annual air temperature is 12℃ at the low site, 10℃ at the mid site and 7℃ at the high site (mean daily temperature between 22/05/2025 and 21/05/2026 measured by the same weather stations mentioned above).
 
 Fires are a natural occurrence in the Maloti-Drakensberg, and are essential for the maintenance of plant biodiversity [@morris2021]. The majority of species in Drakensberg grasslands possess underground storage organs or bud banks from which they resprout after fire. Historically, fires were ignited by lightning and occurred in the early spring [@finch2022]. Since European occupation in the Drakensberg and surrounding area, more fires are set by humans in the winter [@finch2022]. The fire return interval or time since last fire for the three sites are not known, but all three sites were subject to a similar fire regime consisting of incidental wildfires started by lightning or accidental ignition.
 
@@ -395,13 +397,13 @@ The low site is formally conserved as a National Park where livestock has been e
 knitr::include_graphics("C:\\Users\\imke6\\Documents\\PhD 2025\\Spatial analysis\\Figure1_proposal_13Jul26.png")
 ```
 
-At each site, species composition and functional traits were sampled using a grid design (@fig-sitemap c). Eight grids were sampled at the low site, and seven were sampled at the mid and high site (@fig-sitemap b). Each grid was 8 x 20 m in size, consisting of 160 contiguous 1 x 1 m cells (@fig-sitemap c). In total, there were 3520 cells in the study. The grids were spaced \> 80 m apart in each site and were positioned to encompass the full range of environmental conditions at the site, covering a range of topographies and vegetation characteristics. In addition, individual grids were oriented to capture as much local variation in vegetation and topography as possible. This sampling design has previously been applied in high-elevation and high-latitude systems to sample broad environmental gradients and allows the influence of fine-scale heterogeneity to be examined without the confounding effect of macroclimate or species pools [e.g., @mod_outcomes_2014; @momberg_exposing_2021].
+At each site, species composition and functional traits were sampled using a grid design (@fig-sitemap c). Each grid was 8 x 20 m in size, consisting of 160 contiguous 1 x 1 m cells (@fig-sitemap c). Eight grids were sampled at the low site, and seven were sampled at the mid and high site (@fig-sitemap b), resulting in a total of 3520 cells in this study. The grids were spaced \> 80 m apart in each site and were positioned to encompass the full range of environmental conditions at the site, covering a range of topographies and vegetation characteristics. In addition, individual grids were oriented to capture as much local variation in vegetation and topography as possible. This sampling design has previously been applied in high-elevation and high-latitude systems to sample broad environmental gradients and allows the influence of fine-scale heterogeneity to be examined without the confounding effect of macroclimate or species pools [e.g., @mod_outcomes_2014; @momberg_exposing_2021].
 
 ## Data collection and variable selection
 
-Vegetation surveys were conducted at the low site in January 2019, at the mid site in January 2022, at the high site in January 2023. The identity and percentage cover of all vascular species in each cell was recorded. Species cover was visually estimated as a percentage of the 1 $m^2$ cell covered by the foliage of each species. The total vegetation cover of cells may exceed 100% in the case of layered vegetation. Species were identified from local field guides [@pooley2003; @pooley2005], as well as the Flora of the Free State [@retief]. In the case where a species could not be identified to species level, it was assigned a morphoname.
+Vegetation surveys were conducted at the low site in January 2019, at the mid site in January 2022, at the high site in January 2023. The identity and percentage cover of all vascular species in each cell was recorded. `r sprich$n` species occurred across the three sites. Species cover was visually estimated as a percentage of the 1 $m^2$ cell covered by the foliage of each species. The total vegetation cover of cells may exceed 100% in the case of layered vegetation. Species were identified from local field guides [@pooley2003; @pooley2005], as well as the Flora of the Free State [@retief]. In the case where a species could not be identified to species level, it was assigned a morphoname.
 
-Functional trait data was collected in December 2021 at the low site, December 2022 at the mid site, and December 2023 at the high site. The following traits were measured (following the standardised methods of @perez-harguindeguy_new_2013: plant height, leaf area (LA), specific leaf area (SLA) and leaf dry matter content (LDMC). Functional traits were measured for 60-95% of species in each grid, comprising 67-99% of the total vegetation cover in each grid. To maximise the range of environmental conditions in which we collected functional trait data, we sampled many species at the ends of the grid, but sampled sparsely toward the center of the grid. Species were not sampled for functional traits in adjacent cells.
+Functional trait data was collected in December 2021 at the low site, December 2022 at the mid site, and December 2023 at the high site. The following traits were measured following the standardised methods of @perez-harguindeguy_new_2013: plant height, leaf area (LA), specific leaf area (SLA) and leaf dry matter content (LDMC). Functional traits were measured for 60-95% of species in each grid, comprising 67-99% of the total vegetation cover in each grid. To maximise the range of environmental conditions in which we collected functional trait data, we sampled many species at the ends of the grid, but sampled sparsely toward the center of the grid. Species were not sampled for functional traits in adjacent cells.
 
 Micro-environmental variables were measured at the same time as the vegetation survey. Seven micro-environmental variables were measured in each cell of each grid: rock cover, soil depth, northness, slope height, instantaneous soil moisture, instantaneous soil temperature and surface heterogeneity. Rock cover was visually estimated as the percent of a cell covered by rocks large enough to impede plant growth. Soil depth was measured at three random points in each cell by inserting a metal rod of 60 cm length and 8mm diameter at into the soil until further penetration was impeded. These three measurements were used to calculate the mean soil depth of each cell. Soils deeper than 60 cm were assigned a depth of 61 cm. Three soil depth measurements were taken in each cell and the mean calculated. The aspect of each cell was measured with a compass and transformed to a linear variable, northness, by taking the cosine of the aspect. Slope height was measured as the vertical difference between the highest and lowest point in a cell, and is a measure of slope steepness. Instantaneous soil moisture was measured in each cell more than 24 hours after the last rainfall event, using a handheld time-domain soil moisture meter (FieldScout 300 TDR; Spectrum Technologies, Plainfield, IL, US) at a depth of 7.5 cm. Instantaneous soil temperature was measured at the same time as soil moisture with a handheld soil thermometer. It took 47-74 minutes to measure the instantaneous soil moisture and temperature in each cell of a grid, during which the air temperature may have increased (especially for grids measured early in the morning). Therefore, the instantaneous soil moisture and temperature values were adjusted to account for the increase in air temperature over the time of the campaign. Surface heterogeneity was calculated as the standard deviation of elevation in a cell from a digital surface model. The digital surface model reflects the elevation of the earth's surface (not the ground), and is influenced by vegetation, rocks or any object that may lie on top of the soil. The digital surface model was created from high resolution drone imagery captured by a DJI Phantom 4 Pro drone equipped with a 20MP camera with a 1 inch (CMOS) sensor. Imagery was captured in the winter in August 2023, when the biomass of live vegetation and the volume of dried vegetation was at its lowest. Flights were conducted at 20 m above the take-off point, but the distance to the ground varied due to topographic heterogeneity. The digital surface model was created in Agisoft Metashape following a standard photogrammetry workflow.
 
@@ -454,9 +456,7 @@ mean_R2 <- validation_results |>
 
 The instantaneous measures of soil moisture and temperature only reflect microclimate conditions at one time point, and may not accurately reflect persistent microclimatic differences between cells. Therefore, we also measured soil moisture and temperature over one year in a subset of cells (six or seven cells in each grid), and calculated the mean soil moisture and temperature of the growing season. We interpolated the mean soil moisture and temperature values to other cells in the grid, and performed cross validation to assess the quality of the interpolation. We also performed a correlation analysis to assess how well the interpolated values of mean soil moisture and temperature correspond to the instantaneous soil moisture and temperature. We used Temperature-Moisture-Sensors [TMS, @wild_climate_2019] to record soil moisture and temperature readings at 8 cm below the soil surface every 15 minutes for one year (12 January 2023 – 21 January 2024). The start of the growing season was defined as the first day after 21 June when the minimum daily temperature of all loggers at a site were above 5℃. The end of the growing season was the first day before 21 June when all loggers at a site had a minimum daily temperature below 5℃. Following these definitions, the growing season was from 23 August to 8 July at the low site, 1 September to 6 June at the mid site, and 10 October to 3 April at the high site. The mean soil moisture and temperature for the growing season was calculated for each sensor and interpolated to other cells in the grid. An inverse-distance-weighted interpolation algorithm was used from the gstat package [@gräler2016] with a power parameter of two. Cells with more than 50% rock cover were not used in the interpolation process if they contained a sensor and did not receive an interpolated value if they were without a sensor. Following this threshold, `r lost[2,2]` cells were excluded from interpolation at the low site, `r lost[3,2]` cells were excluded from the mid site, and `r lost[1,2]` cells were excluded from the high site. The ability of the interpolation algorithm to predict observed mean soil temperature and moisture values varied by grid (Appendix @tbl-validation-results), but was generally poor, with the mean $R^2$ of mean soil temperature = `r mean_R2[1,2]`, and the mean $R^2$ of mean soil moisture = `r mean_R2[2,2]`. However, the interpolated soil moisture and temperature for the growing season correlated well with the instantaneous soil moisture and temperature measurements (pearson correlation coefficient between instantaneous and interpolated soil moisture = `r round(cor(moisture_dat$soil_moisture_adj_campaign2, moisture_dat$mean_moist_growing_season), digits = 2)`, pearson correlation coefficient between instantaneous and interpolated soil temperature = `r round(cor(moisture_dat$soil_temperature_adj_campaign2, moisture_dat$mean_T1_growing_season), digits = 2)`).
 
-A principal component analysis was performed using the princomp [@rcoreteam2025] function to identify the main axes of micro-environmental variation across the three sites (@fig-environmental-PCA). Most of the micro-environmental variation across the three sites was attributed to differences in soil moisture and temperature (PC1, explaining 34% of the variation), as well as soil depth (PC2, explaining 17% of the variation). We selected the following uncorrelated micro-environmental variables to test whether fine-scale variation in community assembly is shaped by micro-environmental variation: mean soil temperature of the growing season (hereafter referred to as soil temperature), mean soil moisture of the growing season (hereafter referred to as soil moisture), rock cover, mean soil depth and surface heterogeneity.`r C5_ele_comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` cells were included in testing how community assembly varies with elevation. `r C5_ele_comb|> filter(trait == "log_Height", site == "GG") |> drop_na() |> summarise(n = n())` Cells were from the low site, `r C5_ele_comb |> filter(trait == "log_Height", site == "WH") |> drop_na() |> summarise(n = n())` cells were from the mid site, and `r C5_ele_comb |> filter(trait == "log_Height", site == "BK") |> drop_na() |> summarise(n = n())` cells were from the high site. `r composition$n` Species occurred across the three sites.
-
-There was high heterogeneity of micro-environmental variables in the grids (@fig-env-heterogeneity). For example, soil depth could vary by 44 cm between adjacent cells, and rock cover could vary by 99% between adjacent cells (@fig-env-heterogeneity).
+To identify the main axes of micro-environmental variation across the three sites, A principal component analysis was performed using the princomp [@rcoreteam2025] function (@fig-environmental-PCA). Most of the micro-environmental variation across the three sites was attributed to differences in soil moisture and temperature (PC1, explaining 34% of the variation), as well as soil depth (PC2, explaining 17% of the variation). We selected the uncorrelated variables with highest loadings on PC1 and PC2 to test whether fine-scale variation in community assembly is shaped by micro-environmental variation: mean soil temperature of the growing season (hereafter referred to as soil temperature), mean soil moisture of the growing season (hereafter referred to as soil moisture), rock cover, mean soil depth and surface heterogeneity. `r C5_ele_comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` cells were included in testing how community assembly varies with elevation. `r C5_ele_comb|> filter(trait == "log_Height", site == "GG") |> drop_na() |> summarise(n = n())` cells were from the low site, `r C5_ele_comb |> filter(trait == "log_Height", site == "WH") |> drop_na() |> summarise(n = n())` cells were from the mid site, and `r C5_ele_comb |> filter(trait == "log_Height", site == "BK") |> drop_na() |> summarise(n = n())` cells were from the high site. There was high heterogeneity of micro-environmental variables in the grids (Appendix @fig-env-heterogeneity). For example, soil depth could vary by 44 cm between adjacent cells, and rock cover could vary by 99% between adjacent cells (Appendix @fig-env-heterogeneity).
 
 ```{r}
 #| label: fig-environmental-PCA
@@ -1156,138 +1156,6 @@ validation_grid
 ```
 
 ```{r}
-#| label: tbl-ele-model-results
-#| tbl-cap: Model results from linear mixed effect models models testing the SDH. Tests were performed with SES calculated from the C5 site pool and C2 null model for each trait. The F ratio and p value test the hypothesis that there is no difference between the mean SES of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
-#| message: false
-#| echo: false
-
-#build table with model results
-ele_model_results <- expand_grid(null_model = c("C5 entire pool", "C2 site pool"), 
-                                    trait = c("Plant height", "LA", "LDMC","SLA")) |> 
-  mutate(F_value = c(C5_SES_ele_anova$log_Height$`F-value`[2], C5_SES_ele_anova$log_LA$`F-value`[2],
-                     C5_SES_ele_anova$log_LDMC$`F-value`[2], C5_SES_ele_anova$SLA$`F-value`[2], 
-                     C2_SES_ele_anova$log_Height$`F-value`[2], C2_SES_ele_anova$log_LA$`F-value`[2],
-                     C2_SES_ele_anova$log_LDMC$`F-value`[2], C2_SES_ele_anova$SLA$`F-value`[2]), 
-         p_value = c(C5_SES_ele_anova$log_Height$`p-value`[2], C5_SES_ele_anova$log_LA$`p-value`[2],
-                     C5_SES_ele_anova$log_LDMC$`p-value`[2], C5_SES_ele_anova$SLA$`p-value`[2], 
-                     C2_SES_ele_anova$log_Height$`p-value`[2], C2_SES_ele_anova$log_LA$`p-value`[2],
-                     C2_SES_ele_anova$log_LDMC$`p-value`[2], C2_SES_ele_anova$SLA$`p-value`[2]), 
-         marginal_R_squared = c(C5_SES_ele_Rsq$log_Height[1], C5_SES_ele_Rsq$log_LA[1],
-                                C5_SES_ele_Rsq$log_LDMC[1],C5_SES_ele_Rsq$SLA[1],
-                                C2_SES_ele_Rsq$log_Height[1], C2_SES_ele_Rsq$log_LA[1],
-                                C2_SES_ele_Rsq$log_LDMC[1],C2_SES_ele_Rsq$SLA[1]))
-
-ele_results_table <- ele_model_results |> 
-  mutate(F_value = round(F_value, digits = 3), 
-         p_value = round(p_value, digits = 3), 
-         marginal_R_squared = round(marginal_R_squared, digits = 3)) |> 
-  flextable() |> 
-  set_header_labels(null_model = "Null model", 
-                    trait = "Trait", 
-                    F_value = "F value", 
-                    p_value = "p value", 
-                    marginal_R_squared = "marginal R\u00B2") |> 
-  align(j = 1:5, align = "center", part = "all") |>
-  fontsize(size = 18, part = "all") |> 
-  theme_vanilla() |> 
-  bold(part = "header") |> 
-  autofit() |> 
-  fit_to_width(max_width = 6.5)
-
-ele_results_table
-
-
-```
-
-```{r}
-#| label: tbl-ele-RaoQ-CWM-results
-#| tbl-cap: Model results from linear mixed effect models testing whether the RoaQ and CWM of traits vary with elevation. The F ratio and p value test the hypothesis that there is no difference between the mean of cell-level CWM or RaoQ of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
-#| message: false
-#| echo: false
-
-#build table with model results
-RaoQ_model_results <- expand_grid(response = c("CWM", "RaoQ"), 
-                                    trait = c("Plant height", "LA", "LDMC","SLA")) |> 
-  mutate(F_value = c(RaoQ_ele_anova$log_Height$`F-value`[2], RaoQ_ele_anova$log_LA$`F-value`[2],
-                     RaoQ_ele_anova$log_LDMC$`F-value`[2], RaoQ_ele_anova$SLA$`F-value`[2], 
-                     CWM_ele_anova$log_Height$`F-value`[2], CWM_ele_anova$log_LA$`F-value`[2],
-                     CWM_ele_anova$log_LDMC$`F-value`[2], CWM_ele_anova$SLA$`F-value`[2]), 
-         p_value = c(RaoQ_ele_anova$log_Height$`p-value`[2], RaoQ_ele_anova$log_LA$`p-value`[2],
-                     RaoQ_ele_anova$log_LDMC$`p-value`[2], RaoQ_ele_anova$SLA$`p-value`[2], 
-                     CWM_ele_anova$log_Height$`p-value`[2], CWM_ele_anova$log_LA$`p-value`[2],
-                     CWM_ele_anova$log_LDMC$`p-value`[2], CWM_ele_anova$SLA$`p-value`[2]), 
-         marginal_R_squared = c(RaoQ_ele_Rsq$log_Height[1], RaoQ_ele_Rsq$log_LA[1],
-                                RaoQ_ele_Rsq$log_LDMC[1],RaoQ_ele_Rsq$SLA[1],
-                                CWM_ele_Rsq$log_Height[1], CWM_ele_Rsq$log_LA[1],
-                                CWM_ele_Rsq$log_LDMC[1],CWM_ele_Rsq$SLA[1]))
-
-RaoQ_results_table <- RaoQ_model_results |> 
-  mutate(F_value = round(F_value, digits = 3), 
-         p_value = round(p_value, digits = 3), 
-         marginal_R_squared = round(marginal_R_squared, digits = 3)) |> 
-  flextable() |> 
-  set_header_labels(response = "Response variable", 
-                    trait = "Trait", 
-                    F_value = "F value", 
-                    p_value = "p value", 
-                    marginal_R_squared = "marginal R\u00B2") |> 
-  align(j = 1:5, align = "center", part = "all") |>
-  fontsize(size = 18, part = "all") |> 
-  theme_vanilla() |> 
-  bold(part = "header") |> 
-  autofit() |> 
-  fit_to_width(max_width = 6.5)
-
-RaoQ_results_table
-
-
-```
-
-```{r}
-#| label: tbl-microenv-models-results
-#| tbl-cap: Model results 
-#| message: false
-#| echo: false
-
-#build table with model results
-RaoQ_model_results <- expand_grid(null_model = c("C5 site pool", "C2 site pool"), 
-                                    trait = c("Plant height", "LA", "LDMC","SLA")) |> 
-  mutate(F_value = c(RaoQ_ele_anova$log_Height$`F-value`[2], RaoQ_ele_anova$log_LA$`F-value`[2],
-                     RaoQ_ele_anova$log_LDMC$`F-value`[2], RaoQ_ele_anova$SLA$`F-value`[2], 
-                     CWM_ele_anova$log_Height$`F-value`[2], CWM_ele_anova$log_LA$`F-value`[2],
-                     CWM_ele_anova$log_LDMC$`F-value`[2], CWM_ele_anova$SLA$`F-value`[2]), 
-         p_value = c(RaoQ_ele_anova$log_Height$`p-value`[2], RaoQ_ele_anova$log_LA$`p-value`[2],
-                     RaoQ_ele_anova$log_LDMC$`p-value`[2], RaoQ_ele_anova$SLA$`p-value`[2], 
-                     CWM_ele_anova$log_Height$`p-value`[2], CWM_ele_anova$log_LA$`p-value`[2],
-                     CWM_ele_anova$log_LDMC$`p-value`[2], CWM_ele_anova$SLA$`p-value`[2]), 
-         marginal_R_squared = c(RaoQ_ele_Rsq$log_Height[1], RaoQ_ele_Rsq$log_LA[1],
-                                RaoQ_ele_Rsq$log_LDMC[1],RaoQ_ele_Rsq$SLA[1],
-                                CWM_ele_Rsq$log_Height[1], CWM_ele_Rsq$log_LA[1],
-                                CWM_ele_Rsq$log_LDMC[1],CWM_ele_Rsq$SLA[1]))
-
-RaoQ_results_table <- RaoQ_model_results |> 
-  mutate(F_value = round(F_value, digits = 3), 
-         p_value = round(p_value, digits = 3), 
-         marginal_R_squared = round(marginal_R_squared, digits = 3)) |> 
-  flextable() |> 
-  set_header_labels(response = "Response variable", 
-                    trait = "Trait", 
-                    F_value = "F value", 
-                    p_value = "p value", 
-                    marginal_R_squared = "marginal R\u00B2") |> 
-  align(j = 1:5, align = "center", part = "all") |>
-  fontsize(size = 18, part = "all") |> 
-  theme_vanilla() |> 
-  bold(part = "header") |> 
-  autofit() |> 
-  fit_to_width(max_width = 6.5)
-
-RaoQ_results_table
-
-
-```
-
-```{r}
 #| message: false
 #| warning: false
 #| echo: false
@@ -1454,4 +1322,137 @@ diff_summary |>
   filter(distance == 1)
   
   
+```
+
+
+```{r}
+#| label: tbl-ele-model-results
+#| tbl-cap: Model results from linear mixed effect models models testing the SDH. Tests were performed with SES calculated from the C5 site pool and C2 null model for each trait. The F ratio and p value test the hypothesis that there is no difference between the mean SES of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
+#| message: false
+#| echo: false
+
+#build table with model results
+ele_model_results <- expand_grid(null_model = c("C5 entire pool", "C2 site pool"), 
+                                    trait = c("Plant height", "LA", "LDMC","SLA")) |> 
+  mutate(F_value = c(C5_SES_ele_anova$log_Height$`F-value`[2], C5_SES_ele_anova$log_LA$`F-value`[2],
+                     C5_SES_ele_anova$log_LDMC$`F-value`[2], C5_SES_ele_anova$SLA$`F-value`[2], 
+                     C2_SES_ele_anova$log_Height$`F-value`[2], C2_SES_ele_anova$log_LA$`F-value`[2],
+                     C2_SES_ele_anova$log_LDMC$`F-value`[2], C2_SES_ele_anova$SLA$`F-value`[2]), 
+         p_value = c(C5_SES_ele_anova$log_Height$`p-value`[2], C5_SES_ele_anova$log_LA$`p-value`[2],
+                     C5_SES_ele_anova$log_LDMC$`p-value`[2], C5_SES_ele_anova$SLA$`p-value`[2], 
+                     C2_SES_ele_anova$log_Height$`p-value`[2], C2_SES_ele_anova$log_LA$`p-value`[2],
+                     C2_SES_ele_anova$log_LDMC$`p-value`[2], C2_SES_ele_anova$SLA$`p-value`[2]), 
+         marginal_R_squared = c(C5_SES_ele_Rsq$log_Height[1], C5_SES_ele_Rsq$log_LA[1],
+                                C5_SES_ele_Rsq$log_LDMC[1],C5_SES_ele_Rsq$SLA[1],
+                                C2_SES_ele_Rsq$log_Height[1], C2_SES_ele_Rsq$log_LA[1],
+                                C2_SES_ele_Rsq$log_LDMC[1],C2_SES_ele_Rsq$SLA[1]))
+
+ele_results_table <- ele_model_results |> 
+  mutate(F_value = round(F_value, digits = 3), 
+         p_value = round(p_value, digits = 3), 
+         marginal_R_squared = round(marginal_R_squared, digits = 3)) |> 
+  flextable() |> 
+  set_header_labels(null_model = "Null model", 
+                    trait = "Trait", 
+                    F_value = "F value", 
+                    p_value = "p value", 
+                    marginal_R_squared = "marginal R\u00B2") |> 
+  align(j = 1:5, align = "center", part = "all") |>
+  fontsize(size = 18, part = "all") |> 
+  theme_vanilla() |> 
+  bold(part = "header") |> 
+  autofit() |> 
+  fit_to_width(max_width = 6.5)
+
+ele_results_table
+
+
+```
+
+```{r}
+#| label: tbl-ele-RaoQ-CWM-results
+#| tbl-cap: Model results from linear mixed effect models testing whether the RoaQ and CWM of traits vary with elevation. The F ratio and p value test the hypothesis that there is no difference between the mean of cell-level CWM or RaoQ of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
+#| message: false
+#| echo: false
+
+#build table with model results
+RaoQ_model_results <- expand_grid(response = c("CWM", "RaoQ"), 
+                                    trait = c("Plant height", "LA", "LDMC","SLA")) |> 
+  mutate(F_value = c(RaoQ_ele_anova$log_Height$`F-value`[2], RaoQ_ele_anova$log_LA$`F-value`[2],
+                     RaoQ_ele_anova$log_LDMC$`F-value`[2], RaoQ_ele_anova$SLA$`F-value`[2], 
+                     CWM_ele_anova$log_Height$`F-value`[2], CWM_ele_anova$log_LA$`F-value`[2],
+                     CWM_ele_anova$log_LDMC$`F-value`[2], CWM_ele_anova$SLA$`F-value`[2]), 
+         p_value = c(RaoQ_ele_anova$log_Height$`p-value`[2], RaoQ_ele_anova$log_LA$`p-value`[2],
+                     RaoQ_ele_anova$log_LDMC$`p-value`[2], RaoQ_ele_anova$SLA$`p-value`[2], 
+                     CWM_ele_anova$log_Height$`p-value`[2], CWM_ele_anova$log_LA$`p-value`[2],
+                     CWM_ele_anova$log_LDMC$`p-value`[2], CWM_ele_anova$SLA$`p-value`[2]), 
+         marginal_R_squared = c(RaoQ_ele_Rsq$log_Height[1], RaoQ_ele_Rsq$log_LA[1],
+                                RaoQ_ele_Rsq$log_LDMC[1],RaoQ_ele_Rsq$SLA[1],
+                                CWM_ele_Rsq$log_Height[1], CWM_ele_Rsq$log_LA[1],
+                                CWM_ele_Rsq$log_LDMC[1],CWM_ele_Rsq$SLA[1]))
+
+RaoQ_results_table <- RaoQ_model_results |> 
+  mutate(F_value = round(F_value, digits = 3), 
+         p_value = round(p_value, digits = 3), 
+         marginal_R_squared = round(marginal_R_squared, digits = 3)) |> 
+  flextable() |> 
+  set_header_labels(response = "Response variable", 
+                    trait = "Trait", 
+                    F_value = "F value", 
+                    p_value = "p value", 
+                    marginal_R_squared = "marginal R\u00B2") |> 
+  align(j = 1:5, align = "center", part = "all") |>
+  fontsize(size = 18, part = "all") |> 
+  theme_vanilla() |> 
+  bold(part = "header") |> 
+  autofit() |> 
+  fit_to_width(max_width = 6.5)
+
+RaoQ_results_table
+
+
+```
+
+```{r}
+#| label: tbl-microenv-models-results
+#| tbl-cap: Model results 
+#| message: false
+#| echo: false
+
+#build table with model results
+RaoQ_model_results <- expand_grid(null_model = c("C5 site pool", "C2 site pool"), 
+                                    trait = c("Plant height", "LA", "LDMC","SLA")) |> 
+  mutate(F_value = c(RaoQ_ele_anova$log_Height$`F-value`[2], RaoQ_ele_anova$log_LA$`F-value`[2],
+                     RaoQ_ele_anova$log_LDMC$`F-value`[2], RaoQ_ele_anova$SLA$`F-value`[2], 
+                     CWM_ele_anova$log_Height$`F-value`[2], CWM_ele_anova$log_LA$`F-value`[2],
+                     CWM_ele_anova$log_LDMC$`F-value`[2], CWM_ele_anova$SLA$`F-value`[2]), 
+         p_value = c(RaoQ_ele_anova$log_Height$`p-value`[2], RaoQ_ele_anova$log_LA$`p-value`[2],
+                     RaoQ_ele_anova$log_LDMC$`p-value`[2], RaoQ_ele_anova$SLA$`p-value`[2], 
+                     CWM_ele_anova$log_Height$`p-value`[2], CWM_ele_anova$log_LA$`p-value`[2],
+                     CWM_ele_anova$log_LDMC$`p-value`[2], CWM_ele_anova$SLA$`p-value`[2]), 
+         marginal_R_squared = c(RaoQ_ele_Rsq$log_Height[1], RaoQ_ele_Rsq$log_LA[1],
+                                RaoQ_ele_Rsq$log_LDMC[1],RaoQ_ele_Rsq$SLA[1],
+                                CWM_ele_Rsq$log_Height[1], CWM_ele_Rsq$log_LA[1],
+                                CWM_ele_Rsq$log_LDMC[1],CWM_ele_Rsq$SLA[1]))
+
+RaoQ_results_table <- RaoQ_model_results |> 
+  mutate(F_value = round(F_value, digits = 3), 
+         p_value = round(p_value, digits = 3), 
+         marginal_R_squared = round(marginal_R_squared, digits = 3)) |> 
+  flextable() |> 
+  set_header_labels(response = "Response variable", 
+                    trait = "Trait", 
+                    F_value = "F value", 
+                    p_value = "p value", 
+                    marginal_R_squared = "marginal R\u00B2") |> 
+  align(j = 1:5, align = "center", part = "all") |>
+  fontsize(size = 18, part = "all") |> 
+  theme_vanilla() |> 
+  bold(part = "header") |> 
+  autofit() |> 
+  fit_to_width(max_width = 6.5)
+
+RaoQ_results_table
+
+
 ```
