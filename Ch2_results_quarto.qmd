@@ -35,10 +35,6 @@ conflict_prefer_all("tidylog", quiet = TRUE)
 
 # Introduction
 
-Next step: Finish intro and discussion.
-
-Aud and Pete see it one more time. Then invite Morgan, Ralph, Julia and Peter Chatanga before inviting other authors for comment.
-
 Understanding what drives community assembly is a central goal of ecology [@hillerislambers_rethinking_2012; @diamond_assembly_1975; @weiher_community_1998]. Community composition is understood to be shaped by environmental conditions, interactions with other plant species, neutral processes, or a combination of all three[@gotzenberger_ecological_2012]. From the pool of species that are able to disperse to a site, only a subset species may be able to survive the environmental conditions in the absence of other species. This assembly mechanism is termed environmental filtering [@kraft_community_2015]. Other species may influence community composition through competition. The principle of competitive exclusion dictates that species with similar niches cannot coexist [@hardin1960]. Therefore, interspecific competition should lead to the coexistence of species with divergent niches [@macarthur1967; but see @mayfield2010]. This assembly mechanism is termed limiting similarity. Neutral assembly processes refer to stochastic forces that govern the composition of communities [@hubbell2001]. Under this assembly mechanism, all species are equally good competitors, and have an equal probability of entering the community should an individual die [@hubbell2001; @hubbell2006].
 
 Investigating the functional trait patterns in communities offers insight into the dominant assembly processes at work in a community [@ackerly2007; @gotzenberger_ecological_2012]. Plant functional traits are related to the environmental requirements and competitive effects of species [@violle_towards_2009; @schöb2017; @funk_revisiting_2017]. Therefore, assembly mechanisms should generate predictable patterns of trait convergence or divergence. Environmental filtering selects species with traits that allow them to survive the abiotic environment, and should create a pattern of trait convergence toward an optimum trait for survival [@gotzenberger_ecological_2012]. In contrast, limiting similarity should create a pattern of trait divergence of in the community, as only species with divergent niches are able to coexist [@weiher_community_1998]. Under neutral assembly, a species' trait should not affect it's presence in the community, and should therefore generate a random distribution of traits [@hubbell2006].
@@ -52,198 +48,6 @@ Here we investigate the effects of macro- and micro-environmental conditions on 
 In accordance with the predictions of the SDH, we expect that communities will be structured by limiting similarity at low elevation, and environmental filtering at high elevation. Thus, that trait distributions will become more convergent with elevation. We expect that rock cover, surface heterogeneity and soil depth will be related to trait divergence, while fine-scale temperature and moisture conditions will have a filtering effect on size and leaf economic traits.
 
 # Methods
-
-## Study site
-
-This study was conducted on an elevation gradient spanning 1000m in the Northern Malot-Drakensberg in South Africa (@fig-sitemap a). The Maloti-Drakensberg is the highest extension of the great escarpment of South Africa, formed during the Jurassic period when outflows of basaltic lava covered sedimentary rocks of the Karoo supergroup [@knight2015]. The Maloti-Drakensberg is the only mountain range south of Kilimanjaro with an alpine zone [@kotze2023], with its highest peak reaching 3482 m a.s.l. The Maloti-Drakensberg falls within the grassland biome of South Africa [@mucina2006], where Poaceae species dominate in terms of cover and biomass. Herbaceous forbs have low cover but contribute the most to species richness, and woody shrubs or trees are sparse. The vegetation in the Maloti-Drakensberg is highly diverse, forming the Drakensberg Mountain Centre of endemism with a 9% plant endemism rate [@carbutt2019].
-
-The elevation gradient consited of three study sites; located in the Golden Gate Highlands National Park (low site) at 2000 m a.s.l., Wistieshoek (mid site) at 2500 m a.s.l. and the Bokong Nature Reserve (high site) at 3000 m a.s.l (@fig-sitemap a). All three sites were located on basaltic bedrock. The low site falls within the Northern Drakensberg Highland Grassland vegetation type [@mucina2006], characterised by taller, C4 grasses, and the presence of some trees such as *Protea* species, *Leucosidea sericea* and *Buddleja* species. The mid site falls within the uKahlamba Basalt grassland vegetation type [@mucina2006], which includes many C3 grass genera such as *Festuca*, *Pentameris* and *Tenaxia*, and a very high diversity of forbs. The high site is in the Lesotho Highland Basalt grassland vegetation type [@mucina2006], where the grass is extremely short and dominated by C3 species. Shrubs of e.g., *Erica* and *Passerina* are present, as well as cushion forming *Helichrysum* shrubs.
-
-The climate in the Northern Maloti-Drakensberg is characterised by highly seasonal rainfall, with 75% of annual rainfall occurring in the summer months between November and March [@nel2009]. Rainfall occurs as thundershowers formed through orographic lift [@nel2009]. The total annual rainfall at the three sites are approximately 1310 mm p.a. at the low site, 1558 mm p.a. at the mid site, and 913 mm p.a. at the high site (total rainfall measured between 22/05/2025 and 21/05/2026 by the Witsieshoek \[35 km from site\], Sentinel car park \[at site\] and Alpine base \[56 km from site\] weather stations of the African Mountain Research Foundation; <https://africanmountainresearch.com/the-solutions/our-data/>). Very little rainfall occurs in the winter (10mm - 190mm), but precipitation may also occur in the form of snow [@mulder2009; @nel2009]. Snow occurs when cold fronts or cutoff low pressure cells move over the Drakensberg [@mulder2009], and tends to melt before the next cold weather system arrives. Summer temperatures are mild, but winters are cold, with minimum temperatures regularly dropping below freezing in winter [@nel2008]. Mean annual air temperature is 12℃ at the low site, 10℃ at the mid site and 7℃ at the high site (mean daily temperature between 22/05/2025 and 21/05/2026 measured by the nearest weather stations of the African Mountain Research Foundation).
-
-Fires are a natural occurrence in the Maloti-Drakensberg, and are essential for the maintenance of plant biodiversity [@morris2021]. The majority of species in Drakensberg grasslands possess underground storage organs or bud banks from which they resprout after fire. Historically, fires were ignited by lightning and occurred in the early spring [@finch2022]. Since European occupation in the Drakensberg and surrounding area, more fires are set by humans in the winter [@finch2022]. The fire return interval or time since last fire for the three sites are not known, but all three sites were subject to a similar fire regime consisting of incidental wildfires started by lightning or accidental ignition.
-
-The low site is formally conserved as a National Park where livestock has been excluded, but with large herbivores like zebra, blue wildebeest and eland present at the site. The mid site is situated on land owned by the Batlokoa Royal House, where livestock is not excluded but were never observed grazing at the mid site. Wild herbivores and omnivores such as grey rhebuck, klipspringer and baboon have been observed at the mid site. The high site is situated in the Bokong Nature Reserve managed by the National Government of Lesotho. Livestock is not permitted inside the reserve but herds have been observed passing through on their way to grazing pastures. Grey rhebuck, ice rat and rock hyrax are present at the high site.
-
-```{r}
-#| message: false
-#| echo: false
-#| label: fig-sitemap
-#| fig-cap: "Study site locations and sampling design in the Maloti-Drakensberg. a) Location of each of the three sites along the elevational gradient. b) Layout of the sampling grids at each site. c) A schematic of one sampling grid, consisting of 160 1 x 1m cells. Maps were created in QGIS with Bing Maps Satellite Imagery."
-knitr::include_graphics("C:\\Users\\imke6\\Documents\\PhD 2025\\Spatial analysis\\Figure1_proposal_13Jul26.png")
-```
-
-At each site, species composition and functional traits were sampled using a grid design (@fig-sitemap c). Eight grids were sampled at the low site, and seven were sampled at the mid and high site (@fig-sitemap b). Each grid was 8 x 20 m in size, consisting of 160 contiguous 1 x 1 m cells (@fig-sitemap c). In total, there were 3520 cells in the study. The grids were spaced \> 80 m apart in each site and were positioned to encompass the full range of environmental conditions at the site, covering a range of topographies and vegetation characteristics. In addition, individual grids were oriented to capture as much local variation in vegetation and topography as possible. This sampling design has previously been applied in high-elevation and high-latitude systems to sample broad environmental gradients and allows the influence of fine-scale heterogeneity to be examined without the confounding effect of macroclimate or species pools [e.g., @mod_outcomes_2014; @momberg_exposing_2021].
-
-## Data collection and variable selection
-
-Vegetation surveys were conducted at the low site in January 2019, at the mid site in January 2022, at the high site in January 2023. The identity and percentage cover of all vascular species in each cell was recorded. Species cover was visually estimated as a percentage of the 1 $m^2$ cell covered by the foliage of each species. The total vegetation cover of cells may exceed 100% in the case of layered vegetation. Species were identified from local field guides [@pooley2003; @pooley2005], as well as the Flora of the Free State [@retief]. In the case where a species could not be identified to species level, it was assigned a morphoname.
-
-Functional trait data was collected in December 2021 at the low site, December 2022 at the mid site, and December 2023 at the high site. The following traits were measured (following the standardised methods of @perez-harguindeguy_new_2013: plant height, leaf area (LA), specific leaf area (SLA) and leaf dry matter content (LDMC). Functional traits were measured for 60-95% of species in each grid, comprising 67-99% of the total vegetation cover in each grid. To maximise the range of environmental conditions in which we collected functional trait data, we sampled many species at the ends of the grid, but sampled sparsely toward the center of the grid. Species were not sampled for functional traits in adjacent cells.
-
-Micro-environmental variables were measured at the same time as the vegetation survey. Seven micro-environmental variables were measured in each cell of each grid: rock cover, soil depth, northness, slope height, instantaneous soil moisture, instantaneous soil temperature and surface heterogeneity. Rock cover was visually estimated as the percent of a cell covered by rocks large enough to impede plant growth. Soil depth was measured at three random points in each cell by inserting a metal rod of 60 cm length and 8mm diameter at into the soil until further penetration was impeded. These three measurements were used to calculate the mean soil depth of each cell. Soils deeper than 60 cm were assigned a depth of 61 cm. Three soil depth measurements were taken in each cell and the mean calculated. The aspect of each cell was measured with a compass and transformed to a linear variable, northness, by taking the cosine of the aspect. Slope height was measured as the vertical difference between the highest and lowest point in a cell, and is a measure of slope steepness. Instantaneous soil moisture was measured in each cell more than 24 hours after the last rainfall event, using a handheld time-domain soil moisture meter (FieldScout 300 TDR; Spectrum Technologies, Plainfield, IL, US) at a depth of 7.5 cm. Instantaneous soil temperature was measured at the same time as soil moisture with a handheld soil thermometer. It took 47-74 minutes to measure the instantaneous soil moisture and temperature in each cell of a grid, during which the air temperature may have increased (especially for grids measured early in the morning). Therefore, the instantaneous soil moisture and temperature values were adjusted to account for the increase in air temperature over the time of the campaign. Surface heterogeneity was calculated as the standard deviation of elevation in a cell from a digital surface model. The digital surface model reflects the elevation of the earth's surface (not the ground), and is influenced by vegetation, rocks or any object that may lie on top of the soil. The digital surface model was created from high resolution drone imagery captured by a DJI Phantom 4 Pro drone equipped with a 20MP camera with a 1 inch (CMOS) sensor. Imagery was captured in the winter in August 2023, when the biomass of live vegetation and the volume of dried vegetation was at its lowest. Flights were conducted at 20 m above the take-off point, but the distance to the ground varied due to topographic heterogeneity. The digital surface model was created in Agisoft Metashape following a standard photogrammetry workflow.
-
-```{r interpolation statistics}
-#| message: false
-#| echo: false
-#| warning: false
-
-####How many cells did we lose?###
-#environmental data for reverence 
-ref <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
-  select(site, Cell_ID)
-
-#import interpolated indices
-ind <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1) |> 
-  drop_na()
-
-#Cells we lost
-lost <- ref |> 
-  anti_join(ind, by = "Cell_ID") |> 
-  group_by(site) |> 
-  summarise(n = n())
-
-###Correlate interpolation with instantaneous####
-#import microenvironmental data containing instantaneous temperature variables
-inst_micro <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
-  tibble() |> 
-  #variables we are interested in
-  select(Cell_ID:row, soil_moisture_adj_campaign2, soil_moisture_adj_campaign1, 
-         soil_temperature_adj_campaign1, soil_temperature_adj_campaign2, rock_cover) |> 
-  mutate(across(contains("soil"), as.numeric)) 
-
-###JOin instantaneous and interpolated 
-moisture_dat <- inst_micro |> 
-  inner_join(ind, by = "Cell_ID") |> 
-  drop_na()
-
-#import validation results
-validation_results <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_interpolation_validation.csv")
-
-#mean R2 for soil moisture and temp
-mean_R2 <- validation_results |> 
-  group_by(site, grid_number, variable) |> 
-  summarise(
-    R2       = ifelse(var(observed) > 0, 
-                      cor(observed, predicted)^2, NA_real_)) |> 
-  group_by(variable) |> 
-  summarise(mean_R2 = mean(R2))
-```
-
-The instantaneous measures of soil moisture and temperature only reflect microclimate conditions at one time point, and may not accurately reflect persistent microclimatic differences between cells. Therefore, we also measured soil moisture and temperature over one year in a subset of cells (six or seven cells in each grid), and calculated the mean soil moisture and temperature of the growing season. We interpolated the mean soil moisture and temperature values to other cells in the grid, and performed cross validation to assess the quality of the interpolation. We also performed a correlation analysis to assess how well the interpolated values of mean soil moisture and temperature correspond to the instantaneous soil moisture and temperature. We used Temperature-Moisture-Sensors [TMS, @wild_climate_2019] to record soil moisture and temperature readings at 8 cm below the soil surface every 15 minutes for one year (12 January 2023 – 21 January 2024). The start of the growing season was defined as the first day after 21 June when the minimum daily temperature of all loggers at a site were above 5℃. The end of the growing season was the first day before 21 June when all loggers at a site had a minimum daily temperature below 5℃. Following these definitions, the growing season was from 23 August to 8 July at the low site, 1 September to 6 June at the mid site, and 10 October to 3 April at the high site. The mean soil moisture and temperature for the growing season was calculated for each sensor and interpolated to other cells in the grid. An inverse-distance-weighted interpolation algorithm was used from the gstat package [@gräler2016] with a power parameter of two. Cells with more than 50% rock cover were not used in the interpolation process if they contained a sensor and did not receive an interpolated value if they were without a sensor. Following this threshold, `r lost[2,2]` cells were excluded from interpolation at the low site, `r lost[3,2]` cells were excluded from the mid site, and `r lost[1,2]` cells were excluded from the high site. The ability of the interpolation algorithm to predict observed mean soil temperature and moisture values varied by grid (Appendix @tbl-validation-results), but was generally poor, with the mean $R^2$ of mean soil temperature = `r mean_R2[1,2]`, and the mean $R^2$ of mean soil moisture = `r mean_R2[2,2]`. However, the interpolated soil moisture and temperature for the growing season correlated well with the instantaneous soil moisture and temperature measurements (pearson correlation coefficient between instantaneous and interpolated soil moisture = `r round(cor(moisture_dat$soil_moisture_adj_campaign2, digits), moisture_dat$mean_moist_growing_season), digits = 2)`, pearson correlation coefficient between instantaneous and interpolated soil temperature = `r round(cor(moisture_dat$soil_temperature_adj_campaign2, moisture_dat$mean_T1_growing_season), digits = 2)`).
-
-A principal component analysis was performed using the princomp [@rcoreteam2025] function to identify the main axes of micro-environmental variation across the three sites (@fig-environmental-PCA). Most of the micro-environmental variation across the three sites was attributed to differences in soil moisture and temperature (PC1, explaining 34% of the variation), as well as soil depth (PC2, explaining 17% of the variation). We selected the following uncorrelated micro-environmental variables to test whether fine-scale variation in community assembly is shaped by micro-environmental variation: mean soil temperature of the growing season (hereafter referred to as soil temperature), mean soil moisture of the growing season (hereafter referred to as soil moisture), rock cover, mean soil depth and surface heterogeneity.`r C5_ele_comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` cells were included in testing how community assembly varies with elevation. `r C5_ele_comb|> filter(trait == "log_Height", site == "GG") |> drop_na() |> summarise(n = n())` Cells were from the low site, `r C5_ele_comb |> filter(trait == "log_Height", site == "WH") |> drop_na() |> summarise(n = n())` cells were from the mid site, and `r C5_ele_comb |> filter(trait == "log_Height", site == "BK") |> drop_na() |> summarise(n = n())` cells were from the high site. `r sprich$n` Species occurred across the three sites.
-
-There was high heterogeneity of micro-environmental variables in the grids (@fig-env-heterogeneity). For example, soil depth could vary by 44 cm between adjacent cells, and rock cover could vary by 99% between adjacent cells (@fig-env-heterogeneity).
-
-```{r}
-#| label: fig-environmental-PCA
-#| fig-cap: "Principal component analysis of all environmental variables measured in sampling grids, as well as interpolated soil moisture and temperature."
-#| warning: false
-#| message: false
-#| echo: false
-#| fig-width: 6.5
-#| fig-height: 5
-#import microenvironmental data
-env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
-  tibble() |> 
-  mutate(soil_depth_sd = sd(c(soil_depth_1, soil_depth_2, soil_depth_3), na.rm = TRUE), 
-         soil_depth_CV = (soil_depth_sd/mean_soil_depth) *100) |> 
-  #variables we are interested in
-  select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
-         soil_depth_CV, mean_soil_depth, slope_height,  soil_temperature_adj_campaign2) |>
-  mutate(mean_soil_depth = case_when(mean_soil_depth > 61 ~ 61, .default = mean_soil_depth)) |> 
-  #add elevation variables
-  mutate(site = case_when(site == "GG" ~ "low", 
-                               site == "WH" ~ "mid", 
-                               site == "BK" ~ "high",
-                               .default = NA), 
-         site = factor(site, levels = c("low", "mid", "high")), 
-         across(contains("campaign"), as.numeric)) 
-
-#import remote sensing derived variables
-rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
-  select(CELL_ID, STD) |> 
-  rename(Cell_ID = CELL_ID)
-
-#import interpolated microclimate indices
-micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
-
-
-##Combine all environmental data
-all_env_subs <- env |> 
-  #join to microclimate indices |> 
-  full_join(micro_idw, by = "Cell_ID") |> 
-  #join to remote sensing data |> 
-  full_join(rms, by = "Cell_ID") |>  
-  drop_na() |> 
-  select(site, rock_cover:STD) |> 
-  filter(if_all(where(is.numeric), is.finite)) |> 
-  #3 cells have Inf CV, this is because soil depth is zero, we have to remove them in order to scale
-  mutate(across(where(is.numeric), ~as.vector(scale(.)))) |> 
-  rename(mean_soil_temp = mean_T1_growing_season, 
-          mean_soil_moist = mean_moist_growing_season, 
-          surface_heterogeneity= STD, 
-          instant_soil_moist = soil_moisture_adj_campaign2, 
-         instant_soil_temp = soil_temperature_adj_campaign2)
-
-
-all_env_pca <- princomp(all_env_subs[2:ncol(all_env_subs)], scores = T) #not including elevation
-
-###GGplot biplot
-env_pca <- ggbiplot(all_env_pca, choices = c(1,2), 
-                      varname.size = 4, varname.color = "black", 
-                      groups = c(all_env_subs$site), 
-                    ellipse = TRUE, ellipse.fill = FALSE, 
-                    alpha = 0.4) +
-  #geom_point(aes(color = all_env_subs$site), alpha = 0.2)+
-  scale_color_manual(values = c("blue", "grey", "red"))+
-  theme_classic() +
-  labs(color = "Site") +
-  xlim(-5, 6)+
-  ylim(-4,6)+
-  theme(legend.position = "bottom")
-env_pca$layers <- c(env_pca$layers, env_pca$layers[[2]], env_pca$layers[[4]]) #move the arrows to plot in the foreground
-env_pca
-
-```
-
-## Statistical methods
-
-To investigate community assembly along elevation and micro-environmental gradients, we used a trait-based method to compare observed functional diversity to the functional diversity expected under a scenario of random assembly (following e.g., @scherrer_disentangling_2019; @price_within-community_2017). Rao’s quadratic entropy (RaoQ) was used as a metric of functional diversity and is the sum of the trait dissimilarity between all species pairs within a sample, weighted by the product of their relative abundances. It is calculated as follows:
-
-$$
-RaoQ = \sum_{i=1}^{S-1} \sum_{j=1}^{S} d_{ij} \, p_i \, p_j
-$$
-
-where $p_i$ and $p_j$ is the percentage cover of species $i$ and $j$ in a community with a species richness of $s$. $d_{ij}$ is the dissimilarity between each pair of species $i$and $j$, expressed as Euclidean distance [@botta-dukat_raos_2005]. RaoQ was calculated with the FD package [@laliberté2014] using the study-wide mean traits of species. RaoQ was not calculated for 13% of cells (453 cells) which had less than 3 species, or where species with trait values made up less than 80% of the vascular cover.
-
-A null-model approach was used to determine whether RaoQ was significantly different from the functional diversity expected under random assembly [@gotzenberger_which_2016]. This approach entails randomly shuffling the cover values of species in the species-by site matrix to create a null model in which species are randomly distributed accross sites. By comparing the observed species-by site matrix to the null model we can determine whether the observed distribution of species across sites are different from a random distribution. Null models are a useful tool to gain insight into community assembly processes, but they differ in their ability to detect different assembly mechanisms. Thus, an appropriate null model must be chosen to test each different assembly mechanism. Here, we followed the recommendations of @gotzenberger_which_2016 and selected the C5 and C2 null model (@fig-nullmodel). The C5 null model was successful in detecting environmental filtering, with a low type I error rate, and the C2 null model was successful in detecting limiting similarity with a low type I error rate in a simulation study [@gotzenberger_which_2016]. If the C5 null model detects significant trait convergence, we interpret it as evidence of environmental filtering, while divergence detected by the C2 null model is interpreted as evidence for limiting similarity. Divergence detected by the C5 null model, or convergence detected by the C2 null model, is not interpreted as evidence for any assembly mechanism (@fig-nullmodel). Null models were built using the permatswap function in vegan.
-
-```{r}
-#| message: false
-#| echo: false
-#| label: fig-nullmodel
-#| fig-cap: "The different null models used here, and how to interepret their results. To test the SDH, the C5 entire pool model and the C2 site pool model is used. The C5 entire pool model shuffles cover values accross cells, keeping species richness of cells, species frequency and species total cover constant. If SES<0 calculated with the C5 null model, we interpret it as a signal of environmental filtering. SES>0 indicates that no environmental filtering effect is present. The C2 site pool model shuffles cover values accross species, but only accorss the species that occur at the site in the observed species by site matrix. The richness and total vascular cover of cells are kept constant. SES>0 from this null model indicates that limiting similarity is present, while SES<0 shows no evidence of limiting similarity. The SDH predicts that community assembly will shift from limiting similarity to environmental filtering with elevation, thus that SES values should decrease with elevation. To test whether micro-environmental conditions affect community assembly within sites, the C2 site pool model and C5 site pool model are used. The C5 site pool model shuffles cover values across the cells in each site, so that a species unique to one site may not occur in another site. SES<0 from this null model indicates environmental filtering, while a SES>0 does not give evidence of environmental filtering. We expect micro-environmental conditions to have a negative or positive linear relationship with SES."
-knitr::include_graphics("C:\\Users\\imke6\\Documents\\PhD 2025\\Ch1 Drakensberg analysis community assembly\\Ch2_write_up\\null model figure.png")
-```
-
-We used both null models to test how assembly mechanisms vary along elevation and micro-environmental gradients. The C5 null model shuffles the occurrences of each species across cells, such that the richness of each cell, the frequency of species, and species total cover stays the same as in the observed matrix. The total vegetation cover within cells, and the identity of species occurring in each cell are allowed to deviate from the observed matrix. Thus, we can determine whether the composition of a cell is random compared to a scenario where species can occur in any cell, after controlling for richness and the commonness (frequency in the matrix and total cover) of species. This null model is appropriate to detect environmental filtering because it allows species to occur in cells where they are not present in the observed dataset and has a low type I error rate [@gotzenberger_which_2016]. We built two categories of C5 null model algorithms: The "C5 entire pool model" selected species from the entire species pool to fill the null matrix. Thus, species exclusive to one site in the observed matrix can occur at any site in the null matrix (@fig-nullmodel). This model is appropriate to detect differences in environmental filtering between sites, in other words, filtering by macroclimatic differences at the scale of the elevation gradient. In the "C5 site pool model" we restricted the species pool that the null model fills the matrix from to the site-level species pool (@fig-nullmodel). This model is appropriate to detect environmental filtering at the scale of one site, allowing us to determine whether micro-environmental conditions act as an additional filter after the effect of macroclimate.
-
-The C2 null model shuffles the cover values of species in cells, keeping the richness and total cover of cells constant (@fig-nullmodel). The frequency and total cover of species, and the identity of species in each cell are allowed to deviate from the observed matrix. In this null model, the link between a species' mean trait value and its abundance is not maintained. Species' traits are understood to be linked to their competitive ability and abundance. Thus, this null model test whether assembly is random compared to a community where species' traits do not determine their abundance, while controlling for the total vegetation cover and richness of cells [@gotzenberger_which_2016]. In other words, this null model asks whether the observed community is similar to one where co-occurring, abundant species may have similar or weakly competitive traits. It is recommended that the effect of environmental filtering be removed when testing for limiting similarity [@gotzenberger_which_2016], therefore, we only built a C2 algorithm that selects species from the site-level species pool (@fig-nullmodel). This null model is appropriate to test whether there are differences in limiting similarity between sites, only considering the species that have passed through the macroclimate filter. It is also appropriate to test whether there are differences in similarity between the cells at each site.
-
-To determine whether functional diversity is higher or lower than expected from random assembly, we calculated the standard effect size [SES, @gotelli2002] of RaoQ as a measure of deviance between the observed matrix and null model. SES is calculated as:
-
-$$
-SES = (RaoQ_{observed} - \mu{RaoQ_{null}})/\sigma{RaoQ_{null}}
-$$
-
-Where $RaoQ_{observed}$ is the observed RaoQ in a cell; $\mu{RaoQ_{null}}$ is the mean of RaoQ from 999 null models, and $\sigma{RaoQ_{null}}$ is the standard deviation of RaoQ from 999 null models. If SES \>0, functional diversity is higher than expected under null assembly, and it is interpreted as a signal of limiting similarity. If SES \< 0, functional diversity is lower than expected under null assembly, and it is interpreted as a signal of habitat filtering. SES was calculated for plant height, LA, SLA and LDMC, using the C5 entire pool model, the C5 site pool model and the C2 site pool model to investigate the effect of elevation and micro-environmental conditions on community assembly.
-
-To determine whether community assembly varies with elevation, linear mixed-effect models were used with the SES of each trait from the C5 entire pool model and C2 site pool model as response variables, and elevation as a predictor. To determine whether micro-environmental variables were related to fine-scale variation in community assembly, separate linear mixed-effect models were built for each trait and each site. The SES of each trait from the C5 site pool model and the C2 site pool model were the response variables, and the following micro-environmental measurements were included as predictors: soil temperature, soil moisture, rock cover, mean soil depth and surface heterogeneity. Predictor variables were standardised to a mean of zero and unit variance prior to modelling. In all analyses, grid was added as a random effect, and a spherical correlation structure was used to account for the spatial autocorrelation between the cells of each grid. To improve the distribution of the model residuals, SES was calculated with the natural log of height, LDMC, and LA in the elevation model, and the natural log of LDMC in the micro-environmental model. Modelling was performed using the nlme package [@pinheiro2025].
-
-To investigate the direction in which traits are filtered, the community-weighted mean (CWM) traits of each cell was calculated with the FD package [@laliberté2014]. A linear mixed effect model with grid as a random effect and a spherical correlation structure was used to determine how CWM varies with elevation. All analyses were performed in R 4.5.2 [@rcoreteam2025].
-
 ```{r setup chunk}
 #| message: false
 #| echo: false
@@ -570,6 +374,197 @@ median_cover <- composition |>
 
   
 ```
+
+## Study site
+
+This study was conducted on an elevation gradient spanning 1000m in the Northern Malot-Drakensberg in South Africa (@fig-sitemap a). The Maloti-Drakensberg is the highest extension of the great escarpment of South Africa, formed during the Jurassic period when outflows of basaltic lava covered sedimentary rocks of the Karoo supergroup [@knight2015]. The Maloti-Drakensberg is the only mountain range south of Kilimanjaro with an alpine zone [@kotze2023], with its highest peak reaching 3482 m a.s.l. The Maloti-Drakensberg falls within the grassland biome of South Africa [@mucina2006], where Poaceae species dominate in terms of cover and biomass. Herbaceous forbs have low cover but contribute the most to species richness, and woody shrubs or trees are sparse. The vegetation in the Maloti-Drakensberg is highly diverse, forming the Drakensberg Mountain Centre of endemism with a 9% plant endemism rate [@carbutt2019].
+
+The elevation gradient consited of three study sites; located in the Golden Gate Highlands National Park (low site) at 2000 m a.s.l., Wistieshoek (mid site) at 2500 m a.s.l. and the Bokong Nature Reserve (high site) at 3000 m a.s.l (@fig-sitemap a). All three sites were located on basaltic bedrock. The low site falls within the Northern Drakensberg Highland Grassland vegetation type [@mucina2006], characterised by taller, C4 grasses, and the presence of some trees such as *Protea* species, *Leucosidea sericea* and *Buddleja* species. The mid site falls within the uKahlamba Basalt grassland vegetation type [@mucina2006], which includes many C3 grass genera such as *Festuca*, *Pentameris* and *Tenaxia*, and a very high diversity of forbs. The high site is in the Lesotho Highland Basalt grassland vegetation type [@mucina2006], where the grass is extremely short and dominated by C3 species. Shrubs of e.g., *Erica* and *Passerina* are present, as well as cushion forming *Helichrysum* shrubs.
+
+The climate in the Northern Maloti-Drakensberg is characterised by highly seasonal rainfall, with 75% of annual rainfall occurring in the summer months between November and March [@nel2009]. Rainfall occurs as thundershowers formed through orographic lift [@nel2009]. The total annual rainfall at the three sites are approximately 1310 mm p.a. at the low site, 1558 mm p.a. at the mid site, and 913 mm p.a. at the high site (total rainfall measured between 22/05/2025 and 21/05/2026 by the Witsieshoek \[35 km from site\], Sentinel car park \[at site\] and Alpine base \[56 km from site\] weather stations of the African Mountain Research Foundation; <https://africanmountainresearch.com/the-solutions/our-data/>). Very little rainfall occurs in the winter (10mm - 190mm), but precipitation may also occur in the form of snow [@mulder2009; @nel2009]. Snow occurs when cold fronts or cutoff low pressure cells move over the Drakensberg [@mulder2009], and tends to melt before the next cold weather system arrives. Summer temperatures are mild, but winters are cold, with minimum temperatures regularly dropping below freezing in winter [@nel2008]. Mean annual air temperature is 12℃ at the low site, 10℃ at the mid site and 7℃ at the high site (mean daily temperature between 22/05/2025 and 21/05/2026 measured by the nearest weather stations of the African Mountain Research Foundation).
+
+Fires are a natural occurrence in the Maloti-Drakensberg, and are essential for the maintenance of plant biodiversity [@morris2021]. The majority of species in Drakensberg grasslands possess underground storage organs or bud banks from which they resprout after fire. Historically, fires were ignited by lightning and occurred in the early spring [@finch2022]. Since European occupation in the Drakensberg and surrounding area, more fires are set by humans in the winter [@finch2022]. The fire return interval or time since last fire for the three sites are not known, but all three sites were subject to a similar fire regime consisting of incidental wildfires started by lightning or accidental ignition.
+
+The low site is formally conserved as a National Park where livestock has been excluded, but with large herbivores like zebra, blue wildebeest and eland present at the site. The mid site is situated on land owned by the Batlokoa Royal House, where livestock is not excluded but were never observed grazing at the mid site. Wild herbivores and omnivores such as grey rhebuck, klipspringer and baboon have been observed at the mid site. The high site is situated in the Bokong Nature Reserve managed by the National Government of Lesotho. Livestock is not permitted inside the reserve but herds have been observed passing through on their way to grazing pastures. Grey rhebuck, ice rat and rock hyrax are present at the high site.
+
+```{r}
+#| message: false
+#| echo: false
+#| label: fig-sitemap
+#| fig-cap: "Study site locations and sampling design in the Maloti-Drakensberg. a) Location of each of the three sites along the elevational gradient. b) Layout of the sampling grids at each site. c) A schematic of one sampling grid, consisting of 160 1 x 1m cells. Maps were created in QGIS with Bing Maps Satellite Imagery."
+knitr::include_graphics("C:\\Users\\imke6\\Documents\\PhD 2025\\Spatial analysis\\Figure1_proposal_13Jul26.png")
+```
+
+At each site, species composition and functional traits were sampled using a grid design (@fig-sitemap c). Eight grids were sampled at the low site, and seven were sampled at the mid and high site (@fig-sitemap b). Each grid was 8 x 20 m in size, consisting of 160 contiguous 1 x 1 m cells (@fig-sitemap c). In total, there were 3520 cells in the study. The grids were spaced \> 80 m apart in each site and were positioned to encompass the full range of environmental conditions at the site, covering a range of topographies and vegetation characteristics. In addition, individual grids were oriented to capture as much local variation in vegetation and topography as possible. This sampling design has previously been applied in high-elevation and high-latitude systems to sample broad environmental gradients and allows the influence of fine-scale heterogeneity to be examined without the confounding effect of macroclimate or species pools [e.g., @mod_outcomes_2014; @momberg_exposing_2021].
+
+## Data collection and variable selection
+
+Vegetation surveys were conducted at the low site in January 2019, at the mid site in January 2022, at the high site in January 2023. The identity and percentage cover of all vascular species in each cell was recorded. Species cover was visually estimated as a percentage of the 1 $m^2$ cell covered by the foliage of each species. The total vegetation cover of cells may exceed 100% in the case of layered vegetation. Species were identified from local field guides [@pooley2003; @pooley2005], as well as the Flora of the Free State [@retief]. In the case where a species could not be identified to species level, it was assigned a morphoname.
+
+Functional trait data was collected in December 2021 at the low site, December 2022 at the mid site, and December 2023 at the high site. The following traits were measured (following the standardised methods of @perez-harguindeguy_new_2013: plant height, leaf area (LA), specific leaf area (SLA) and leaf dry matter content (LDMC). Functional traits were measured for 60-95% of species in each grid, comprising 67-99% of the total vegetation cover in each grid. To maximise the range of environmental conditions in which we collected functional trait data, we sampled many species at the ends of the grid, but sampled sparsely toward the center of the grid. Species were not sampled for functional traits in adjacent cells.
+
+Micro-environmental variables were measured at the same time as the vegetation survey. Seven micro-environmental variables were measured in each cell of each grid: rock cover, soil depth, northness, slope height, instantaneous soil moisture, instantaneous soil temperature and surface heterogeneity. Rock cover was visually estimated as the percent of a cell covered by rocks large enough to impede plant growth. Soil depth was measured at three random points in each cell by inserting a metal rod of 60 cm length and 8mm diameter at into the soil until further penetration was impeded. These three measurements were used to calculate the mean soil depth of each cell. Soils deeper than 60 cm were assigned a depth of 61 cm. Three soil depth measurements were taken in each cell and the mean calculated. The aspect of each cell was measured with a compass and transformed to a linear variable, northness, by taking the cosine of the aspect. Slope height was measured as the vertical difference between the highest and lowest point in a cell, and is a measure of slope steepness. Instantaneous soil moisture was measured in each cell more than 24 hours after the last rainfall event, using a handheld time-domain soil moisture meter (FieldScout 300 TDR; Spectrum Technologies, Plainfield, IL, US) at a depth of 7.5 cm. Instantaneous soil temperature was measured at the same time as soil moisture with a handheld soil thermometer. It took 47-74 minutes to measure the instantaneous soil moisture and temperature in each cell of a grid, during which the air temperature may have increased (especially for grids measured early in the morning). Therefore, the instantaneous soil moisture and temperature values were adjusted to account for the increase in air temperature over the time of the campaign. Surface heterogeneity was calculated as the standard deviation of elevation in a cell from a digital surface model. The digital surface model reflects the elevation of the earth's surface (not the ground), and is influenced by vegetation, rocks or any object that may lie on top of the soil. The digital surface model was created from high resolution drone imagery captured by a DJI Phantom 4 Pro drone equipped with a 20MP camera with a 1 inch (CMOS) sensor. Imagery was captured in the winter in August 2023, when the biomass of live vegetation and the volume of dried vegetation was at its lowest. Flights were conducted at 20 m above the take-off point, but the distance to the ground varied due to topographic heterogeneity. The digital surface model was created in Agisoft Metashape following a standard photogrammetry workflow.
+
+```{r interpolation statistics}
+#| message: false
+#| echo: false
+#| warning: false
+
+####How many cells did we lose?###
+#environmental data for reverence 
+ref <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
+  select(site, Cell_ID)
+
+#import interpolated indices
+ind <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1) |> 
+  drop_na()
+
+#Cells we lost
+lost <- ref |> 
+  anti_join(ind, by = "Cell_ID") |> 
+  group_by(site) |> 
+  summarise(n = n())
+
+###Correlate interpolation with instantaneous####
+#import microenvironmental data containing instantaneous temperature variables
+inst_micro <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
+  tibble() |> 
+  #variables we are interested in
+  select(Cell_ID:row, soil_moisture_adj_campaign2, soil_moisture_adj_campaign1, 
+         soil_temperature_adj_campaign1, soil_temperature_adj_campaign2, rock_cover) |> 
+  mutate(across(contains("soil"), as.numeric)) 
+
+###Join instantaneous and interpolated 
+moisture_dat <- inst_micro |> 
+  inner_join(ind, by = "Cell_ID") |> 
+  drop_na()
+
+#import validation results
+validation_results <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_interpolation_validation.csv")
+
+#mean R2 for soil moisture and temp
+mean_R2 <- validation_results |> 
+  group_by(site, grid_number, variable) |> 
+  summarise(
+    R2       = ifelse(var(observed) > 0, 
+                      cor(observed, predicted)^2, NA_real_)) |> 
+  group_by(variable) |> 
+  summarise(mean_R2 = mean(R2))
+```
+
+The instantaneous measures of soil moisture and temperature only reflect microclimate conditions at one time point, and may not accurately reflect persistent microclimatic differences between cells. Therefore, we also measured soil moisture and temperature over one year in a subset of cells (six or seven cells in each grid), and calculated the mean soil moisture and temperature of the growing season. We interpolated the mean soil moisture and temperature values to other cells in the grid, and performed cross validation to assess the quality of the interpolation. We also performed a correlation analysis to assess how well the interpolated values of mean soil moisture and temperature correspond to the instantaneous soil moisture and temperature. We used Temperature-Moisture-Sensors [TMS, @wild_climate_2019] to record soil moisture and temperature readings at 8 cm below the soil surface every 15 minutes for one year (12 January 2023 – 21 January 2024). The start of the growing season was defined as the first day after 21 June when the minimum daily temperature of all loggers at a site were above 5℃. The end of the growing season was the first day before 21 June when all loggers at a site had a minimum daily temperature below 5℃. Following these definitions, the growing season was from 23 August to 8 July at the low site, 1 September to 6 June at the mid site, and 10 October to 3 April at the high site. The mean soil moisture and temperature for the growing season was calculated for each sensor and interpolated to other cells in the grid. An inverse-distance-weighted interpolation algorithm was used from the gstat package [@gräler2016] with a power parameter of two. Cells with more than 50% rock cover were not used in the interpolation process if they contained a sensor and did not receive an interpolated value if they were without a sensor. Following this threshold, `r lost[2,2]` cells were excluded from interpolation at the low site, `r lost[3,2]` cells were excluded from the mid site, and `r lost[1,2]` cells were excluded from the high site. The ability of the interpolation algorithm to predict observed mean soil temperature and moisture values varied by grid (Appendix @tbl-validation-results), but was generally poor, with the mean $R^2$ of mean soil temperature = `r mean_R2[1,2]`, and the mean $R^2$ of mean soil moisture = `r mean_R2[2,2]`. However, the interpolated soil moisture and temperature for the growing season correlated well with the instantaneous soil moisture and temperature measurements (pearson correlation coefficient between instantaneous and interpolated soil moisture = `r round(cor(moisture_dat$soil_moisture_adj_campaign2, moisture_dat$mean_moist_growing_season), digits = 2)`, pearson correlation coefficient between instantaneous and interpolated soil temperature = `r round(cor(moisture_dat$soil_temperature_adj_campaign2, moisture_dat$mean_T1_growing_season), digits = 2)`).
+
+A principal component analysis was performed using the princomp [@rcoreteam2025] function to identify the main axes of micro-environmental variation across the three sites (@fig-environmental-PCA). Most of the micro-environmental variation across the three sites was attributed to differences in soil moisture and temperature (PC1, explaining 34% of the variation), as well as soil depth (PC2, explaining 17% of the variation). We selected the following uncorrelated micro-environmental variables to test whether fine-scale variation in community assembly is shaped by micro-environmental variation: mean soil temperature of the growing season (hereafter referred to as soil temperature), mean soil moisture of the growing season (hereafter referred to as soil moisture), rock cover, mean soil depth and surface heterogeneity.`r C5_ele_comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` cells were included in testing how community assembly varies with elevation. `r C5_ele_comb|> filter(trait == "log_Height", site == "GG") |> drop_na() |> summarise(n = n())` Cells were from the low site, `r C5_ele_comb |> filter(trait == "log_Height", site == "WH") |> drop_na() |> summarise(n = n())` cells were from the mid site, and `r C5_ele_comb |> filter(trait == "log_Height", site == "BK") |> drop_na() |> summarise(n = n())` cells were from the high site. `r sprich$n` Species occurred across the three sites.
+
+There was high heterogeneity of micro-environmental variables in the grids (@fig-env-heterogeneity). For example, soil depth could vary by 44 cm between adjacent cells, and rock cover could vary by 99% between adjacent cells (@fig-env-heterogeneity).
+
+```{r}
+#| label: fig-environmental-PCA
+#| fig-cap: "Principal component analysis of all environmental variables measured in sampling grids, as well as interpolated soil moisture and temperature."
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-width: 6.5
+#| fig-height: 5
+#import microenvironmental data
+env <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
+  tibble() |> 
+  mutate(soil_depth_sd = sd(c(soil_depth_1, soil_depth_2, soil_depth_3), na.rm = TRUE), 
+         soil_depth_CV = (soil_depth_sd/mean_soil_depth) *100) |> 
+  #variables we are interested in
+  select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
+         soil_depth_CV, mean_soil_depth, slope_height,  soil_temperature_adj_campaign2) |>
+  mutate(mean_soil_depth = case_when(mean_soil_depth > 61 ~ 61, .default = mean_soil_depth)) |> 
+  #add elevation variables
+  mutate(site = case_when(site == "GG" ~ "low", 
+                               site == "WH" ~ "mid", 
+                               site == "BK" ~ "high",
+                               .default = NA), 
+         site = factor(site, levels = c("low", "mid", "high")), 
+         across(contains("campaign"), as.numeric)) 
+
+#import remote sensing derived variables
+rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
+  select(CELL_ID, STD) |> 
+  rename(Cell_ID = CELL_ID)
+
+#import interpolated microclimate indices
+micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
+
+
+##Combine all environmental data
+all_env_subs <- env |> 
+  #join to microclimate indices |> 
+  full_join(micro_idw, by = "Cell_ID") |> 
+  #join to remote sensing data |> 
+  full_join(rms, by = "Cell_ID") |>  
+  drop_na() |> 
+  select(site, rock_cover:STD) |> 
+  filter(if_all(where(is.numeric), is.finite)) |> 
+  #3 cells have Inf CV, this is because soil depth is zero, we have to remove them in order to scale
+  mutate(across(where(is.numeric), ~as.vector(scale(.)))) |> 
+  rename(mean_soil_temp = mean_T1_growing_season, 
+          mean_soil_moist = mean_moist_growing_season, 
+          surface_heterogeneity= STD, 
+          instant_soil_moist = soil_moisture_adj_campaign2, 
+         instant_soil_temp = soil_temperature_adj_campaign2)
+
+
+all_env_pca <- princomp(all_env_subs[2:ncol(all_env_subs)], scores = T) #not including elevation
+
+###GGplot biplot
+env_pca <- ggbiplot(all_env_pca, choices = c(1,2), 
+                      varname.size = 4, varname.color = "black", 
+                      groups = c(all_env_subs$site), 
+                    ellipse = TRUE, ellipse.fill = FALSE, 
+                    alpha = 0.4) +
+  #geom_point(aes(color = all_env_subs$site), alpha = 0.2)+
+  scale_color_manual(values = c("blue", "grey", "red"))+
+  theme_classic() +
+  labs(color = "Site") +
+  xlim(-5, 6)+
+  ylim(-4,6)+
+  theme(legend.position = "bottom")
+env_pca$layers <- c(env_pca$layers, env_pca$layers[[2]], env_pca$layers[[4]]) #move the arrows to plot in the foreground
+env_pca
+
+```
+
+## Statistical methods
+
+To investigate community assembly along elevation and micro-environmental gradients, we used a trait-based method to compare observed functional diversity to the functional diversity expected under a scenario of random assembly (following e.g., @scherrer_disentangling_2019; @price_within-community_2017). Rao’s quadratic entropy (RaoQ) was used as a metric of functional diversity and is the sum of the trait dissimilarity between all species pairs within a sample, weighted by the product of their relative abundances. It is calculated as follows:
+
+$$
+RaoQ = \sum_{i=1}^{S-1} \sum_{j=1}^{S} d_{ij} \, p_i \, p_j
+$$
+
+where $p_i$ and $p_j$ is the percentage cover of species $i$ and $j$ in a community with a species richness of $s$. $d_{ij}$ is the dissimilarity between each pair of species $i$and $j$, expressed as Euclidean distance [@botta-dukat_raos_2005]. RaoQ was calculated with the FD package [@laliberté2014] using the study-wide mean traits of species. RaoQ was not calculated for 13% of cells (453 cells) which had less than 3 species, or where species with trait values made up less than 80% of the vascular cover.
+
+A null-model approach was used to determine whether RaoQ was significantly different from the functional diversity expected under random assembly [@gotzenberger_which_2016]. This approach entails randomly shuffling the cover values of species in the species-by site matrix to create a null model in which species are randomly distributed accross sites. By comparing the observed species-by site matrix to the null model we can determine whether the observed distribution of species across sites are different from a random distribution. Null models are a useful tool to gain insight into community assembly processes, but they differ in their ability to detect different assembly mechanisms. Thus, an appropriate null model must be chosen to test each different assembly mechanism. Here, we followed the recommendations of @gotzenberger_which_2016 and selected the C5 and C2 null model (@fig-nullmodel). The C5 null model was successful in detecting environmental filtering, with a low type I error rate, and the C2 null model was successful in detecting limiting similarity with a low type I error rate in a simulation study [@gotzenberger_which_2016]. If the C5 null model detects significant trait convergence, we interpret it as evidence of environmental filtering, while divergence detected by the C2 null model is interpreted as evidence for limiting similarity. Divergence detected by the C5 null model, or convergence detected by the C2 null model, is not interpreted as evidence for any assembly mechanism (@fig-nullmodel). Null models were built using the permatswap function in vegan.
+
+```{r}
+#| message: false
+#| echo: false
+#| label: fig-nullmodel
+#| fig-cap: "The different null models used here, and how to interepret their results. To test the SDH, the C5 entire pool model and the C2 site pool model is used. The C5 entire pool model shuffles cover values accross cells, keeping species richness of cells, species frequency and species total cover constant. If SES<0 calculated with the C5 null model, we interpret it as a signal of environmental filtering. SES>0 indicates that no environmental filtering effect is present. The C2 site pool model shuffles cover values accross species, but only accorss the species that occur at the site in the observed species by site matrix. The richness and total vascular cover of cells are kept constant. SES>0 from this null model indicates that limiting similarity is present, while SES<0 shows no evidence of limiting similarity. The SDH predicts that community assembly will shift from limiting similarity to environmental filtering with elevation, thus that SES values should decrease with elevation. To test whether micro-environmental conditions affect community assembly within sites, the C2 site pool model and C5 site pool model are used. The C5 site pool model shuffles cover values across the cells in each site, so that a species unique to one site may not occur in another site. SES<0 from this null model indicates environmental filtering, while a SES>0 does not give evidence of environmental filtering. We expect micro-environmental conditions to have a negative or positive linear relationship with SES."
+knitr::include_graphics("C:\\Users\\imke6\\Documents\\PhD 2025\\Ch1 Drakensberg analysis community assembly\\Ch2_write_up\\null model figure.png")
+```
+
+We used both null models to test how assembly mechanisms vary along elevation and micro-environmental gradients. The C5 null model shuffles the occurrences of each species across cells, such that the richness of each cell, the frequency of species, and species total cover stays the same as in the observed matrix. The total vegetation cover within cells, and the identity of species occurring in each cell are allowed to deviate from the observed matrix. Thus, we can determine whether the composition of a cell is random compared to a scenario where species can occur in any cell, after controlling for richness and the commonness (frequency in the matrix and total cover) of species. This null model is appropriate to detect environmental filtering because it allows species to occur in cells where they are not present in the observed dataset and has a low type I error rate [@gotzenberger_which_2016]. We built two categories of C5 null model algorithms: The "C5 entire pool model" selected species from the entire species pool to fill the null matrix. Thus, species exclusive to one site in the observed matrix can occur at any site in the null matrix (@fig-nullmodel). This model is appropriate to detect differences in environmental filtering between sites, in other words, filtering by macroclimatic differences at the scale of the elevation gradient. In the "C5 site pool model" we restricted the species pool that the null model fills the matrix from to the site-level species pool (@fig-nullmodel). This model is appropriate to detect environmental filtering at the scale of one site, allowing us to determine whether micro-environmental conditions act as an additional filter after the effect of macroclimate.
+
+The C2 null model shuffles the cover values of species in cells, keeping the richness and total cover of cells constant (@fig-nullmodel). The frequency and total cover of species, and the identity of species in each cell are allowed to deviate from the observed matrix. In this null model, the link between a species' mean trait value and its abundance is not maintained. Species' traits are understood to be linked to their competitive ability and abundance. Thus, this null model test whether assembly is random compared to a community where species' traits do not determine their abundance, while controlling for the total vegetation cover and richness of cells [@gotzenberger_which_2016]. In other words, this null model asks whether the observed community is similar to one where co-occurring, abundant species may have similar or weakly competitive traits. It is recommended that the effect of environmental filtering be removed when testing for limiting similarity [@gotzenberger_which_2016], therefore, we only built a C2 algorithm that selects species from the site-level species pool (@fig-nullmodel). This null model is appropriate to test whether there are differences in limiting similarity between sites, only considering the species that have passed through the macroclimate filter. It is also appropriate to test whether there are differences in similarity between the cells at each site.
+
+To determine whether functional diversity is higher or lower than expected from random assembly, we calculated the standard effect size [SES, @gotelli2002] of RaoQ as a measure of deviance between the observed matrix and null model. SES is calculated as:
+
+$$
+SES = (RaoQ_{observed} - \mu{RaoQ_{null}})/\sigma{RaoQ_{null}}
+$$
+
+Where $RaoQ_{observed}$ is the observed RaoQ in a cell; $\mu{RaoQ_{null}}$ is the mean of RaoQ from 999 null models, and $\sigma{RaoQ_{null}}$ is the standard deviation of RaoQ from 999 null models. If SES \>0, functional diversity is higher than expected under null assembly, and it is interpreted as a signal of limiting similarity. If SES \< 0, functional diversity is lower than expected under null assembly, and it is interpreted as a signal of habitat filtering. SES was calculated for plant height, LA, SLA and LDMC, using the C5 entire pool model, the C5 site pool model and the C2 site pool model to investigate the effect of elevation and micro-environmental conditions on community assembly.
+
+To determine whether community assembly varies with elevation, linear mixed-effect models were used with the SES of each trait from the C5 entire pool model and C2 site pool model as response variables, and elevation as a predictor. To determine whether micro-environmental variables were related to fine-scale variation in community assembly, separate linear mixed-effect models were built for each trait and each site. The SES of each trait from the C5 site pool model and the C2 site pool model were the response variables, and the following micro-environmental measurements were included as predictors: soil temperature, soil moisture, rock cover, mean soil depth and surface heterogeneity. Predictor variables were standardised to a mean of zero and unit variance prior to modelling. In all analyses, grid was added as a random effect, and a spherical correlation structure was used to account for the spatial autocorrelation between the cells of each grid. To improve the distribution of the model residuals, SES was calculated with the natural log of height, LDMC, and LA in the elevation model, and the natural log of LDMC in the micro-environmental model. Modelling was performed using the nlme package [@pinheiro2025].
+
+To investigate the direction in which traits are filtered, the community-weighted mean (CWM) traits of each cell was calculated with the FD package [@laliberté2014]. A linear mixed effect model with grid as a random effect and a spherical correlation structure was used to determine how CWM varies with elevation. All analyses were performed in R 4.5.2 [@rcoreteam2025].
 
 # Results
 
