@@ -5,6 +5,8 @@ library(readxl)
 library(janitor)
 library(ggplot2)
 library(openxlsx)
+library(conflicted)
+conflict_prefer_all("tidylog", quiet = TRUE)
 
 ####GOLDEN GATE####
 gg_summer <- read_excel("All_data/raw_data/raw_occurrence_data/GoldenGate/GoldenGate_grids_2019_09_27.xlsx", 
@@ -93,7 +95,7 @@ bk <- read_excel("All_data/raw_data/raw_occurrence_data/Bokong/BNR_vegetation_su
 #there are still NA's in the cover column, let's sort them out
 bk[which(is.na(bk$cover2)) , ] #get Na rows
 #Go back to paper data sheets and check these values
-bk[which(bk$cellref == "BK_G1A_13" & bk$taxon == "new_alternate_anthospermum") , which(colnames(bk) == "cover2")] <- 0.5
+bk[which(bk$cellref == "BK_G1_A13" & bk$taxon == "new_alternate_anthospermum") , which(colnames(bk) == "cover2")] <- 0.5
 bk[which(bk$cellref == "BK_G2_A5" & bk$taxon == "festuca_caprina") , which(colnames(bk) == "cover2")] <- 25
 bk <- bk[-which(bk$cellref == "BK_G6_G12" & bk$taxon == "afroaster_erucifolius") , ] #sp not present on sheet
 bk[which(bk$cellref == "BK_G7_B20" & bk$taxon == "gazania_krebsiana") , which(colnames(bk) == "cover2")] <- 0.5
@@ -209,6 +211,7 @@ micro_climb_veg_survey <- gg_summer_clean_names |>
   bind_rows(wh_clean_names) |> 
   bind_rows(bk_clean_names) |> 
   select(!change_tracker) |> 
-  rename(Cell_ID = cellref)
+  rename(Cell_ID = cellref) |> 
+  select(Cell_ID, site, grid, column, row, taxon, cover)
 
 write.csv(micro_climb_veg_survey, "All_data/clean_data/micro_climb_occurrence.csv")
