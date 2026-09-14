@@ -698,6 +698,8 @@ SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
 
 SES_elevation_ridges
 
+ggsave("SES_elevation_C5_C2.png", plot = SES_elevation_ridges, path = "Figures")
+
 ```
 
 ```{r}
