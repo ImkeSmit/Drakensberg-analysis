@@ -1105,6 +1105,8 @@ allsites_microenv_plot <- microenv_dat_all |>
             show.legend = FALSE, parse = TRUE)
 allsites_microenv_plot
 
+ggsave("SES_microenv_points.png", plot = allsites_microenv_plot, path = "Figures")
+
 ```
 
 # Discussion
