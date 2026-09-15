@@ -52,6 +52,38 @@ ggsave(hypothesis_ses_scatter, filename = "hypothesis_SES_scatter.png", path = "
        width = 1400, height = 1100, units = "px")
 
 
+#####Hypothesis trait distributions####
+#generate fake data
+convergence <- data.frame(trait_val = rnorm(200, mean = 0, sd = 0.2))
+divergence <- data.frame(trait_val = rnorm(200, mean = 0, sd = 1))
+
+
+convergence_density <- convergence |>
+  ggplot(aes(x = trait_val)) +
+  geom_density(alpha = 0.5, fill = "grey") +
+  labs(x = "Trait value", y = "Density") +
+  theme_bw() +
+  xlim(-2, 2)+
+  theme( axis.title = element_text(size = 20), 
+        axis.text = element_text(size = 18), 
+        panel.grid = element_blank()) 
+
+ggsave(convergence_density, filename = "hypothesis_convergence.png", path = "Figures", 
+       width = 1100, height = 1100, units = "px")
+
+divergence_density <- divergence |>
+  ggplot(aes(x = trait_val)) +
+  geom_density(alpha = 0.5, fill = "grey") +
+  labs(x = "Trait value", y = "Density") +
+  theme_bw() +
+  theme( axis.title = element_text(size = 20), 
+         axis.text = element_text(size = 18), 
+         panel.grid = element_blank()) 
+
+ggsave(divergence_density, filename = "hypothesis_divergence.png", path = "Figures", 
+       width = 1100, height = 1100, units = "px")
+
+
 
 ####Hypothesis grid maps####
 ##Function to retrieve data of one grid
