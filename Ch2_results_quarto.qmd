@@ -523,7 +523,7 @@ To investigate the direction in which traits are filtered, the community-weighte
 
 No trait showed a shift from divergence to convergence with elevation as predicted by the SDH. Instead, functional convergence was often detected at the low or mid elevation, and functional diversity was often no different from the null expectation at high elevation. The trends in the mean SES from the regional site shuffle model with elevation largely corresponded to the trends in the local species shuffle model, although the regional site shuffle model sometimes detected significant divergence where the local species shuffle model did not. Models with SES from the regional site shuffle model performed better (marginal R$^2$ ranging between 0.026 - 0.285) than models with SES from the local species shuffle model (marginal R$^2$ ranging between 0.006 - 0.041) as response variable (Appendix @tbl-ele-model-results).
 
-Plant height and LDMC showed a shift from functional convergence to random assembly with elevation in the regional site shuffle model (@fig-SES-elevation-ridges). Although the functional diversity of height and LDMC increased with elevation (@fig-RaoQ-elevation-ridges), the local species shuffle model did not detect significant divergence. The CWM plant height decreased with elevation, indicating a selection effect toward taller plants at the low elevation (@fig-CWM-elevation-ridges). The CWM of LDMC showed a hump-shaped relationship with elevation, indicating that high LDMC values are selected for at the low elevation, and lower LDMC values at the mid elevation (@fig-CWM-elevation-ridges).
+Plant height and LDMC showed a shift from functional convergence to random assembly with elevation in the regional site shuffle model (@fig-SES-elevation-ridges). Although the functional diversity of height and LDMC increased with elevation (@fig-RaoQ-elevation-ridges), the local species shuffle model did not detect significant divergence. The CWM plant height decreased with elevation, indicating a filtering effect toward taller plants at the low elevation (@fig-CWM-elevation-ridges). The CWM of LDMC showed a hump-shaped relationship with elevation, indicating that high LDMC values are selected for at the low elevation, and lower LDMC values at the mid elevation (@fig-CWM-elevation-ridges).
 
 SLA showed functional convergence at all elevations (@fig-SES-elevation-ridges), but with weaker trait convergence and higher diversity at the mid elevation (@fig-RaoQ-elevation-ridges). The direction of the filtering effect was hump-shaped, with high SLA values selected for at the mid elevation but low SLA values at the low and high elevation (@fig-CWM-elevation-ridges).
 
@@ -714,7 +714,7 @@ raoq_ridges <- C5_ele_comb |> #doesn't matter which df we use here, observed Rao
   mutate(elevation = as.factor(elevation)) |> 
   ggplot(aes(x = RaoQ, y = elevation)) +
   geom_density_ridges(alpha = 0.5) +
-  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", 
+  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", ncol = 1, nrow = 4,
              strip.position = "bottom")+
   labs(x = " ", y = "Elevation (m a.s.l.)") +
   theme_bw() +
@@ -834,7 +834,7 @@ cwm_ridges <- cwm_comb |>
   ggplot(aes(x = cwm_value, y = elevation)) +
   geom_density_ridges(alpha = 0.5) +
   facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), 
-             scale = "free_x", strip.position = "bottom")+
+             scale = "free_x", strip.position = "bottom", ncol = 1, nrow = 4)+
   labs(x = "", y = "Elevation (m a.s.l.)") +
   #scale_x_continuous(breaks = c(0,25,50))+
   theme_bw() +
