@@ -75,9 +75,15 @@ pos <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_
 
 #import microenvironmental data containing microenv variables
 env2 <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
+  tibble() |> 
+  rowwise() |> #make sure it computes CV row by row and does not compute one sd for all 3 columns
+  mutate(soil_depth_sd = sd(c(soil_depth_1, soil_depth_2, soil_depth_3), na.rm = TRUE), 
+         soil_depth_CV = if_else(mean_soil_depth == 0, NA_real_, (soil_depth_sd / mean_soil_depth) * 100)) |> #if mean soil depth is zero give it NA
+  ungroup() |> 
   #variables we are interested in
   select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
-        mean_soil_depth, slope_height) |> 
+        soil_temperature_adj_campaign2, mean_soil_depth, slope_height, 
+        soil_depth_CV) |> 
   #add elevation variables
   mutate(elevation = case_when(site == "GG" ~ 2000, 
                                site == "WH" ~ 2500, 
@@ -86,7 +92,8 @@ env2 <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental
   mutate(ncolumn = match(column, LETTERS[1:8]),  #also add x and y coordinates
          grid = paste0(site, grid), 
         elevation = as.factor(elevation), 
-        grid = as.factor(grid)) |> #each grid must have a unique id 
+        grid = as.factor(grid), 
+        across(contains("campaign"), as.numeric)) |> #each grid must have a unique id 
   rename(x_coord = ncolumn, 
          y_coord = row)
 
@@ -94,9 +101,6 @@ env2 <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental
 rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
   select(CELL_ID, STD) |> 
   rename(Cell_ID = CELL_ID)
-
-#import interpolated microclimate indices
-micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
 
 
 ###=========================================###
@@ -169,8 +173,6 @@ C5_cell_ses_poolsite <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted
 
 ##Combine SES and environmental data
 C5_microenv_comb <- env2 |> 
-  #join to microclimate indices |> 
-  full_join(micro_idw, by = "Cell_ID") |> 
   #join to remote sensing data |> 
   full_join(rms, by = "Cell_ID") |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
@@ -179,11 +181,12 @@ C5_microenv_comb <- env2 |>
          grid = as.factor(grid)) |> 
   group_by(site) |> 
   mutate(       #standardise the variables we will use in the model, per site
-         mean_T1_growing_season = as.numeric(scale(mean_T1_growing_season)), 
-         mean_moist_growing_season = as.numeric(scale(mean_moist_growing_season)), 
+         soil_temperature_adj_campaign2 = as.numeric(scale(soil_temperature_adj_campaign2)), 
+         soil_moisture_adj_campaign2 = as.numeric(scale(soil_moisture_adj_campaign2)), 
          rock_cover = as.numeric(scale(rock_cover)), 
          mean_soil_depth = as.numeric(scale(mean_soil_depth)), 
-         STD = as.numeric(scale(STD))) |> 
+         STD = as.numeric(scale(STD)), 
+         soil_depth_CV = as.numeric(scale(soil_depth_CV))) |> 
   ungroup()
 
 
@@ -207,7 +210,7 @@ for (t in 1:length(traitlist)) {
     drop_na()
   
   
-  model<- lme(SES ~ mean_T1_growing_season + mean_moist_growing_season + rock_cover+ mean_soil_depth + STD,
+  model<- lme(SES ~ soil_temperature_adj_campaign2 + soil_moisture_adj_campaign2 + rock_cover+ mean_soil_depth + STD + soil_depth_CV,
               random = ~1|grid, 
               correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
               data = modeldat) #only gaussian family possible
@@ -298,9 +301,7 @@ C2_cell_ses_poolsite <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted
 
 ##Combine SES and environmental data
 C2_microenv_comb <- env2 |> 
-  #join to microclimate indices |> 
-  full_join(micro_idw, by = "Cell_ID") |> 
-  #join to remote sensing data |> 
+  #join to remote sensing data 
   full_join(rms, by = "Cell_ID") |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
   full_join(C2_cell_ses_poolsite, by = "Cell_ID", relationship = "one-to-many") |>
@@ -309,11 +310,12 @@ C2_microenv_comb <- env2 |>
          grid = as.factor(grid)) |> 
   group_by(site) |> 
   mutate(       #standardise the variables we will use in the model, per site
-         mean_T1_growing_season = as.numeric(scale(mean_T1_growing_season)), 
-         mean_moist_growing_season = as.numeric(scale(mean_moist_growing_season)), 
+         soil_temperature_adj_campaign2 = as.numeric(scale(soil_temperature_adj_campaign2)), 
+         soil_moisture_adj_campaign2 = as.numeric(scale(soil_moisture_adj_campaign2)), 
          rock_cover = as.numeric(scale(rock_cover)), 
          mean_soil_depth = as.numeric(scale(mean_soil_depth)), 
-         STD = as.numeric(scale(STD))) |> 
+         STD = as.numeric(scale(STD)), 
+         soil_depth_CV = as.numeric(scale(soil_depth_CV))) |> 
   ungroup()
 
 
@@ -337,10 +339,10 @@ for (t in 1:length(traitlist)) {
       drop_na()
     
     
-    model<- lme(SES ~ mean_T1_growing_season + mean_moist_growing_season + rock_cover+ mean_soil_depth + STD,
-                random = ~1|grid, 
-                correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
-                data = modeldat) #only gaussian family possible
+    model<- lme(SES ~ soil_temperature_adj_campaign2 + soil_moisture_adj_campaign2 + rock_cover+ mean_soil_depth + STD + soil_depth_CV,
+              random = ~1|grid, 
+              correlation = corSpher(form = ~ x_coord + y_coord|grid, nugget = TRUE), #spherical structure
+              data = modeldat) #only gaussian family possible
     
     
     #Also save results in a list object so we can call it with quarto
