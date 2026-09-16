@@ -603,11 +603,11 @@ letters_comb <- C5_ridges_letters |> bind_rows(C2_ridges_letters)|>
   mutate(model = factor(model, levels = c("C5 entire pool", "C2 site pool")))
 
 
-l1 <- c("log_Height" = "Plant~height", "SLA" = "SLA", "log_LDMC" = "LDMC", "log_LA" = "LA", "C5 entire pool" = "C5~entire~pool", 
-        "C2 site pool" = "C2~site~pool")
+l1 <- c("log_Height" = "Plant height", "SLA" = "SLA", "log_LDMC" = "LDMC", "log_LA" = "LA", "C5 entire pool" = "regional site\nshuffle model", 
+        "C2 site pool" = "local species\nshuffle model")
 SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
-  geom_density_ridges(alpha = 0.5) +
-  facet_grid(trait~model, labeller = as_labeller(l1, default = label_parsed), scale = "free_x")+
+  geom_density_ridges(aes(fill = model), alpha = 0.5) +
+  facet_grid(trait~model, labeller = as_labeller(l1), scale = "free_x")+
   labs(x = "SES", y = "Elevation (m a.s.l.)") +
   geom_vline(xintercept = 0, linetype = "dashed") +
   geom_text(data = letters_comb, aes(x = x_pos, y = elevation, label = letters, size = 16))+
@@ -623,6 +623,7 @@ SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
     height = 0.08,
     linewidth = 1, inherit.aes = FALSE)+
   scale_color_manual(values = c("no" ="black","significant" = "red")) +
+  scale_fill_manual(values = c("C5 entire pool" = "darkorange", "C2 site pool" = "darkcyan")) +
   theme_bw() +
   theme(legend.position = "none", axis.title = element_text(size = 14), 
         axis.text = element_text(size = 12), strip.text = element_text(size = 14), strip.text.y.right = element_text(angle = 0, hjust = 0),
@@ -1021,26 +1022,28 @@ allsites_microenv_plot <- microenv_dat_all |>
   geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0, 
                 position = position_dodge(width = 0.5), 
                 orientation = "y")+
-  scale_color_manual(values = c("C5" = "black", "C2" = "grey50"))+
+  scale_color_manual(values = c("C5" = "darkorange", "C2" = "darkcyan"), 
+                     labels = c("C5" = "Regional site\nshuffle model", "C2" = "Local species\nshuffle model"))+
   geom_vline(xintercept = 0, linetype = "dashed")+
-  geom_text(aes(x = 0.6, y = variable, label = sign),
+  geom_text(aes(x = 0.5, y = variable, label = sign),
             size = 5, position = position_dodge(width = 0.5), 
             show.legend = FALSE)+
   facet_grid(site~trait,
              labeller = as_labeller(l1, default = label_parsed)) +
-  scale_x_continuous(breaks = c(-0.4,0,0.6)) +
+  xlim(-0.3,0.5)+
+  scale_x_continuous(breaks = c(-0.3,0,0.3)) +
   theme_bw() +
   labs(y = " ", x = "Slope estimate", color = "Null model") +
   theme(panel.grid = element_blank(), legend.position = "bottom", 
+        legend.title = element_blank(),
         strip.background = element_blank(), 
         strip.text.y.right = element_text(angle = 0), 
         strip.text.x.top = element_text(angle = 45),
-        axis.text.y.left = element_text(angle = 25),
         axis.title = element_text(size = 14), axis.text = element_text(size = 12), 
-        strip.text = element_text(size = 14), legend.text = element_text(size = 14)) +
-  geom_text(aes(x = -0.6, y = "temp", label = R2_label),
-            size = 2.5, position = position_dodge(width = 1), 
-            show.legend = FALSE, parse = TRUE)
+        strip.text = element_text(size = 14), legend.text = element_text(size = 14)) #+
+  #geom_text(aes(x = -0.7, y = "depth", label = R2_label),
+            #size = 2.5, position = position_dodge(width = 1), 
+            #show.legend = FALSE, parse = TRUE)
 allsites_microenv_plot
 
 ggsave("SES_microenv_points.png", plot = allsites_microenv_plot, path = "Figures")
