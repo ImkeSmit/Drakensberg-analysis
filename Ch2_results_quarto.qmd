@@ -872,75 +872,75 @@ Micro-environmental factors were weakly related to fine-scale variation in commu
 #Create tables of coeffieicents for each site, it is easier to manage this way
 GG_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
-                         variable = c("soil temperature", "soil moisture", "rock cover", "soil depth", "surface heterogeneity")) |> 
+                         variable = c("temp", "moist", "rock", "depth", "het", "depth CV")) |> 
   mutate(
-    coefficient = c(C5_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
-    C5_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
-    C5_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
-    C5_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6],
-    C2_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
-    C2_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
-    C2_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
-    C2_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6]), 
+    coefficient = c(C5_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:7], 
+    C5_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:7], 
+    C5_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:7], 
+    C5_SES_microenv_summary$SLA_GG$coefficients$fixed[2:7],
+    C2_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:7], 
+    C2_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:7], 
+    C2_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:7], 
+    C2_SES_microenv_summary$SLA_GG$coefficients$fixed[2:7]), 
 
-    std_error = c(C5_SES_microenv_summary$Height_cm_GG$tTable[2:6,2], 
-    C5_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:6,2], 
-    C5_SES_microenv_summary$log_LDMC_GG$tTable[2:6,2], 
-    C5_SES_microenv_summary$SLA_GG$tTable[2:6,2],
-    C2_SES_microenv_summary$Height_cm_GG$tTable[2:6,2], 
-    C2_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:6,2], 
-    C2_SES_microenv_summary$log_LDMC_GG$tTable[2:6,2], 
-    C2_SES_microenv_summary$SLA_GG$tTable[2:6,2])) |>  
+    std_error = c(C5_SES_microenv_summary$Height_cm_GG$tTable[2:7,2], 
+    C5_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:7,2], 
+    C5_SES_microenv_summary$log_LDMC_GG$tTable[2:7,2], 
+    C5_SES_microenv_summary$SLA_GG$tTable[2:7,2],
+    C2_SES_microenv_summary$Height_cm_GG$tTable[2:7,2], 
+    C2_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:7,2], 
+    C2_SES_microenv_summary$log_LDMC_GG$tTable[2:7,2], 
+    C2_SES_microenv_summary$SLA_GG$tTable[2:7,2])) |>  
     mutate(
     lower_ci = coefficient - 1.96*std_error, 
     upper_ci = coefficient + 1.96*std_error)
 
 WH_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
-                         variable = c("soil temperature", "soil moisture", "rock cover", "soil depth", "surface heterogeneity")) |> 
+                         variable = c("temp", "moist", "rock", "depth", "het", "depth CV")) |> 
   mutate(
-    coefficient = c(C5_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:6], 
-    C5_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:6], 
-    C5_SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:6], 
-    C5_SES_microenv_summary$SLA_WH$coefficients$fixed[2:6],
-    C2_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:6], 
-    C2_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:6], 
-    C2_SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:6], 
-    C2_SES_microenv_summary$SLA_WH$coefficients$fixed[2:6]), 
+    coefficient = c(C5_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:7], 
+    C5_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:7], 
+    C5_SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:7], 
+    C5_SES_microenv_summary$SLA_WH$coefficients$fixed[2:7],
+    C2_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:7], 
+    C2_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:7], 
+    C2_SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:7], 
+    C2_SES_microenv_summary$SLA_WH$coefficients$fixed[2:7]), 
 
-    std_error = c(C5_SES_microenv_summary$Height_cm_WH$tTable[2:6,2], 
-    C5_SES_microenv_summary$Leaf_area_mm2_WH$tTable[2:6,2], 
-    C5_SES_microenv_summary$log_LDMC_WH$tTable[2:6,2], 
-    C5_SES_microenv_summary$SLA_WH$tTable[2:6,2],
-    C2_SES_microenv_summary$Height_cm_WH$tTable[2:6,2], 
-    C2_SES_microenv_summary$Leaf_area_mm2_WH$tTable[2:6,2], 
-    C2_SES_microenv_summary$log_LDMC_WH$tTable[2:6,2], 
-    C2_SES_microenv_summary$SLA_WH$tTable[2:6,2])) |>  
+    std_error = c(C5_SES_microenv_summary$Height_cm_WH$tTable[2:7,2], 
+    C5_SES_microenv_summary$Leaf_area_mm2_WH$tTable[2:7,2], 
+    C5_SES_microenv_summary$log_LDMC_WH$tTable[2:7,2], 
+    C5_SES_microenv_summary$SLA_WH$tTable[2:7,2],
+    C2_SES_microenv_summary$Height_cm_WH$tTable[2:7,2], 
+    C2_SES_microenv_summary$Leaf_area_mm2_WH$tTable[2:7,2], 
+    C2_SES_microenv_summary$log_LDMC_WH$tTable[2:7,2], 
+    C2_SES_microenv_summary$SLA_WH$tTable[2:7,2])) |>  
     mutate(
     lower_ci = coefficient - 1.96*std_error, 
     upper_ci = coefficient + 1.96*std_error)
 
 BK_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
-                         variable = c("soil temperature", "soil moisture", "rock cover", "soil depth", "surface heterogeneity")) |> 
+                         variable = c("temp", "moist", "rock", "depth", "het", "depth CV")) |> 
   mutate(
-    coefficient = c(C5_SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:6], 
-    C5_SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:6], 
-    C5_SES_microenv_summary$log_LDMC_BK$coefficients$fixed[2:6], 
-    C5_SES_microenv_summary$SLA_BK$coefficients$fixed[2:6],
-    C2_SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:6], 
-    C2_SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:6], 
-    C2_SES_microenv_summary$log_LDMC_BK$coefficients$fixed[2:6], 
-    C2_SES_microenv_summary$SLA_BK$coefficients$fixed[2:6]), 
+    coefficient = c(C5_SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:7], 
+    C5_SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:7], 
+    C5_SES_microenv_summary$log_LDMC_BK$coefficients$fixed[2:7], 
+    C5_SES_microenv_summary$SLA_BK$coefficients$fixed[2:7],
+    C2_SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:7], 
+    C2_SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:7], 
+    C2_SES_microenv_summary$log_LDMC_BK$coefficients$fixed[2:7], 
+    C2_SES_microenv_summary$SLA_BK$coefficients$fixed[2:7]), 
 
-    std_error = c(C5_SES_microenv_summary$Height_cm_BK$tTable[2:6,2], 
-    C5_SES_microenv_summary$Leaf_area_mm2_BK$tTable[2:6,2], 
-    C5_SES_microenv_summary$log_LDMC_BK$tTable[2:6,2], 
-    C5_SES_microenv_summary$SLA_BK$tTable[2:6,2],
-    C2_SES_microenv_summary$Height_cm_BK$tTable[2:6,2], 
-    C2_SES_microenv_summary$Leaf_area_mm2_BK$tTable[2:6,2], 
-    C2_SES_microenv_summary$log_LDMC_BK$tTable[2:6,2], 
-    C2_SES_microenv_summary$SLA_BK$tTable[2:6,2])) |>  
+    std_error = c(C5_SES_microenv_summary$Height_cm_BK$tTable[2:7,2], 
+    C5_SES_microenv_summary$Leaf_area_mm2_BK$tTable[2:7,2], 
+    C5_SES_microenv_summary$log_LDMC_BK$tTable[2:7,2], 
+    C5_SES_microenv_summary$SLA_BK$tTable[2:7,2],
+    C2_SES_microenv_summary$Height_cm_BK$tTable[2:7,2], 
+    C2_SES_microenv_summary$Leaf_area_mm2_BK$tTable[2:7,2], 
+    C2_SES_microenv_summary$log_LDMC_BK$tTable[2:7,2], 
+    C2_SES_microenv_summary$SLA_BK$tTable[2:7,2])) |>  
     mutate(
     lower_ci = coefficient - 1.96*std_error, 
     upper_ci = coefficient + 1.96*std_error)
@@ -1023,21 +1023,22 @@ allsites_microenv_plot <- microenv_dat_all |>
                 orientation = "y")+
   scale_color_manual(values = c("C5" = "black", "C2" = "grey50"))+
   geom_vline(xintercept = 0, linetype = "dashed")+
-  geom_text(aes(x = 1, y = variable, label = sign),
+  geom_text(aes(x = 0.6, y = variable, label = sign),
             size = 5, position = position_dodge(width = 0.5), 
             show.legend = FALSE)+
   facet_grid(site~trait,
              labeller = as_labeller(l1, default = label_parsed)) +
-  scale_x_continuous(breaks = c(-0.8,0,0.8)) +
+  scale_x_continuous(breaks = c(-0.4,0,0.6)) +
   theme_bw() +
   labs(y = " ", x = "Slope estimate", color = "Null model") +
   theme(panel.grid = element_blank(), legend.position = "bottom", 
         strip.background = element_blank(), 
         strip.text.y.right = element_text(angle = 0), 
         strip.text.x.top = element_text(angle = 45),
+        axis.text.y.left = element_text(angle = 25),
         axis.title = element_text(size = 14), axis.text = element_text(size = 12), 
         strip.text = element_text(size = 14), legend.text = element_text(size = 14)) +
-  geom_text(aes(x = -0.6, y = "surface heterogeneity", label = R2_label),
+  geom_text(aes(x = -0.6, y = "temp", label = R2_label),
             size = 2.5, position = position_dodge(width = 1), 
             show.legend = FALSE, parse = TRUE)
 allsites_microenv_plot
