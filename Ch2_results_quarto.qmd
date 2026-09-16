@@ -410,53 +410,6 @@ Micro-environmental variables were measured at the same time as the vegetation s
 
 Instantaneous soil moisture was measured in each cell more than 24 hours after the last rainfall event, using a handheld time-domain soil moisture meter (FieldScout 300 TDR; Spectrum Technologies, Plainfield, IL, US) at a depth of 7.5 cm. Instantaneous soil temperature was measured at the same time as soil moisture with a handheld soil thermometer. As it took 2-4 hours to measure the instantaneous soil moisture and temperature in each cell in a site, soil moisture and temperature values were linearly adjusted to account for increases in air temperature and declines in soil moisture over time.
 
-```{r interpolation statistics}
-#| message: false
-#| echo: false
-#| warning: false
-
-####How many cells did we lose?###
-#environmental data for reverence 
-ref <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
-  select(site, Cell_ID)
-
-#import interpolated indices
-ind <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1) |> 
-  drop_na()
-
-#Cells we lost
-lost <- ref |> 
-  anti_join(ind, by = "Cell_ID") |> 
-  group_by(site) |> 
-  summarise(n = n())
-
-###Correlate interpolation with instantaneous####
-#import microenvironmental data containing instantaneous temperature variables
-inst_micro <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
-  tibble() |> 
-  #variables we are interested in
-  select(Cell_ID:row, soil_moisture_adj_campaign2, soil_moisture_adj_campaign1, 
-         soil_temperature_adj_campaign1, soil_temperature_adj_campaign2, rock_cover) |> 
-  mutate(across(contains("soil"), as.numeric)) 
-
-###Join instantaneous and interpolated 
-moisture_dat <- inst_micro |> 
-  inner_join(ind, by = "Cell_ID") |> 
-  drop_na()
-
-#import validation results
-validation_results <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_interpolation_validation.csv")
-
-#mean R2 for soil moisture and temp
-mean_R2 <- validation_results |> 
-  group_by(site, grid_number, variable) |> 
-  summarise(
-    R2       = ifelse(var(observed) > 0, 
-                      cor(observed, predicted)^2, NA_real_)) |> 
-  group_by(variable) |> 
-  summarise(mean_R2 = mean(R2))
-```
-
 [Remove all references to interpolation]{.underline}
 
 To identify the main axes of micro-environmental variation across the three sites, a principal component analysis was performed using the princomp function [@rcoreteam2025; @fig-environmental-PCA]. Most of the micro-environmental variation across the three sites was attributed to differences in soil moisture and temperature (PC1, explaining 34% of the variation), as well as soil depth (PC2, explaining 17% of the variation). We selected the uncorrelated variables with highest loadings on PC1 and PC2 to test whether fine-scale variation in community assembly is shaped by micro-environmental variation: mean soil temperature of the growing season (hereafter referred to as soil temperature), mean soil moisture of the growing season (hereafter referred to as soil moisture), rock cover, mean soil depth and surface heterogeneity. As a result, `r C5_ele_comb |>  filter(trait == "log_Height") |> drop_na() |> summarise(n = n())` cells were included in testing how community assembly varies with elevation (`r C5_ele_comb|> filter(trait == "log_Height", site == "GG") |> drop_na() |> summarise(n = n())` cells were from the low site, `r C5_ele_comb |> filter(trait == "log_Height", site == "WH") |> drop_na() |> summarise(n = n())` cells were from the mid site, and `r C5_ele_comb |> filter(trait == "log_Height", site == "BK") |> drop_na() |> summarise(n = n())` cells were from the high site). Micro-environmental conditions were heterogeneous in the grids (Appendix @fig-env-heterogeneity). For example, soil depth could vary by 44 cm between adjacent cells, and rock cover could vary by 99% between adjacent cells (Appendix @fig-env-heterogeneity).
