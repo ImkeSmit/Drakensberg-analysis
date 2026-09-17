@@ -863,7 +863,7 @@ median_height <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.
 ggsave("CWM_ridges.png", plot = cwm_ridges, path = "Figures")
 ```
 
-Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. The models had low explanatory power with marginal $R^2$ values generally below 0.1 (@fig-allsites-microenv_C5_C2), although the models for leaf area (marginal $R^2$, local site shuffle model = 0.333, marginal $R^2$, C2 site pool model = 0.275) and plant height (marginal $R^2$, local site shuffle model = 0.143, marginal $R^2$, C2 site pool model = 0.127) at the low site had better explanatory power. Only surface heterogeneity had a somewhat consistent relationship with community assembly, often being related to higher than expected trait divergence (in 5 out of 12 trait x site combinations, @fig-allsites-microenv_C5_C2), although this relationship was not detected at all sites or for all traits. Other micro-environmental factors had weak and inconsistent effects on community assembly. For example, soil depth was significantly related to limiting similarity in 6 trait x site combinations, but significantly related to environmental filtering in 3 trait x site combinations (@fig-allsites-microenv_C5_C2). Rock cover, soil moisture and soil temperature had few significant relationships with SES. Rock cover was only significantly related to trait divergence of LA at the low site and soil moisture was only significantly related to convergence of LDMC at the mid site (@fig-allsites-microenv_C5_C2). Soil temperature was significantly related to convergence of plant height and LA at the low site (@fig-allsites-microenv_C5_C2).
+Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. Models generally had low explanatory power with marginal $R^2$ values below 0.1 (@fig-allsites-microenv_C5_C2), although LA at the low site (marginal $R^2$, local site shuffle model = 0.134, marginal $R^2$, local species shuffle model = 0.127), and SLA at the low (marginal $R^2$, local site shuffle model = 0.049, marginal $R^2$, local species shuffle model = 0.104) and high site (marginal $R^2$, local site shuffle model = 0.158, marginal $R^2$, local species shuffle model = 0.057) were more accurately modelled. Micro-environmental variables showed inconsistent or no significant relationships with SES. For example, soil temperature, the coefficient of variation of soil depth and mean soil depth was sometimes positively related to SES in some trait x site combinations (suggesting it is associated with limiting similarity), but negatively related in others (suggesting it is associated with environmental filtering , @fig-allsites-microenv_C5_C2). The most consistent relationships were with rock cover and soil moisture, but these were only significantly related to SES in two and three trait x site combinations, respectively (@fig-allsites-microenv_C5_C2). In these instances, rock cover and soil moisture were related to functional divergence, suggesting these micro-environmental conditions are associated with limiting similarity. The coefficient of variation in soil depth was never significantly related to SES (@fig-allsites-microenv_C5_C2).
 
 ```{r}
 #| label: fig-allsites-microenv_C5_C2
@@ -1027,7 +1027,7 @@ allsites_microenv_plot <- microenv_dat_all |>
                 position = position_dodge(width = 0.5), 
                 orientation = "y")+
   scale_color_manual(values = c("C5" = "darkorange", "C2" = "darkcyan"), 
-                     labels = c("C5" = "Regional site\nshuffle model", "C2" = "Local species\nshuffle model"))+
+                     labels = c("C5" = "Local site\nshuffle model", "C2" = "Local species\nshuffle model"))+
   geom_vline(xintercept = 0, linetype = "dashed")+
   geom_text(aes(x = 0.5, y = variable, label = sign),
             size = 5, position = position_dodge(width = 0.5), 
@@ -1044,10 +1044,10 @@ allsites_microenv_plot <- microenv_dat_all |>
         strip.text.y.right = element_text(angle = 0), 
         strip.text.x.top = element_text(angle = 45),
         axis.title = element_text(size = 14), axis.text = element_text(size = 12), 
-        strip.text = element_text(size = 14), legend.text = element_text(size = 14)) #+
-  #geom_text(aes(x = -0.7, y = "depth", label = R2_label),
-            #size = 2.5, position = position_dodge(width = 1), 
-            #show.legend = FALSE, parse = TRUE)
+        strip.text = element_text(size = 14), legend.text = element_text(size = 14)) +
+  geom_text(aes(x = -0.7, y = "depth", label = R2_label),
+            size = 2.5, position = position_dodge(width = 1), 
+            show.legend = FALSE, parse = TRUE)
 allsites_microenv_plot
 
 ggsave("SES_microenv_points.png", plot = allsites_microenv_plot, path = "Figures")
