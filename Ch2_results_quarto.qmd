@@ -641,17 +641,15 @@ ggsave("SES_elevation_C5_C2.png", plot = SES_elevation_ridges, path = "Figures")
 
 ```
 
-```{r}
+```{r RaoQ and CWM models}
 #| message: false
 #| echo: false
-#| label: fig-RaoQ-elevation-ridges
-#| fig-cap: "The distribution of cell level trait diversity, calculated with RaoQ, at the mid, low and high site. RaoQ was calculated with plant height, leaf area (LA), leaf dry matter content (LDMC), and specific leaf area (SLA). Points with error bars show the mean and confidence interval of RaoQ for cells at each elevation. Letters indicate significant differences between the mean RaoQ of different elevations."
 #| warning: false
 #| fig-width: 6
 #| fig-height: 4
 
 
-####model RaoQ ~ elevation####
+####model RaoQ ~ elevation#####
 traitlist <- c("log_Height", "log_LDMC", "log_LA", "SLA")
 #lists to store results in
 RaoQ_ele_cld<- vector(mode= "list", length = length(traitlist))
@@ -686,8 +684,7 @@ RaoQ_ele_anova[[t]] <- anova(model)
 RaoQ_ele_Rsq[[t]] <- r.squaredGLMM(model)
 }
 
-###Graph####
-l1 <- c("log_Height" = "RaoQ~of~plant~height", "SLA" = "RaoQ~of~SLA", "log_LDMC" = "RaoQ~of~LDMC", "log_LA" = "RaoQ~of~LA")
+#significance letters
 raoq_ridges_letters <- tibble(trait = c(rep("log_Height", 3), rep("SLA", 3), rep("log_LDMC", 3),rep("log_LA", 3)), 
                              elevation = as.factor(c(rep(c("2000", "2500", "3000"), 4))),
                              letters = c(RaoQ_ele_cld$log_Height$.group, 
@@ -709,46 +706,18 @@ raoq_ridges_letters <- tibble(trait = c(rep("log_Height", 3), rep("SLA", 3), rep
                               mutate(upper_ci = emmean+1.96*emmean_SE, 
                                      lower_ci = emmean-1.96*emmean_SE)
 
-raoq_ridges <- C5_ele_comb |> #doesn't matter which df we use here, observed RaoQ should stay the same
-  filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
-  mutate(elevation = as.factor(elevation)) |> 
-  ggplot(aes(x = RaoQ, y = elevation)) +
-  geom_density_ridges(alpha = 0.5) +
-  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), scale = "free_x", ncol = 1, nrow = 4,
-             strip.position = "bottom")+
-  labs(x = " ", y = "Elevation (m a.s.l.)") +
-  theme_bw() +
-  geom_text(data = raoq_ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
-  geom_point(
-    data = raoq_ridges_letters,
-    aes(x = emmean, y = as.numeric(elevation)),
-    size = 2, inherit.aes = FALSE) +
-  geom_errorbarh(
-    data = raoq_ridges_letters,
-    aes(xmin = lower_ci,
-        xmax = upper_ci,
-        y = as.numeric(elevation)),
-    height = 0.08,
-    linewidth = 1, inherit.aes = FALSE)+
-  theme(legend.position = "none", axis.title = element_text(size = 14), 
-        axis.text = element_text(size = 12), strip.text = element_text(size = 14), 
-        strip.background = element_blank(),
-        strip.placement = "outside", panel.grid = element_blank()) 
+#make it long format
+RQ_long <- C5_ele_comb |> 
+  select(Cell_ID, elevation, RaoQ, trait) |> 
+  mutate(metric = "RaoQ") |> 
+  rename(value = RaoQ)
 
-raoq_ridges
+RQ_letters_long <- raoq_ridges_letters |> 
+  mutate(metric = "RaoQ")
+  
 
-ggsave("RaoQ_ridges.png", plot = raoq_ridges, path = "Figures")
-```
 
-```{r}
-#| label: fig-CWM-elevation-ridges
-#| fig-cap: "Distributions of Community-weighted mean (CWM) traits of plant height (cm), leaf area (LA, mm$^2$), leaf dry matter content (LDMC, mg.g$^{-1}$), and specific leaf area (SLA, mm$^2$.mg$^{-1}$) at the low, mid and high elevation. Height, LDMC and leaf area are on the log scale. Points with error bars show the mean and confidence interval of the CWM at each elevation. Letters indicate significant differences between the CWM of different elevations."
-#| warning: false
-#| message: false
-#| echo: false
-#| fig-width: 6
-#| fig-height: 4
-
+#####Model CWM~elevation####
 #import trait and abundance data
 abun_matrix <-read.csv("All_data/comm_assembly_results/abun_matrix.csv", row.names = 1)
 
@@ -829,38 +798,66 @@ cwm_ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), 
                               mutate(upper_ci = emmean+1.96*emmean_SE, 
                                      lower_ci = emmean-1.96*emmean_SE)
 
-cwm_ridges <- cwm_comb |>
-  filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
-  ggplot(aes(x = cwm_value, y = elevation)) +
-  geom_density_ridges(alpha = 0.5) +
-  facet_wrap(~trait, labeller = as_labeller(l1, default = label_parsed), 
-             scale = "free_x", strip.position = "bottom", ncol = 1, nrow = 4)+
-  labs(x = "", y = "Elevation (m a.s.l.)") +
-  #scale_x_continuous(breaks = c(0,25,50))+
-  theme_bw() +
-  geom_text(data = cwm_ridges_letters, aes(x = x_pos, y = elevation, label = letters, size = 16))+
-  geom_point(
-    data = cwm_ridges_letters,
-    aes(x = emmean, y = as.numeric(elevation)),
-    size = 2, inherit.aes = FALSE) +
-  geom_errorbarh(
-    data = cwm_ridges_letters,
-    aes(xmin = lower_ci,
-        xmax = upper_ci,
-        y = as.numeric(elevation)),
-    height = 0.08,
-    linewidth = 1, inherit.aes = FALSE)+
-  theme(legend.position = "none", axis.title = element_text(size = 14), 
-        axis.text = element_text(size = 12), strip.text = element_text(size = 14), 
-        strip.background = element_blank(),
-        strip.placement = "outside", panel.grid = element_blank()) 
-cwm_ridges
+cwm_long <- cwm_comb |> 
+  select(Cell_ID, trait, elevation, cwm_value) |> 
+  mutate(metric = "CWM") |> 
+  rename(value = cwm_value)
+
+
+####Combine CWM and RaoQ data####
+letters_long <- cwm_ridges_letters |> 
+  mutate(metric = "CWM") |> 
+  bind_rows(RQ_letters_long) |> 
+  mutate(letters = str_trim(letters, side = "both"))
+
+combo_long <- bind_rows(RQ_long, cwm_long)
+
 
 #median height
 median_height <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.names = 1) |> 
   summarise(median_height = median(Height_cm))
 
-ggsave("CWM_ridges.png", plot = cwm_ridges, path = "Figures")
+```
+
+```{r}
+#| label: fig-RaoQ-CWM-ridges
+#| fig-cap: "Density distributions of Community-weighted mean (CWM) and RaoQ of plant traits.The units of the CWM of traits and RaoQ are as follows: plant height = cm, leaf area (LA) = mm$^2$, leaf dry matter content (LDMC) = mg.g$^{-1}$, and specific leaf area (SLA) = mm$^2$.mg$^{-1}$. RaoQ is unitless. Height, LDMC and leaf area are on the log scale. Points with error bars show the mean and 95% confidence interval of the CWM or RaoQ at each elevation. Letters indicate significant differences between the CWM or RaoQ of different elevations."
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-width: 6
+#| fig-height: 4
+
+l1 <- c("log_Height" = "ln(Plant height)", "SLA" = "SLA", "log_LDMC" = "ln(LDMC)", "log_LA" = "ln(LA)", "CWM" = "CWM", "RaoQ" = "RaoQ")
+
+RQ_cwm_comb_figure <- combo_long |>
+  filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
+  ggplot(aes(x = value, y = elevation)) +
+  geom_density_ridges(alpha = 0.5) +
+  facet_grid2(trait ~ metric, scales = "free_x", independent = "x", 
+              labeller = as_labeller(l1)) +
+  labs(y = "Elevation (m a.s.l.)", x = " ") +
+  geom_text(data = letters_long, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  geom_point(
+    data = letters_long,
+    aes(x = emmean, y = as.numeric(elevation)),
+    size = 2, inherit.aes = FALSE) +
+  geom_errorbarh(
+    data = letters_long,
+    aes(xmin = lower_ci,
+        xmax = upper_ci,
+        y = as.numeric(elevation)),
+    height = 0.08,
+    linewidth = 1, inherit.aes = FALSE)+
+  theme_bw() +
+  theme(legend.position = "none", axis.title = element_text(size = 14), 
+        axis.text = element_text(size = 12), strip.text = element_text(size = 14), 
+        strip.background = element_blank(),
+        strip.placement = "outside", panel.grid = element_blank(), 
+        strip.text.y.right = element_text(angle = 0)) 
+
+
+ggsave("RaoQ_CWM_ridges.png", plot = RQ_cwm_comb_figure, path = "Figures")
 ```
 
 Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites. Models generally had low explanatory power with marginal $R^2$ values below 0.1 (@fig-allsites-microenv_C5_C2), although LA at the low site (marginal $R^2$, local site shuffle model = 0.134, marginal $R^2$, local species shuffle model = 0.127), and SLA at the low (marginal $R^2$, local site shuffle model = 0.049, marginal $R^2$, local species shuffle model = 0.104) and high site (marginal $R^2$, local site shuffle model = 0.158, marginal $R^2$, local species shuffle model = 0.057) were more accurately modelled. Micro-environmental variables showed inconsistent or no significant relationships with SES. For example, soil temperature, the coefficient of variation of soil depth and mean soil depth was sometimes positively related to SES in some trait x site combinations (suggesting it is associated with limiting similarity), but negatively related in others (suggesting it is associated with environmental filtering , @fig-allsites-microenv_C5_C2). The most consistent relationships were with rock cover and soil moisture, but these were only significantly related to SES in two and three trait x site combinations, respectively (@fig-allsites-microenv_C5_C2). In these instances, rock cover and soil moisture were related to functional divergence, suggesting these micro-environmental conditions are associated with limiting similarity. The coefficient of variation in soil depth was never significantly related to SES (@fig-allsites-microenv_C5_C2).
