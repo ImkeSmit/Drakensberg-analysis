@@ -645,6 +645,8 @@ ggsave("SES_elevation_C5_C2.png", plot = SES_elevation_ridges, path = "Figures")
 #| message: false
 #| echo: false
 #| warning: false
+#| fig-width: 6.5
+#| fig-height: 7
 
 
 ####model RaoQ ~ elevation#####
