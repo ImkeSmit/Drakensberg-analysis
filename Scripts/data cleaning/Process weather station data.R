@@ -138,4 +138,10 @@ Rai_alpbase <- alpbase2 |>
   mutate(Rain_Tot = as.numeric(Rain_Tot)) |> 
   summarise(rai = sum(Rain_Tot)) #913.6
 
+#Save weather statin data
+all_weather <- witsies2 |> 
+  bind_rows(scarpark2) |> 
+  bind_rows(alpbase2) |> 
+  select(Timestamp, StationID, AirTemp_Avg, Rain_Tot)
 
+write_csv(all_weather, "All_data/clean_data/weather_station_rain_temp.csv")
