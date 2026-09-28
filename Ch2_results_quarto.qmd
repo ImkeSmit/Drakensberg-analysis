@@ -1088,7 +1088,7 @@ wd <- read_csv("All_data/clean_data/weather_station_rain_temp.csv") |>
 temp_bar <- ggplot(wd, aes(y = mean_temp, x = month)) +
   geom_bar(stat = "identity") +
   facet_wrap(~StationID)+
-  labs(x = " ", y = "Mean air temperature (°C)")+
+  labs(x = " ", y = "Mean air \ntemperature (°C)")+
   theme_bw() +
   theme(panel.grid = element_blank(), 
         axis.text.x = element_text(angle = 45))
@@ -1111,6 +1111,7 @@ weather_comb
 #| message: false
 #| warning: false
 #| echo: false
+#| results: false
 #| label: fig-env-heterogeneity
 #| fig-cap: Scatterplot showing how micro-environmental variables vary with distance in the grids. The filled symbols show the maximum difference in a micro-environmental variable between cells at increasing distances from each other. The empty symbols show the mean difference in a micro-environmental variable between cells at increasing distances from each other. Differences are absolute values. Mean and maximum differences were calculated accross all grids in all sites. 
 
