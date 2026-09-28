@@ -7,7 +7,7 @@ fig-dpi: 300
 fig-width: 6
 fig-height: 4
 bibliography: Ch2_community_assembly_library.bib
-csl: journal-of-vegetation-science.csl
+csl: ecology.csl
 ---
 
 ```{r loading libraries}
