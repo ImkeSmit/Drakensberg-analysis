@@ -607,8 +607,8 @@ letters_comb <- C5_ridges_letters |> bind_rows(C2_ridges_letters)|>
   mutate(model = factor(model, levels = c("C5 entire pool", "C2 site pool")))
 
 
-l1 <- c("log_Height" = "Plant height", "SLA" = "SLA", "log_LDMC" = "LDMC", "log_LA" = "LA", "C5 entire pool" = "regional site\nshuffle model", 
-        "C2 site pool" = "local species\nshuffle model")
+l1 <- c("log_Height" = "Plant height", "SLA" = "SLA", "log_LDMC" = "LDMC", "log_LA" = "LA", "C5 entire pool" = "Regional site\nshuffle model", 
+        "C2 site pool" = "Local species\nshuffle model")
 SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
   geom_density_ridges(aes(fill = model), alpha = 0.5) +
   facet_grid(trait~model, labeller = as_labeller(l1), scale = "free_x")+
