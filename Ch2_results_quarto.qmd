@@ -990,8 +990,7 @@ C5_R2_table_long <- R2_table |>
                            trait == "LA"~ "Leaf_area_mm2", 
                            .default = trait), 
          R2 = round(R2, digits = 3), 
-         R2_label = paste0("R^2*m*' = '*", R2)) |> 
-  filter(grepl("M", metric))
+         R2_label = paste0("R^2*m*' = '*", R2)) 
 
 
 C2_R2_table_long <- C2_R2_table |> 
@@ -1005,8 +1004,7 @@ C2_R2_table_long <- C2_R2_table |>
                            trait == "LA"~ "Leaf_area_mm2", 
                            .default = trait), 
          R2 = round(R2, digits = 3), 
-         R2_label = paste0("R^2*m*' = '*", R2)) |> 
-  filter(grepl("M", metric)) 
+         R2_label = paste0("R^2*m*' = '*", R2)) 
 
 
 #Bind to coefficients table
@@ -1365,5 +1363,38 @@ RaoQ_results_table <- RaoQ_model_results |>
   fit_to_width(max_width = 6.5)
 
 RaoQ_results_table
+
+```
+``` {r}
+#| label: tbl-R2-microenv
+#| tbl-cap: R2 values
+#| message: false
+#| echo: false
+
+
+R2_microenv_table <- C2_R2_table_long |> 
+  bind_rows(C5_R2_table_long) |> 
+  select(null_model, trait, metric, R2, site) |> 
+  mutate(metric = replace_when(metric, grepl("R2M", metric) ~ "Marginal R2", 
+                               grepl("R2C", metric) ~ "Conditional R2")) |> 
+  pivot_wider(id_cols = c("null_model", "trait", "metric"), names_from = "site", values_from = "R2") |> 
+  arrange(null_model, trait,
+          factor(metric, levels = c("Marginal R2", "Conditional R2"))) |> 
+  flextable() |> 
+  set_header_labels(null_model = "Null model", 
+                    trait = "Trait", 
+                    metric2 = "R\u00B2 metric"
+                    ) |> 
+  merge_v(j = c("null_model", "trait")) |>
+  valign(j = c("null_model", "trait"), valign = "top") |>
+  colformat_double(j = c("low", "mid", "high"), digits = 3) |>
+  fontsize(size = 12, part = "all") |> 
+  theme_vanilla() |> 
+  bold(part = "header") |> 
+  autofit() |> 
+  fit_to_width(max_width = 6.5) 
+  
+  
+
 
 ```
