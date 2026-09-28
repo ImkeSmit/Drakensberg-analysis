@@ -387,7 +387,7 @@ This study was conducted on an elevation gradient spanning 1000m in the Northern
 
 The elevation gradient consisted of three study sites; located in the Golden Gate Highlands National Park (low site) at c. 2000 m a.s.l., Wistieshoek (mid site) at c. 2500 m a.s.l. and the Bokong Nature Reserve (high site) at c. 3000 m a.s.l (@fig-sitemap a). All three sites were located on basaltic bedrock. The low site falls within the Northern Drakensberg Highland Grassland vegetation type [@mucina2006], characterised by taller, C4 grasses, and the presence of some trees such as *Protea* species, *Leucosidea sericea* and *Buddleja* species. The mid site falls within the uKahlamba Basalt grassland vegetation type [@mucina2006], which includes a mixture of C3 and C4 grass genera, and a very high diversity of forbs. The high site is in the Lesotho Highland Basalt grassland vegetation type [@mucina2006], where the grass is often short and dominated by C3 species.
 
-The climate in the Northern Maloti-Drakensberg is characterised by highly seasonal rainfall, with 75% of annual rainfall occurring in the summer months between November and March [@nel2009]. Rainfall occurs as thundershowers formed through orographic lift, and exceeds 900 mm p.a. [@nel2009]. Very little rainfall occurs in the winter (10 - 190mm), but precipitation may also occur in the form of snow [@mulder2009; @nel2009]. Snow occurs when cold fronts or cutoff low pressure cells move over the Drakensberg [@mulder2009], and tends to melt before the next cold weather system arrives. Summer temperatures are mild, but winters are cold, with minimum temperatures regularly dropping below freezing in winter [@nel2008]. Mean annual air temperature varies by 5℃ across the three sites [(see Appendix X for details).]{.underline}
+The climate in the Northern Maloti-Drakensberg is characterised by highly seasonal rainfall, with 75% of annual rainfall occurring in the summer months between November and March [@nel2009, @fig-weather]. Rainfall occurs as thundershowers formed through orographic lift, and exceeds 900 mm p.a. [@nel2009]. Very little rainfall occurs in the winter (10 - 190mm), but precipitation may also occur in the form of snow [@mulder2009; @nel2009]. Snow occurs when cold fronts or cutoff low pressure cells move over the Drakensberg [@mulder2009], and tends to melt before the next cold weather system arrives. Summer temperatures are mild, but winters are cold, with minimum temperatures regularly dropping below freezing in winter [@nel2008]. Mean annual air temperature varies by 5℃ across the three sites (@fig-weather).
 
 Fires are a natural occurrence in the Maloti-Drakensberg, and are essential for the maintenance of plant biodiversity [@morris2021]. The majority of species in Drakensberg grasslands possess underground storage organs or bud banks from which they resprout after fire. Historically, fires were ignited by lightning and occurred in the early spring [@finch2022]. Since European occupation in the Drakensberg and surrounding area, more fires are set by humans in the winter [@finch2022]. The fire return interval or time since last fire for the three sites are not known, but all three sites were subject to a similar fire regime consisting of incidental wildfires started by lightning or accidental ignition.
 
@@ -1072,14 +1072,39 @@ Overall, macroclimate drives differences in community assembly in Drakensberg mo
 #| warning: false
 #| echo: false
 #| label: fig-weather
-#| fig-cap: Annual mean temperature and rainfall along the elevation gradient
+#| fig-cap: Mean monthly air temperature (a), and total monthly rainfall (b) of three weather stations nearest to the mid, high and low site.  The weather station at 2000 m a.s.l. is 35 km from the low site, the weather station at 2500 m a.s.l. is at the mid site, and the weather station at 3000 m a.s.l. is 56 km from the high site. Weather stations are managed by the African mountain Research Foundation (https://africanmountainresearch.com/the-solutions/our-data/).
 
 #import weather station data
 
-wd <- read_csv("All_data/clean_data/weather_station_rain_temp.csv")
+wd <- read_csv("All_data/clean_data/weather_station_rain_temp.csv") |> 
+  mutate(month = month(Timestamp, label = TRUE), 
+  StationID = replace_values(StationID, "AMRF_UFS4_SentinelPeak" ~ "3000 m a.s.l.", 
+                 "UFS_AWS_3_4809" ~ "2500 m a.s.l.", 
+                 "UFS_AWS_2_4809" ~ "2000 m a.s.l."),  
+  StationID = factor(StationID, levels = c("2000 m a.s.l.", "2500 m a.s.l.", "3000 m a.s.l."))) |> 
+  group_by(StationID, month) |> 
+  summarise(mean_temp = mean(AirTemp_Avg, na.rm = T), 
+            total_rai = sum(Rain_Tot, na.rm = T))
 
+temp_bar <- ggplot(wd, aes(y = mean_temp, x = month)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~StationID)+
+  labs(x = " ", y = "Mean air temperature (°C)")+
+  theme_bw() +
+  theme(panel.grid = element_blank(), 
+        axis.text.x = element_text(angle = 45))
 
+rain_bar <- ggplot(wd, aes(y = total_rai, x = month)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~StationID)+
+  labs(x = " ", y = "Total rainfall (mm)")+
+  theme_bw() +
+  theme(panel.grid = element_blank(), 
+        axis.text.x = element_text(angle = 45))
 
+weather_comb <- ggarrange(temp_bar, rain_bar, ncol = 1, nrow = 2, labels = c("a", "b"))
+
+weather_comb
 
 ```
 
