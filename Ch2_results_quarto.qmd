@@ -1296,18 +1296,25 @@ ele_model_results <- expand_grid(null_model = c("C5 entire pool", "C2 site pool"
          marginal_R_squared = c(C5_SES_ele_Rsq$log_Height[1], C5_SES_ele_Rsq$log_LA[1],
                                 C5_SES_ele_Rsq$log_LDMC[1],C5_SES_ele_Rsq$SLA[1],
                                 C2_SES_ele_Rsq$log_Height[1], C2_SES_ele_Rsq$log_LA[1],
-                                C2_SES_ele_Rsq$log_LDMC[1],C2_SES_ele_Rsq$SLA[1]))
+                                C2_SES_ele_Rsq$log_LDMC[1],C2_SES_ele_Rsq$SLA[1]), 
+         conditional_R_squared = c(C5_SES_ele_Rsq$log_Height[2], C5_SES_ele_Rsq$log_LA[2],
+                                C5_SES_ele_Rsq$log_LDMC[2],C5_SES_ele_Rsq$SLA[2],
+                                C2_SES_ele_Rsq$log_Height[2], C2_SES_ele_Rsq$log_LA[2],
+                                C2_SES_ele_Rsq$log_LDMC[2],C2_SES_ele_Rsq$SLA[2]))
 
 ele_results_table <- ele_model_results |> 
   mutate(F_value = round(F_value, digits = 3), 
          p_value = round(p_value, digits = 3), 
-         marginal_R_squared = round(marginal_R_squared, digits = 3)) |> 
+         marginal_R_squared = round(marginal_R_squared, digits = 3), 
+         null_model = replace_values(null_model, "C5 entire pool" ~ "Regional site shuffle model", 
+                                     "C2 site pool" ~ "Local species shuffle model")) |> 
   flextable() |> 
   set_header_labels(null_model = "Null model", 
                     trait = "Trait", 
                     F_value = "F value", 
                     p_value = "p value", 
-                    marginal_R_squared = "marginal R\u00B2") |> 
+                    marginal_R_squared = "marginal R\u00B2", 
+                    conditional_R_squared = "conditional R\u00B2") |> 
   align(j = 1:5, align = "center", part = "all") |>
   fontsize(size = 12, part = "all") |> 
   theme_vanilla() |> 
@@ -1364,7 +1371,7 @@ RaoQ_results_table
 ```
 ``` {r}
 #| label: tbl-R2-microenv
-#| tbl-cap: R2 values
+#| tbl-cap: Marginal and conditional $R^2$ values of models testing whether SES is related to micro-environmental conditions. Models were built for each site and each trait using the local site shuffle and local species shuffle models.
 #| message: false
 #| echo: false
 
@@ -1375,7 +1382,9 @@ R2_microenv_table <- C2_R2_table_long |>
   mutate(metric = replace_when(metric, grepl("R2M", metric) ~ "Marginal R2", 
                                grepl("R2C", metric) ~ "Conditional R2"), 
          null_model = replace_values(null_model, "C5" ~ "Local site shuffle model", 
-                                     "C2" ~ "Local species shuffle model")) |> 
+                                     "C2" ~ "Local species shuffle model"), 
+         trait = replace_values(trait, "Height_cm" ~ "Plant height", 
+                                "Leaf_area_mm2" ~ "LA")) |> 
   pivot_wider(id_cols = c("null_model", "trait", "metric"), names_from = "site", values_from = "R2") |> 
   arrange(null_model, trait,
           factor(metric, levels = c("Marginal R2", "Conditional R2"))) |> 
