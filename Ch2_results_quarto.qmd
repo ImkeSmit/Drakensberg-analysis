@@ -1071,6 +1071,22 @@ Overall, macroclimate drives differences in community assembly in Drakensberg mo
 #| message: false
 #| warning: false
 #| echo: false
+#| label: fig-weather
+#| fig-cap: Annual mean temperature and rainfall along the elevation gradient
+
+#import weather station data
+
+wd <- read_csv("All_data/clean_data/weather_station_rain_temp.csv")
+
+
+
+
+```
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
 #| label: fig-env-heterogeneity
 #| fig-cap: Scatterplot showing how micro-environmental variables vary with distance in the grids. The filled symbols show the maximum difference in a micro-environmental variable between cells at increasing distances from each other. The empty symbols show the mean difference in a micro-environmental variable between cells at increasing distances from each other. Differences are absolute values. Mean and maximum differences were calculated accross all grids in all sites. 
 
