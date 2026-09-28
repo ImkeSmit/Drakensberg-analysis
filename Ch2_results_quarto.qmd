@@ -498,7 +498,7 @@ A null-model approach was used to determine whether RaoQ was significantly diffe
 #| message: false
 #| echo: false
 #| label: fig-nullmodel
-#| fig-cap: "The different null models used here, and how their results were interpretted. Grey arrows indicates how cover values are swapped in the spcies by site matrix. To test the stress dominance hypothesis, the regional site shuffle model and the local species shuffle model is used. The regional site shuffle model shuffles cover values across cells. If SES<0 calculated with the regional site shuffle model, we interpret it as a signal of environmental filtering. SES>0 indicates that no environmental filtering effect is present. The local species shuffle model shuffles cover values across species within each site. SES>0 from the local species shuffle model indicates that limiting similarity is present, while SES<0 shows no evidence of limiting similarity. To test whether micro-environmental conditions affect community assembly within sites, the local species shuffle model and local site shuffle model are used. The local site shuffle model swaps cover values across the cells in each site, so that a species unique to one site may not occur in another site. SES<0 from this null model indicates environmental filtering, while a SES>0 does not give evidence of environmental filtering."
+#| fig-cap: "The different null models used here, and how their results were interpretted. Grey arrows indicates how cover values are swapped in the species by site matrix. To test the stress dominance hypothesis, the regional site shuffle model and the local species shuffle model is used. The regional site shuffle model shuffles cover values across cells. If SES<0 calculated with the regional site shuffle model, we interpret it as a signal of environmental filtering. SES>0 indicates that no environmental filtering effect is present. The local species shuffle model shuffles cover values across species within each site. SES>0 from the local species shuffle model indicates that limiting similarity is present, while SES<0 shows no evidence of limiting similarity. To test whether micro-environmental conditions affect community assembly within sites, the local species shuffle model and local site shuffle model are used. The local site shuffle model swaps cover values across the cells in each site, so that a species unique to one site may not occur in another site. SES<0 from this null model indicates environmental filtering, while a SES>0 does not give evidence of environmental filtering."
 knitr::include_graphics("C:\\Users\\imke6\\Documents\\PhD 2025\\Ch1 Drakensberg analysis community assembly\\Ch2_write_up\\null model figure.png")
 ```
 
@@ -853,6 +853,7 @@ RQ_cwm_comb_figure <- combo_long |>
         strip.placement = "outside", panel.grid = element_blank(), 
         strip.text.y.right = element_text(angle = 0)) 
 
+RQ_cwm_comb_figure
 
 ggsave("RaoQ_CWM_ridges.png", plot = RQ_cwm_comb_figure, path = "Figures")
 ```
