@@ -507,7 +507,7 @@ knitr::include_graphics("C:\\Users\\imke6\\Documents\\PhD 2025\\Ch1 Drakensberg 
 
 We used both null models to test how assembly mechanisms vary along elevation and micro-environmental gradients. The site shuffle model swaps the occurrences of each species across cells, such that the richness of each cell, the frequency of species, and species total cover stays the same as in the observed matrix. The total vegetation cover within cells, and the identity of species occurring in each cell are allowed to deviate from the observed data. Thus, we can determine whether the species composition of a cell is random compared to a scenario where all species can occur in any cell, after controlling for richness and the commonness (frequency in the matrix and total cover) of species. This null model is appropriate to detect environmental filtering because it allows species to occur in cells where they are not present in the observed dataset [@gotzenberger_which_2016]. We built two categories of site shuffle model algorithms: The "regional site shuffle model" selected species from the entire species pool to fill the null matrix. Thus, even species exclusive to one site in the observed matrix can occur at any site in the null matrix (@fig-nullmodel). This model is appropriate to detect differences in environmental filtering between sites, i.e., filtering by macro-environmental differences at the scale of the elevation gradient. In the "local site shuffle model" we restricted the species pool such that the null model fills the matrix from to the site-level species pool (@fig-nullmodel). This model is appropriate to detect environmental filtering at the scale of one site, allowing us to determine whether micro-environmental conditions act as additional filters after the effect of macro-environment.
 
-The species shuffle model swaps the cover values of species in cells, keeping the richness and total cover of cells constant (@fig-nullmodel). The frequency and total cover of species, and the identity of species in each cell are allowed to deviate from the observed matrix. In this null model, the link between a species' mean trait value and its abundance is not maintained. Because species' traits are understood to be linked to their competitive ability and abundance, this null model test whether assembly is random compared to a community where species' traits do not determine their abundance, while controlling for the total vegetation cover and richness of cells [@gotzenberger_which_2016]. In other words, this null model asks whether the observed community is similar to one where co-occurring, abundant species may have similar or weakly competitive traits. It is recommended that the effect of environmental filtering be removed when testing for limiting similarity [@gotzenberger_which_2016], therefore, we only built a species shuffle algorithm that selects species from the site-level species pool (@fig-nullmodel). This null model is appropriate to test whether there are differences in limiting similarity between sites, only considering each site individually and the species that have passed through the macro-environmental filter. It is also appropriate to test whether there are differences in similarity between the cells at each site.
+The species shuffle model swaps the cover values of species in cells, keeping the richness and total cover of cells constant (@fig-nullmodel). The frequency and total cover of species, and the identity of species in each cell are allowed to deviate from the observed matrix. In this null model, the link between a species' mean trait value and its abundance is not maintained. Because species' traits are understood to be linked to their competitive ability and abundance, this null model tests whether assembly is random compared to a community where species' traits do not determine their abundance, while controlling for the total vegetation cover and richness of cells [@gotzenberger_which_2016]. In other words, this null model asks whether the observed community is similar to one where co-occurring, abundant species may have similar or weakly competitive traits. It is recommended that the effect of environmental filtering be removed when testing for limiting similarity [@gotzenberger_which_2016], therefore, we only built a species shuffle algorithm that selects species from the site-level species pool (@fig-nullmodel). This null model is appropriate to test whether there are differences in limiting similarity between sites, only considering each site individually and the species that have passed through the macro-environmental filter. It is also appropriate to test whether there are differences in similarity between the cells at each site.
 
 To determine whether functional diversity is higher or lower than expected from random assembly, we calculated the standard effect size [SES, @gotelli2002] of RaoQ as a measure of deviance between the observed matrix and null model. SES is calculated as:
 
@@ -517,13 +517,13 @@ $$
 
 Where $RaoQ_{observed}$ is the observed RaoQ in a cell; $\mu{RaoQ_{null}}$ is the mean of RaoQ from 999 null models, and $\sigma{RaoQ_{null}}$ is the standard deviation of RaoQ from 999 null models. If SES \>0, functional diversity is higher than expected under null assembly, and it is interpreted as a signal of limiting similarity. If SES \< 0, functional diversity is lower than expected under null assembly, and it is interpreted as a signal of habitat filtering. SES was calculated for all four plant traits (height, LA, SLA and LDMC), using the regional site shuffle model, the local site shuffle model and the local species shuffle model to investigate the effect of elevation and micro-environmental conditions on community assembly.
 
-To determine whether community assembly varies with elevation, linear mixed-effect models were used with the SES of each trait from the regional site shuffle model and local species shuffle model as response variables, and elevation as a predictor. To determine whether micro-environmental variables were related to fine-scale variation in community assembly, separate linear mixed-effect models were built for each trait and each site. The SES of each trait from the local site shuffle model and the local species shuffle model were the response variables, and the following micro-environmental measurements were included as predictors: soil temperature, soil moisture, rock cover, mean soil depth and surface heterogeneity. Predictor variables were standardised to a mean of zero and unit variance prior to modelling. In all analyses, grid was added as a random effect, and a spherical correlation structure was used to account for the spatial autocorrelation between the cells of each grid. To improve the distribution of the model residuals, SES was calculated with the natural log of height, LDMC, and LA in the elevation model, and the natural log of LDMC in the micro-environmental model. Modelling was performed using the nlme package [@pinheiro2025].
+To determine whether community assembly varies with elevation, linear mixed-effect models were used with the SES of each trait from the regional site shuffle model and local species shuffle model as response variables, and elevation as a predictor. To determine whether micro-environmental variables were related to fine-scale variation in community assembly, separate linear mixed-effect models were built for each trait and each site. The SES of each trait from the local site shuffle model and the local species shuffle model were the response variables, and the following micro-environmental measurements were included as predictors: soil temperature, soil moisture, rock cover, mean soil depth and the coefficient of variation of soil depth. Predictor variables were standardised to a mean of zero and unit variance prior to modelling. In all analyses, grid was added as a random effect, and a spherical correlation structure was used to account for the spatial autocorrelation between the cells of each grid. To improve the distribution of the model residuals, SES was calculated with the natural log of height, LDMC, and LA in the elevation model, and the natural log of LDMC in the micro-environmental model. Modelling was performed using the nlme package \[@pinhei
 
 To investigate the direction in which traits are filtered, the community-weighted mean (CWM) traits of each cell was calculated with the FD package [@laliberté2014]. A linear mixed effect model with grid as a random effect and a spherical correlation structure was used to determine how CWM varies with elevation. All analyses were performed in R 4.5.2 [@rcoreteam2025].
 
 # Results
 
-No trait showed a shift from divergence to convergence with elevation as predicted by the SDH. Instead, functional convergence was often detected at the low or mid elevation, and functional diversity was often no different from the null expectation at high elevation. The trends in the mean SES from the regional site shuffle model largely corresponded to the trends in the local species shuffle model, although the regional site shuffle model sometimes detected significant divergence where the local species shuffle model did not. Models with SES from the regional site shuffle model performed better (marginal R$^2$ ranging between 0.026 - 0.285) than models with SES from the local species shuffle model (marginal R$^2$ ranging between 0.006 - 0.041) as response variable (Appendix @tbl-ele-model-results).
+No trait showed a shift from divergence to convergence with elevation as predicted by the SDH. Instead, functional convergence was often detected at the low or mid elevation, and functional diversity was often no different from the null expectation at high elevation. The trends in the mean SES from the regional site shuffle model largely corresponded to the trends in the local species shuffle model, although the regional site shuffle model sometimes detected significant divergence where the local species shuffle model did not. Models of SES predicted by elevation from the regional site shuffle model performed better (marginal R$^2$ ranging between 0.026 - 0.285) than models with SES from the local species shuffle model (marginal R$^2$ ranging between 0.006 - 0.041) as response variable (Appendix @tbl-ele-model-results).
 
 Plant height and LDMC showed a shift from functional convergence to divergence with elevation in the regional site shuffle model (@fig-SES-elevation-ridges). However, this divergence was not detected by the local species shuffle model. Therefore, we deduce that the functional diversity of height and LDMC is no different from random at the high site. The CWM plant height decreased with elevation, indicating a filtering effect toward taller plants at the low elevation (@fig-RaoQ-CWM-ridges). The CWM of LDMC showed a hump-shaped relationship with elevation, indicating that high LDMC values are selected for at the low elevation, and lower LDMC values at the mid elevation (@fig-RaoQ-CWM-ridges).
 
@@ -823,7 +823,7 @@ median_height <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.
 
 ```{r}
 #| label: fig-RaoQ-CWM-ridges
-#| fig-cap: "Density distributions of Community-weighted mean (CWM) and RaoQ of plant traits.The units of the CWM of traits and RaoQ are as follows: plant height = cm, leaf area (LA) = mm$^2$, leaf dry matter content (LDMC) = mg.g$^{-1}$, and specific leaf area (SLA) = mm$^2$.mg$^{-1}$. RaoQ is unitless. Height, LDMC and leaf area are on the log scale. Points with error bars show the mean and 95% confidence interval of the CWM or RaoQ at each elevation. Letters indicate significant differences between the CWM or RaoQ of different elevations."
+#| fig-cap: "Density distributions of Community-weighted mean (CWM) and RaoQ of plant traits.The units of the CWM of traits and RaoQ are as follows: plant height = cm, leaf area (LA) = mm$^2$, leaf dry matter content (LDMC) = mg.g$^{-1}$, and specific leaf area (SLA) = mm$^2$.mg$^{-1}$. The CWM of Height, LDMC and leaf area are on the log scale. Points with error bars show the mean and 95% confidence interval of the CWM or RaoQ at each elevation. Letters indicate significant differences between the CWM or RaoQ of different elevations."
 #| warning: false
 #| message: false
 #| echo: false
@@ -879,23 +879,23 @@ GG_microenv_results <- expand_grid(null_model = c("C5", "C2"),
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
                          variable = c("temp", "moist", "rock", "depth", "het", "depth CV")) |> 
   mutate(
-    coefficient = c(C5_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:7], 
-    C5_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:7], 
-    C5_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:7], 
-    C5_SES_microenv_summary$SLA_GG$coefficients$fixed[2:7],
-    C2_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:7], 
-    C2_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:7], 
-    C2_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:7], 
-    C2_SES_microenv_summary$SLA_GG$coefficients$fixed[2:7]), 
+    coefficient = c(C5_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6],
+    C2_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$log_LDMC_GG$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$SLA_GG$coefficients$fixed[2:6]), 
 
-    std_error = c(C5_SES_microenv_summary$Height_cm_GG$tTable[2:7,2], 
-    C5_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:7,2], 
-    C5_SES_microenv_summary$log_LDMC_GG$tTable[2:7,2], 
-    C5_SES_microenv_summary$SLA_GG$tTable[2:7,2],
-    C2_SES_microenv_summary$Height_cm_GG$tTable[2:7,2], 
-    C2_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:7,2], 
-    C2_SES_microenv_summary$log_LDMC_GG$tTable[2:7,2], 
-    C2_SES_microenv_summary$SLA_GG$tTable[2:7,2])) |>  
+    std_error = c(C5_SES_microenv_summary$Height_cm_GG$tTable[2:6,2], 
+    C5_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:6,2], 
+    C5_SES_microenv_summary$log_LDMC_GG$tTable[2:6,2], 
+    C5_SES_microenv_summary$SLA_GG$tTable[2:6,2],
+    C2_SES_microenv_summary$Height_cm_GG$tTable[2:6,2], 
+    C2_SES_microenv_summary$Leaf_area_mm2_GG$tTable[2:6,2], 
+    C2_SES_microenv_summary$log_LDMC_GG$tTable[2:6,2], 
+    C2_SES_microenv_summary$SLA_GG$tTable[2:6,2])) |>  
     mutate(
     lower_ci = coefficient - 1.96*std_error, 
     upper_ci = coefficient + 1.96*std_error)
@@ -904,23 +904,23 @@ WH_microenv_results <- expand_grid(null_model = c("C5", "C2"),
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
                          variable = c("temp", "moist", "rock", "depth", "het", "depth CV")) |> 
   mutate(
-    coefficient = c(C5_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:7], 
-    C5_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:7], 
-    C5_SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:7], 
-    C5_SES_microenv_summary$SLA_WH$coefficients$fixed[2:7],
-    C2_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:7], 
-    C2_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:7], 
-    C2_SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:7], 
-    C2_SES_microenv_summary$SLA_WH$coefficients$fixed[2:7]), 
+    coefficient = c(C5_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$SLA_WH$coefficients$fixed[2:6],
+    C2_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$log_LDMC_WH$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$SLA_WH$coefficients$fixed[2:6]), 
 
-    std_error = c(C5_SES_microenv_summary$Height_cm_WH$tTable[2:7,2], 
-    C5_SES_microenv_summary$Leaf_area_mm2_WH$tTable[2:7,2], 
-    C5_SES_microenv_summary$log_LDMC_WH$tTable[2:7,2], 
-    C5_SES_microenv_summary$SLA_WH$tTable[2:7,2],
-    C2_SES_microenv_summary$Height_cm_WH$tTable[2:7,2], 
-    C2_SES_microenv_summary$Leaf_area_mm2_WH$tTable[2:7,2], 
-    C2_SES_microenv_summary$log_LDMC_WH$tTable[2:7,2], 
-    C2_SES_microenv_summary$SLA_WH$tTable[2:7,2])) |>  
+    std_error = c(C5_SES_microenv_summary$Height_cm_WH$tTable[2:6,2], 
+    C5_SES_microenv_summary$Leaf_area_mm2_WH$tTable[2:6,2], 
+    C5_SES_microenv_summary$log_LDMC_WH$tTable[2:6,2], 
+    C5_SES_microenv_summary$SLA_WH$tTable[2:6,2],
+    C2_SES_microenv_summary$Height_cm_WH$tTable[2:6,2], 
+    C2_SES_microenv_summary$Leaf_area_mm2_WH$tTable[2:6,2], 
+    C2_SES_microenv_summary$log_LDMC_WH$tTable[2:6,2], 
+    C2_SES_microenv_summary$SLA_WH$tTable[2:6,2])) |>  
     mutate(
     lower_ci = coefficient - 1.96*std_error, 
     upper_ci = coefficient + 1.96*std_error)
@@ -929,23 +929,23 @@ BK_microenv_results <- expand_grid(null_model = c("C5", "C2"),
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
                          variable = c("temp", "moist", "rock", "depth", "het", "depth CV")) |> 
   mutate(
-    coefficient = c(C5_SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:7], 
-    C5_SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:7], 
-    C5_SES_microenv_summary$log_LDMC_BK$coefficients$fixed[2:7], 
-    C5_SES_microenv_summary$SLA_BK$coefficients$fixed[2:7],
-    C2_SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:7], 
-    C2_SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:7], 
-    C2_SES_microenv_summary$log_LDMC_BK$coefficients$fixed[2:7], 
-    C2_SES_microenv_summary$SLA_BK$coefficients$fixed[2:7]), 
+    coefficient = c(C5_SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$log_LDMC_BK$coefficients$fixed[2:6], 
+    C5_SES_microenv_summary$SLA_BK$coefficients$fixed[2:6],
+    C2_SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$log_LDMC_BK$coefficients$fixed[2:6], 
+    C2_SES_microenv_summary$SLA_BK$coefficients$fixed[2:6]), 
 
-    std_error = c(C5_SES_microenv_summary$Height_cm_BK$tTable[2:7,2], 
-    C5_SES_microenv_summary$Leaf_area_mm2_BK$tTable[2:7,2], 
-    C5_SES_microenv_summary$log_LDMC_BK$tTable[2:7,2], 
-    C5_SES_microenv_summary$SLA_BK$tTable[2:7,2],
-    C2_SES_microenv_summary$Height_cm_BK$tTable[2:7,2], 
-    C2_SES_microenv_summary$Leaf_area_mm2_BK$tTable[2:7,2], 
-    C2_SES_microenv_summary$log_LDMC_BK$tTable[2:7,2], 
-    C2_SES_microenv_summary$SLA_BK$tTable[2:7,2])) |>  
+    std_error = c(C5_SES_microenv_summary$Height_cm_BK$tTable[2:6,2], 
+    C5_SES_microenv_summary$Leaf_area_mm2_BK$tTable[2:6,2], 
+    C5_SES_microenv_summary$log_LDMC_BK$tTable[2:6,2], 
+    C5_SES_microenv_summary$SLA_BK$tTable[2:6,2],
+    C2_SES_microenv_summary$Height_cm_BK$tTable[2:6,2], 
+    C2_SES_microenv_summary$Leaf_area_mm2_BK$tTable[2:6,2], 
+    C2_SES_microenv_summary$log_LDMC_BK$tTable[2:6,2], 
+    C2_SES_microenv_summary$SLA_BK$tTable[2:6,2])) |>  
     mutate(
     lower_ci = coefficient - 1.96*std_error, 
     upper_ci = coefficient + 1.96*std_error)
