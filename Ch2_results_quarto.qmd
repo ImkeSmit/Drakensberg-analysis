@@ -877,7 +877,7 @@ Micro-environmental factors were weakly related to fine-scale variation in commu
 #Create tables of coeffieicents for each site, it is easier to manage this way
 GG_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
-                         variable = c("temp", "moist", "rock", "depth", "het", "depth CV")) |> 
+                         variable = c("temp", "moist", "rock", "depth", "depth CV")) |> 
   mutate(
     coefficient = c(C5_SES_microenv_summary$Height_cm_GG$coefficients$fixed[2:6], 
     C5_SES_microenv_summary$Leaf_area_mm2_GG$coefficients$fixed[2:6], 
@@ -902,7 +902,7 @@ GG_microenv_results <- expand_grid(null_model = c("C5", "C2"),
 
 WH_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
-                         variable = c("temp", "moist", "rock", "depth", "het", "depth CV")) |> 
+                         variable = c("temp", "moist", "rock", "depth", "depth CV")) |> 
   mutate(
     coefficient = c(C5_SES_microenv_summary$Height_cm_WH$coefficients$fixed[2:6], 
     C5_SES_microenv_summary$Leaf_area_mm2_WH$coefficients$fixed[2:6], 
@@ -927,7 +927,7 @@ WH_microenv_results <- expand_grid(null_model = c("C5", "C2"),
 
 BK_microenv_results <- expand_grid(null_model = c("C5", "C2"), 
                          trait = c("Height_cm", "Leaf_area_mm2", "LDMC", "SLA"),
-                         variable = c("temp", "moist", "rock", "depth", "het", "depth CV")) |> 
+                         vvariable = c("temp", "moist", "rock", "depth", "depth CV")) |> 
   mutate(
     coefficient = c(C5_SES_microenv_summary$Height_cm_BK$coefficients$fixed[2:6], 
     C5_SES_microenv_summary$Leaf_area_mm2_BK$coefficients$fixed[2:6], 
