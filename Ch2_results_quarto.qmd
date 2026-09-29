@@ -1057,7 +1057,7 @@ We expected that leaf economic traits would increasingly converge toward "slow" 
 
 Micro-environmental variation had weak and inconsistent relationships with functional convergence or divergence, challenging the perception that microclimate and microtopography acts as an additional filter in community assembly. The lack of relationship between trait diversity patterns and other micro-environmental variables may suggest that we did not sample broad enough environmental gradients, or that we did not measure variables at biologically relevant scales. However, our sampling design inherently maximised the micro-environmental variation sampled, and we observed large variation in micro-environmental variables over short distances (Appendix @fig-env-heterogeneity). The scale at which assembly processes function are influenced by the size of individuals [@mcnickle2018]. Along this elevation gradient, the median height of species was `r round(median_height$median_height, digits = 2)`cm, and the median foliar cover c. `r median_cover$median_cover`% (i.e. $\le 100 cm^2$). Therefore, we believe that the sampling resolution of our study, i.e. 1$m^2$, should reasonably be the scale at which micro-environmental conditions and species interactions influence composition. This falls within the range of 0.5 - 1.5 $m^2$ at which assembly processes were found to function in the Canadian prairie [@mcnickle2018].
 
-It is possible that micro-environmental variables have little effect on community composition, and that, instead, coexistence in these montane grasslands is driven more strongly by stochastic processes at the 1$m^2$ scale. Although species exhibit different functional characteristics, these differences may not matter in influencing their abundance or occurrence. Such ecological equivalence is more likely to be present in highly diverse communities where species have poor dispersal ability, as inferior competitor species may establish at a site simply because a superior competitor did not arrive there [@hubbell2006]. It is thus possible that species within an elevational band have broad tolerances to micro-environmental variation, and do not exclusively occupy certain microhabitats.
+It is possible that micro-environmental variables have little effect on community composition, and that, instead, fine-scale coexistence in these montane grasslands is driven more strongly by stochastic processes at the 1$m^2$ scale. Although species exhibit different functional characteristics, these differences may not matter in influencing their abundance or occurrence. Such ecological equivalence is more likely to be present in highly diverse communities where species have poor dispersal ability, as inferior competitor species may establish at a site simply because a superior competitor did not arrive there [@hubbell2006]. It is thus possible that species within an elevational band have broad tolerances to micro-environmental variation, and do not exclusively occupy certain microhabitats.
 
 Overall, macroclimate drives differences in community assembly in Drakensberg montane grasslands, while micro-environmental variables have little effect. The effect of macroclimate did not agree with the predictions of the SDH, with no trait showing a trend toward increasing convergence with elevation. Trait convergence was often detected at low elevation, likely driven by competitive filtering [@mayfield2010]. The perception that the composition and functional characteristics of high altitude communities are predominantly shaped by environmental stress toward convergent strategies may warrant reconsideration. Plants native to alpine areas may not necessarily be "limited" by extreme climatic conditions, since they evolved adaptations to survive in these environments [@körner2003]. These adaptations may be diverse resulting in high functional trait diversity in alpine systems.
 
@@ -1115,7 +1115,7 @@ weather_comb
 #| echo: false
 #| results: false
 #| label: fig-env-heterogeneity
-#| fig-cap: Scatterplot showing how micro-environmental variables vary with distance in the grids. The filled symbols show the maximum difference in a micro-environmental variable between cells at increasing distances from each other. The empty symbols show the mean difference in a micro-environmental variable between cells at increasing distances from each other. Differences are absolute values. Mean and maximum differences were calculated accross all grids in all sites. 
+#| fig-cap: Scatterplot showing how micro-environmental variables vary with distance in the sampling grids. The filled symbols show the maximum difference in a micro-environmental variable between cells at increasing distances from each other. The empty symbols show the mean difference in a micro-environmental variable between cells at increasing distances from each other. Differences are absolute values. Mean and maximum differences were calculated accross all grids in all sites. 
 
 #import microenvironmental data containing x and y coordinates
 pos <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
@@ -1281,7 +1281,7 @@ diff_summary |>
 
 ```{r}
 #| label: tbl-ele-model-results
-#| tbl-cap: Model results from linear mixed effect models models testing the SDH. Tests were performed with SES calculated from the local site shuffle and C2 null model for each trait. The F ratio and p value test the hypothesis that there is no difference between the mean SES of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
+#| tbl-cap: Model results from linear mixed effect models models testing the SDH. Tests were performed with SES calculated from the local site shuffle and local species shuffle model for each trait. The F ratio and p value test the hypothesis that there is no difference between the mean SES of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
 #| message: false
 #| echo: false
 
@@ -1332,7 +1332,7 @@ ele_results_table
 
 ```{r}
 #| label: tbl-ele-RaoQ-CWM-results
-#| tbl-cap: Model results from linear mixed effect models testing whether the RoaQ and CWM of traits vary with elevation. The F ratio and p value test the hypothesis that there is no difference between the mean of cell-level CWM or RaoQ of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
+#| tbl-cap: Model results from linear mixed effect models testing whether the RaoQ and CWM of traits vary with elevation. The F ratio and p value test the hypothesis that there is no difference between the mean of cell-level CWM or RaoQ of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
 #| message: false
 #| echo: false
 
