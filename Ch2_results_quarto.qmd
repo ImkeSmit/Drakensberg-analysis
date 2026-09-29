@@ -825,8 +825,8 @@ median_height <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.
 #| warning: false
 #| message: false
 #| echo: false
-#| fig-width: 6
-#| fig-height: 4
+#| fig-width: 6.5
+#| fig-height: 7
 
 l1 <- c("log_Height" = "ln(Plant height)", "SLA" = "SLA", "log_LDMC" = "ln(LDMC)", "log_LA" = "ln(LA)", "CWM" = "CWM", "RaoQ" = "RaoQ")
 
@@ -1025,12 +1025,12 @@ allsites_microenv_plot <- microenv_dat_all |>
   scale_color_manual(values = c("C5" = "darkorange", "C2" = "darkcyan"), 
                      labels = c("C5" = "Local site\nshuffle model", "C2" = "Local species\nshuffle model"))+
   geom_vline(xintercept = 0, linetype = "dashed")+
-  geom_text(aes(x = 0.5, y = variable, label = sign),
+  geom_text(aes(x = 0.4, y = variable, label = sign),
             size = 5, position = position_dodge(width = 0.5), 
             show.legend = FALSE)+
   facet_grid(site~trait,
              labeller = as_labeller(l1, default = label_parsed)) +
-  xlim(-0.3,0.5)+
+  xlim(-0.3,0.4)+
   scale_x_continuous(breaks = c(-0.3,0,0.3)) +
   theme_bw() +
   labs(y = " ", x = "Slope estimate", color = "Null model") +
