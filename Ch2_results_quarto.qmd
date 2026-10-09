@@ -867,7 +867,7 @@ Micro-environmental factors were weakly related to fine-scale variation in commu
 
 ```{r}
 #| label: fig-allsites-microenv_C5_C2
-#| fig-cap: Effects of microenvironmental variables on assembly of traits at the mid site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait and each null model. Positive coefficients indicate that the variable is related to higher than expected trait divergence, while negative coefficients indicate that the variable is related to higher than expected trait convergence. Stars indicate significant relationships. Marginal R$^2$ (R$^2$m) values for each model (with SES from the C5 null model as response variable in black, and SES from the C2 null model as response variable in grey) are shown in the top left corner of each pane. Mean SES significantly lower than 0 in the local site shuffle model indicates significant trait convergence/environmental filtering. Mean SES significantly higher than 0 in the C2 site pool model indicates significant trait divergence/limiting similarity.
+#| fig-cap: Effects of microenvironmental variables on assembly of traits at the low,mid and high site. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait and each null model. Coefficients indicating significant relationships with p < 0.05 and mean SES < 0 in the local site shuffle model, and SES > 0 in the local species shuffle model are shown as opaque symbols. Coefficients indicating nonsignificant (p > 0.05) or non-meaningful relationships (mean SES > 0 in the local site shuffle model or mean SES < 0 in the local species shuffle model) are shown with transparent symbols. Mean SES significantly lower than 0 in the local site shuffle model indicates significant trait convergence/environmental filtering. Mean SES significantly higher than 0 in the local species shuffle model indicates significant trait divergence/limiting similarity.
 #| echo: false
 #| warning: false
 #| message: false
@@ -956,7 +956,8 @@ allsites_microenv <- bind_rows(GG_microenv_results, WH_microenv_results, BK_micr
   mutate(site = c(rep("low", nrow(GG_microenv_results)), rep("mid", nrow(WH_microenv_results)), rep("high", nrow(BK_microenv_results))), 
          site = factor(site, levels = c("low", "mid", "high"))) |> 
   mutate(sign = if_else(lower_ci < 0 & upper_ci > 0," ", "*")) |> 
-  relocate(sign, .after = variable)
+  mutate(transparency = if_else(null_model == "C5" & coefficient < 0 & sign == "*", "focus", if_else(null_model == "C2" & coefficient >0 & sign == "*", "focus", "background"))) |> 
+  relocate(sign, .after = variable) 
 
 write.csv(allsites_microenv, "All_data/comm_assembly_results/SES_microenv_model_results_table.csv")
 
@@ -1019,17 +1020,18 @@ microenv_dat_all <- C2_R2_table_long |>
 #Plot
 l1 <- c("Height_cm" = "Plant~height", "SLA" = "SLA", "LDMC" = "LDMC", "Leaf_area_mm2" = "LA", "low" = "low", "mid" = "mid", "high" = "high")
 allsites_microenv_plot <- microenv_dat_all |> 
-  ggplot(aes(x = coefficient, y = variable, color = null_model)) +
+  ggplot(aes(x = coefficient, y = variable, color = null_model, alpha = transparency)) +
   geom_point(position = position_dodge(width = 0.5)) +
   geom_errorbar(aes(xmin = lower_ci, xmax = upper_ci), width = 0, 
                 position = position_dodge(width = 0.5), 
                 orientation = "y")+
   scale_color_manual(values = c("C5" = "darkorange", "C2" = "darkcyan"), 
                      labels = c("C5" = "Local site\nshuffle model", "C2" = "Local species\nshuffle model"))+
+  scale_alpha_manual(values = c("background" = 0.2, "focus" = 1), guide = "none") +
   geom_vline(xintercept = 0, linetype = "dashed")+
-  geom_text(aes(x = 0.5, y = variable, label = sign),
-            size = 5, position = position_dodge(width = 0.5), 
-            show.legend = FALSE)+
+  #geom_text(aes(x = 0.5, y = variable, label = sign),
+  #          size = 5, position = position_dodge(width = 0.5), 
+  #          show.legend = FALSE)+
   facet_grid(site~trait,
              labeller = as_labeller(l1, default = label_parsed)) +
   xlim(-0.3,0.5)+
