@@ -529,7 +529,7 @@ Plant height and LDMC showed a shift from functional convergence to divergence w
 
 SLA showed functional convergence at all elevations in the regional site shuffle model, and no divergence in the local species shuffle model (@fig-SES-elevation-ridges). However, functional convergence was weaker (@fig-SES-elevation-ridges) and functional diversity was higher at the mid elevation (@fig-RaoQ-CWM-ridges). The direction of the filtering effect was hump-shaped, with high SLA values selected for at the mid elevation but low SLA values at the low and high elevation (@fig-RaoQ-CWM-ridges).
 
-The assembly of LA was not affected by elevation, with the diversity of LA being no different from the random expectation at all three sites (@fig-SES-elevation-ridges). The functional diversity of LA did not change with elevation (@fig-RaoQ-CWM-ridges), although the CWM of LA was higher at the mid site than at the low and high site (@fig-RaoQ-CWM-ridges).
+The assembly of LA was not affected by elevation, with the diversity of LA being no different from the random expectation at all three sites in both null models (@fig-SES-elevation-ridges). The functional diversity of LA did not change with elevation (@fig-RaoQ-CWM-ridges), although the CWM of LA was higher at the mid site than at the low and high site (@fig-RaoQ-CWM-ridges).
 
 ```{r}
 #| message: false
@@ -830,7 +830,7 @@ median_height <- read.csv("All_data/comm_assembly_results/mean_traits.csv", row.
 #| fig-width: 6.5
 #| fig-height: 7
 
-l1 <- c("log_Height" = "ln(Plant height)", "SLA" = "SLA", "log_LDMC" = "ln(LDMC)", "log_LA" = "ln(LA)", "CWM" = "CWM", "RaoQ" = "RaoQ")
+l1 <- c("log_Height" = "Plant height", "SLA" = "SLA", "log_LDMC" = "LDMC", "log_LA" = "LA", "CWM" = "CWM", "RaoQ" = "RaoQ")
 
 RQ_cwm_comb_figure <- combo_long |>
   filter(trait %in% c("log_Height", "SLA", "log_LDMC", "log_LA")) |> 
