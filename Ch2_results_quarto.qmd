@@ -616,7 +616,7 @@ SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
   facet_grid(trait~model, labeller = as_labeller(l1), scale = "free_x")+
   labs(x = "SES", y = "Elevation (m a.s.l.)") +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  geom_text(data = letters_comb, aes(x = x_pos, y = elevation, label = letters, size = 16))+
+  geom_text(data = letters_comb, aes(x = x_pos, y = elevation, label = letters), size = 12)+
   geom_point(
     data = letters_comb,
     aes(x = emmean, y = as.numeric(elevation), color = sign),
