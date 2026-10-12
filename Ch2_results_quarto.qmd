@@ -35,6 +35,14 @@ library(ggh4x)
 conflict_prefer_all("tidylog", quiet = TRUE)
 ```
 
+# Abstract
+
+Understanding what drives community assembly is a central goal of ecology. The assembly of plant communities is understood to be shaped by differences in the macro- and micro-environmental conditions. Macro-environmental conditions may act as a filter, selecting species with optimum niche characteristics for survival, or promote the coexistence of species divergent niches. Local, micro-environmental conditions are expected to further sort species according to their local habitat preferences. Here we investigate the role of macro- and micro-environmental characteristics in the assembly of grassland plant communities. We use a functional trait approach to gain insight into the assembly mechanism, with
+
+# Key words
+
+Community assembly, elevation gradient, functional diversity, grassland, Maloti-Drakensberg, montane.
+
 # Introduction
 
 Community assembly, the process by which species from a regional pool assemble to form local communities, has long been a core focus of ecology [@hillerislambers_rethinking_2012; @diamond_assembly_1975; @weiher_community_1998]. The question of what determines which species coexist stands central to many contemporary research areas in ecology such as predicting species richness or predicting compositional change in response to climate change. Community composition is understood to be shaped by environmental conditions, interactions with other plant species, neutral processes, or a combination of all three [@gotzenberger_ecological_2012]. Environmental conditions may exclude species from the regional pool that are able to disperse to a site, but not survive the environmental conditions [environmental filtering, @kraft_community_2015]. Other species may influence community composition through competition, which should exclude species with similar niches and lead to the coexistence of species with divergent niches [limiting similarity, @macarthur1967]. However, competition may also lead to the coexistence of species with similar niches if species differ primarily in their competitive ability, and there is one trait that confers strong competitive dominance. In this case, species with weak competitive ability will be excluded, leading to the coexistence of species with similar traits [@mayfield2010]. Neutral assembly processes refer to stochastic forces that govern the composition of communities [@hubbell2001]. Under this assembly mechanism, all species are considered equally good competitors, and have an equal probability of entering the community should an individual die [@hubbell2001; @hubbell2006].
@@ -1062,6 +1070,22 @@ Micro-environmental variation had weak and inconsistent relationships with funct
 It is possible that micro-environmental variables have little effect on community composition, and that, instead, fine-scale coexistence in these montane grasslands is driven more strongly by stochastic processes at the 1$m^2$ scale. Similar patterns were observed in stream insect communities along an elevation gradient in China [@zhou2026]. The thermal niches of taxa, calculated from gridded climate data, drove their distribution along the elevation gradient. The local conditions that species occupy in streams were not related to the local abundance of taxa, suggesting that stochastic processes shapes composition within streams [@zhou2026]. Although species exhibit different functional characteristics, these differences may not matter in influencing their local abundance or occurrence [@hubbell2001; @hubbell2006]. Such ecological equivalence is more likely to be present in highly diverse communities where species have poor dispersal ability, as inferior competitor species may establish at a site simply because a superior competitor did not arrive there [@hubbell2006]. It is thus possible that species within an elevational band have broad tolerances to micro-environmental variation, and do not have strong preferences for certain microhabitats.
 
 Overall, macroclimate drives differences in community assembly in Drakensberg montane grasslands, while micro-environmental variables have little effect. The effect of macroclimate did not agree with the predictions of the SDH, with no trait showing a trend toward increasing convergence with elevation. Trait convergence was often detected at low elevation, likely driven by competitive filtering [@mayfield2010]. The perception that the composition and functional characteristics of high altitude communities are predominantly shaped by environmental stress toward convergent strategies may warrant reconsideration. Plants native to alpine areas may not necessarily be "limited" by extreme climatic conditions, since they evolved adaptations to survive in these environments [@körner2003]. These adaptations may be diverse resulting in high functional trait diversity in alpine systems.
+
+# Acknowledgements
+
+The data collection at Witsieshoek was conducted with a research permit from the Free State
+Department of Economic, Small Business Development, Tourism and Environmental Affairs
+(DESTEA, permit number 202108000007627), and with permission from the Batlokoa Royal House.
+The data collection in the Golden Gate Highlands National Park was conducted under a research
+agreement with South African National Parks (Agreement SS225). Data collection in the Bokong
+Nature Reserve was done under a research agreement with the Lesotho Ministry of Tourism,
+Environment and Culture. The authors acknowledge the support from the staff at the Witsieshoek Mountain lodge and the leadership of the Batlokoa royal house in conducting fieldwork at Witsieshoek. We thank Mrs. Potia Mathibela for support with field logistics. We are grateful to Vigdis Vandvik and Richard Telford for advice on statistical analyses.
+
+# Funding source acknowledgements
+
+Data collection for this project was funded by the National Research Foundation (NRF) of South Africa
+through the Competitive Programme for Rated Researchers to Prof. Peter le Roux (grant number
+129334). ICS was funded through a Doctoral Research bursary from the University of Pretoria.
 
 # References
 
