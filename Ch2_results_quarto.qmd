@@ -1294,7 +1294,8 @@ difference_plot <- ggplot(diff_summary) +
   scale_shape_manual(name = " ", values = c("Maximum difference" = 16, "Mean difference"= 21))+
   xlab("Distance (m)")+
   ylab("Absolute value of the difference")+
-  theme_classic()
+  theme_classic() +
+  theme(legend.position = "bottom")
 
 difference_plot
 
