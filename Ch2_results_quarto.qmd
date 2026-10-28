@@ -624,7 +624,8 @@ models_comb <- C5_dat |> bind_rows(C2_dat) |>
 
 
 letters_comb <- C5_ridges_letters |> bind_rows(C2_ridges_letters)|> 
-  mutate(model = factor(model, levels = c("C5 entire pool", "C2 site pool")))
+  mutate(model = factor(model, levels = c("C5 entire pool", "C2 site pool"))) |> 
+  mutate(transparency = if_else(model == "C5 entire pool" & emmean < 0 & sign == "significant", "focus", if_else(model == "C2 site pool" & emmean >0 & sign == "significant", "focus", "background")))
 
 
 l1 <- c("log_Height" = "Plant height", "SLA" = "SLA", "log_LDMC" = "LDMC", "log_LA" = "LA", "C5 entire pool" = "Regional site\nshuffle model", 
@@ -637,7 +638,7 @@ SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
   geom_text(data = letters_comb, aes(x = x_pos, y = elevation, label = letters), size = 5)+
   geom_point(
     data = letters_comb,
-    aes(x = emmean, y = as.numeric(elevation), shape = sign),
+    aes(x = emmean, y = as.numeric(elevation), shape = transparency),
     size = 2, inherit.aes = FALSE) +
   geom_errorbarh(
     data = letters_comb, linewidth = 0.5,
@@ -646,7 +647,7 @@ SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
         y = as.numeric(elevation)),
     height = 0.08,
     linewidth = 1, inherit.aes = FALSE)+
-  scale_shape_manual(values = c("no" = 1,"significant" = 16))+
+  scale_shape_manual(values = c("background" = 1,"focus" = 16))+
   #scale_color_manual(values = c("no" ="black","significant" = "red")) +
   scale_fill_manual(values = c("C5 entire pool" = "darkorange", "C2 site pool" = "darkcyan")) +
   theme_bw() +
