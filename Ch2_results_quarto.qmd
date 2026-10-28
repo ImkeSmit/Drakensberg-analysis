@@ -641,7 +641,7 @@ SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
     aes(x = emmean, y = as.numeric(elevation), shape = transparency),
     size = 2, inherit.aes = FALSE) +
   geom_errorbarh(
-    data = letters_comb, linewidth = 0.5,
+    data = letters_comb, linewidth = 0.7,
     aes(xmin = lower_ci,
         xmax = upper_ci,
         y = as.numeric(elevation)),
@@ -713,10 +713,10 @@ raoq_ridges_letters <- tibble(trait = c(rep("log_Height", 3), rep("SLA", 3), rep
                                          RaoQ_ele_cld$SLA$.group, 
                                          RaoQ_ele_cld$log_LDMC$.group, 
                                          RaoQ_ele_cld$log_LA$.group), 
-                             x_pos = c(2.2,2.2,2.2,
+                             x_pos = c(3,3,3,
                                        2.7,2.7,2.7, 
-                                       5,5,5,
-                                       3.8,3.8,3.8), 
+                                       6,6,6,
+                                       4,4,4), 
                              emmean = c(RaoQ_ele_cld$log_Height$emmean,
                                         RaoQ_ele_cld$SLA$emmean,
                                         RaoQ_ele_cld$log_LDMC$emmean,
@@ -805,10 +805,10 @@ cwm_ridges_letters <- data.frame(trait = c(rep("log_Height", 3), rep("SLA", 3), 
                                          CWM_ele_cld$SLA$.group, 
                                          CWM_ele_cld$log_LDMC$.group, 
                                          CWM_ele_cld$log_LA$.group), 
-                             x_pos = c(4,4,4,
-                                       62,62,62, 
-                                       6.5,6.5,6.5,
-                                       8.1,8.1,8.1), 
+                             x_pos = c(5,5,5,
+                                       70,70,70, 
+                                       7,7,7,
+                                       9,9,9), 
                              emmean = c(CWM_ele_cld$log_Height$emmean,
                                         CWM_ele_cld$SLA$emmean,
                                         CWM_ele_cld$log_LDMC$emmean,
@@ -883,11 +883,11 @@ RQ_cwm_comb_figure
 ggsave("RaoQ_CWM_ridges.png", plot = RQ_cwm_comb_figure, path = "Figures")
 ```
 
-Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites (@fig-allsites-microenv_C5_C2). Models generally had low explanatory power with marginal $R^2$ values below 0.1 (Appendix @tbl-R2-microenv), although LA at the low site (marginal $R^2$, local site shuffle model = 0.131, marginal $R^2$, local species shuffle model = 0.114), and SLA at the low (marginal $R^2$, local species shuffle model = 0.104) and high site (marginal $R^2$, local site shuffle model = 0.155) were more accurately modelled. Micro-environmental variables showed inconsistent or no significant relationships with SES. For example, soil depth was positively related to SES of LA at the mid site, and SES of LA and SLA at the low site (suggesting it is associated with limiting similarity), but negatively related to SES of SLA at the mid site (suggesting it is associated with environmental filtering, @fig-allsites-microenv_C5_C2). The most consistent relationships were with rock cover and soil moisture, but these were only significantly related to SES in seven and three trait x site combinations, respectively (@fig-allsites-microenv_C5_C2). In these instances, rock cover and soil moisture were related to functional divergence, suggesting these micro-environmental conditions are associated with limiting similarity. Soil temperature was only related to SES in the instance of SLA at the high site, and the coefficient of variation in soil depth was never significantly related to SES (@fig-allsites-microenv_C5_C2).
+Micro-environmental factors were weakly related to fine-scale variation in community assembly, with relationships varying between traits and sites (@fig-allsites-microenv_C5_C2). Models generally had low explanatory power with marginal $R^2$ values below 0.1 (Appendix @tbl-R2-microenv). However, LA at the low site (marginal $R^2$, local site shuffle model = 0.131, marginal $R^2$, local species shuffle model = 0.114), and SLA at the low site (marginal $R^2$, local species shuffle model = 0.104) and high site (marginal $R^2$, local site shuffle model = 0.155) were more accurately modelled. Micro-environmental variables showed inconsistent or no significant relationships with SES. For example, soil depth was positively related to SES of LA at the mid site, and SES of LA and SLA at the low site (suggesting it is associated with limiting similarity), but negatively related to SES of SLA at the mid site (suggesting it is associated with environmental filtering, @fig-allsites-microenv_C5_C2). The most consistent relationships were with rock cover and soil moisture, but these were only significantly related to SES in seven and three trait × site combinations, respectively (@fig-allsites-microenv_C5_C2). In these instances, rock cover and soil moisture were related to functional divergence, suggesting these micro-environmental conditions are associated with limiting similarity. Soil temperature was significantly associated with SES only for SLA at the high elevation site, whereas the coefficient of variation in soil depth was never significantly related to SES for any trait at any site (@fig-allsites-microenv_C5_C2).
 
 ```{r}
 #| label: fig-allsites-microenv_C5_C2
-#| fig-cap: Effects of microenvironmental variables on assembly of traits at the low,mid and high site. temp = soil temperature, rock = rock cover, moist = soil moisture, depth CV = the coefficient of variation of soil depth, depth = soil depth. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait and each null model. Coefficients indicating significant relationships with p < 0.05 and mean SES < 0 in the local site shuffle model, and SES > 0 in the local species shuffle model are shown as opaque symbols. Coefficients indicating nonsignificant (p > 0.05) or non-meaningful relationships (mean SES > 0 in the local site shuffle model or mean SES < 0 in the local species shuffle model) are shown with transparent symbols. Mean SES significantly lower than 0 in the local site shuffle model indicates significant trait convergence/environmental filtering. Mean SES significantly higher than 0 in the local species shuffle model indicates significant trait divergence/limiting similarity.
+#| fig-cap: Effects of microenvironmental variables on the assembly of traits at the low,mid and high elevation sites. temp = soil temperature, rock = rock cover, moist = soil moisture, depth CV = the coefficient of variation of soil depth, depth = soil depth. Coefficients show the effect of microenvironmental variables on the SES calculated with each trait and each null model. Coefficients indicating significant relationships with p < 0.05 and mean SES < 0 in the local site shuffle model, and SES > 0 in the local species shuffle model are shown as opaque symbols. Coefficients indicating nonsignificant (p > 0.05) or non-meaningful relationships (mean SES > 0 in the local site shuffle model or mean SES < 0 in the local species shuffle model) are shown with transparent symbols. Mean SES significantly lower than 0 in the local site shuffle model indicates significant trait convergence (environmental filtering). Mean SES significantly higher than 0 in the local species shuffle model indicates significant trait divergence (limiting similarity).
 #| echo: false
 #| warning: false
 #| message: false
