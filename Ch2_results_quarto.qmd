@@ -553,7 +553,7 @@ Unlike the other traits, the assembly of LA was not affected by elevation, with 
 #| message: false
 #| echo: false
 #| label: fig-SES-elevation-ridges
-#| fig-cap: "Distributions of standard effect sizes (SES) from the regional site shuffle and  local species shuffle null model calculated with plant height, SLA, LDMC and leaf area along the elevational gradient. SES calculated with plant height, LDMC and leaf area used the traits on the log scale. Points with error bars show the mean and confidence interval of the SES. Points in red are significantly different from zero. Letters indicate significant differences between the mean SES of different elevations. Mean SES significantly lower than 0 in the regional site shuffle model indicates significant trait convergence/environmental filtering. Mean SES significantly higher than 0 in the local species shuffle model indicates significant trait divergence/limiting similarity."
+#| fig-cap: "Distributions of standard effect sizes (SES) of rao's quadratic entropy (RaoQ) from the regional site shuffle and  local species shuffle null models calculated using plant height, SLA, LDMC and leaf area along the elevational gradient. SES for plant height, LDMC, and leaf area was calculated using natural log-transformed trait values. Points with error bars show the mean and confidence interval of the SES. Points in red are significantly different from zero. Letters indicate significant differences between the mean SES of different elevations. Mean SES significantly lower than 0 in the regional site shuffle model indicates significant trait convergence (environmental filtering). Mean SES significantly higher than 0 in the local species shuffle model indicates significant trait divergence (limiting similarity)."
 #| warning: false
 #| fig-width: 6.5
 #| fig-height: 7
@@ -571,9 +571,9 @@ C5_ridges_letters <- tibble(trait = c(rep("log_Height", 3), rep("SLA", 3), rep("
                                          C5_SES_ele_cld$SLA$.group, 
                                          C5_SES_ele_cld$log_LDMC$.group, 
                                          C5_SES_ele_cld$log_LA$.group), 
-                             x_pos = c(5,5,5,
-                                       4,4,4, 
-                                       9,9,9,
+                             x_pos = c(6,6,6,
+                                       5,5,5, 
+                                       10,10,10,
                                        8.5,8.5,8.5), 
                              emmean = c(C5_SES_ele_cld$log_Height$emmean,
                                         C5_SES_ele_cld$SLA$emmean,
