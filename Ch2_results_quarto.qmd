@@ -573,7 +573,7 @@ C5_ridges_letters <- tibble(trait = c(rep("log_Height", 3), rep("SLA", 3), rep("
                                          C5_SES_ele_cld$log_LA$.group), 
                              x_pos = c(6,6,6,
                                        5,5,5, 
-                                       10,10,10,
+                                       9.8,9.8,9.8,
                                        8.5,8.5,8.5), 
                              emmean = c(C5_SES_ele_cld$log_Height$emmean,
                                         C5_SES_ele_cld$SLA$emmean,
@@ -637,16 +637,17 @@ SES_elevation_ridges <- ggplot(models_comb, aes(x = SES, y = elevation)) +
   geom_text(data = letters_comb, aes(x = x_pos, y = elevation, label = letters), size = 5)+
   geom_point(
     data = letters_comb,
-    aes(x = emmean, y = as.numeric(elevation), color = sign),
+    aes(x = emmean, y = as.numeric(elevation), shape = sign),
     size = 2, inherit.aes = FALSE) +
   geom_errorbarh(
-    data = letters_comb,
+    data = letters_comb, linewidth = 0.5,
     aes(xmin = lower_ci,
         xmax = upper_ci,
-        y = as.numeric(elevation), color = sign),
+        y = as.numeric(elevation)),
     height = 0.08,
     linewidth = 1, inherit.aes = FALSE)+
-  scale_color_manual(values = c("no" ="black","significant" = "red")) +
+  scale_shape_manual(values = c("no" = 1,"significant" = 16))+
+  #scale_color_manual(values = c("no" ="black","significant" = "red")) +
   scale_fill_manual(values = c("C5 entire pool" = "darkorange", "C2 site pool" = "darkcyan")) +
   theme_bw() +
   theme(legend.position = "none", axis.title = element_text(size = 14), 
