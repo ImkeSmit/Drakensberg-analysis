@@ -1106,7 +1106,7 @@ Data collection for this project was funded by the National Research Foundation 
 #| warning: false
 #| echo: false
 #| label: fig-aws
-#| fig-cap: Mean monthly air temperature (a), and total monthly rainfall (b) of three weather stations nearest to the mid, high and low site. Data presented here were recorded from 22/05/2025 - 21/05/2026 at th elow and mid weather stations, and from 10/07/2025 - 20/05/2026 at the high weather station. The weather station at 2000 m a.s.l. is 35 km from the low site, the weather station at 2500 m a.s.l. is at the mid site, and the weather station at 3000 m a.s.l. is 56 km from the high site. Weather stations are managed by the African mountain Research Foundation (https://africanmountainresearch.com/the-solutions/our-data/).
+#| fig-cap: Mean monthly air temperature (a), and total monthly rainfall (b) of three weather stations nearest to the mid, high and low site. Data presented here were recorded from 22/05/2025 - 21/05/2026 at the low and mid weather stations, and from 10/07/2025 - 20/05/2026 at the high weather station. The weather station at 2000 m a.s.l. is 35 km from the low site, the weather station at 2500 m a.s.l. is at the mid site, and the weather station at 3000 m a.s.l. is 56 km from the high site. Weather stations are managed by the African mountain Research Foundation (https://africanmountainresearch.com/the-solutions/our-data/).
 
 #import weather station data
 
@@ -1148,7 +1148,7 @@ weather_comb
 #| echo: false
 #| results: false
 #| label: fig-env-heterogeneity
-#| fig-cap: Scatterplot showing how micro-environmental variables vary with distance in the sampling grids. The filled symbols show the maximum difference in a micro-environmental variable between cells at increasing distances from each other. The empty symbols show the mean difference in a micro-environmental variable between cells at increasing distances from each other. Differences are absolute values. Mean and maximum differences were calculated accross all grids in all sites. 
+#| fig-cap: Scatterplot showing how micro-environmental variables vary with distance in the sampling grids. The filled symbols show the maximum difference in a micro-environmental variable between cells at increasing distances from each other. The empty symbols show the mean difference in a micro-environmental variable between cells at increasing distances from each other. Differences are absolute values. Mean and maximum differences were calculated across all grids in all sites. 
 
 #import microenvironmental data containing x and y coordinates
 pos <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
