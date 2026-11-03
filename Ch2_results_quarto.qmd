@@ -1261,7 +1261,12 @@ difference_plot <- ggplot(diff_summary) +
   xlab("Distance (m)")+
   ylab("Absolute value of the difference")+
   theme_classic() +
-  theme(legend.position = "bottom")
+  theme(panel.border = element_rect(fill = NA), legend.position = "bottom", 
+        legend.title = element_blank(),
+        strip.background = element_blank(), 
+        strip.text.y.right = element_text(angle = 0), 
+        axis.title = element_text(size = 10), axis.text = element_text(size = 9), 
+        strip.text = element_text(size = 10), legend.text = element_text(size = 10))
 
 difference_plot
 
