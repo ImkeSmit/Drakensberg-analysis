@@ -1279,6 +1279,35 @@ diff_summary |>
 ```
 
 ```{r}
+#| message: false
+#| warning: false
+#| echo: false
+#| results: false
+#| label: fig-env-heterogeneity
+#| fig-cap: Scatterplot
+
+CV_variables <- env2 |> 
+  group_by(site) |> 
+  summarise(across(
+    c(rock_cover, soil_temperature_adj_campaign2, soil_moisture_adj_campaign2, mean_soil_depth), 
+    ~ sd(.x, na.rm = TRUE) / mean(.x, na.rm = TRUE),
+      .names = "cv_{.col}")) |> 
+  mutate(site = factor(site, levels = c("GG", "WH", "BK"))) |> 
+  pivot_longer(cols = contains("cv"), names_to = "variable", values_to = "cv")
+
+cv_bar <- ggplot(CV_variables, aes(x = variable, y = cv, fill = site)) +
+  geom_bar(stat = "identity", position = "dodge")+
+  scale_fill_manual(values = c("GG" = "darkorange", "WH" = "grey", "BK" = "darkcyan"))+
+  theme_classic() +
+  labs(y = "Coefficient of variation", x = "Micro-environmental variable") +
+  
+  
+  cv_bar
+
+
+```
+
+```{r}
 #| label: tbl-ele-model-results
 #| tbl-cap: Model results from linear mixed effect models models testing the SDH. Tests were performed with SES calculated from the local site shuffle and local species shuffle model for each trait. The F ratio and p value test the hypothesis that there is no difference between the mean SES of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
 #| message: false
