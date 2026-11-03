@@ -1283,8 +1283,8 @@ diff_summary |>
 #| warning: false
 #| echo: false
 #| results: false
-#| label: fig-env-heterogeneity
-#| fig-cap: Scatterplot
+#| label: fig-env-cv
+#| fig-cap: The coefficient of variation of micro-environmental variables across the grids in each site. 
 
 CV_variables <- env2 |> 
   group_by(site) |> 
@@ -1295,11 +1295,20 @@ CV_variables <- env2 |>
   mutate(site = factor(site, levels = c("GG", "WH", "BK"))) |> 
   pivot_longer(cols = contains("cv"), names_to = "variable", values_to = "cv")
 
-cv_bar <- ggplot(CV_variables, aes(x = variable, y = cv, fill = site)) +
-  geom_bar(stat = "identity", position = "dodge")+
-  scale_fill_manual(values = c("GG" = "darkorange", "WH" = "grey", "BK" = "darkcyan"))+
+
+cv_bar <- ggplot(CV_variables) +
+  geom_bar(stat = "identity", position = "dodge", aes(x = variable, y = cv, fill = site)) +
+  scale_x_discrete(labels = c(
+      "cv_rock_cover" = "Rock cover",
+      "cv_soil_temperature_adj_campaign2" = "Soil temperature", 
+      "cv_soil_moisture_adj_campaign2" = "Soil moisture", 
+      "cv_mean_soil_depth" = "Mean soil depth")) +
+  scale_fill_manual(values = c(
+    "GG" = "darkorange", "WH" = "grey", "BK" = "darkcyan"), 
+    labels = c("GG" = "Low", "WH" = "Mid", "BK" = "High"))+
   theme_classic() +
   labs(y = "Coefficient of variation", x = "Micro-environmental variable") +
+  theme(legend.title = element_blank())
   
   
   cv_bar
