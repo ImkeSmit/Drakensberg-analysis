@@ -1150,47 +1150,6 @@ weather_comb
 #| label: fig-env-heterogeneity
 #| fig-cap: Scatterplot showing how micro-environmental variables vary with distance in the sampling grids. The filled symbols show the maximum difference in a micro-environmental variable between cells at increasing distances from each other. The empty symbols show the mean difference in a micro-environmental variable between cells at increasing distances from each other. Differences are absolute values. Mean and maximum differences were calculated across all grids in all sites. 
 
-#import microenvironmental data containing x and y coordinates
-pos <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
-  #variables we are interested in
-  select(Cell_ID:row) |> 
-  #add elevation variables
-  mutate(elevation = case_when(site == "GG" ~ 2000, 
-                               site == "WH" ~ 2500, 
-                               site == "BK" ~ 3000,
-                               .default = NA)) |> 
-  mutate(ncolumn = match(column, LETTERS[1:8]), 
-         grid = paste0(site, grid), 
-         elevation = as.factor(elevation), 
-         grid = as.factor(grid)) |> #each grid must have a unique id 
-  rename(x_coord = ncolumn, 
-         y_coord = row)
-
-#import microenvironmental data containing microenv variables
-env2 <- read.csv("All_data/clean_data/Environmental data/All_Sites_Environmental_Data_OSF.csv") |> 
-  #variables we are interested in
-  select(Cell_ID:row, rock_cover, northness, soil_moisture_adj_campaign2, 
-        mean_soil_depth, slope_height) |> 
-  #add elevation variables
-  mutate(elevation = case_when(site == "GG" ~ 2000, 
-                               site == "WH" ~ 2500, 
-                               site == "BK" ~ 3000,
-                               .default = NA)) |> 
-  mutate(ncolumn = match(column, LETTERS[1:8]),  #also add x and y coordinates
-         grid = paste0(site, grid), 
-        elevation = as.factor(elevation), 
-        grid = as.factor(grid)) |> #each grid must have a unique id 
-  rename(x_coord = ncolumn, 
-         y_coord = row)
-
-#import remote sensing derived variables
-rms <- read.csv("All_data/clean_data/Environmental data/Zonal_stats_all.csv") |> 
-  select(CELL_ID, STD) |> 
-  rename(Cell_ID = CELL_ID)
-
-#import interpolated microclimate indices
-micro_idw <- read.csv("All_data/clean_data/Environmental data/Imke_microclimate_indices_idw_interpolated.csv", row.names = 1)
-
 #import ses, get the cells we have SES for
 SES_Cell_IDs <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C5_poolsite.csv", row.names = 1) |> 
   rename(Cell_ID = cellref) |> 
@@ -1199,16 +1158,12 @@ SES_Cell_IDs <- read.csv("All_data/comm_assembly_results/SES_RQ_weighted_cells_C
 
 ##Combine SES and environmental data to make sure we have the correct cells
 C5_microenv_comb <- env2 |> 
-  #join to microclimate indices |> 
-  full_join(micro_idw, by = "Cell_ID") |> 
-  #join to remote sensing data |> 
-  full_join(rms, by = "Cell_ID") |> 
   #join, one row in env matches many rows in cell_ses due to it containing ses of different traits
   full_join(SES_Cell_IDs, by = "Cell_ID") |> 
   mutate(grid = as.factor(grid)) |> 
   mutate(soil_moisture_adj_campaign2 = as.numeric(soil_moisture_adj_campaign2))
 
-variable_list <- c("rock_cover", "mean_T1_growing_season", "mean_moist_growing_season", "STD", "mean_soil_depth")
+variable_list <- c("rock_cover", "soil_moisture_adj_campaign2", "soil_temperature_adj_campaign2", "mean_soil_depth", "soil_depth_CV")
 gridlist      <- unique(pos$grid)
 
 # ---- 1. Distances: same for every grid, since all grids share the ----
@@ -1280,8 +1235,9 @@ pairdiff2 <- pairdiff |>
 #7. calculate mean and maximum differences for every distance category
 diff_summary <- pairdiff2 |> 
   filter(!is.na(difference)) |>
-  mutate(difference =abs(difference)) |> #use absolute values
-  group_by(variable, distance) |> 
+  mutate(difference =abs(difference), 
+         site = str_sub(grid, 1,2)) |> #use absolute values
+  group_by(site, variable, distance) |> 
   summarise(max_diff = max(difference), 
             mean_diff = mean(difference))
 
@@ -1291,12 +1247,12 @@ diff_summary <- pairdiff2 |>
 difference_plot <- ggplot(diff_summary) +
   geom_point(aes(x = distance, y = max_diff, shape = "Maximum difference"))+
   geom_point(aes(x = distance, y = mean_diff, shape = "Mean difference"))+
-  facet_wrap(~variable, scale = "free_y", ncol = 2, 
-             labeller = as_labeller(c("mean_moist_growing_season" = "Soil moisture", 
+  facet_wrap(site~variable, scale = "free_y", ncol = 2, 
+             labeller = as_labeller(c("soil_moisture_adj_campaign2" = "Soil moisture", 
                                     "mean_soil_depth" = "Soil depth (cm)", 
-                                    "mean_T1_growing_season" = "Soil temperature (°C)", 
+                                    "soil_temperature_adj_campaign2" = "Soil temperature (°C)", 
                                     "rock_cover" = "Rock cover (%)", 
-                                    "STD" = "Surface heterogeneity"))) +
+                                    "soil_depth_CV" = "Soil depth CV"))) +
   scale_shape_manual(name = " ", values = c("Maximum difference" = 16, "Mean difference"= 21))+
   xlab("Distance (m)")+
   ylab("Absolute value of the difference")+
