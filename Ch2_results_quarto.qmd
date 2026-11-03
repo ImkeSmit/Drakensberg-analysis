@@ -1236,7 +1236,8 @@ pairdiff2 <- pairdiff |>
 diff_summary <- pairdiff2 |> 
   filter(!is.na(difference)) |>
   mutate(difference =abs(difference), 
-         site = str_sub(grid, 1,2)) |> #use absolute values
+         site = str_sub(grid, 1,2), 
+         site = factor(site, levels= c("GG", "WH", "BK"))) |> #use absolute values
   group_by(site, variable, distance) |> 
   summarise(max_diff = max(difference), 
             mean_diff = mean(difference))
@@ -1247,12 +1248,15 @@ diff_summary <- pairdiff2 |>
 difference_plot <- ggplot(diff_summary) +
   geom_point(aes(x = distance, y = max_diff, shape = "Maximum difference"))+
   geom_point(aes(x = distance, y = mean_diff, shape = "Mean difference"))+
-  facet_wrap(site~variable, scale = "free_y", ncol = 2, 
+  facet_grid(variable~site, scale = "free_y", 
              labeller = as_labeller(c("soil_moisture_adj_campaign2" = "Soil moisture", 
                                     "mean_soil_depth" = "Soil depth (cm)", 
                                     "soil_temperature_adj_campaign2" = "Soil temperature (°C)", 
                                     "rock_cover" = "Rock cover (%)", 
-                                    "soil_depth_CV" = "Soil depth CV"))) +
+                                    "soil_depth_CV" = "Soil depth CV", 
+                                    "BK" = "High", 
+                                    "WH" = "Mid", 
+                                    "GG"= "Low"))) +
   scale_shape_manual(name = " ", values = c("Maximum difference" = 16, "Mean difference"= 21))+
   xlab("Distance (m)")+
   ylab("Absolute value of the difference")+
