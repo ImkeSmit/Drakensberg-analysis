@@ -56,6 +56,7 @@ scarpark_longtime <- read.csv("All_data\\weather station data\\UFS3_Sentinel_Tab
 colnames(scarpark_longtime) <- c(scarpark_longtime[2,])
 scarpark_longtime <- scarpark_longtime[-c(1:4), ]
 
+
 #compute daiy averages, maxima, minima
 scarpark_daily <- scarpark_longtime |> 
   tibble() |> 
@@ -64,6 +65,7 @@ scarpark_daily <- scarpark_longtime |>
     TIMESTAMP = ymd_hm(TIMESTAMP, tz = "Africa/Johannesburg"),
     across(AirTemp_Avg:Rain_Tot, as.numeric),
     Date = as_date(TIMESTAMP)) |> 
+  filter(AirTemp_Avg > -15) |>
   group_by(Date) |> 
   summarise(
     AirTemp_mean = mean(AirTemp_Avg, na.rm = TRUE),
@@ -71,6 +73,17 @@ scarpark_daily <- scarpark_longtime |>
     AirTemp_max  = max(AirTemp_Avg, na.rm = TRUE),
     Rain_total   = sum(Rain_Tot, na.rm = TRUE),
     n_obs        = n())
+
+
+ggplot(scarpark_daily, aes(y = AirTemp_max, x = Date)) +
+  geom_point()
+
+ggplot(scarpark_daily, aes(y = AirTemp_min, x = Date)) +
+  geom_point()
+
+ggplot(scarpark_daily, aes(y = AirTemp_mean, x = Date)) +
+  geom_point()
+
 
 #save data
 write.csv(scarpark_daily, "All_data\\weather station data\\Sentinel_carpark_daily_2023-2025.csv")
@@ -88,7 +101,9 @@ alpbase_daily <- alpbase_longtime |>
   mutate(
     TIMESTAMP = ymd_hm(TIMESTAMP, tz = "Africa/Johannesburg"),
     across(AirTemp_Avg:Rain_Tot, as.numeric),
-    Date = as_date(TIMESTAMP)) |> 
+    Date = as_date(TIMESTAMP)) |>
+  filter(AirTemp_Avg > -15) |>
+  filter(!between(Date, as_date("2025-05-01"), as_date("2025-07-10"))) |> #takes no measurements here
   group_by(Date) |> 
   summarise(
     AirTemp_mean = mean(AirTemp_Avg, na.rm = TRUE),
@@ -96,6 +111,15 @@ alpbase_daily <- alpbase_longtime |>
     AirTemp_max  = max(AirTemp_Avg, na.rm = TRUE),
     Rain_total   = sum(Rain_Tot, na.rm = TRUE),
     n_obs        = n())
+
+ggplot(alpbase_daily, aes(y = AirTemp_max, x = Date)) +
+  geom_point()
+
+ggplot(alpbase_daily, aes(y = AirTemp_min, x = Date)) +
+  geom_point()
+
+ggplot(alpbase_daily, aes(y = AirTemp_mean, x = Date)) +
+  geom_point()
 
 #save data
 write.csv(alpbase_daily, "All_data\\weather station data\\Alpine_base_daily_2023-2025.csv")
