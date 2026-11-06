@@ -98,17 +98,24 @@ scarpark_longtime <- read.csv("All_data\\weather station data\\UFS3_Sentinel_Tab
 colnames(scarpark_longtime) <- c(scarpark_longtime[2,])
 scarpark_longtime <- scarpark_longtime[-c(1:4), ]
 
+#compute daiy averages, maxima, minima
 scarpark_daily <- scarpark_longtime |> 
   tibble() |> 
   select(TIMESTAMP, StationID, AirTemp_Avg, Rain_Tot) |> 
-mutate(
-  TIMESTAMP = ymd_hm(TIMESTAMP, tz = "Africa/Johannesburg"),
-  across(AirTemp_Avg:Rain_Tot, as.numeric),
-  Date = as_date(TIMESTAMP)) |> 
+  mutate(
+    TIMESTAMP = ymd_hm(TIMESTAMP, tz = "Africa/Johannesburg"),
+    across(AirTemp_Avg:Rain_Tot, as.numeric),
+    Date = as_date(TIMESTAMP)) |> 
   group_by(Date) |> 
-  summarise(across(AirTemp_Avg:Rain_Tot, ~ mean(.x, na.rm = TRUE), .names = "{.col}_mean"))
-  
+  summarise(
+    AirTemp_mean = mean(AirTemp_Avg, na.rm = TRUE),
+    AirTemp_min  = min(AirTemp_Avg, na.rm = TRUE),
+    AirTemp_max  = max(AirTemp_Avg, na.rm = TRUE),
+    Rain_total   = sum(Rain_Tot, na.rm = TRUE),
+    n_obs        = n())
 
+#save data
+write.csv(scarpark_daily, "All_data\\weather station data\\Sentinel_carpark_daily_2023-2025.csv")
 
 
 ####Alpine base weather station####
