@@ -1140,15 +1140,15 @@ rain_bar <- wd |>
   group_by(stationID, year, month) |> 
   summarise(sum_monthly = sum(Rain_total, na.rm = T)) |> 
   ungroup() |> 
-  group_by(month) |> 
+  group_by(stationID, month) |> 
   summarise(mean_rain = mean(sum_monthly),
             sd = sd(sum_monthly), 
-            n_days = n()) |> 
-  mutate(se = sd/sqrt(n_days), 
+            n_years = n()) |> 
+  mutate(se = sd/sqrt(n_years), 
          lower = mean_rain - se, 
          upper = mean_rain + se) |> 
   ggplot(aes(y = mean_rain, x = month)) +
-  geom_bar(stat = "identity") +
+  geom_bar(stat = "identity", fill = "lightgrey") +
   geom_errorbar(aes(ymin = lower, ymax = upper)) +
   facet_wrap(~stationID)+
   labs(x = " ", y = "Mean rainfall (mm)")+
@@ -1156,7 +1156,7 @@ rain_bar <- wd |>
   theme(panel.grid = element_blank(), 
         axis.text.x = element_text(angle = 45))
 
-weather_comb <- ggarrange(temp_bar, rain_bar, ncol = 1, nrow = 2, labels = c("a", "b"))
+weather_comb <- ggarrange(temp_line, rain_bar, ncol = 1, nrow = 2, labels = c("a", "b"))
 
 weather_comb
 
