@@ -1116,35 +1116,21 @@ alpbase <- read_csv("All_data/weather station data/Alpine_base_daily_2023-2025.c
 wd <- alpbase |> 
   bind_rows(scarpark)
 
-ggplot(alpbase, aes(x = Date, y = AirTemp_min)) +
-  geom_point()
-
-
-
-wd <- scarpark|>
-  bind_rows(alpbase) |> 
-  mutate(month = month(TIMESTAMP, label = TRUE), 
-  StationID = replace_values(StationID, "AMRF_UFS4_SentinelPeak" ~ "3000 m a.s.l.", 
-                 "UFS_AWS_3_4809" ~ "2500 m a.s.l.", 
-                 "UFS_AWS_2_4809" ~ "2000 m a.s.l."),  
-  StationID = factor(StationID, levels = c("2000 m a.s.l.", "2500 m a.s.l.", "3000 m a.s.l."))) |> 
-  group_by(StationID, month) |> 
-  summarise(mean_temp = mean(AirTemp_Avg, na.rm = T), 
-            total_rai = sum(Rain_Tot, na.rm = T))
-
-test <- wd |> 
+temp_line <- wd |> 
   mutate(month = month(Date, label = TRUE)) |> 
   group_by(stationID, month) |> 
   summarise(mean_temp = mean(AirTemp_mean, na.rm = T), 
-            min_temp = min(AirTemp_min, na.rm = T), 
-            max_temp = max(AirTemp_max, na.rm = T)) |>
+            min_temp = mean(AirTemp_min, na.rm = T), 
+            max_temp = mean(AirTemp_max, na.rm = T)) |>
   pivot_longer(cols = c("mean_temp", "min_temp", "max_temp"), names_to = "metric", values_to = "value") |> 
-  ggplot(aes(y = value, x = month, color = "metric")) +
+  ggplot(aes(y = value, x = month, color = metric, group = metric)) +
+  geom_line()+
   geom_point()+
   facet_wrap(~stationID)+
+  scale_color_manual(values = c("red", "darkgrey", "blue"), labels = c("max_temp" = "maximum temperature","mean_temp"  ="mean_temperature", "min_temp" = "minimum_temperature"))+
   labs(x = " ", y = "Mean air \ntemperature (°C)")+
   theme_bw() +
-  theme(panel.grid = element_blank(), 
+  theme(panel.grid = element_blank(), legend.title = element_blank(),
         axis.text.x = element_text(angle = 45))
 
 rain_bar <- ggplot(wd, aes(y = total_rai, x = month)) +
