@@ -1109,9 +1109,14 @@ Data collection for this project was funded by the National Research Foundation 
 #| fig-cap: Mean monthly air temperature (a), and total monthly rainfall (b) of three weather stations nearest to the mid, high and low site. Data presented here were recorded from 22/05/2025 - 21/05/2026 at the low and mid weather stations, and from 10/07/2025 - 20/05/2026 at the high weather station. The weather station at 2000 m a.s.l. is 35 km from the low site, the weather station at 2500 m a.s.l. is at the mid site, and the weather station at 3000 m a.s.l. is 56 km from the high site. Weather stations are managed by the African mountain Research Foundation (https://africanmountainresearch.com/the-solutions/our-data/).
 
 #import weather station data
+scarpark <- read_csv("All_data/weather station data/Sentinel_carpark_daily_2023-2025.csv")
+alpbase <- read_csv("All_data/weather station data/Alpine_base_daily_2023-2025.csv")
+witsies <- scarpark |> 
+  mutate()
 
-wd <- read_csv("All_data/clean_data/weather_station_rain_temp.csv") |> 
-  mutate(month = month(Timestamp, label = TRUE), 
+wd <- scarpark|>
+  bind_rows(alpbase) |> 
+  mutate(month = month(TIMESTAMP, label = TRUE), 
   StationID = replace_values(StationID, "AMRF_UFS4_SentinelPeak" ~ "3000 m a.s.l.", 
                  "UFS_AWS_3_4809" ~ "2500 m a.s.l.", 
                  "UFS_AWS_2_4809" ~ "2000 m a.s.l."),  
