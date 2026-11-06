@@ -77,6 +77,31 @@ write.csv(scarpark_daily, "All_data\\weather station data\\Sentinel_carpark_dail
 
 
 ####Alpine base weather station####
+###Import hourly data from multiple years
+alpbase_longtime <- read.csv("All_data\\weather station data\\UFS4 direct CR300_TableHour-2023-2025.csv", sep = ";", header = FALSE, row.names = NULL)
+colnames(alpbase_longtime) <- c(alpbase_longtime[2,])
+alpbase_longtime <- alpbase_longtime[-c(1:4), which(colnames(alpbase_longtime) %in% c("TIMESTAMP", "StationID", "AirTemp_Avg", "Rain_Tot"))]
+
+#compute daiy averages, maxima, minima
+alpbase_daily <- alpbase_longtime |> 
+  tibble() |> 
+  mutate(
+    TIMESTAMP = ymd_hm(TIMESTAMP, tz = "Africa/Johannesburg"),
+    across(AirTemp_Avg:Rain_Tot, as.numeric),
+    Date = as_date(TIMESTAMP)) |> 
+  group_by(Date) |> 
+  summarise(
+    AirTemp_mean = mean(AirTemp_Avg, na.rm = TRUE),
+    AirTemp_min  = min(AirTemp_Avg, na.rm = TRUE),
+    AirTemp_max  = max(AirTemp_Avg, na.rm = TRUE),
+    Rain_total   = sum(Rain_Tot, na.rm = TRUE),
+    n_obs        = n())
+
+#save data
+write.csv(alpbase_daily, "All_data\\weather station data\\Alpine_base_daily_2023-2025.csv")
+
+
+
 alpbase <- read.delim("All_data\\weather station data\\Alpine_base_daily_21May.txt", sep = ",", header = F, row.names = NULL)
 colnames(alpbase) <- c("Timestamp","StationID","WSpd_Min","WSpd_TMn",          
                         "WSpd_Max","WSpd_TMx","WSpd_Avg","WSpd_Std","WDir_Avg",          
