@@ -93,6 +93,17 @@ Rai_scarpark <- scarpark2 |>
   summarise(rai = sum(Rain_Tot)) #1557.8
 
 
+###Import hourly data from multiple years
+scarpark_longtime <- read.csv("All_data\\weather station data\\UFS3_Sentinel_TableHour-2023-2025.csv", sep = ";", header = FALSE, row.names = NULL)
+colnames(scarpark_longtime) <- c(scarpark_longtime[2,])
+scarpark_longtime <- scarpark_longtime[-c(1:4), ]
+
+scarpark_daily <- scarpark_longtime |> 
+  tibble() |> 
+  #mutate(TIMESTAMP = gsub('"', '', TIMESTAMP)) |> 
+  mutate(TIMESTAMP = ymd_hms(TIMESTAMP))
+
+
 
 ####Alpine base weather station####
 alpbase <- read.delim("All_data\\weather station data\\Alpine_base_daily_21May.txt", sep = ",", header = F, row.names = NULL)
