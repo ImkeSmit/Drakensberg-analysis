@@ -100,8 +100,14 @@ scarpark_longtime <- scarpark_longtime[-c(1:4), ]
 
 scarpark_daily <- scarpark_longtime |> 
   tibble() |> 
-  #mutate(TIMESTAMP = gsub('"', '', TIMESTAMP)) |> 
-  mutate(TIMESTAMP = ymd_hms(TIMESTAMP))
+  select(TIMESTAMP, StationID, AirTemp_Avg, Rain_Tot) |> 
+mutate(
+  TIMESTAMP = ymd_hm(TIMESTAMP, tz = "Africa/Johannesburg"),
+  across(AirTemp_Avg:Rain_Tot, as.numeric),
+  Date = as_date(TIMESTAMP)) |> 
+  group_by(Date) |> 
+  summarise(across(AirTemp_Avg:Rain_Tot, ~ mean(.x, na.rm = TRUE), .names = "{.col}_mean"))
+  
 
 
 
