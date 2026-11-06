@@ -1131,7 +1131,7 @@ temp_line <- wd |>
   labs(x = " ", y = "Mean air \ntemperature (°C)")+
   theme_bw() +
   theme(panel.grid = element_blank(), legend.title = element_blank(),
-        axis.text.x = element_text(angle = 45))
+        axis.text.x = element_text(angle = 45), legend.position = "top")
 
 
 rain_bar <- wd |> 
