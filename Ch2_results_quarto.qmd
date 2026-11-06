@@ -1133,10 +1133,25 @@ temp_line <- wd |>
   theme(panel.grid = element_blank(), legend.title = element_blank(),
         axis.text.x = element_text(angle = 45))
 
-rain_bar <- ggplot(wd, aes(y = total_rai, x = month)) +
+
+rain_bar <- wd |> 
+  mutate(month = month(Date, label = TRUE), 
+         year = year(Date)) |> 
+  group_by(stationID, year, month) |> 
+  summarise(sum_monthly = sum(Rain_total, na.rm = T)) |> 
+  ungroup() |> 
+  group_by(month) |> 
+  summarise(mean_rain = mean(sum_monthly),
+            sd = sd(sum_monthly), 
+            n_days = n()) |> 
+  mutate(se = sd/sqrt(n_days), 
+         lower = mean_rain - se, 
+         upper = mean_rain + se) |> 
+  ggplot(aes(y = mean_rain, x = month)) +
   geom_bar(stat = "identity") +
-  facet_wrap(~StationID)+
-  labs(x = " ", y = "Total rainfall (mm)")+
+  geom_errorbar(aes(ymin = lower, ymax = upper)) +
+  facet_wrap(~stationID)+
+  labs(x = " ", y = "Mean rainfall (mm)")+
   theme_bw() +
   theme(panel.grid = element_blank(), 
         axis.text.x = element_text(angle = 45))
