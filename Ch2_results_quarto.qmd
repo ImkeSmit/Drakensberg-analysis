@@ -1109,10 +1109,17 @@ Data collection for this project was funded by the National Research Foundation 
 #| fig-cap: Mean monthly air temperature (a), and total monthly rainfall (b) of three weather stations nearest to the mid, high and low site. Data presented here were recorded from 22/05/2025 - 21/05/2026 at the low and mid weather stations, and from 10/07/2025 - 20/05/2026 at the high weather station. The weather station at 2000 m a.s.l. is 35 km from the low site, the weather station at 2500 m a.s.l. is at the mid site, and the weather station at 3000 m a.s.l. is 56 km from the high site. Weather stations are managed by the African mountain Research Foundation (https://africanmountainresearch.com/the-solutions/our-data/).
 
 #import weather station data
-scarpark <- read_csv("All_data/weather station data/Sentinel_carpark_daily_2023-2025.csv")
-alpbase <- read_csv("All_data/weather station data/Alpine_base_daily_2023-2025.csv")
-witsies <- scarpark |> 
-  mutate()
+scarpark <- read_csv("All_data/weather station data/Sentinel_carpark_daily_2023-2025.csv") |> 
+  mutate(stationID = "2500 m a.s.l.")
+alpbase <- read_csv("All_data/weather station data/Alpine_base_daily_2023-2025.csv") |> mutate(stationID = "3000 m a.s.l.")
+
+wd <- alpbase |> 
+  bind_rows(scarpark)
+
+ggplot(alpbase, aes(x = Date, y = AirTemp_min)) +
+  geom_point()
+
+
 
 wd <- scarpark|>
   bind_rows(alpbase) |> 
@@ -1125,9 +1132,16 @@ wd <- scarpark|>
   summarise(mean_temp = mean(AirTemp_Avg, na.rm = T), 
             total_rai = sum(Rain_Tot, na.rm = T))
 
-temp_bar <- ggplot(wd, aes(y = mean_temp, x = month)) +
-  geom_bar(stat = "identity") +
-  facet_wrap(~StationID)+
+test <- wd |> 
+  mutate(month = month(Date, label = TRUE)) |> 
+  group_by(stationID, month) |> 
+  summarise(mean_temp = mean(AirTemp_mean, na.rm = T), 
+            min_temp = min(AirTemp_min, na.rm = T), 
+            max_temp = max(AirTemp_max, na.rm = T)) |>
+  pivot_longer(cols = c("mean_temp", "min_temp", "max_temp"), names_to = "metric", values_to = "value") |> 
+  ggplot(aes(y = value, x = month, color = "metric")) +
+  geom_point()+
+  facet_wrap(~stationID)+
   labs(x = " ", y = "Mean air \ntemperature (°C)")+
   theme_bw() +
   theme(panel.grid = element_blank(), 
