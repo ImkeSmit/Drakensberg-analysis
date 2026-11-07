@@ -425,10 +425,20 @@ mean_winter_t <- wd |>
   group_by(stationID) |> 
   summarise(mean_temp = mean(AirTemp_mean, na.rm = T))
 
+#frost days
+frost_days <- wd |> 
+  mutate(year = year(Date)) |>
+  filter(!year == 2026) |> 
+  group_by(stationID, year) |> 
+  summarise(frost_days = sum(AirTemp_min < 0, na.rm = TRUE)) |> #sum of days with min below zero
+  ungroup() |> 
+  group_by(stationID) |> 
+  summarise(mean_frost_days = mean(frost_days))
+
 
 ```
 
-The climate in the northern Maloti-Drakensberg is characterised by highly seasonal rainfall, with 75% of annual rainfall occurring in the summer months between November and March ([@nel2009]; Appendix @fig-aws). Rainfall occurs as thunder showers formed through orographic lift, and exceeds 900 mm p.a. [@nel2009]. Very little rainfall occurs in the winter (10 – 90mm), but precipitation regularly also occurs in the form of snow [@mulder2009; @nel2009]. Snow occurs when cold fronts or cutoff low pressure cells move over the Drakensberg [@mulder2009], and tends to melt before the next cold weather system arrives. Summer temperatures are mild, but winters are cold, with minimum temperatures regularly dropping below freezing in winter [@nel2008]. Mean annual air temperature varied by 5℃ across the three sites, with a mean annual air temperature of 12℃ at the low site, 10℃ at the mid site and 7℃ at the high site (Calculated from measurements taken by the three nearest weather stations from the African Mountain Research Foundation, Appendix @fig-aws).
+The climate in the northern Maloti-Drakensberg is characterised by highly seasonal rainfall, with 75% of annual rainfall occurring in the summer months between November and March ([@nel2009]; Appendix @fig-aws). Rainfall occurs as thunder showers formed through orographic lift, and exceeds 900 mm p.a. [@nel2009]. Very little rainfall occurs in the winter (10 – 90mm), but precipitation regularly also occurs in the form of snow [@mulder2009; @nel2009]. Snow occurs when cold fronts or cutoff low pressure cells move over the Drakensberg [@mulder2009], and tends to melt before the next cold weather system arrives. Summer temperatures are mild, with mean summer temperatures of `r mean_summer_t[1,2]` and  `r mean_summer_t[2,2]` recorder at the mid and high elevation, respectively. Winters are cold, with, on average, `r frost_days[1,2]` frost days at the mid site, and `r frost_days[2,2]` frost days at the high site (Calculated from measurements taken by the three nearest weather stations from the African Mountain Research Foundation, Appendix @fig-aws).
 
 Fires are a natural occurrence in the Maloti-Drakensberg, and are essential for the maintenance of plant diversity [@morris2021; @lodder2018]. Most of the plant species in the Maloti-Drakensberg grasslands are not killed by fire, but possess underground storage organs or bud banks from which they resprout after a fire event. Fires temporarily remove biomass and decrease canopy cover, creating opportunities for the growth and reproduction of light-demanding forbs [@morris2021; @gordijn2018]. Long fire-return intervals lead to the accumulation of moribund grass biomass, which is linked to a decline in forb diversity [@gordijn2018]. Historically, fires were ignited by lightning, resulting in a variable fire-return interval across the mountain range [@finch2022; @gordijn2018]. This fire regime has changed substantially since European occupation in the Drakensberg, with fire suppression practiced during the colonial period from 1840 [@finch2022], and a short fire return interval of two years promoted from 1960 to promote forage and water provision [@gordijn2018]. Currently fire management varies in the Maloti-Drakensberg, including the use of fire breaks [@oconnor2004], planned burning according to various return intervals, as well as accidental or arson fires [@lodder2018]. The fire return interval or time since last fire for the three sites are not known, but all three sites were subject to a similar fire regime consisting of incidental wildfires started by lightning or accidental ignition.
 
