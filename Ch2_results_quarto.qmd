@@ -442,7 +442,7 @@ frost_days <- wd |>
 
 ```
 
-The climate in the northern Maloti-Drakensberg is characterised by highly seasonal rainfall, with 75% of annual rainfall occurring in the summer months between November and March (@nel2009; Appendix @fig-aws). Rainfall occurs as thunder showers formed through orographic lift, and exceeds 900 mm p.a. \[@nel2009\]. Very little rainfall occurs in the winter (10 – 90mm), but precipitation regularly occurs in the form of snow [@mulder2009; @nel2009]. Snow occurs when cold fronts or cutoff low pressure cells move over the Drakensberg [@mulder2009], and tends to melt before the next cold weather system arrives. Summer temperatures are mild, with mean summer temperatures of `r round(mean_summer_t[1,2], digits = 0)` ℃ and `r round(mean_summer_t[2,2], digits = 0)` ℃ recorded at the mid and high elevation, respectively. Winters are cold, with, on average, `r round(frost_days[1,2], digits = 0)` frost days at the mid site, and `r frost_days[2,2]` frost days at the high site. Winter temperatures range from `r round(mean_winter_t[1,2], digits = 0)` ℃ at the mid site, to `r round(mean_winter_t[2,2], digits = 0)` ℃ at the high site (Calculated from measurements taken by the three weather stations nearest to the sites from the African Mountain Research Foundation, Appendix @fig-aws).
+The climate in the northern Maloti-Drakensberg is characterised by highly seasonal rainfall, with 75% of annual rainfall occurring in the summer months between November and March (@nel2009; Appendix @fig-aws). Rainfall occurs as thunder showers formed through orographic lift, and exceeds 900 mm p.a. [@nel2009]. Very little rainfall occurs in the winter (10 – 90mm), but precipitation regularly occurs in the form of snow [@mulder2009; @nel2009]. Snow occurs when cold fronts or cutoff low pressure cells move over the Drakensberg [@mulder2009], and tends to melt before the next cold weather system arrives. Summer temperatures are mild, with mean summer temperatures of `r round(mean_summer_t[1,2], digits = 0)` ℃ and `r round(mean_summer_t[2,2], digits = 0)` ℃ recorded at the mid and high elevation, respectively. Winters are cold, with, on average, `r round(frost_days[1,2], digits = 0)` frost days at the mid site, and `r frost_days[2,2]` frost days at the high site. Winter temperatures range from `r round(mean_winter_t[1,2], digits = 0)` ℃ at the mid site, to `r round(mean_winter_t[2,2], digits = 0)` ℃ at the high site (Calculated from measurements taken by the three weather stations nearest to the sites from the African Mountain Research Foundation, Appendix @fig-aws).
 
 Fires are a natural occurrence in the Maloti-Drakensberg, and are essential for the maintenance of plant diversity [@morris2021; @lodder2018]. Most of the plant species in the Maloti-Drakensberg grasslands are not killed by fire, but possess underground storage organs or bud banks from which they resprout after a fire event. Fires temporarily remove biomass and decrease canopy cover, creating opportunities for the growth and reproduction of light-demanding forbs [@morris2021; @gordijn2018]. Long fire-return intervals lead to the accumulation of moribund grass biomass, which is linked to a decline in forb diversity [@gordijn2018]. Historically, fires were ignited by lightning, resulting in a variable fire-return interval across the mountain range [@finch2022; @gordijn2018]. This fire regime has changed substantially since European occupation in the Drakensberg, with fire suppression encouraged during the colonial period from 1840 [@finch2022], and a short fire return interval of two years promoted from 1960 to promote forage and water provision [@gordijn2018]. Currently fire management varies in the Maloti-Drakensberg, including the use of fire breaks [@oconnor2004], planned burning according to various return intervals, as well as accidental or arson fires [@lodder2018]. The fire return interval or time since last fire for the three sites are not known, but all three sites were subject to a similar fire regime consisting of incidental wildfires started by lightning or accidental ignition.
 
@@ -1147,7 +1147,7 @@ Data collection for this project was funded by the National Research Foundation 
 #| warning: false
 #| echo: false
 #| label: fig-aws
-#| fig-cap: Mean monthly air temperature (a), and total monthly rainfall (b) of three weather stations nearest to the mid, high and low site. Data presented here were recorded between 01/01/2023 and 01/01/2026. The weather station at 2000 m a.s.l.  (Witseieshoek station) is 35 km from the low site, the weather station at 2500 m a.s.l. (Sentinel car park station) is at the mid site, and the weather station at 3000 m a.s.l. (Alpine base station) is 56 km from the high site. Weather stations are managed by the African mountain Research Foundation (https://africanmountainresearch.com/the-solutions/our-data/).
+#| fig-cap: Mean monthly air temperature (a), and mean monthly rainfall (b) of three weather stations nearest to the mid, high and low site. Error bars on (b) represent the standard error.  Data presented here were recorded between 01/01/2023 and 01/01/2026, by the three nearest weather stations at similar elevations to the low, mid and high site. The weather station at 2000 m a.s.l.  (Witseieshoek station) is 35 km from the low site, the weather station at 2500 m a.s.l. (Sentinel car park station) is at the mid site, and the weather station at 3000 m a.s.l. (Alpine base station) is 56 km from the high site. Weather stations are managed by the African mountain Research Foundation (https://africanmountainresearch.com/the-solutions/our-data/).
 
 #import weather station data
 scarpark <- read_csv("All_data/weather station data/Sentinel_carpark_daily_2023-2025.csv") |> 
@@ -1157,22 +1157,56 @@ alpbase <- read_csv("All_data/weather station data/Alpine_base_daily_2023-2025.c
 wd <- alpbase |> 
   bind_rows(scarpark)
 
-temp_line <- wd |> 
-  mutate(month = month(Date, label = TRUE)) |> 
+temp_long <- wd |> 
+  mutate(month = month(Date, label = TRUE), year = year(Date)) |> 
+  filter(!year == 2026) |> 
+  group_by(stationID, year, month) |> 
+  summarise(across(c(mean_temp = AirTemp_mean, #monthly means
+                     min_temp  = AirTemp_min, 
+                     max_temp  = AirTemp_max),
+                   ~ mean(.x, na.rm = TRUE)),
+            .groups = "drop") |> 
   group_by(stationID, month) |> 
-  summarise(mean_temp = mean(AirTemp_mean, na.rm = T), 
-            min_temp = mean(AirTemp_min, na.rm = T), 
-            max_temp = mean(AirTemp_max, na.rm = T)) |>
-  pivot_longer(cols = c("mean_temp", "min_temp", "max_temp"), names_to = "metric", values_to = "value") |> 
-  ggplot(aes(y = value, x = month, color = metric, group = metric)) +
-  geom_line()+
-  geom_point()+
-  facet_wrap(~stationID)+
-  scale_color_manual(values = c("red", "darkgrey", "blue"), labels = c("max_temp" = "maximum temperature","mean_temp"  ="mean_temperature", "min_temp" = "minimum_temperature"))+
-  labs(x = " ", y = "Mean air \ntemperature (°C)")+
+  summarise(n_years       = n(), #compute mean and se for each mean metric accross 3 years
+            
+            mean_temp_3yr = mean(mean_temp, na.rm = TRUE),
+            mean_temp_sd  = sd(mean_temp,   na.rm = TRUE),
+            mean_temp_se  = mean_temp_sd / sqrt(n_years),
+            
+            min_temp_3yr  = mean(min_temp, na.rm = TRUE),
+            min_temp_sd   = sd(min_temp,   na.rm = TRUE),
+            min_temp_se   = min_temp_sd / sqrt(n_years),
+            
+            max_temp_3yr  = mean(max_temp, na.rm = TRUE),
+            max_temp_sd   = sd(max_temp,   na.rm = TRUE),
+            max_temp_se   = max_temp_sd / sqrt(n_years),
+            .groups = "drop")|> 
+  rename_with(~ sub("_3yr$", "_avg", .x)) |>        # mean_temp_3yr -> mean_temp_avg
+  pivot_longer(
+    cols = matches("^(mean|min|max)_temp_(avg|sd|se)$"),
+    names_to = c("metric", ".value"),
+    names_pattern = "^(mean|min|max)_temp_(avg|sd|se)$"
+  ) |> 
+  mutate(metric = factor(metric, levels = c("max", "mean", "min"))) 
+
+
+temp_line <-   ggplot(temp_long, aes(x = month, y = avg, color = metric, group = metric)) +
+  geom_errorbar(aes(ymin = avg - se, ymax = avg + se), width = 0.2) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ stationID) +
+  scale_color_manual(
+    values = c(max = "red", mean = "darkgrey", min = "blue"),
+    labels = c(max = "maximum temperature",
+               mean = "mean temperature",
+               min = "minimum temperature")
+  ) +
+  labs(x = NULL, y = "Mean air \ntemperature (°C)") +
   theme_bw() +
-  theme(panel.grid = element_blank(), legend.title = element_blank(),
-        axis.text.x = element_text(angle = 45), legend.position = "top")
+  theme(panel.grid = element_blank(),
+        legend.title = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "top")
 
 
 rain_bar <- wd |> 
@@ -1190,7 +1224,7 @@ rain_bar <- wd |>
          upper = mean_rain + se) |> 
   ggplot(aes(y = mean_rain, x = month)) +
   geom_bar(stat = "identity", fill = "lightgrey") +
-  geom_errorbar(aes(ymin = lower, ymax = upper)) +
+  geom_errorbar(aes(ymin = lower, ymax = upper, width = 0.5)) +
   facet_wrap(~stationID)+
   labs(x = " ", y = "Mean rainfall (mm)")+
   theme_bw() +
