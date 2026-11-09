@@ -1379,7 +1379,7 @@ diff_summary |>
 #| echo: false
 #| results: false
 #| label: fig-env-cv
-#| fig-cap: The coefficient of variation of micro-environmental variables across the grids in each site. 
+#| fig-cap: The coefficient of variation of micro-environmental variables across the grids at the low, mid and high site.
 
 CV_variables <- env2 |> 
   group_by(site) |> 
@@ -1438,9 +1438,10 @@ ele_model_results <- expand_grid(null_model = c("C5 entire pool", "C2 site pool"
                                 C2_SES_ele_Rsq$log_LDMC[2],C2_SES_ele_Rsq$SLA[2]))
 
 ele_results_table <- ele_model_results |> 
+  select(!conditional_R_squared)
   mutate(F_value = round(F_value, digits = 3), 
          p_value = round(p_value, digits = 3), 
-         marginal_R_squared = round(marginal_R_squared, digits = 3), 
+         marginal_R_squared = round(marginal_R_squared, digits = 3),
          null_model = replace_values(null_model, "C5 entire pool" ~ "Regional site shuffle model", 
                                      "C2 site pool" ~ "Local species shuffle model")) |> 
   flextable() |> 
@@ -1448,8 +1449,7 @@ ele_results_table <- ele_model_results |>
                     trait = "Trait", 
                     F_value = "F value", 
                     p_value = "p value", 
-                    marginal_R_squared = "marginal R\u00B2", 
-                    conditional_R_squared = "conditional R\u00B2") |> 
+                    marginal_R_squared = "marginal R\u00B2") |> 
   align(j = 1:5, align = "center", part = "all") |>
   fontsize(size = 12, part = "all") |> 
   theme_vanilla() |> 
