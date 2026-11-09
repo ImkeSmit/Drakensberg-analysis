@@ -1242,6 +1242,8 @@ weather_comb
 #| warning: false
 #| echo: false
 #| results: false
+#| fig-width: 6.5
+#| fig-height: 8
 #| label: fig-env-heterogeneity
 #| fig-cap: Scatterplot showing how micro-environmental variables vary with distance in the sampling grids. The filled symbols show the maximum difference in a micro-environmental variable between cells at increasing distances from each other. The empty symbols show the mean difference in a micro-environmental variable between cells at increasing distances from each other. Differences are absolute values. Mean and maximum differences were calculated across all grids in all sites. 
 
