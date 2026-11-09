@@ -1360,8 +1360,8 @@ difference_plot <- ggplot(diff_summary) +
         legend.title = element_blank(),
         strip.background = element_blank(), 
         strip.text.y.right = element_text(angle = 0), 
-        axis.title = element_text(size = 10), axis.text = element_text(size = 9), 
-        strip.text = element_text(size = 10), legend.text = element_text(size = 10))
+        axis.title = element_text(size = 11), axis.text = element_text(size = 10), 
+        strip.text = element_text(size = 11), legend.text = element_text(size = 11))
 
 difference_plot
 
@@ -1464,7 +1464,7 @@ ele_results_table
 
 ```{r}
 #| label: tbl-ele-RaoQ-CWM-results
-#| tbl-cap: Model results from linear mixed effect models testing whether the RaoQ and CWM of traits vary with elevation. The F ratio and p value test the hypothesis that there is no difference between the mean of cell-level CWM or RaoQ of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
+#| tbl-cap: Model results from linear mixed effect models testing whether the RaoQ and CWM of traits vary with elevation. The F value and p value test the hypothesis that there is no difference between the mean of cell-level CWM or RaoQ of the low, mid and high elevation. The marginal $R^2$ is the variation explained by elevation, excluding the variation explained by the random effect, grid. 
 #| message: false
 #| echo: false
 
@@ -1515,15 +1515,15 @@ RaoQ_results_table
 R2_microenv_table <- C2_R2_table_long |> 
   bind_rows(C5_R2_table_long) |> 
   select(null_model, trait, metric, R2, site) |> 
-  mutate(metric = replace_when(metric, grepl("R2M", metric) ~ "Marginal R2", 
-                               grepl("R2C", metric) ~ "Conditional R2"), 
+  mutate(metric = replace_when(metric, grepl("R2M", metric) ~ "Marginal R\u00B2", 
+                               grepl("R2C", metric) ~ "Conditional R\u00B2"), 
          null_model = replace_values(null_model, "C5" ~ "Local site shuffle model", 
                                      "C2" ~ "Local species shuffle model"), 
          trait = replace_values(trait, "Height_cm" ~ "Plant height", 
                                 "Leaf_area_mm2" ~ "LA")) |> 
   pivot_wider(id_cols = c("null_model", "trait", "metric"), names_from = "site", values_from = "R2") |> 
   arrange(null_model, trait,
-          factor(metric, levels = c("Marginal R2", "Conditional R2"))) |> 
+          factor(metric, levels = c("Marginal R\u00B2", "Conditional R\u00B2"))) |> 
   flextable() |> 
   set_header_labels(null_model = "Null model", 
                     trait = "Trait", 
