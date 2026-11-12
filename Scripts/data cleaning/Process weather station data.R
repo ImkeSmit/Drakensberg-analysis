@@ -5,6 +5,44 @@ library(lubridate)
 library(ggplot2)
 
 ###Witsieshoek weather station, behind WH mountain lodge####
+#Import daily data from multiple years
+
+witsies_longtime <- read.csv("All_data\\weather station data\\UFS2_Witsies_TableDay.dat-upto Oct 2026.csv", sep = ";", header = FALSE, row.names = NULL)
+colnames(witsies_longtime) <- c(witsies_longtime[2,])
+witsies_longtime <- witsies_longtime[-c(1:4), ]
+
+witsies_daily <- witsies_longtime |> 
+  tibble() |> 
+  mutate(
+    TIMESTAMP = ymd_hm(TIMESTAMP, tz = "Africa/Johannesburg"),
+    across(AirTemp_Avg:Rain_Tot, as.numeric),
+    Date = as_date(TIMESTAMP)) |> 
+  rename(AirTemp_mean = AirTemp_Avg, 
+         AirTemp_max = AirTemp_Max, 
+         AirTemp_min = AirTemp_Min)
+
+ggplot(witsies_daily, aes(y = AirTemp_max, x = Date)) +
+  geom_point()
+
+ggplot(witsies_daily, aes(y = AirTemp_min, x = Date)) +
+  geom_point()
+
+ggplot(witsies_daily, aes(y = AirTemp_mean, x = Date)) +
+  geom_point()
+
+|>
+  filter(AirTemp_Avg > -15) |>
+  filter(!between(Date, as_date("2025-05-01"), as_date("2025-07-10"))) |> #takes no measurements here
+  group_by(Date) |> 
+  summarise(
+    AirTemp_mean = mean(AirTemp_Avg, na.rm = TRUE),
+    AirTemp_min  = min(AirTemp_Avg, na.rm = TRUE),
+    AirTemp_max  = max(AirTemp_Avg, na.rm = TRUE),
+    Rain_total   = sum(Rain_Tot, na.rm = TRUE),
+    n_obs        = n())
+
+
+
 witsies <- read.delim("All_data\\weather station data\\Witsieshoek_lodge_daily_21May.txt", sep = ",", header = F, row.names = NULL) 
 
 colnames(witsies) <- c("Timestamp","StationID","WSpd_Min","WSpd_TMn",          
