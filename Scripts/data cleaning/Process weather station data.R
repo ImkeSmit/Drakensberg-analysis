@@ -15,11 +15,14 @@ witsies_daily <- witsies_longtime |>
   tibble() |> 
   mutate(
     TIMESTAMP = ymd_hm(TIMESTAMP, tz = "Africa/Johannesburg"),
-    across(AirTemp_Avg:Rain_Tot, as.numeric),
+    across(WSpd_Min:Rain_Tot, as.numeric),
     Date = as_date(TIMESTAMP)) |> 
+  filter(between(Date, as_date("2023-01-01"), as_date("2025-12-31"))) |> 
   rename(AirTemp_mean = AirTemp_Avg, 
          AirTemp_max = AirTemp_Max, 
-         AirTemp_min = AirTemp_Min)
+         AirTemp_min = AirTemp_Min)|>
+  filter(AirTemp_min > -15) |> 
+  select(Date, AirTemp_min, AirTemp_mean, AirTemp_max, Rain_Tot)
 
 ggplot(witsies_daily, aes(y = AirTemp_max, x = Date)) +
   geom_point()
@@ -30,61 +33,10 @@ ggplot(witsies_daily, aes(y = AirTemp_min, x = Date)) +
 ggplot(witsies_daily, aes(y = AirTemp_mean, x = Date)) +
   geom_point()
 
-|>
-  filter(AirTemp_Avg > -15) |>
-  filter(!between(Date, as_date("2025-05-01"), as_date("2025-07-10"))) |> #takes no measurements here
-  group_by(Date) |> 
-  summarise(
-    AirTemp_mean = mean(AirTemp_Avg, na.rm = TRUE),
-    AirTemp_min  = min(AirTemp_Avg, na.rm = TRUE),
-    AirTemp_max  = max(AirTemp_Avg, na.rm = TRUE),
-    Rain_total   = sum(Rain_Tot, na.rm = TRUE),
-    n_obs        = n())
+ggplot(witsies_daily, aes(y = Rain_Tot, x = Date)) +
+  geom_point()
 
-
-
-witsies <- read.delim("All_data\\weather station data\\Witsieshoek_lodge_daily_21May.txt", sep = ",", header = F, row.names = NULL) 
-
-colnames(witsies) <- c("Timestamp","StationID","WSpd_Min","WSpd_TMn",          
-                        "WSpd_Max","WSpd_TMx","WSpd_Avg","WSpd_Std","WDir_Avg",          
-                        "WDir_Std","AirTemp_Min","AirTemp_TMn","AirTemp_Max","AirTemp_TMx",       
-                        "AirTemp_Avg","RH_Min","RH_TMn","RH_Max","RH_TMx",            
-                        "DewPointTemp_Min","DewPointTemp_TMn","DewPointTemp_Max","DewPointTemp_TMx","DewPointTemp_Avg",  
-                        "SlrW_Max","SlrW_TMx","SlrW_Avg","SlrMJ_Tot","Rain_Tot",          
-                        "BPress_Min","BPress_TMn","BPress_Max","BPress_TMx","BPress_Avg",        
-                        "LoggerSerialNumber","ProgramName","ProgramSignature","LoggerBattery_Min","LoggerBattery_TMn", 
-                        "LoggerBattery_Max","LoggerBattery_TMx","LoggerBattery_Avg","LoggerTemp_Min","LoggerTemp_TMn",    
-                        "LoggerTemp_Max","LoggerTemp_TMx","LoggerTemp_Avg","LoggerLithiumBatt","PingTime_Avg",      
-                        "ScanCount","ETos","Rso","SunHrs_Tot","WC_C_Min",          
-                        "WC_C_TMn")
-
-witsies <- witsies[-c(1:4),]
-
-#witsies2 <- witsies |> #the scancount column was separated into two because there is a comma in the value.
-#  mutate(ScanCount = paste(ScanCount, ETos)) |> 
-#  select(!ETos) 
-#colnames(witsies2)[51:55] <- c("ETos","Rso","SunHrs_Tot","WC_C_Min",          
-#                              "WC_C_TMn")
-#fix the date format
-witsies2 <- witsies |> 
-  mutate(Timestamp = gsub('"', '', Timestamp)) |> 
-  mutate(Timestamp = ymd_hms(Timestamp))
-
-#date range
-range(witsies2$Timestamp) #"2025-05-22 UTC" "2026-05-21 UTC"
-
-#mean daily temperature
-mat_witsies <- witsies2 |> 
-  mutate(AirTemp_Avg = as.numeric(AirTemp_Avg)) |> 
-  filter(!is.na(AirTemp_Avg)) |> 
-  summarise(mat = mean(AirTemp_Avg)) #11.67479
-
-#annual rainfall
-Rai_witsies <- witsies2 |> 
-  mutate(Rain_Tot = as.numeric(Rain_Tot)) |> 
-  filter(!is.na(Rain_Tot)) |> 
-  summarise(rai = sum(Rain_Tot)) #1309.8
-
+write.csv(witsies_daily, "All_data\\weather station data\\Witsieshoek_daily_2023-2025.csv")
 
 
 ####Sentinel car park####
