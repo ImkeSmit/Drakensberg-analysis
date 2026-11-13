@@ -407,16 +407,19 @@ All three sites were located on basaltic bedrock. The low site falls within the 
 #| echo: false
 #| results: hide
 #import weather station data
-witsies <- read_csv("All_data/weather station data/Sentinel_carpark_daily_2023-2025.csv") |> 
+witsies <- read_csv("All_data/weather station data/Witsieshoek_daily_2023-2025.csv") |> 
   mutate(stationID = "2000 m a.s.l.")
 
 scarpark <- read_csv("All_data/weather station data/Sentinel_carpark_daily_2023-2025.csv") |> 
-  mutate(stationID = "2500 m a.s.l.")
+  mutate(stationID = "2500 m a.s.l.") |> 
+  select(!n_obs)
 
-alpbase <- read_csv("All_data/weather station data/Alpine_base_daily_2023-2025.csv") |> mutate(stationID = "3000 m a.s.l.")
+alpbase <- read_csv("All_data/weather station data/Alpine_base_daily_2023-2025.csv") |> mutate(stationID = "3000 m a.s.l.") |> 
+  select(!n_obs)
 
 wd <- alpbase |> 
-  bind_rows(scarpark)
+  bind_rows(scarpark) |> 
+  bind_rows(witsies)
 
 #mean summer temperatures
 mean_summer_t<- wd |> 
