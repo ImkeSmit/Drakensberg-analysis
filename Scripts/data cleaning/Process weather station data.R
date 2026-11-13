@@ -20,9 +20,10 @@ witsies_daily <- witsies_longtime |>
   filter(between(Date, as_date("2023-01-01"), as_date("2025-12-31"))) |> 
   rename(AirTemp_mean = AirTemp_Avg, 
          AirTemp_max = AirTemp_Max, 
-         AirTemp_min = AirTemp_Min)|>
+         AirTemp_min = AirTemp_Min, 
+         Rain_total = Rain_Tot)|>
   filter(AirTemp_min > -15) |> 
-  select(Date, AirTemp_min, AirTemp_mean, AirTemp_max, Rain_Tot)
+  select(Date, AirTemp_min, AirTemp_mean, AirTemp_max, Rain_total)
 
 ggplot(witsies_daily, aes(y = AirTemp_max, x = Date)) +
   geom_point()
