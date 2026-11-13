@@ -1154,13 +1154,6 @@ Data collection for this project was funded by the National Research Foundation 
 #| label: fig-aws
 #| fig-cap: Mean monthly air temperature (a), and mean monthly rainfall (b) of three weather stations nearest to the mid, high and low site. Error bars on represent the confidence interval of the mean.  Data presented here were recorded between 01/01/2023 and 31/12/2025, by the three nearest weather stations at similar elevations to the low, mid and high site. The weather station at 2000 m a.s.l.  (Witsieshoek Station, https://doi.org/10.15493/ARU.17678287) is 35 km from the low site, the weather station at 2500 m a.s.l. (Sentinel Car Park station, https://doi.org/10.15493/ARU.44042026) is at the mid site, and the weather station at 3000 m a.s.l. (Alpine Base Station, https://doi.org/10.15493/ARU.35804783) is 56 km from the high site.
 
-#import weather station data
-scarpark <- read_csv("All_data/weather station data/Sentinel_carpark_daily_2023-2025.csv") |> 
-  mutate(stationID = "2500 m a.s.l.")
-alpbase <- read_csv("All_data/weather station data/Alpine_base_daily_2023-2025.csv") |> mutate(stationID = "3000 m a.s.l.")
-
-wd <- alpbase |> 
-  bind_rows(scarpark)
 
 temp_long <- wd |> 
   mutate(month = month(Date, label = TRUE), year = year(Date)) |> 
@@ -1239,6 +1232,8 @@ rain_bar <- wd |>
 weather_comb <- ggarrange(temp_line, rain_bar, ncol = 1, nrow = 2, labels = c("a", "b"))
 
 weather_comb
+
+ggsave(plot = weather_comb, path = "Figures", filename = "sites_weather.png")
 
 ```
 
