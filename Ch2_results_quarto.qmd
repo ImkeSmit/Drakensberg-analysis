@@ -1233,7 +1233,7 @@ weather_comb <- ggarrange(temp_line, rain_bar, ncol = 1, nrow = 2, labels = c("a
 
 weather_comb
 
-ggsave(plot = weather_comb, path = "Figures", filename = "sites_weather.png")
+ggsave(plot = weather_comb, path = "Figures", filename = "sites_weather.png", height = 1800, width = 2100, units = "px")
 
 ```
 
